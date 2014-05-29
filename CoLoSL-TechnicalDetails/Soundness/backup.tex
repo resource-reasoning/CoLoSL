@@ -1,0 +1,590 @@
+%\newpage	
+%\begin{lemma}[]\label{lem:amodWitness}
+%%
+%\[
+%\begin{array}{l}
+%	\for{s, s_0 \LState}\for{\amod{}, \amod{0} \in \AMods}\for{F,F_0 \in \pset{\LState}}\\
+%	\hspace*{0.2cm} \exsts{s'} s \composeL s_0 = s' \;\land\; s \in F \;\land\; s_0 \in F_0\;\land\; F \strictfences \amod{} \;\land\; F_0 \strictfences \amod{0} \;\land; \dom{\amod{}} \disjoint \dom{\amod{0}}\\
+%	\hspace*{3cm}\implies\\
+%	\exsts{\amod{}', F'} s \composeL s_0 \in F' \;\land\; F' \strictfences \amod{}' \;\land\; \extendsAM{\amod{}'}{s_0}{s}{\amod{0}} \;\land\\
+%	\hspace*{0.5cm} \for{l, r, \amod{1}} l \composeL r = s \;\land\;  \extendsAM{\amod{}}{l}{r}{\amod{1}} \implies \extendsAM{\amod{}'}{l}{r \composeL s_0}{\amod{1}}
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%Pick $F \in \pset{\LState}$ such that:
+%%
+%\[
+%	F' \eqdef
+%	\left\{
+%		f_0 \composeL  f \;|\;
+%		f_0 \in F_0 \;\land\; f \in F
+%	\right\}
+%\]
+%%
+%Pick $\amod{}'', \amod{0}'' \in \AMods$ such that for each $\ca{} \in \Caps$:
+%%
+%\[
+%\amod{}''(\ca{}) =
+%\left\{
+%	\begin{array}{l | l}
+%		(s_1 \composeL d \composeL f_0, s_2 \composeL d \composeL f_0)
+%		&
+%		\begin{array}{l}
+%			\hspace*{-0.2cm} \exsts{f' \in F'} \exsts{f \in F, \cdots, f_0 \in F_0}\\
+%			f' = f \composeL f_0\\
+%			(s_1 \composeL c, s_2 \composeL c) \in \amod{}(\ca{})\\
+%			\for{s'} s' \leq s_1 \;\land\; s' \leq s_2 \implies s' = \unitL\\
+%			s_1 \composeL d = f \;\land\; s_1 \composeL c \leq f'\\
+%			s_2 \composeL d \composeL f_0 \hspace*{0.2cm} \text{is defined}
+%		\end{array}
+%	\end{array}
+%\right\}
+%\]
+%%
+%and
+%%
+%\[
+%\amod{0}''(\ca{}) =
+%\left\{
+%	\begin{array}{l | l}
+%		(s_1 \composeL d \composeL f, s_2 \composeL d \composeL f)
+%		&
+%		\begin{array}{l}
+%			\hspace*{-0.2cm} \exsts{f' \in F'} \exsts{f \in F, \cdots, f_0 \in F_0}\\
+%			f' = f \composeL f_0\\
+%			(s_1 \composeL c, s_2 \composeL c) \in \amod{0}(\ca{})\\
+%			\for{s'} s' \leq s_1 \;\land\; s' \leq s_2 \implies s' = \unitL\\
+%			s_1 \composeL d = f_0 \;\land\; s_1 \composeL c \leq f'\\
+%			s_2 \composeL d \composeL f \hspace*{0.2cm} \text{is defined}
+%		\end{array}
+%	\end{array}
+%\right\}
+%\]
+%%
+%Let 
+%%
+%\begin{align}
+%	\amod{}' = \amod{}'' \cup \amod{0}'' \label{LAW:Ass1}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Pick an arbitrary $F, F_0, s, s_0, \amod{}, \amod{0}$ and\\
+%\textbf{Assume:}
+%%
+%\begin{align}
+%	& \exsts{s'} s \composeL  s_0 = s' \label{LAW:Ass2}\\
+%	& \dom{\amod{}} \disjoint \dom{\amod{0}} \label{LAW:Ass3}\\
+%	& s_0 \in F_0  \;\land\; F_0 \strictfences \amod{0} \;\land\; s \in F  \;\land\; F \strictfences \amod{} \label{LAW:Ass4}
+%\end{align}
+%%
+%\noindent\textbf{Show}
+%\begin{align}
+%	&s \composeL s_0 \in F' \label{LAW:Goal1} \\
+%	& F' \strictfences \amod{}' \label{LAW:Goal2}\\
+%	& \extendsAM{\amod{}'}{s_0}{s}{\amod{0}} \label{LAW:Goal3}\\
+%	& \for{l, r, \amod{1}} l \composeL r = s \;\land\;  \extendsAM{\amod{}}{l}{r}{\amod{1}} \implies \extendsAM{\amod{}'}{l}{r \composeL s_0}{\amod{1}} \label{LAW:Goal4}
+%\end{align}
+%%
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal1})}\\
+%This follows trivially from (\ref{LAW:Ass4}).\\
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal3})}\\
+%\begin{proof}
+%By induction on the number of steps $m$.\\
+%
+%\noindent\textbf{Base Case}\\
+%\textbf{RTS. } $\extendsAMUpto{\amod{}'}{0}{s_0}{s}{\amod{0}}$\\
+%This holds trivially by definition of $\amod{}'\downarrow_{0}$.\\
+%
+%\noindent\textbf{Inductive Case}\\
+%\textbf{Assume}
+%\begin{align}
+%	\begin{array}{l }
+%		\exsts{s'} s \composeL s_0 = s' \\
+%	  \land\; \dom{\amod{0}} \disjoint \dom{\amod{}} \\
+%	  \land\;  s_0 \in F_0  \;\land\; s \in F \;\land\; F_0 \strictfences \amod{0} \;\land\; F \strictfences \amod{} \\
+%	  \hspace*{3cm} \implies\\
+%	  \extendsAMUpto{\amod{}'}{m-1}{s_0}{s}{\amod{0}}
+%	\end{array} \tag{I.H} \label{LAW:I.H}
+%\end{align}
+%\textbf{Show } 
+%\begin{align}
+%	&\begin{array}{l}
+%		\for{\ca{}, c, d, s_3, s_4}\for{(s_1 \composeL e, s_2 \composeL e) \in \amod{0}(\ca{})} \\
+%	\hspace*{0.2cm}\left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \;\land\; s_1 \composeL e \leq  s \composeL s_0 \implies\\
+%	\hspace*{0.4cm} s_1 = s_3 \composeL s_4 \;\land\; s_1 \maxMeetL s_0 = s_3 \;\land\\
+%	\hspace*{0.4cm} s_0 = s_3 \composeL c \;\land\; s = s_4 \composeL d \\
+%	\hspace*{1cm}\implies\\
+%	\left((s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \land
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}}\right)\\
+%	\lor\; s_2 \composeL c \composeL d \text{ is undefined}
+%	\end{array} \label{LAW:Goal5} \\\nonumber\\
+%	&\begin{array}{l}
+%		\for{\ca{}} \for{(s_1, s_2) \in \amod{}'(\ca{})} s_1 = s \composeL s_0 \;\implies\\
+%	  \hspace*{0.5cm}\exsts{l_0, l'_0, c, c_0} \\
+%	  \hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) 
+%	  \end{array}\\
+%	  \hspace*{2cm}\lor  \\
+%		\hspace*{0.5cm}\exsts{r'} s_2 = s_0 \composeL r' \;\land\; \extendsAMUpto{\amod}{(m-1)}{s_0}{r'}{\amod{0}}
+%	\end{array} \label{LAW:Goal6}
+%\end{align}
+%%
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal5})} \\
+%Pick an arbitrary $\ca{}, c, d, s_3, s_4, s_1, s_2, e$ such that:
+%%
+%\begin{align}
+%	& (s_1 \composeL e, s_2 \composeL e) \in \amod{i}(\ca{}) \label{LAW:Ass5} \\
+%	& \left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \label{LAW:Ass6}\\
+%	& s_1 \composeL e \leq  s \composeL s_0 \label{LAW:Ass7}\\
+%	& s_1 = s_3 \composeL s_4 \label{LAW:Ass8}\\
+%	& s_1 \maxMeetL s_0 = s_3 \label{LAW:Ass9}\\
+%	& s_0 = s_3 \composeL c \label{LAW:Ass10}\\
+%	& s = s_4 \composeL d \label{LAW:Ass11}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass4}) we know that $s_1 \leq s_0$ and consequently from (\ref{LAW:Ass8})-(\ref{LAW:Ass11}) and definition of $\maxMeetL$ we have:
+%%
+%\begin{align}
+%\begin{array}{l}
+%	s_3 = s_1 \\
+%	s_4 = \unitL\\
+%	s = d
+%\end{array} \label{LAW:Ass12}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Consequently, from (\ref{LAW:Ass1}), (\ref{LAW:Ass4})-(\ref{LAW:Ass7}), (\ref{LAW:Ass10}) and (\ref{LAW:Ass12}) we have:
+%%
+%\begin{align}
+%	(s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined} \label{LAW:Ass13}
+%\end{align}
+%%
+%On the other hand, from (\ref{LAW:Ass4}), (\ref{LAW:Ass5}), (\ref{LAW:Ass8}), (\ref{LAW:Ass10}), (\ref{LAW:Ass12}) and definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	s_2 \composeL c \in F_0 \label{LAW:Ass14}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass3}), (\ref{LAW:Ass4}), (\ref{LAW:Ass12})-(\ref{LAW:Ass14}) and (\ref{LAW:I.H}) we have:
+%%
+%\begin{align}
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \label{LAW:Ass15}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Finally from (\ref{LAW:Ass13}) and (\ref{LAW:Ass15}) we have:
+%%
+%\begin{align}
+%\begin{array}{l}
+%	(s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}}\\
+%	\;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined}
+%\end{array} \nonumber
+%\end{align}
+%%(\ref{LAW:Ass})
+%as required.\\
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal6})}\\
+%Pick an arbitrary $\ca{}, s_1, s_2$ such that:
+%%
+%\begin{align}
+%	(s_1, s_2) \in \amod{}'(\ca{}) \label{LAW:Ass16}\\
+%	s_1 = s \composeL s_0 \label{LAW:Ass17}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Then from (\ref{LAW:Ass1}), (\ref{LAW:Ass13}), (\ref{LAW:Ass16}) and (\ref{LAW:Ass17}) we have:
+%%
+%\begin{align}
+%	\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{0}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s_0 \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s\\
+%		& \hspace*{1cm}\lor\\
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s_0 \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s_0
+%	\end{array} \label{LAW:Ass18}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Thus there are two cases to consider:\\
+%
+%\noindent\textbf{Case 1. }
+%%
+%\[
+%	\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s_0 \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s_0
+%	\end{array} 
+%\]
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass4}), (\ref{LAW:Ass18}) and definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	l'_0 \composeL d \in F \label{LAW:Ass19}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Let $r' = l'_0 \composeL d $. Then from (\ref{LAW:Ass18}) we have:
+%%
+%\begin{align}
+%	\exsts{r'} s_2 = s_0 \composeL r' \label{LAW:Ass20}
+%\end{align}
+%%
+%From (\ref{LAW:Ass3}), (\ref{LAW:Ass4}), (\ref{LAW:Ass19}), (\ref{LAW:Ass20}) and (\ref{LAW:I.H}) we have:
+%%
+%\begin{align}
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_0}{r'}{\amod{0}} \label{LAW:Ass21}
+%\end{align}
+%%(\ref{LAW:Ass})
+%and consequently from (\ref{LAW:Ass20}) and (\ref{LAW:Ass21}) we have:
+%%
+%\begin{align}
+%	\exsts{r'} s_2 = s_0 \composeL r' \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s_0}{r'}{\amod{0}} \label{LAW:Ass22}
+%\end{align}\\
+%%(\ref{LAW:Ass})
+%
+%\noindent\textbf{Case 2. }
+%%
+%\[
+%\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{0}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s_0 \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s
+%	\end{array}
+%\]
+%%
+%Let 
+%%%
+%%\begin{align}
+%%	e = l_1 \composeL \cdots \composeL l_{j-1} \composeL l_{j+1} \composeL \cdots \composeL l_n \label{LAW:Ass23}
+%%\end{align}
+%%%
+%Then from assumption of the case we have:
+%%
+%\begin{align}
+%	\begin{array}{l l}
+%		\exsts{c_0}  & l_0 \composeL c \composeL c_0 = l_0 \composeL d \composeL s\\
+%		& s_1 = l_0 \composeL d \composeL s\\
+%		& s_2 = l'_0 \composeL d \composeL s
+%	\end{array} \label{LAW:Ass24}
+%\end{align}
+%%
+%Consequently from the cancellativity of separation algebras we have:
+%%
+%\begin{align}
+%	c \composeL c_0 = d \composeL s \label{LAW:Ass25}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass18}), (\ref{LAW:Ass24}), (\ref{LAW:Ass25}) and assumption of case 2 we have:
+%%
+%\begin{align}
+%	\begin{array}{l}
+%		\exsts{l_0, l'_0, c, c_0} \\
+%  	\hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) 
+%	  \end{array} 
+%	\end{array} \label{LAW:Ass26}  
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass22}) and (\ref{LAW:Ass26}) we have:
+%%
+%\begin{align}
+%	\begin{array}{l}
+%		\exsts{l_0, l'_0, c, c_0} \nonumber\\
+%  	\hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) \\ 	
+%	  \end{array} \\
+%	  \hspace*{3cm}\lor\\
+%	  \exsts{r'} s_2 = s \composeL r' \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s}{r'}{\amod{0}}
+%	\end{array} \nonumber
+%\end{align}
+%%(\ref{LAW:Ass})
+%as required.
+%\renewcommand{\qed}{}
+%\end{proof}
+%
+%
+%
+%
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal4})}\\
+%Pick an arbitrary $l, r, \amod{1}$ such that 
+%\begin{align}
+%	l \composeL r = s \label{LAW2:Ass1}\\
+%	\for{n \in \Nats}\extendsAMUpto{\amod{}}{n}{l}{r}{\amod{1}}\label{LAW2:Ass2}
+%\end{align}
+%%
+%Show
+%%
+%\begin{equation}
+%	\extendsAM{\amod{}'}{l}{r \composeL s_0}{\amod{1}} \nonumber
+%\end{equation}
+%%
+%\begin{proof}
+%By induction on the number of steps $m$.\\
+%
+%\noindent\textbf{Base Case}\\
+%\textbf{RTS. } $\extendsAMUpto{\amod{}'}{0}{l}{r \composeL s_0}{\amod{1}}$\\
+%This holds trivially by definition of $\amod{}'\downarrow_{0}$.\\
+%
+%\noindent\textbf{Inductive Case}\\
+%\textbf{Assume}
+%\begin{align}
+%	\begin{array}{l }
+%		\exsts{s'} s \composeL s_0 = s' \\
+%	  \land\; \dom{\amod{0}} \disjoint \dom{\amod{}} \\
+%	  \land\;  s_0 \in F_0  \;\land\; s \in F \;\land\; F_0 \strictfences \amod{0} \;\land\; F \strictfences \amod{} \\
+%	  \hspace*{3cm} \implies\\
+%	  \extendsAMUpto{\amod{}'}{m-1}{s_0}{s}{\amod{0}}
+%	\end{array} \tag{I.H} \label{LAW:I.H}
+%\end{align}
+%\textbf{Show } 
+%\begin{align}
+%	&\begin{array}{l}
+%		\for{\ca{}, c, d, s_3, s_4}\for{(s_1 \composeL e, s_2 \composeL e) \in \amod{0}(\ca{})} \\
+%	\hspace*{0.2cm}\left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \;\land\; s_1 \composeL e \leq  s \composeL s_0 \implies\\
+%	\hspace*{0.4cm} s_1 = s_3 \composeL s_4 \;\land\; s_1 \maxMeetL s_0 = s_3 \;\land\\
+%	\hspace*{0.4cm} s_0 = s_3 \composeL c \;\land\; s = s_4 \composeL d \\
+%	\hspace*{1cm}\implies\\
+%	\left((s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \land
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}}\right)\\
+%	\lor\; s_2 \composeL c \composeL d \text{ is undefined}
+%	\end{array} \label{LAW:Goal5} \\\nonumber\\
+%	&\begin{array}{l}
+%		\for{\ca{}} \for{(s_1, s_2) \in \amod{}'(\ca{})} s_1 = s \composeL s_0 \;\implies\\
+%	  \hspace*{0.5cm}\exsts{l_0, l'_0, c, c_0} \\
+%	  \hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) 
+%	  \end{array}\\
+%	  \hspace*{2cm}\lor  \\
+%		\hspace*{0.5cm}\exsts{r'} s_2 = s_0 \composeL r' \;\land\; \extendsAMUpto{\amod}{(m-1)}{s_0}{r'}{\amod{0}}
+%	\end{array} \label{LAW:Goal6}
+%\end{align}
+%%
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal5})} \\
+%Pick an arbitrary $\ca{}, c, d, s_3, s_4, s_1, s_2, e$ such that:
+%%
+%\begin{align}
+%	& (s_1 \composeL e, s_2 \composeL e) \in \amod{i}(\ca{}) \label{LAW:Ass5} \\
+%	& \left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \label{LAW:Ass6}\\
+%	& s_1 \composeL e \leq  s \composeL s_0 \label{LAW:Ass7}\\
+%	& s_1 = s_3 \composeL s_4 \label{LAW:Ass8}\\
+%	& s_1 \maxMeetL s_0 = s_3 \label{LAW:Ass9}\\
+%	& s_0 = s_3 \composeL c \label{LAW:Ass10}\\
+%	& s = s_4 \composeL d \label{LAW:Ass11}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass4}) we know that $s_1 \leq s_0$ and consequently from (\ref{LAW:Ass8})-(\ref{LAW:Ass11}) and definition of $\maxMeetL$ we have:
+%%
+%\begin{align}
+%\begin{array}{l}
+%	s_3 = s_1 \\
+%	s_4 = \unitL\\
+%	s = d
+%\end{array} \label{LAW:Ass12}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Consequently, from (\ref{LAW:Ass1}), (\ref{LAW:Ass4})-(\ref{LAW:Ass7}), (\ref{LAW:Ass10}) and (\ref{LAW:Ass12}) we have:
+%%
+%\begin{align}
+%	(s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined} \label{LAW:Ass13}
+%\end{align}
+%%
+%On the other hand, from (\ref{LAW:Ass4}), (\ref{LAW:Ass5}), (\ref{LAW:Ass8}), (\ref{LAW:Ass10}), (\ref{LAW:Ass12}) and definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	s_2 \composeL c \in F_0 \label{LAW:Ass14}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass3}), (\ref{LAW:Ass4}), (\ref{LAW:Ass12})-(\ref{LAW:Ass14}) and (\ref{LAW:I.H}) we have:
+%%
+%\begin{align}
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \label{LAW:Ass15}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Finally from (\ref{LAW:Ass13}) and (\ref{LAW:Ass15}) we have:
+%%
+%\begin{align}
+%\begin{array}{l}
+%	(s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s_2 \composeL c}{d}{\amod{0}}\\
+%	\;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined}
+%\end{array} \nonumber
+%\end{align}
+%%(\ref{LAW:Ass})
+%as required.\\
+%
+%\noindent\textbf{RTS. (\ref{LAW:Goal6})}\\
+%Pick an arbitrary $\ca{}, s_1, s_2$ such that:
+%%
+%\begin{align}
+%	(s_1, s_2) \in \amod{}'(\ca{}) \label{LAW:Ass16}\\
+%	s_1 = s \composeL s_0 \label{LAW:Ass17}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Then from (\ref{LAW:Ass1}), (\ref{LAW:Ass13}), (\ref{LAW:Ass16}) and (\ref{LAW:Ass17}) we have:
+%%
+%\begin{align}
+%	\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{0}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s_0 \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s\\
+%		& \hspace*{1cm}\lor\\
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s_0 \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s_0
+%	\end{array} \label{LAW:Ass18}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Thus there are two cases to consider:\\
+%
+%\noindent\textbf{Case 1. }
+%%
+%\[
+%	\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s_0 \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s_0
+%	\end{array} 
+%\]
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass4}), (\ref{LAW:Ass18}) and definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	l'_0 \composeL d \in F \label{LAW:Ass19}
+%\end{align}
+%%(\ref{LAW:Ass})
+%Let $r' = l'_0 \composeL d $. Then from (\ref{LAW:Ass18}) we have:
+%%
+%\begin{align}
+%	\exsts{r'} s_2 = s_0 \composeL r' \label{LAW:Ass20}
+%\end{align}
+%%
+%From (\ref{LAW:Ass3}), (\ref{LAW:Ass4}), (\ref{LAW:Ass19}), (\ref{LAW:Ass20}) and (\ref{LAW:I.H}) we have:
+%%
+%\begin{align}
+%	\extendsAMUpto{\amod{}'}{(m-1)}{s_0}{r'}{\amod{0}} \label{LAW:Ass21}
+%\end{align}
+%%(\ref{LAW:Ass})
+%and consequently from (\ref{LAW:Ass20}) and (\ref{LAW:Ass21}) we have:
+%%
+%\begin{align}
+%	\exsts{r'} s_2 = s_0 \composeL r' \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s_0}{r'}{\amod{0}} \label{LAW:Ass22}
+%\end{align}\\
+%%(\ref{LAW:Ass})
+%
+%\noindent\textbf{Case 2. }
+%%
+%\[
+%\begin{array}{l l}
+%		\exsts{c, d, l_0, l'_0} & 
+%		(l_0 \composeL c, l'_0 \composeL c) \in \amod{0}(\ca{}) \;\land\\
+%		&\for{l'} l' \leq l_0 \;\land\; l' \leq l'_0 \implies l' = \unitL  \;\land\\
+%		&l_0 \composeL d = s_0 \;\land\; l_0 \composeL c \leq s \composeL s_0  \;\land\\
+%		&s_1 = l_0 \composeL d \composeL s \;\land\\
+%		&s_2 = l'_0 \composeL d \composeL s
+%	\end{array}
+%\]
+%%
+%Let 
+%%%
+%%\begin{align}
+%%	e = l_1 \composeL \cdots \composeL l_{j-1} \composeL l_{j+1} \composeL \cdots \composeL l_n \label{LAW:Ass23}
+%%\end{align}
+%%%
+%Then from assumption of the case we have:
+%%
+%\begin{align}
+%	\begin{array}{l l}
+%		\exsts{c_0}  & l_0 \composeL c \composeL c_0 = l_0 \composeL d \composeL s\\
+%		& s_1 = l_0 \composeL d \composeL s\\
+%		& s_2 = l'_0 \composeL d \composeL s
+%	\end{array} \label{LAW:Ass24}
+%\end{align}
+%%
+%Consequently from the cancellativity of separation algebras we have:
+%%
+%\begin{align}
+%	c \composeL c_0 = d \composeL s \label{LAW:Ass25}
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass18}), (\ref{LAW:Ass24}), (\ref{LAW:Ass25}) and assumption of case 2 we have:
+%%
+%\begin{align}
+%	\begin{array}{l}
+%		\exsts{l_0, l'_0, c, c_0} \\
+%  	\hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) 
+%	  \end{array} 
+%	\end{array} \label{LAW:Ass26}  
+%\end{align}
+%%(\ref{LAW:Ass})
+%From (\ref{LAW:Ass22}) and (\ref{LAW:Ass26}) we have:
+%%
+%\begin{align}
+%	\begin{array}{l}
+%		\exsts{l_0, l'_0, c, c_0} \nonumber\\
+%  	\hspace*{1cm}
+%	  \begin{array}{l}
+%	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
+%	  	s_1 = l_0 \composeL c_0 \composeL c \;\land\; s_2 = l'_0 \composeL c_0 \composeL c  \;\land\\
+%	  	(l_0 \composeL c,\ l'_0 \composeL c) \in \amod{0}(\ca{}) \\ 	
+%	  \end{array} \\
+%	  \hspace*{3cm}\lor\\
+%	  \exsts{r'} s_2 = s \composeL r' \;\land\; \extendsAMUpto{\amod{}'}{(m-1)}{s}{r'}{\amod{0}}
+%	\end{array} \nonumber
+%\end{align}
+%%(\ref{LAW:Ass})
+%as required.
+%\renewcommand{\qed}{}
+%\end{proof}
+%
+%
+%\end{proof}
+%\end{lemma}
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%

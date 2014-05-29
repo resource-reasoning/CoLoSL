@@ -1,0 +1,36 @@
+\subsubsection*{Proof Rules}
+%
+\[
+\begin{array}{l}
+
+	\infer{
+		\vdash \{ P \}
+		\atomic{\mathbb{C}}
+	 	\{ Q \}
+	}
+	{		
+		\vdash\{p\} \mathbb{C} \{q\} & \repartitions{P}{Q}{p}{q} 
+	}	\\\\\\
+
+%  \shared{P \sepish Q}{I} \iff \shared{P}{I_1} * \shared{Q}{I_2} \land I = (I_1, P) \bowtie (I_2, Q)\\
+
+
+
+	
+	\shared{P}{I_1}^{\;\fence{1}}
+	* \shared{Q}{I_2}^{\;\fence{2}}
+	\;\land\; (\fence{1}, I_1) \agrees (\fence{2}, I_2)
+	\implies 
+	\shared{P \sepish Q}{I_1 \cup I_2}
+	\\\\
+	
+	\shared{P \sepish Q}{I}
+	\;\land\; 
+	\fence{} \fences (I, Q)
+	\;\land\; 
+	I  \weakenI{\fence{}} I_1 
+	\implies 
+	\shared{Q}{I_1}
+
+\end{array}\\
+\]

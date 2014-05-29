@@ -1,0 +1,242 @@
+\begin{lemma}[] \label{lem:updateGContainment}
+%
+\[
+\begin{array}{l}
+	\for{w_1, w_2, w \in \Worlds} w_1 \composeW w_2 = w \implies\\
+	\hspace*{1cm}(l'_1, s', \amod{}') \in \updateG(w_1) \implies (\localPart{(w_2)}, s', \amod{}') \in \updateR(w_2)
+\end{array}
+\]
+%
+where given any relation $S \in (A \times A)$ we write
+%
+\[
+\begin{array}{l}
+	S(w) \eqdef \left\{w' \;|\; (w, w') \in S \right\}\\
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $(l_1, s_1, \amod{1}), (l_2, s_2, \amod{2}), w$ and $(l'_1, s', \amod{}')$ such that:
+%
+\begin{align}
+	(l_1, s_1, \amod{1}) \composeW (l_2, s_2, \amod{2}) = w \label{L11:Ass1}\\
+	(l'_1, s', \amod{}') \in \updateG(l_1, s_1, \amod{1}) \label{L11:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}') \in \updateR(l_2, s_2, \amod{2}) \label{L11:Goal}
+\end{align}
+From (\ref{L11:Ass1}) we know:
+%
+\begin{align}
+	s_1 = s_2 \label{L11:Ass3}\\
+	\amod{1} = \amod{2} \label{L11:Ass4}
+\end{align}
+%
+By definition of \updateG and from (\ref{L11:Ass2}) and (\ref{L11:Ass4}) we know:
+%
+\begin{align}
+	& \amod{1} = \amod{2} = \amod{}' \label{L11:Ass5} \\
+	& \capSize{\capPart{l_1 \composeL s_1)}} \subseteq \capSize{\heapPart{(l'_1 \composeL s')}} \label{L11:Perms} \\
+	& s' = s_1 \lor 
+	\left(\begin{array}{l}
+		\exsts{\ca{} \leq \capPart{(l_1)}}  (s_1, s') \in \amod{1}(\ca{}) \;\land \\
+		\heapSize{\heapPart{l_1 \composeL s_1)}} = \heapSize{\heapPart{(l'_1 \composeL s')}}
+	\end{array} \right) \nonumber
+\end{align}
+%
+There are two cases to consider:\\
+
+\noindent\textbf{Case 1.} $s_1 = s'$\\
+From (\ref{L11:Ass3}) and the assumption of the case we know $s' = s_2$. Consequently, from (\ref{L11:Ass5}) we have:
+
+\begin{equation}
+	(\localPart{(w_2)}, s', \amod{}') = (l_2, s_2, \amod{2}) \label{L11:Ass6}
+\end{equation}
+%
+By definition of \updateR\ and from (\ref{L11:Ass6}) we can conclude:
+%
+\begin{equation}
+	(\localPart{(w_2)}, s', \amod{}') \in \updateR(l_2, s_2, \amod{2}) \label{L11:Ass7}
+\end{equation}
+%
+\textbf{Case 2.} 
+%
+\begin{align}
+	\exsts{\ca{} \leq \capPart{(l_1)}} & (s_1, s') \in \amod{1}(\ca{}) \label{L11:Ass8} \;\land\\
+	&\heapSize{\heapPart{l_1 \composeL s_1)}} = \heapSize{\heapPart{(l'_1 \composeL s')}} \label{L11:Ass9}
+\end{align}
+%
+From (\ref{L11:Ass1}), (\ref{L11:Ass3}) and (\ref{L11:Ass4}) we know that 
+%
+\begin{equation}
+	w = (l_1 \composeL l_2, s_2, \amod{2}) \label{L11:Ass10}
+\end{equation}
+%
+Since $\wf{w}$ (by definition of \Worlds) and from (\ref{L11:Ass3}) we know:
+\begin{align}
+	&\capPart{(l_1 \composeL l_2 \composeL s_2)} = \capPart{(l_1)} \composeCap \capPart{(l_2)} \composeCap {(s_2)} = \capPart{(l_1 \composeL s_1)} \composeCap \capPart{(l_2)}\hspace*{0.2cm} \text{is defined} \label{L11:Ass11}\\
+%	
+	&\heapPart{(l_1 \composeL l_2 \composeL s_1)} = \heapPart{(l_1 \composeH s_1)} \composeH \heapPart{(l_2)}  \hspace*{0.2cm} \text{is defined} \label{L11:Ass12}
+\end{align}
+%
+Since $\ca{1} \leq \capPart{(l_1)}$ (\ref{L11:Ass8}), from (\ref{L11:Ass11}) and Lemma \ref{lem:disjointByOrder}, we know:
+%
+\begin{equation}
+	\ca{} \disjoint\ \ \capPart{(l_2)} \composeCap \capPart{(s_2)} \label{L11:Ass13}
+\end{equation}
+%
+From (\ref{L11:Ass3}), (\ref{L11:Ass9}) and (\ref{L11:Ass12}) we know
+%
+\begin{equation}
+	\heapPart{(l'_1 \composeL s')} \composeH \heapPart{(l_2)} = \heapPart{(l'_1 \composeL l_2 \composeL s')}\hspace*{0.2cm}\text{ is defined} \label{L11:Ass14}
+\end{equation}
+%
+From (\ref{L11:Perms}) and (\ref{L11:Ass11}) we know
+%
+\begin{equation}
+	\capPart{(l'_1 \composeL s')} \composeCap \capPart{(l_2)} = \capPart{(l'_1 \composeL l_2 \composeL s')}\hspace*{0.2cm}\text{ is defined} \label{L11:Ass15}
+\end{equation}
+%
+From (\ref{L11:Ass14}) and (\ref{L11:Ass15}) we know $l'_1 \composeL l_2 \composeL s'$ is defined and consequently:
+%
+\begin{equation}
+	l_2 \composeL s' \hspace*{0.2cm} \text{ is defined} \label{L11:Ass16}
+\end{equation}
+%
+From (\ref{L11:Ass4}), (\ref{L11:Ass8}), (\ref{L11:Ass13}), (\ref{L11:Ass16}) and by definition of \updateR, we have:
+%
+\begin{equation}
+	(\localPart{(w_2)}, s', \amod{}') = (l_2, s', \amod{}) \in \updateR(l_2, s_2, \amod{})  \label{L11:Ass17}
+\end{equation}
+%
+From (\ref{L11:Ass7}) and (\ref{L11:Ass17}) we can dismiss (\ref{L11:Goal}).
+\end{proof}
+%
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:extendGContainment}
+%
+\[
+\begin{array}{l}
+	\for{w_1, w_2, w \in \Worlds} w_1 \composeW w_2 = w \implies\\
+	\hspace*{1cm}(l'_1, s', \amod{}') \in \extendG(w_1) \implies (\localPart{(w_2)}, s', \amod{}') \in \extendR(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $(l_1, s_1, \amod{1}), (l_2, s_2, \amod{2}), w$ and $(l'_1, s', \amod{}')$ such that:
+%
+\begin{align}
+	(l_1, s_1, \amod{1}) \composeW (l_2, s_2, \amod{2}) = w \label{L12:Ass1}\\
+	(l'_1, s', \amod{}') \in \extendG(l_1, s_1, \amod{1}) \label{L12:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}') \in \extendR(l_2, s_2, \amod{2}) \label{L12:Goal}
+\end{align}
+From (\ref{L12:Ass1}) we know:
+%
+\begin{align}
+	s_1 = s_2 \label{L12:Ass3}\\
+	\amod{1} = \amod{2} \label{L12:Ass4}
+\end{align}
+%
+By definition of \extendG and from (\ref{L12:Ass2}), (\ref{L12:Ass3}) and (\ref{L12:Ass4}) we know:
+%
+\begin{align}
+	\exsts{l_3, l_4, \ca{1}, \ca{2}, s''} \hspace*{0.2cm}& l_1 = l_3 \composeL l_4 \;\land\; l'_1 = l_3 \composeL (\unitH, \ca{1}) \;\land \label{L12:Ass5}\\
+	& s'' = l_4 \composeL (\unitH, \ca{2}) \;\land\; s' = s_2 \composeL s'' \label{L12:Ass6}\\
+%
+	\exsts{F, \amod{0}} \hspace*{0.2cm} & \for{\ca{} \in \left(\{\ca{1}, \ca{2}\} \cup \dom{\amod{0}}\right)} \for{\ca{}' \in \dom{\amod{}}}\;\; \ca{} \disjoint \ca{} \label{L12:Ass7}\\
+%
+	& s'' \in \fence{} \;\land\; \fence{} \strictfences \amod{0} \label{L12:fence}\\
+%	
+	&\for{l_7, r_7, \amod{7}} l_7 \composeL r_7 = s_2 \land \extendsAM{\amod{}}{l_7}{r_7}{\amod{7}} \implies \nonumber\\ 
+	&\extendsAM{\amod{}'}{l_7}{r_7 \composeL s''}{\amod{7}}  \label{L12:Ass9}\\
+%	& \extendsAM{\amod{}'}{s_2}{s''}{\amod{2}} \label{L12:Ass9}\\
+%
+	& \extendsAM{\amod{}'}{s''}{s_2}{\amod{0}}  \label{L12:Ass10}
+\end{align}
+%
+%Since $\wf{l_1, s_1, \amod{1}}$, we know 
+%\begin{equation}
+%	\contains{\dom{\amod{1}}}{\capPart{(l_1 \composeL s_1)}} \nonumber
+%\end{equation}
+%%
+%and consequently from (\ref{L12:Ass4}) and (\ref{L12:Ass5})
+%\begin{equation}
+%	\contains{\dom{\amod{2}}}{\capPart{(l_4)}} \label{L12:Ass11}
+%\end{equation}
+%%
+%From (\ref{L12:Ass5}), (\ref{L12:Ass6}) and (\ref{L12:Ass11}), we have
+%%
+%\begin{equation}
+%	\contains{K \cup \dom{\amod{2}}}{\capPart{s''}} \label{L12:Ass12}
+%\end{equation}
+%%
+%From (\ref{L12:Ass5})-(\ref{L12:Ass10}) and (\ref{L12:Ass12}) we have:
+From (\ref{L12:Ass6}) and (\ref{L12:Ass9}) we have:
+%
+\begin{equation}
+	(\localPart{(w_2)}, s', \amod{}') = (l_2, s', \amod{}') \in \extendR(l_2, s_2, \amod{2}) \nonumber
+\end{equation}
+% 
+%and consequently by definition of \rely, 
+%%
+%\begin{equation}
+%	(\localPart{(w_2)}, s', \amod{}') \in \rely(l_2, s_2, \amod{2}) \nonumber
+%\end{equation}
+%% 
+as required.
+\end{proof}
+%
+%
+\end{lemma}
+%
+%
+\begin{lemma}[] \label{lem:guaranteeContainment}
+%
+\[
+\begin{array}{l}
+	\for{w_1, w_2, w \in \Worlds} w_1 \composeW w_2 = w \implies\\
+	\hspace*{1cm}(l', s', \amod{}') \in \guarantee(w_1) \implies (\localPart{(w_2)}, s', \amod{}') \in \rely(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $w_1, w_2, w$ and $(l'_1, s', \amod{}')$ such that:
+%
+\begin{align}
+	w_1 \composeW w_2 = w \label{L13:Ass1}\\
+	(l'_1, s', \amod{}') \in \guarantee(w_1) \label{L13:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}') \in \rely(w_2) \label{L13:Goal}
+\end{align}
+From (\ref{L13:Ass2}) and by definition of \guarantee\ we know:
+%
+\begin{align}
+	(l'_1, s', \amod{}') \in \left(\updateG \cup \extendG \right)^{*}(w_2) \label{L13:Ass3}
+\end{align}
+%
+From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment} and \ref{lem:extendGContainment} we have:
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}') \in \left(\updateR \cup \extendR \right)^{*}(w_2) \nonumber
+\end{align}
+%
+and consequently 
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}') \in \rely(w_2) \nonumber
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}

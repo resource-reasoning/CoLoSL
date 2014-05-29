@@ -1,0 +1,273 @@
+\section*{General Definitions}
+%
+\begin{definition}[Separation Algebra Size]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{size} function:
+%
+\[
+\size{\blankArg}{\mathbb{M}} : \mathbb{M} \rightarrow \pset{\mathbb{M}}
+\]
+%
+is defined as:
+%
+\[
+	\size{m}{\mathbb{M}} \eqdef \left\{ m' \;|\; \exsts{m''}\; m \compose{\mathbb{M}} m' = m'' \right\}
+\]
+%
+%
+\end{definition}
+%
+%
+\begin{definition}[Overlap]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{overlap} function:
+%
+\[
+\meet{\mathbb{M}} : \left(\mathbb{M} \times \mathbb{M} \right)\rightarrow \pset{\mathbb{M}}
+\]
+%
+is defined as:
+%
+\[
+	m_1 \meet{\mathbb{M}} m_2 \eqdef \left\{ m \;|\; \exsts{m', m'', m_3} m_1 = m \compose{\mathbb{M}} m' \;\land\; m_2 = m \compose{\mathbb{M}} m'' \;\land\; m \compose{\mathbb{M}} m' \compose{\mathbb{M}} m'' = m_3 \right\}
+\]
+%
+The \emph{maximal overlap} is defined as:
+%
+\[
+	m_1 \maxMeet{\mathbb{M}} m_2 = m \iffdef m \in (m_1 \meet{\mathbb{M}} m_2) \;\land\; \for{m' \in (m_1 \meet{\mathbb{M}} m_2)} m' \leq m
+\]
+%
+\end{definition}
+%
+%
+%\begin{definition}[Containment]
+%Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{containment} function:
+%%
+%\[
+%	\contains{.\ }{\ .} : \pset{\mathbb{M}} \rightarrow \mathbb{M} \rightarrow \{true, false\}
+%\]
+%%
+%is defined as:
+%%
+%\[
+%	\contains{S}{m} \iffdef 
+%	\begin{array}{l}
+%		\exsts{M}\;\; m = \prod\limits_{m_{i} \in M}^{\compose{\mathbb{M}}} m_{i} \;\land\;
+%		\for{m_{i} \in M} \exsts{m' \in S} m_{i} \leq m'
+%	\end{array}
+%\]
+%%
+%\end{definition}
+%
+%
+\begin{definition}[Extension]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{extension} function:
+%
+\[
+\extend{.} : \pset{\mathbb{M}} \rightarrow \pset{\pset{\mathbb{M}}}
+\]
+%
+is defined as:
+%
+\[
+\begin{array}{l}
+	\extend{M} \eqdef \left\{S \;|\; \for{s \in S} \exsts{m \in M} \exsts{r} s = m \compose{\mathbb{M}} r \right\}
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Disjointness]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{disjointness} relation over elements of $\mathbb{M}$:
+%
+\[
+\disjoint : \mathbb{M} \times \mathbb{M}
+\]
+%
+is defined as:
+%
+\[
+\begin{array}{l}
+	m_1 \disjoint m_2 \iffdef \for{m} m \leq m_1 \;\land\; m \leq m_2 \implies m = \unit{\mathbb{M}}
+\end{array}
+\]
+%
+where $m_1 \disjoint m_2$ denotes $(m_1, m_2) \in \disjoint$. We lift disjointness to sets of elements in $\pset{\mathbb{M}}$ where
+%
+\[
+	M_1 \disjoint M_2 \iffdef \for{m_1 \in M_1}\for{m_2 \in M_2} m_1 \disjoint m_2
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Separation]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{separation} relation over elements of $\mathbb{M}$:
+%
+\[
+\separate : \mathbb{M} \times \mathbb{M}
+\]
+%
+is defined as:
+%
+\[
+\begin{array}{l}
+	m_1 \separate m_2 \iffdef \exsts{m} m_1 \compose{\mathbb{M}} m_2 = m 
+\end{array}
+\]
+%
+where $m_1 \separate m_2$ denotes $(m_1, m_2) \in \separate$. 
+%We lift separation to sets of elements in $\pset{\mathbb{M}}$ where
+%%
+%\[
+%	M_1 \separate M_2 \iffdef \for{m_1 \in M_1}\for{m_2 \in M_2} m_1 \separate m_2
+%\]
+%%
+\end{definition}
+%
+%
+\noindent\textbf{Note: } When a separation algebra has the disjointness property, the definitions of disjointness ($\disjoint$) and separation ($\separate$) coincide.
+%
+%
+\section*{Model}
+\begin{parameter}[Capability Separation Algebra]
+Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra representing capability resources ranged over by $\ca{}, \ca{1}, \cdots  \ca{n}$. Assume a set of capability assertions $\KAssertions$ ranged over by $\capAss{}, \capAss{1}, \cdots, \capAss{n}$ and an associated semantics function:
+%
+\[
+	\semK[\blankArg]{.} : \KAssertions \rightarrow \LEnv \rightarrow \pset{\Caps}
+\]
+%
+\end{parameter}
+%
+%
+\begin{parameter}[Heap Separation Algebra]
+Let $(\Heaps, \composeH, \unitH)$ be any separation algebra representing heaps ranged over by $\h{}, \h{1}, \cdots, \h{n}$. Assume a set of heap assertions $\HAssertions$ ranged over by $\heapAss{}, \heapAss{1}, \cdots, \heapAss{n}$ and an associated semantics function:
+%
+\[
+	\semH[\blankArg]{.} : \HAssertions \rightarrow \LEnv \rightarrow \pset{\Heaps}
+\]
+%
+\end{parameter}
+%
+%
+\begin{definition}[Logical States]
+Given the separation algebra of heaps $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, a \emph{logical state} is a pair consisting of a heap and a capability:
+%
+\[
+	l, s \in \LState \eqdef \Heaps \times \Caps
+\]
+%
+We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Furthermore, given a logical state $l$, we write $\heapPart{l}$ and $\capPart{l}$ for the first and second projections, respectively.
+\end{definition}
+%
+%
+\begin{definition}[Logical State Composition]
+Given the separation algebra of heaps $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, the \emph{composition of logical states}:
+%
+\[
+	\composeL : \LState \times \LState \rightharpoonup \LState
+\]
+%
+is defined as:
+%
+\[
+	l \composeL l' \eqdef (\heapPart{l} \composeH \heapPart{l'},\; \capPart{l} \composeCap \capPart{l'})
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Action Models]
+An \emph{action model} is a partial function associating capability resources with actions. An action is expressed as a relation between the original logical state and the new logical state reflecting the effects of the action:
+%
+\[
+	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LState \times \LState}
+\]
+%
+We write $\unitAM$ for an action model with empty domain.
+\end{definition}
+%
+%
+\begin{definition}[Worlds]
+A \emph{world} is a triple of a logical state (representing the local state), a second logical state (representing the shared state) and an action model, subject to a well-formedness condition.
+%
+\[
+	w \in \Worlds \eqdef \left\{ (l, s, \amod{}) \in \LState \times \LState \times \AMods \;|\; \wf{l, s, \amod{}} \right\}
+\]
+% 
+Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$ and $\amodelPart{w}$, for the first, second and third projections, respectively.
+% 
+\end{definition}
+%
+%
+\begin{definition}[World Composition]
+The \emph{composition of worlds}:
+%
+\[
+	\composeW : \Worlds \times \Worlds \rightharpoonup \Worlds
+\]
+%
+is defined as:
+%
+\[
+	w \composeW w' \eqdef (\localPart{w} \composeL \localPart{w'},\; \sharedPart{w} \composeS \sharedPart{w'},\; \amodelPart{w} \composeAM \amodelPart{w'})
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[World Collapse]
+The \emph{collapse function on worlds}:
+%
+\[
+	\collapseW{.}: \Worlds \rightarrow \LState
+\]
+%
+is defined as:
+%
+\[
+	\collapseW{l, s, \amod{}} \eqdef l \composeL s
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Well-formedness]
+%
+\[
+	\wf{l, s, \amod{}} \iffdef \exsts{r} \collapseW{l, s, \amod{}} = r \;\land\; \contains{\dom{\amod{}}}{\capPart{r}}
+\]
+%
+
+\end{definition}
+%
+%
+\begin{parameter}[Machine States]
+Assume a set of machine states $\MStates$, ranged over by $\ms{}, \ms{1}, \cdots, \ms{n}$.
+\end{parameter}
+%
+%
+\begin{parameter}[Heap Reification]
+Assume a reification function from heaps to machine states:
+%
+\[
+	\reifyH{.}: \Heaps \rightarrow \pset{\MStates} 
+\]
+%
+\end{parameter}
+%
+%
+\begin{definition}[Reification]
+Given the set of machine states $\MStates$ and the reification function of heaps, the \emph{reification of worlds}:
+%
+\[
+	\reifyW{.} : \Worlds \rightarrow \pset{\MStates}
+\]
+%
+is defined as:
+%
+\[
+	\reifyW{w} \eqdef \reifyH{\heapPart{\left(\collapseW{w}\right)}}
+\]
+%
+\end{definition}

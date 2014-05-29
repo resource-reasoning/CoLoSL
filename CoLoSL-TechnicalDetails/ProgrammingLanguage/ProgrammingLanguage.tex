@@ -1,0 +1,209 @@
+\section*{Programming Language}
+\begin{parameter}[Basic Commands]
+Assume a set of basic commands \Basics, ranged over by $\bc{}, \bc{1}, \cdots, \bc{n}$.
+\end{parameter}
+%
+%
+\begin{parameter}[Basic Commands Axioms]
+Given the separation algebra of heaps $\left(\Heaps, \composeH, \unitH \right)$, assume a set of axioms associated with basic commands:
+%
+\[
+	\AxiomsB : \pset{\Heaps} \times \Basics \times \pset{\Heaps}
+\]
+%
+\end{parameter}
+%
+%
+\begin{parameter}[Basic Commands Interpretation]\label{par:basicSoundness}
+Given the set of machine states \MStates, assume an interpretation function, associating each basic command with a non-deterministic state transformer:
+%
+\[
+	\opSemB{.}{.} : \Basics \rightarrow \MStates \rightarrow \pset{\MStates}
+\]
+%
+We lift the interpretation function to a set of machine states such that for $S \in \pset{\MStates}$:
+%
+\[
+	\opSemB{\bc{}}{S} \eqdef \bigcup\limits_{\ms{} \in S} \left( \opSemB{\bc{}}{\ms{}}\right)
+\]
+%
+\end{parameter}
+%
+%
+\begin{parameter}[Basic Command Soundness]
+Assume for each basic command $\bc{} \in \Basics$ and $\left(H_1, \bc{}, H_2\right) \in \AxiomsB$ and for all $h \in \Heaps$:
+%
+\[
+	\opSemB{\bc{}}{\reifyH{H_1 \composeH \{h\}}} \subseteq  \reifyH{H_2 \composeH \{h\}}
+\]
+%
+\end{parameter}
+%
+%
+\begin{definition}[Sequential Commands]
+Given the set of basic commands \Basics, the set of sequential commands \Seqs, ranged over by $\seq{}, \seq{1}, \cdots, \seq{n}$ is defined inductively as:
+%
+\[
+	\seq{} ::= \bc{} \;|\; \skipC \;|\; \seq{1} ; \seq{2} \;|\; \seq{1} + \seq{2} \;|\; \seq{}^{*}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Sequential Command Axiomatisation]
+Given the axiomatisation of basic commands \AxiomsB, the \emph{axioms of sequential commands}:
+%
+\[
+	\AxiomsSeq : \pset{\Heaps} \times \Seqs \times \pset{\Heaps}
+\]
+%
+is defined as follows.
+%
+\[
+\begin{array}{r l}
+	\AxiomsSeq \eqdef & \AxiomsB \cup A_{\skipC} \cup A_{Seq} \cup A_{Choice} \cup A_{Loop}\\
+	
+	A_{\skipC} \eqdef & \left\{(H, \skipC, H) \;|\; H \in \pset{\Heaps} \right\} \\
+	
+	A_{Seq} \eqdef & 
+	\left\{
+	\begin{array}{l | l}
+		\left(H, \seq{1} ; \seq{2}, H' \right) 
+		&
+		\begin{array}{l}
+			\seq{1}, \seq{2} \in \Seqs \;\land\; H \in \pset{\Heaps} \\
+			\land\; \left(H, \seq{1}, H'' \right) \in \AxiomsSeq\\
+			\land\; \left(H'', \seq{2}, H' \right) \in \AxiomsSeq 
+		\end{array}
+	\end{array}
+	\right\}\\
+	
+	A_{Choice} \eqdef & 
+	\left\{
+	\begin{array}{l | l}
+		\left(H, \seq{1} + \seq{2}, H' \right) 
+		&
+		\begin{array}{l}
+			\seq{1}, \seq{2} \in \Seqs \;\land\; H \in \pset{\Heaps}\\
+			\land\; \left(H, \seq{1}, H' \right) \in \AxiomsSeq \\
+			\land\; \left(H, \seq{2}, H' \right) \in \AxiomsSeq
+		\end{array}
+	\end{array}
+	\right\}\\
+	
+	A_{Loop} \eqdef & 
+	\left\{
+	\begin{array}{l | l}
+		\left(H, \seq{1}^{*}, H \right) 
+		&
+		\begin{array}{l}
+			\seq{1} \in \Seqs \;\land\; H \in \pset{\Heaps}\\
+			\land\; \left(H, \seq{1}, H \right) \in \AxiomsSeq 
+		\end{array}
+	\end{array}
+	\right\}
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Sequential Command Interpretation]
+Given the basic command interpretation function \opSemB{.}{.}, the \emph{interpretation function for sequential commands}:
+%
+\[
+	\opSemSeq{.}{.} : \Seqs \rightarrow \MStates \rightarrow \pset{\MStates}
+\]
+%
+is defined inductively over the structure of sequential commands where we lift the interpretation function to a set of machine states such that for $S \in \pset{\MStates}$:
+%
+\[
+	\opSemSeq{\seq{}}{S} \eqdef \bigcup\limits_{\ms{} \in S} \left( \opSemSeq{\seq{}}{\ms{}}\right)
+\]
+%
+The interpretation function for sequential commands is defined as:
+%
+\[
+\begin{array}{r l}
+	\opSemSeq{\bc{}}{\ms{}} \eqdef & \opSemB{\bc{}}{\ms{}}\\
+	
+	\opSemSeq{\skipC}{\ms{}} \eqdef & \left\{\ms{} \right\}\\
+	
+	\opSemSeq{\seq{1} ; \seq{2}}{\ms{}} \eqdef & 
+	\left\{
+		\ms{2} \;|\;
+		S = \opSemSeq{\seq{1}}{\ms{}} \;\land\;  \ms{2} \in \opSemSeq{\seq{2}}{S} 
+	\right\}\\
+	
+	\opSemSeq{\seq{1} + \seq{2}}{\ms{}} \eqdef & \opSemSeq{\seq{1}}{\ms{}} \cup \opSemSeq{\seq{2}}{\ms{}}\\
+	
+	\opSemSeq{\seq{}^{*}}{\ms{}} \eqdef & 
+	\opSemSeq{\skipC + \seq{}; \seq{}^{*}}{\ms{}}
+\end{array} 
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Atomic Commands]
+Given the set of sequential commands \Seqs, the set of atomic commands \Atoms, ranged over by $\atom{}, \atom{1}, \cdots, \atom{n}$ is as:
+%
+\[
+	\atom{} ::= \atomic{\seq{}}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Atomic Command Axiomatisation]
+Given the axiomatisation of sequential commands \AxiomsSeq, the \emph{axioms of atomic commands}:
+%
+\[
+	\AxiomsA : \pset{\Worlds} \times \Atoms \times \pset{\Worlds}
+\]
+%
+is defined as follows.
+%
+\[
+\begin{array}{r l}
+
+	\AxiomsA \eqdef & 
+	\left\{ 
+	\begin{array}{l | l}
+		\left(W_1, \atomic{\seq{}}, W_2 \right)	& 
+		\begin{array}{l}
+			\left(H_1, \seq{}, H_2 \right) \in \Seqs \;\land\\ 
+			\repartitions{W_1}{W_2}{H_1}{H_2}	
+		\end{array}
+	\end{array}
+	\right\}
+	
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Atomic Command Interpretation]
+Given the sequential command interpretation function \opSemSeq{.}{.}, the \emph{interpretation function for sequential commands}:
+%
+\[
+	\opSemA{.}{.} : \Atoms \rightarrow \MStates \rightarrow \pset{\MStates}
+\]
+%
+is defined as :
+%
+\[
+	\opSemA{\atomic{\seq{}}}{\ms{}} \eqdef  \opSemSeq{\seq{}}{\ms{}}\\
+\]
+%
+We lift the interpretation function to a set of machine states such that for $S \in \pset{\MStates}$:
+%
+\[
+	\opSemA{\seq{}}{S} \eqdef \bigcup\limits_{\ms{} \in S} \left( \opSemA{\seq{}}{\ms{}}\right)
+\]
+%
+\end{definition}
+%
+%
+
