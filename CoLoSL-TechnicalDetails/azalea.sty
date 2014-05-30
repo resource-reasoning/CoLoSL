@@ -132,9 +132,9 @@
 \newcommand{\unitAM}{\unit{\textsf{A}}}
 
 
-\newcommand{\extendsAM}[4]{#1 \!\downarrow \left(#2, #3, #4\right)}
-\newcommand{\extendsAMUpto}[5]{#1 \!\downarrow_{#2} \left(#3, #4, #5\right)}
-\newcommand{\expandsAM}[4]{#1 \!\uparrow \left(#2, #3, #4\right)}
+\newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
+\newcommand{\extendsAMUpto}[5]{\left(#1\right) \!\downarrow_{#2} \left(#3, #4, #5\right)}
+\newcommand{\expandsAM}[5]{\left(#1\right) \!\uparrow \left(#2, #3, #4, #5\right)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
 %\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
 %\newcommand{\backwardClosure}[1]{#1^{\leftarrow}}
@@ -207,10 +207,12 @@
 %
 \newcommand{\guarantee}{\ensuremath{G}}
 \newcommand{\extendG}{\ensuremath{G^{\textsf{e}}}}
+\newcommand{\shiftG}{\ensuremath{G^{\textsf{s}}}}
 \newcommand{\updateG}{\ensuremath{G^{\textsf{u}}}}
 
 \newcommand{\rely}{\ensuremath{R}}
 \newcommand{\extendR}{\ensuremath{R^{\textsf{e}}}}
+\newcommand{\shiftR}{\ensuremath{R^{\textsf{s}}}}
 \newcommand{\updateR}{\ensuremath{R^{\textsf{u}}}}
 
 \newcommand{\repartitions}[4]{\ensuremath{#1\Rrightarrow^{\left\{#3\right\}\left\{#4\right\}}#2}}

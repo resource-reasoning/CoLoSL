@@ -17,9 +17,11 @@
 
 
 	
-	\shared{P}{I_1}^{\;\fence{1}}
-	* \shared{Q}{I_2}^{\;\fence{2}}
-	\;\land\; (\fence{1}, I_1) \agrees (\fence{2}, I_2)
+	\shared{P}{I_1}
+%	^{\;\fence{1}}
+	* \shared{Q}{I_2}
+%	^{\;\fence{2}}
+%	\;\land\; (\fence{1}, I_1) \agrees (\fence{2}, I_2)
 	\implies 
 	\shared{P \sepish Q}{I_1 \cup I_2}
 	\\\\
@@ -29,8 +31,11 @@
 	\fence{} \fences (I, Q)
 	\;\land\; 
 	I  \weakenI{\fence{}} I_1 
-	\implies 
-	\shared{Q}{I_1}
+	\Rrightarrow 
+	\shared{Q}{I_1}\\\\
+	
+	P \;\land\; \exsts{F} F \strictfences (I, P) \Rrightarrow
+	\exsts{\capAss{}} \capAss{} * \shared{P}{I}
 
 \end{array}\\
 \]

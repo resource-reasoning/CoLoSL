@@ -157,8 +157,8 @@ as required.
 \[
 \begin{array}{l}
 	\for{p, q, r \in \LState} \for{\amod{}, \amod{}' \in \AMods} \for{n \in \Nats}\\
-	\hspace*{0.5cm} \extendsAMUpto{\amod}{n}{p \composeL q}{r}{\amod{}'} \implies 
-									\extendsAMUpto{\amod}{n}{p}{q \composeL r}{\amod{}'}
+	\hspace*{0.5cm} \extendsAMUpto{\amod{}, L}{n}{p \composeL q}{r}{\amod{}'} \implies 
+									\extendsAMUpto{\amod{}, L}{n}{p}{q \composeL r}{\amod{}'}
 \end{array}
 \]
 %
@@ -167,22 +167,22 @@ as required.
 \noindent Pick an arbitrary $p, q, r \in \LState, \amod{}, \amod{}' \in \AMods$.\\
 
 \noindent\textbf{Base case}\\
-\textbf{RTS. }\hspace*{0.5cm}$\extendsAMUpto{\amod}{0}{p \composeL q}{r}{\amod{}'} \implies \extendsAMUpto{\amod}{0}{p}{q \composeL r}{\amod{}'}$\\
-This holds trivially by definition of $\extendsAMUpto{\amod}{0}{p}{q \composeL r}{\amod{}'}$\\
+\textbf{RTS. }\hspace*{0.5cm}$\extendsAMUpto{\amod{}, L}{0}{p \composeL q}{r}{\amod{}'} \implies \extendsAMUpto{\amod{}, L}{0}{p}{q \composeL r}{\amod{}'}$\\
+This holds trivially by definition of $\extendsAMUpto{\amod{}, L}{0}{p}{q \composeL r}{\amod{}'}$\\
 
 \noindent\textbf{Inductive Step} Pick an arbitrary $n \in \Nats$, then
 %
 \begin{equation}
 	\tag{I.H.}
-	\extendsAMUpto{\amod}{(n-1)}{p \composeL q}{r}{\amod{}'} \implies 
-	\extendsAMUpto{\amod}{(n-1)}{p}{q \composeL r}{\amod{}'}
+	\extendsAMUpto{\amod{}, L}{(n-1)}{p \composeL q}{r}{\amod{}'} \implies 
+	\extendsAMUpto{\amod{}, L}{(n-1)}{p}{q \composeL r}{\amod{}'}
 \label{L1:IH}
 \end{equation}
 %
 Assume:
 %
 \begin{align}
-	& \extendsAMUpto{\amod{}}{n}{p \composeL q}{r}{\amod{}'} \label{L1:Ass1}
+	& \extendsAMUpto{\amod{}, L}{n}{p \composeL q}{r}{\amod{}'} \label{L1:Ass1}
 \end{align}
 %
 Show
@@ -192,29 +192,19 @@ Show
 	&\hspace*{0.2cm}\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)\;\land\; l_1 \composeL f \leq  p \composeL q \composeL r \implies \nonumber\\
 	&\hspace*{0.4cm}  l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL p \composeL q = l_3 \;\land\; p \composeL q = l_3 \composeL c \;\land\; r = l_4 \composeL d\implies \nonumber\\
 	&\hspace*{0.7cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \label{L1:Goal1}\\ \nonumber\\
-%
-%	&\hspace*{0.4cm} \land\;  q \composeL r = l_1 \composeL d \;\land\;  (p \composeL l_1 \composeL d, p \composeL l_2 \composeL d) \in \amod{}(\ca{}) \implies \nonumber\\
-%	&\hspace*{0.6cm} \extendsAMUpto{\amod}{(n-1)}{p}{l_2 \composeL d}{\amod{}'} \label{L1:Goal3}\\
-%	
-%	&\hspace*{0.4cm} \land\; l_1 \not\leq p \;\land\; l_1 = l_3 \composeL l_4 \;\land\; p = l_3 \composeL c \;\land\; q \composeL r = l_4 \composeL d  \implies \nonumber\\
-%	&\hspace*{0.6cm} \for{l_5, l_6} l_2 = l_5 \composeL l_6  
-%%	\;\land\;  (\for{l'} l' \leq l_5 \land l' \leq l_6 \implies l' = \unitL) 
-%	\implies \nonumber\\
-%	&\hspace*{1cm} (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod}{(n-1)}{l_5 \composeL c}{l_6 \composeL d}{\amod{}'} \nonumber\\
-%	& \hspace*{1cm}\lor\;  (l_2 \composeL c \composeL d) \hspace*{0.2cm} \text{ is undefined} \label{L1:Goal4}\\ \nonumber\\
-%	\
-	&\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = p \composeL q \composeL r \implies \nonumber\\
-	&\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  &\hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{}'(\ca{}) 
-  \end{array} \nonumber\\
-%
-	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = p \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{p}{r'}{\amod{}'}\label{L1:Goal2}\\\nonumber
+	\extendsAMUpto{\amod{}, L}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \label{L1:Goal1}\\ \nonumber\\
+	& \begin{array}{l}
+		\for{\amod{L} \in L} \for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \\
+  \hspace*{0.2cm} l_1 \composeL f \meetL l \composeL r \not= \emptyset \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
+  \hspace*{0.8cm}\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset\\
+		\hspace*{0.8cm}\lor\;\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
+		\hspace*{1cm}
+		\begin{array}{l l}
+			l_2 \composeL f \composeL c \text{ is undefined}\\
+			\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{G}, L}{(m-1)}{l}{r'}{\amod{}'}
+		\end{array}
+	\end{array}
+	\label{L1:Goal2}\\\nonumber
 \end{align}
 %
 \textbf{RTS. (\ref{L1:Goal1})}\\
@@ -222,11 +212,9 @@ Pick an arbitrary $\ca{}, c, d, l_3, l_4, (l_1 \composeL f, l_2 \composeL f) \in
 %
 \begin{align}
 	&\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL \label{L1:Ass10}\\
-%	\exsts{l_3, l_4} \hspace*{0.5cm} 
 	& l_1 = l_3 \composeL l_4 \label{L1:Ass11}\\
 	& p = l_3 \composeL c \label{L1:Ass12}\\
 	& q \composeL r = l_4 \composeL d \label{L1:Ass13}
-%	& (l_3 \composeL c \composeL l_4 \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \label{L1:Ass14}
 \end{align}
 %(\ref{L1:Ass})
 Since $l_4 \leq q \composeL r$ (\ref{L1:Ass13}), from Lemma \ref{lem:divideUpper} we have:
@@ -243,13 +231,9 @@ From (\ref{L1:Ass13}), (\ref{L1:Ass15})-(\ref{L1:Ass17}) and cancellativity of s
 	e \composeL g = d \label{L1:Ass18}
 \end{align}
 %
-%There are two cases to consider:\\
-%
-%\noindent\textbf{Case 1.} $l_6 > \unitL$\\
 From (\ref{L1:Ass1}), (\ref{L1:Ass10})-(\ref{L1:Ass17}) and assumption of case 1 we have:
 %
 \begin{align}
-%	\;\land\;  (\for{l'} l' \leq l_7 \land l' \leq l_8 \implies l' = \unitL) 
 	&(l_1 \composeL c \composeL  d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\land\;\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL c \composeL e}{g}{\amod{}'}  \nonumber\\
 	&\lor\; (l_2 \composeL c \composeL d) \hspace*{0.2cm}\text{is undefined} \nonumber
 \end{align}
@@ -267,20 +251,27 @@ From (\ref{L1:IH}) and (\ref{L1:Ass18}) we can rewrite the above as
 %
 
 \noindent\textbf{RTS. (\ref{L1:Goal2})}\\
-Pick an arbitrary $\ca{}, l_1, l'_1$ such that $(l_1, l'_1) \in \amod{}(\ca{})$ and $l_1 = p \composeL q \composeL r$. From (\ref{L1:Ass1}) we have:
+Pick an arbitrary $\amod{L} \in L, \ca{}, l_1, l_2, f $ such that:
+%
+\begin{align}
+	\begin{array}{l}
+		l_1 \composeL f \cap p \composeL q \composeL r \not= \emptyset \\
+		\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)\\
+  	(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{}) \\
+	\end{array} \label{LCS: Ass1}
+\end{align} 
+%
+From (\ref{L1:Ass1}) we have:
 %
 \[
 \begin{array}{l}
-	\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  \hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{}'(\ca{}) 
-  \end{array} \\
-%
-	\hspace*{2cm}\lor  \\
-	\exsts{r'} l'_1 = p \composeL q\composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{p \composeL q}{r'}{\amod{}'}
+	\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL p \composeL q \composeL r \not= \emptyset\\
+	\lor\;\for{c, d}  l_1 \composeL f \composeL c = p \composeL q \composeL r \composeL d \implies\\
+	\hspace*{1cm}
+	\begin{array}{l l}
+		l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; \exsts{r'} l_2 \composeL f \composeL c = p \composeL q \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{G}, L}{(m-1)}{p \composeL q}{r'}{\amod{}'}
+	\end{array}
 \end{array}
 \]
 %
@@ -288,16 +279,13 @@ From (\ref{L1:IH}) we can rewrite the above as:
 %
 \[
 \begin{array}{l}
-	\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  \hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{}'(\ca{}) 
-  \end{array} \\
-%
-	\hspace*{2cm}\lor  \\
-	\exsts{r'} l'_1 = p \composeL q\composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{p}{q \composeL r'}{\amod{}'}
+	\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL p \composeL q \composeL r \not= \emptyset\\
+	\lor\;\for{c, d}  l_1 \composeL f \composeL c = p \composeL q \composeL r \composeL d \implies\\
+	\hspace*{1cm}
+	\begin{array}{l l}
+		l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; \exsts{r'} l_2 \composeL f \composeL c = p \composeL q \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{G}, L}{(m-1)}{p}{q \composeL r'}{\amod{}'}
+	\end{array}
 \end{array}
 \]
 %
@@ -305,15 +293,13 @@ and consequently,
 %
 \[
 \begin{array}{l}
-	\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  \hspace*{0.5cm}
-  \begin{array}{l}
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{}'(\ca{}) 
-  \end{array} \\
-%
-	\hspace*{2cm}\lor  \\
-	\exsts{r'} l'_1 = p \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{p}{r'}{\amod{}'}
+	\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL p \composeL q \composeL r \not= \emptyset\\
+	\lor\;\for{c, d}  l_1 \composeL f \composeL c = p \composeL q \composeL r \composeL d \implies\\
+	\hspace*{1cm}
+	\begin{array}{l l}
+		l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; \exsts{r'} l_2 \composeL f \composeL c = p \composeL  r' \composeL d \;\land\; \extendsAMUpto{\amod{G}, L}{(m-1)}{p}{r'}{\amod{}'}
+	\end{array}
 \end{array}
 \]
 %
@@ -332,13 +318,13 @@ as required.
 	l \in F \;\land\; 
 	F \fences \amod{0} \;\land\; 
 	\amod{0} \weakenI{F} \amod{1}\;\land\;
-	\extendsAMUpto{\amod{}}{n}{l}{r}{\amod{0}}\\
+	\extendsAMUpto{\amod{}, L}{n}{l}{r}{\amod{0}}\\
 	
 	\hspace*{1.5cm} \implies\\
 	
 	
 	\hspace*{0.5cm}
-	\extendsAMUpto{\amod{}}{n}{l}{r}{\amod{1}}\\
+	\extendsAMUpto{\amod{}, L \cup \amod{1}}{n}{l}{r}{\amod{1}}\\
 \end{array}
 \]
 %
@@ -346,8 +332,8 @@ as required.
 By induction on $n$. \\
 Pick an arbitrary $l, r \in \LState,\ \amod{0}, \amod{1}, \amod{} \in \AMods,\  F \in \pset{\LState}$;\\
 \noindent\textbf{Base case} $n = 0$\\
-\textbf{RTS. } $\extendsAMUpto{\amod{}}{0}{l}{r}{\amod{1}}$\\
-This case holds trivially from the definition of $\extendsAMUpto{\amod{}}{0}{l}{r}{\amod{1}}$.\\
+\textbf{RTS. } $\extendsAMUpto{\amod{}, L \cup \amod{1}}{0}{l}{r}{\amod{1}}$\\
+This case holds trivially from the definition of $\extendsAMUpto{\amod{}, L \cup \amod{1}}{0}{l}{r}{\amod{1}}$.\\
 
 \noindent\textbf{Inductive Case}\\
 \textbf{Assume}
@@ -356,11 +342,11 @@ This case holds trivially from the definition of $\extendsAMUpto{\amod{}}{0}{l}{
 	&F \fences \amod{0} \label{L2:Ass2}\\
 %	&F \fences \amod{1} \label{L2:Ass3}\\
 	&\amod{0} \weakenI{F} \amod{1}\label{L2:Ass4}\\
-	& \extendsAMUpto{\amod{}}{n}{l}{r}{\amod{0}} \label{L2:Ass5}\\
+	& \extendsAMUpto{\amod{}, L}{n}{l}{r}{\amod{0}} \label{L2:Ass5}\\
 %
 	&\for{l, r \in \LState} l \in F \land F \fences \amod{0} \land \amod{0} \weakenI{F} \amod{1} \land \extendsAMUpto{\amod{}}{(n-1)}{l}{r}{\amod{0}}
 	\implies \nonumber\\
-	&\hspace*{1cm}\extendsAMUpto{\amod{}}{(n-1)}{l}{r}{\amod{1}} \tag{I.H}\label{L2:I.H}\\\nonumber
+	&\hspace*{1cm}\extendsAMUpto{\amod{}, L \cup \amod{1}}{(n-1)}{l}{r}{\amod{1}} \tag{I.H}\label{L2:I.H}\\\nonumber
 \end{align}
 
 \noindent\textbf{Show}
@@ -369,27 +355,20 @@ This case holds trivially from the definition of $\extendsAMUpto{\amod{}}{0}{l}{
 	&\hspace*{0.2cm} \left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)\;\land\; l_1 \composeL f \leq  l \composeL r \implies \nonumber\\
 	&\hspace*{0.4cm}   l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d\implies \nonumber\\
 	&\hspace*{1cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined}\label{L2:Goal1}\\
-%	
-%	&\hspace*{0.4cm} \land\;  l_1 \not\leq l \;\land\; l_1 = l_3 \composeL l_4 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d  \implies \nonumber\\
-%	&\hspace*{0.6cm} \for{l_5, l_6} l_2 = l_5 \composeL l_6 
-%%	\;\land\;  (\for{l'} l' \leq l_5 \land l' \leq l_6 \implies l' = \unitL) 
-%	\implies  \nonumber\\
-%	& \hspace*{0.7cm} (l_3 \composeL c \composeL l_4 \composeL d, l_2 \composeL c \composeL d) \in \amod{} \;\land\; \extendsAMUpto{\amod}{(n-1)}{l_5 \composeL c}{l_6 \composeL d}{\amod{}'} \nonumber\\
-%	& \hspace*{0.7cm}\lor\; l_2 \composeL c \composeL d \hspace*{0.2cm}\text{ is undefined} \label{L2:Goal4}\\
-%	
-%	
-  &\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = l \composeL r \implies \nonumber\\
-	&\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  &\hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\; l_0 \leq l \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{1}(\ca{}) 
-  \end{array} \nonumber\\
+	\extendsAMUpto{\amod{}, L \cup \amod{1}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined}\label{L2:Goal1}\\
 %
-	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{1}}\label{L2:Goal2}
+	&
+  \begin{array}{l}
+  	\for{\amod{L} \in L \cup \amod{1}} \for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \\
+  \hspace*{0.6cm} l_1 \composeL f \meetL l \composeL r \not= \emptyset \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
+  \hspace*{0.8cm}\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset\\
+		\hspace*{0.8cm}\lor\;\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
+		\hspace*{1cm}
+		\begin{array}{l l}
+			l_2 \composeL f \composeL c \text{ is undefined}\\
+			\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \left( d = \unitL \implies \extendsAMUpto{\amod{G}, L \cup \{\amod{1}\}}{(m-1)}{l}{r'}{\amod{1}}\right)
+		\end{array}
+	\end{array}\label{L2:Goal2}
 % 
 \end{align}
 %
@@ -419,7 +398,7 @@ From (\ref{L2:Ass5}), (\ref{L2:Ass20}) and (\ref{L2:Ass23}) we have:
 %
 \begin{align}
 	\begin{array}{l l}
-		&(l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{})\;\land\;  \extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL c}{d}{\amod{0}} \\
+		&(l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{})\;\land\;  \extendsAMUpto{\amod{}, L}{(n-1)}{l_2 \composeL c}{d}{\amod{0}} \\
 		& \lor\; l_2 \composeL c \composeL d \hspace*{0.2cm}\text{ is undefined}
 	\end{array} \label{L2:Ass24}
 \end{align}
@@ -432,7 +411,7 @@ From (\ref{L2:Ass1}), (\ref{L2:Ass2}), (\ref{L2:Ass4}), (\ref{L2:Ass25}) and (\r
 %
 \begin{align}
 	\begin{array}{l l}
-		&(l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{})\;\land\;  \extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL c}{d}{\amod{1}} \\
+		&(l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{})\;\land\;  \extendsAMUpto{\amod{}, L \cup \amod{1}}{(n-1)}{l_2 \composeL c}{d}{\amod{1}} \\
 		& \lor\; l_2 \composeL c \composeL d \hspace*{0.2cm}\text{ is undefined}
 	\end{array} \label{L2:DismissedGoal4}
 \end{align}\\\\
@@ -442,38 +421,56 @@ From (\ref{L2:Ass1}), (\ref{L2:Ass2}), (\ref{L2:Ass4}), (\ref{L2:Ass25}) and (\r
 %
 %
 \noindent\textbf{RTS. (\ref{L2:Goal2})}\\
-Pick an arbitrary $\ca{}, l_1, l'_1$ such that
+Pick an arbitrary $\amod{L} \in L \cup \{\amod{1}\}, \ca{}, l_1, l_2, f$ such that:
+%
 \begin{align}
-	&(l_1, l'_1) \in \amod{}(\ca{}) \;\land\; l_1 = l \composeL r \label{L2:Ass40}
+	\begin{array}{l}
+		l_1 \composeL f \meetL l \composeL r = \emptyset
+  	(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{}) \\
+  	\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)\\
+	\end{array} \label{LIH: Ass1}
+\end{align} 
+%
+If $\amod{L} = \amod{1}$ the desired result holds trivially. On the other hand if $\amod{L} \not= \amod{1}$, then from (\ref{L2:Ass5}) we have:
+\begin{align}
+	\begin{array}{l}
+		\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{0} \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset\\
+		\lor\;\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
+		\hspace*{1cm}
+		\begin{array}{l l}
+			l_2 \composeL f \composeL c \text{ is undefined}\\
+			\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \left( d = \unitL \implies \extendsAMUpto{\amod{G}, L}{(m-1)}{l}{r'}{\amod{0}}\right)
+		\end{array}
+	\end{array} \nonumber
 \end{align}
 %
-Since $(l_1, l'_1) \in \amod{}(\ca{})$, from (\ref{L2:Ass5}) we have:
-\begin{align}
-&\exsts{l_0, l'_0, f, f_0} \nonumber\\
-&  \hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{0}(\ca{}) 
-  \end{array} \nonumber\\
-%
-	& \hspace*{2cm}\lor  \nonumber\\
-	& \exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{0}} \nonumber
-\end{align}
 There are two cases to consider.\\
-\textbf{Case 1.} 
+
+\noindent\textbf{Case 1.} 
 %
 \[
 \begin{array}{l}
-	\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{0}}
+	\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
+	\hspace*{1cm}
+	\begin{array}{l l}
+		l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \left(d = \unitL \implies \extendsAMUpto{\amod{G}, L}{(m-1)}{l}{r'}{\amod{0}}\right)
+	\end{array}
 \end{array}
 \]
 %
 From (\ref{L2:Ass1}), (\ref{L2:Ass2}), (\ref{L2:Ass4}) and (\ref{L2:I.H}) we can rewrite the above as:
 %
-\begin{equation}
- \exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l}{r'}{\amod{1}} \label{L2:Case1}
-\end{equation}\\
+\begin{align}
+\begin{array}{l}
+	\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
+	\hspace*{1cm}
+	\begin{array}{l l}
+		l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \left( d = \unitL \implies  \extendsAMUpto{\amod{G}, L \cup \{\amod{1}\}}{(m-1)}{l}{r'}{\amod{1}}\right)
+	\end{array}
+\end{array}\label{L2:Case1}
+\end{align}\\
 
 %
 %
@@ -483,28 +480,34 @@ From (\ref{L2:Ass1}), (\ref{L2:Ass2}), (\ref{L2:Ass4}) and (\ref{L2:I.H}) we can
 %
 \[
 \begin{array}{l}
-	\exsts{l_0, l'_0, f, f_0} \\
-  \hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\;
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{0}(\ca{}) 
-  \end{array} 
+		\exsts{f'} (l_1 \composeL f',\ l_2 \composeL f') \in \amod{0}(\ca{}) \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset \\
+
 \end{array}
 \]
 %
-Since $l_1 = l_0 \composeL f_0 \composeL f$, we know $l_0 \composeL f \leq l_1$ and consequently from (\ref{L2:Ass40})
+Take arbitrary $a, g$ such that:
+%%
+%\begin{align}
+%	\begin{array}{l l}
+%		\exsts{a, b, g} & l_1 \composeL f' = a \composeL b\\
+%		& l \composeL r = b \composeL g\\
+%		& a \composeL b \composeL g \hspace*{0.2cm} \text{defined}
+%	\end{array} \label{L":Assbreak} 
+%\end{align}
+%%
 %
-\begin{equation}
-	l_0 \composeL f \leq l \composeL r \label{L2:Ass41}
-\end{equation}
+\begin{align}
+	\begin{array}{l l}
+		l_1 \composeL f' \composeL g = l \composeL r \composeL a
+	\end{array} \label{L2:Assbreak} 
+\end{align}
 %
-From (\ref{L2:Ass1}), (\ref{L2:Ass4}), assumption of case 2 ($(l_0 \composeL f, l'_0 \composeL f) \in \amod{0}(\ca{})$) and (\ref{L2:Ass41}) we can deduce:
+and consequently, $l_1 \composeL f' \leq l \composeL r \composeL a$. Thus, from (\ref{L2:Ass1}), (\ref{L2:Ass4}) and assumption of case 2 ($(l_1 \composeL f', l_2  \composeL f') \in \amod{0}(\ca{})$)  we can deduce:
 %(\ref{L2:Ass})
 \begin{align}
 \begin{array}{l}
-	\exsts{f'} (l_0 \composeL f', l'_0 \composeL f') \in \amod{1}(\ca{}) \;\land\; l_0 \composeL f' \leq l \composeL r\\
-	\lor\; \for{w \in (l \meetL l_0)} w \leq l'_0
+	\exsts{f''} (l_1 \composeL f'', l_2 \composeL f'') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f'' \leq l \composeL r \composeL a\\
+	\lor\; \for{w \in (l \meetL l_1)} w \leq l_2
 \end{array} \nonumber
 \end{align}
 %
@@ -515,22 +518,46 @@ There are two cases to consider:\\
 %
 \[
 \begin{array}{l}
-	\for{w \in \left(l \meetL l_0 \right)} w \leq l'_0 
+	\for{w \in \left(l \meetL l_1 \right)} w \leq l_2 
 \end{array}
 \]
 %(\ref{L2:Ass})
-Since $l_0 \leq l \composeL r$ (\ref{L2:Ass41}), we know from lemma \ref{lem:nonEmptyOverlap} that $l \meetL l_0 \not= \emptyset$. Let $m = l_0 \maxMeetL l$. Then from the assumption of case 2.1. we know that $m \leq l'_0$. On the other hand since $m \leq l_0$ and $m \leq l'_0$, from the assumption of case 2. we have:
+Since $l_1 \leq l \composeL r \composeL a$, we know from lemma \ref{lem:nonEmptyOverlap} that $l \meetL l_1 \not= \emptyset$. Let $m = l_1 \maxMeetL l$. Then from the assumption of case 2.1. we know that $m \leq l_2$. On the other hand since $m \leq l_1$ and $m \leq l_2$, from (\ref{LIH: Ass1}) we have:
 %
 \begin{equation}
-	m = l_0 \maxMeetL l = \unitL \label{L2:noOverlap}
+	m = l_1 \maxMeetL l = \unitL \nonumber
 \end{equation} 
 %
-On the other hand, from (\ref{L2:noOverlap}), lemma \ref{lem:divideUpper} and since $l_0 \leq l \composeL r$ (\ref{L2:Ass41}) we have:
+and thus
+%
+%
+\begin{equation}
+	l_1 \disjoint l  \label{L2:noOverlap}
+\end{equation} 
+%
+On the other hand, from (\ref{L2:noOverlap}), lemma \ref{lem:divideUpper} and since $l \composeL r \composeL g = l_1 \composeL f' \composeL g$ (\ref{L2:Assbreak}) and consequently, $l \leq l_1 \composeL f' \composeL g$, we have:
 %
 \begin{align}
-	\exsts{d} r = l_0 \composeL d \label{L2:Ass42}
+	\exsts{h} l \composeL h = f' \composeL d \nonumber
 \end{align}
 %
+and consequently, 
+%
+\begin{align}
+	l_2 \composeL f' \composeL g = l_2 \composeL l \composeL h \nonumber
+\end{align}
+%
+That is
+%
+\begin{align}
+	\exsts{r'} l_2 \composeL f' \composeL g = l \composeL r' \label{L2:AssPart1}
+\end{align}
+%
+Now assume 
+%
+\begin{align}
+	a = \unitL \label{L2:AssUnit}
+\end{align}
 %From (\ref{L2:Ass40}) and the assumption of case 2 we have:
 %%
 %\begin{align}
@@ -558,49 +585,39 @@ On the other hand, from (\ref{L2:noOverlap}), lemma \ref{lem:divideUpper} and si
 %	l_0l = \unitL \label{L2:Ass48}
 %\end{align}
 %%(\ref{L2:Ass})
-From (\ref{L2:Ass40}), (\ref{L2:Ass41}), (\ref{L2:Ass42}) and assumption of case 2 we have:
+Since $l_1 \leq l \composeL r$ (\ref{L2:Assbreak}), from (\ref{L2:AssnoOverlap}) and lemma \ref{lem:divideUpper} we have:
 %
 \begin{align}
-	& (l \composeL l_0 \composeL d, l \composeL l'_0 \composeL d) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l \composeL l'_0}{d}{\amod{0}} \nonumber\\
-	& \lor\; (l \composeL l'_0 \composeL d) \text{ is undefined} \label{L2:Ass49}
+	\exsts{i} l_1 \composeL i = r \label{L2:AssResidue}
+\end{align}
+Then since $l_1 \composeL f' \leq l \composeL r$ (\ref{L2:Assbreak}), (\ref{L2:AssResidue}), from (\ref{L2:AssUnit}) and assumption of case 2 we have:
+%
+\begin{align}
+	& (l \composeL l_1 \composeL i, l \composeL l_2 \composeL i) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}, L}{(n-1)}{l \composeL l_2}{i}{\amod{0}} \nonumber\\
+	& \lor\; (l \composeL l_2 \composeL i) \text{ is undefined} \label{L2:Ass49}
 \end{align} 
 %
-On the other hand, from (\ref{L2:Ass40}), assumption of case 2, (\ref{L2:Ass42})and cancellativity of separation algebras we have: 
-%
-\begin{equation}
-	f_0 \composeL f = l \composeL d \label{L2:Ass43}
-\end{equation}
-% 
-and consequently from (\ref{L2:Ass40}), assumption of case 2 and (\ref{L2:Ass43}) we know $l \composeL l'_0 \composeL d$ is defined. Thus, from (\ref{L2:Ass49}) we have:
+and consequently from Lemma  \ref{lemma:contextSwitch} we have:
 %
 \begin{align}
-	& (l \composeL l_0 \composeL d, l \composeL l'_0 \composeL d) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l \composeL l'_0}{d}{\amod{0}} \label{L2:Ass44}
-\end{align} 
-%
-From (\ref{L2:Ass44}) and lemma \ref{lemma:contextSwitch} we have:
-%
-\begin{align}
-	& (l \composeL l_0 \composeL d, l \composeL l'_0 \composeL d) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l}{l'_0 \composeL d}{\amod{0}} \label{L2:Ass45}
+	& (l \composeL l_1 \composeL i, l \composeL l_2 \composeL i) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}, L}{(n-1)}{l }{l_2 \composeL  i}{\amod{0}} \nonumber\\
+	& \lor\; (l \composeL l_2 \composeL i) \text{ is undefined} \label{L2:Ass45}
 \end{align} 
 %
 %(\ref{L2:Ass})
 From (\ref{L2:Ass1})-(\ref{L2:Ass4}), (\ref{L2:Ass45}) and (\ref{L2:I.H}) we can rewrite (\ref{L2:Ass45}) as:
 %(\ref{L2:Ass})
 \begin{align}
-	\extendsAMUpto{\amod{}}{(n-1)}{l}{l'_0 \composeL d}{\amod{1}}\label{L2:Ass52}
+	& (l \composeL l_1 \composeL i, l \composeL l_2 \composeL i) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}, L \cup \{\amod{1}\}}{(n-1)}{l }{l_2 \composeL  i}{\amod{1}} \nonumber\\
+	& \lor\; (l \composeL l_2 \composeL i) \text{ is undefined} \label{L2:Ass52}
 \end{align}
 %
-From assumption of case 2 and (\ref{L2:Ass43}) we have:
+and thus from (\ref{L2:AssPart1}) and (\ref{L2:AssUnit}) we have:
 %
 \begin{align}
-	l'_1 = l'_0 \composeL l \composeL d \label{L2:Ass53}
+	\exsts{r'}	l_2 \composeL f' \composeL g = l \composeL r' \;\land\; (a = \unitL \implies \extendsAMUpto{\amod{}, L \cup \{\amod{1}\}}{(n-1)}{l }{r'}{\amod{1}} \nonumber\\
+	\lor\; (l \composeL l_2 \composeL i) \text{ is undefined}\label{L2:Case2.1}
 \end{align}
-%
-From (\ref{L2:Ass52}) and (\ref{L2:Ass53}) we have:
-%
-\begin{equation}
-	\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l}{r'}{\amod{1}}\label{L2:Case2.1}
-\end{equation}
 %
 %
 %
@@ -610,33 +627,14 @@ From (\ref{L2:Ass52}) and (\ref{L2:Ass53}) we have:
 %
 \[
 \begin{array}{l}
-	\exsts{f'} (l_0 \composeL f', l'_0 \composeL f') \in \amod{1}(\ca{}) \;\land\; l_0 \composeL f' \leq l \composeL r 
+	\exsts{f''} (l_1 \composeL f'', l_2 \composeL f'') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f'' \leq l \composeL r \composeL a
 \end{array}
 \]
 %(\ref{L2:Ass})
-From (\ref{L2:Ass40}) and assumption of case 2 we have $l_0 \composeL f' \leq l_0 \composeL f \composeL f_0$, that is:
-%
-\begin{equation}
-	\exsts{f'_0} l_0 \composeL f' \composeL f'_0 = l_0 \composeL f \composeL f_0 \label{L2:Ass54}
-\end{equation}
-% 
-and thus by cancellativity of separation algebra of \LState, we have:
-%
-\begin{align}
-	f' \composeL f'_0 = f \composeL f_0 \label{L2:Ass55}
-\end{align}
-%
-From assumptions of case 2 and case 2.2 and by (\ref{L2:Ass55}) we have:
-%
+and consequently 
 \begin{align}
 \begin{array}{l}
-	\exsts{l_0, l'_0, f', f'_0} \\
-  \hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f'_0 \composeL f' \;\land\; l'_1 = l'_0 \composeL f'_0 \composeL f' \;\land\;
-  	(l_0 \composeL f',\ l'_0 \composeL f') \in \amod{1}(\ca{}) 
-  \end{array} 
+	\exsts{f''} (l_1 \composeL f'',\ l_2 \composeL f'') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f'' \meetL l \composeL r \not= \emptyset
 \end{array} \label{L2:Case2.2}
 \end{align}
 %
@@ -657,6 +655,7 @@ as required.
 \end{lemma}
 %
 %
+\input{Soundness/amodMerge.tex}
 \begin{lemma}[] \label{lem:extension}
 %
 \[
@@ -731,487 +730,7 @@ Finally since $w_2 \in \sem[\lenv]{\capAss{1} * \shared{P}{I}}$, from (\ref{LE:A
 as required.
 \end{proof}
 \end{lemma}
-%
-%
-\begin{lemma}[]\label{lem:amodMerge}
-%
-\[
-\begin{array}{l}
-	\for{l, r \in \LState} \for{\amod{}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
-	\hspace*{0.5cm} p \composeL c \in F_1 \;\land\; F_1 \fences \amod{1} \;\land\; c \composeL q \in F_2 \;\land\; F_2 \fences \amod{2} \;\land\; (F_1, \amod{1}) \agrees (F_2, \amod{2})\\
-	\hspace*{0.5cm} \land\; \extendsAMUpto{\amod{}}{n}{p \composeL c}{q \composeL r}{\amod{1}} \;\land\; \extendsAMUpto{\amod{}}{n}{c \composeL q}{p \composeL r}{\amod{2}} \\
-	\hspace*{0.5cm}\land\;\left( \for{s} s \leq p \land s \leq q \implies s = \unitL \right)
-	\implies\\
-	\hspace*{2cm} \extendsAMUpto{\amod{}}{n}{p \composeL c \composeL q}{r}{\amod{1} \cup \amod{2}}
-\end{array}
-\]
-%
-\begin{proof} By induction on number of steps $n$.\\
-\noindent Pick an arbitrary $l, r \in \LState, \amod{}, \amod{1}, \amod{2} \in \AMods$.\\
-\noindent\textbf{Base case}\\
-\textbf{RTS. }\hspace*{0.5cm}$\extendsAMUpto{\amod}{0}{p \composeL c \composeL q}{r}{\amod{1} \cup \amod{2}}$\\
-This holds trivially by definition of $\extendsAMUpto{\amod}{0}{p \composeL c \composeL q}{r}{\amod{1} \cup \amod{2}}$\\
-
-\noindent
-\textbf{}
-\textbf{Inductive Step} Pick an arbitrary $n \in \Nats$, then
-%
-\begin{equation}
-	\tag{I.H.}
-	\begin{array}{l}
-		\for{l, r \in \LState} \for{\amod{}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
-		\hspace*{0.5cm} p \composeL c \in F_1 \;\land\; F_1 \fences \amod{1} \;\land\; c \composeL q \in F_2 \;\land\; F_2 \fences \amod{2} \;\land\; (F_1, \amod{1}) \agrees (F_2, \amod{2})\\
-		\hspace*{0.5cm} \land\; \extendsAMUpto{\amod{}}{(n-1)}{p \composeL c}{q \composeL r}{\amod{1}} \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{c \composeL q}{p \composeL r}{\amod{2}}\\
-		\hspace*{0.5cm}\land\;\left( \for{s} s \leq p \land s \leq q \implies s = \unitL \right)
-		\implies\\
-		\hspace*{2cm} \extendsAMUpto{\amod{}}{(n-1)}{p \composeL c \composeL q}{r}{\amod{1} \cup \amod{2}}
-	\end{array}
-\label{LM:I.H}
-\end{equation}
-%
-Assume:
-%
-\begin{align}
-	& p \composeL c \in F_1 \label{LM:Ass1}\\
-	& F_1 \fences \amod{1} \label{LM:Ass2}\\
-	& c \composeL q \in F_2 \label{LM:Ass3}\\
-	& F_2 \fences \amod{2} \label{LM:Ass4}\\
-	& (F_1, \amod{1}) \agrees (F_2, \amod{2}) \label{LM:Ass5}\\
-	& \extendsAMUpto{\amod{}}{n}{p \composeL c}{q \composeL r}{\amod{1}} \label{LM:Ass6}\\
-	& \extendsAMUpto{\amod{}}{n}{c \composeL q}{p \composeL r}{\amod{2}} \label{LM:Ass7}\\
-	& \for{s} s \leq p \;\land\; s \leq q \implies s = \unitL \label{LM:Ass0}
-\end{align}
-%
-Show
-%
-\begin{align}
-	&\for{\ca{}, d, e, l_3, l_4}\for{(l_1 \composeL f, l_2 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{})} \nonumber\\
-	& \left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right) \;\land\; l_1 \composeL f \leq  p \composeL c \composeL q \composeL r  \implies\nonumber\\
-	& \hspace*{0.2cm} l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL p \composeL c \composeL q = l_3 \;\land\; p \composeL c \composeL q = l_3 \composeL d \;\land\; r = l_4 \composeL e \implies \nonumber\\
-	&\hspace*{1cm} \left((l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL d}{e}{\amod{}'}\right) \lor l_2 \composeL d \composeL e \text{ is undefined} \label{LM:Goal1}\\
-%	& \hspace*{0.2cm} p \composeL c \composeL q = l_1 \composeL d  \implies \nonumber\\
-%	&\hspace*{0.5cm}\left((l_1 \composeL d \composeL r, l_2 \composeL d \composeL r) \in \amod{}(\ca{}) \land
-%	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL d}{r}{\amod{1} \cup \amod{2}}\right) \nonumber\\
-%  &\hspace*{0.5cm}\lor l_2 \composeL d \composeL r \text{ is undefined} \label{LM:Goal1}\\ \nonumber\\
-%
-	&\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = p \composeL c \composeL q \composeL r \implies \nonumber\\
-	&\exsts{l_0, l'_0, f, f_0} \nonumber\\
-  &\hspace*{0.5cm}
-  \begin{array}{l}
-  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\; l_0 \leq l \;\land\\
-  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-  \end{array} \nonumber\\
-%
-	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{1} \cup \amod{2}}\label{LM:Goal2}\\\nonumber
-\end{align}
-%
-
-\noindent\textbf{RTS. (\ref{LM:Goal2})}\\
-Pick an arbitrary $\ca{}, (l_1, l'_1) \in \amod{\ca{}}$ such that 
-%
-\begin{equation}
-	l_1 = p \composeL c \composeL q \composeL r \label{LM:Ass28}
-\end{equation}
-%(\ref{LM:Ass})
-Then from (\ref{LM:Ass6}) we have:
-%
-\begin{align}
-	\begin{array}{l}
-		\exsts{l_0, l'_0, f, f_0} \\
-	  \hspace*{0.5cm}
-	  \begin{array}{l}
-	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-	  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f   \;\land\\
-	  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-	  \end{array} \\
-%
-		\hspace*{2cm}\lor  \\
-		\exsts{r_1} l'_1 = p \composeL c \composeL r_1 \;\land\; \extendsAMUpto{\amod}{(n-1)}{p \composeL c}{r_1}{\amod{1}}
-	\end{array} \label{LM:Ass29}
-\end{align}
-%
-Similarly from (\ref{LM:Ass7}) we have:
-%
-\begin{align}
-	\begin{array}{l}
-		\exsts{l_0, l'_0, f, f_0} \\
-	  \hspace*{0.5cm}
-	  \begin{array}{l}
-	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-	  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f   \;\land\\
-	  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-	  \end{array} \\
-%
-		\hspace*{2cm}\lor  \\
-		\exsts{r_2} l'_1 = q \composeL c \composeL r_2 \;\land\; \extendsAMUpto{\amod}{(n-1)}{q \composeL c}{r_2}{\amod{2}}
-	\end{array} \label{LM:Ass30}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass29}) and (\ref{LM:Ass30}) we have:
-%
-\begin{align}
-	\begin{array}{l}
-		\exsts{l_0, l'_0, f, f_0} \\
-	  \hspace*{0.5cm}
-	  \begin{array}{l}
-	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-	  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-	  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-	  \end{array} \\
-%
-		\hspace*{2cm}\lor  \\
-		\exsts{r_1} l'_1 = p \composeL c \composeL r_1 \;\land\; \extendsAMUpto{\amod}{(n-1)}{p \composeL c}{r_1}{\amod{1}} \;\land\\
-%
-		\exsts{r_2} l'_1 = q \composeL c \composeL r_2 \;\land\; \extendsAMUpto{\amod}{(n-1)}{q \composeL c}{r_2}{\amod{2}}
-	\end{array} \label{LM:Ass31}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass31}) we have $p \composeL c \composeL r_1 = q \composeL c \composeL r_2$ and consequently $p \composeL r_1 = q \composeL r_2$. By the cross split property we then have:
-%
-\begin{align}
-	\exsts{pq, pr_2, r_1q, r_1r_2} \hspace*{0.2cm}& pq  \composeL pr_2 = p \label{LM:Ass32}\\
-	& r_1q \composeL r_1r_2 = r_1 \label{LM:Ass33}\\
-	& pq \composeL r_1q = q \label{LM:Ass34}\\
-	& pr_2 \composeL r_1r_2 = r_2 \label{LM:Ass35}
-\end{align}
-%(\ref{LM:Ass})
-Since from (\ref{LM:Ass32}), (\ref{LM:Ass33}) we have $pq \leq p \;\land\; pq \leq q$, from (\ref{LM:Ass0}) we can deduce $pq = \unitL$. Consequently, we can rewrite (\ref{LM:Ass31}) as:
-%
-\begin{align}
-	\begin{array}{l}
-		\exsts{l_0, l'_0, f, f_0} \\
-	  \hspace*{0.5cm}
-	  \begin{array}{l}
-	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-	  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-	  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-	  \end{array} \\
-%
-		\hspace*{2cm}\lor  \\
-		\exsts{r_1r_2} l'_1 = p \composeL c \composeL q \composeL r_1r_2 \;\land\; \extendsAMUpto{\amod}{(n-1)}{p \composeL c}{q \composeL r_1r_2}{\amod{1}} \;\land\\
-%
-		\extendsAMUpto{\amod}{(n-1)}{q \composeL c}{p \composeL r_1r_2}{\amod{2}}
-	\end{array} \label{LM:Ass36}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass1})-(\ref{LM:Ass5}), (\ref{LM:Ass36}) and (\ref{LM:I.H}) we can rewrite (\ref{LM:Ass36}) as:
-%
-\begin{align}
-	\begin{array}{l}
-		\exsts{l_0, l'_0, f, f_0} \\
-	  \hspace*{0.5cm}
-	  \begin{array}{l}
-	  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-	  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f  \;\land\\
-	  	(l_0 \composeL f,\ l'_0 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{}) 
-	  \end{array} \\
-%
-		\hspace*{2cm}\lor  \\
-		\exsts{r'} l'_1 = p \composeL c \composeL q \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{p \composeL c \composeL q}{r'}{\amod{1} \cup \amod{2}}
-	\end{array} \label{LM:Ass37}
-\end{align}
-%(\ref{LM:Ass})
-%
-%
-%
-%
-%
-
-\noindent\textbf{RTS. (\ref{LM:Goal1})}\\
-Pick an arbitrary $\ca{}, d, e, l_4, l_3, (l_1 \composeL f, l_2 \composeL f) \in (\amod{1} \cup \amod{2})(\ca{})$ such that
-\begin{align}
-	& \left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)\label{LM:Ass47}\\
-	& l_1 \maxMeetL  p \composeL c \composeL q = l_3 \;\land\; l_1 = l_3 \composeL l_4 \label{LM:Ass48}\\
-	& p \composeL c \composeL q = l_3 \composeL d \label{LM:Ass49}\\
-	& r = l_4 \composeL e \label{LM:Ass50}\\
-	& l_1 \composeL f \leq p \composeL c \composeL q \composeL r \label{LM:Ass51}
-%	& (l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \label{LM:Ass52}
-\end{align}
-%(\ref{LM:Ass})
-%
-Then by definition of $\amod{1} \cup \amod{2}$ we know:
-%
-\begin{align}
-	(l_1 \composeL f, l_2 \composeL f) \in \amod{1}(\ca{}) \;\lor\; (l_1 \composeL f, l_2 \composeL f) \in \amod{2}(\ca{}) \label{LM:Ass61}
-\end{align}
-%
-\textbf{Case 1.} $(l_1 \composeL f, l_2 \composeL f) \in \amod{1}(\ca{}) \;\land\; (l_1 \composeL f, l_2 \composeL f) \not\in \amod{2}(\ca{})$\\
-%
-By definition of (\ref{LM:Ass5}) and from (\ref{LM:Ass3}) we have:
-%
-\begin{align}
-	& \begin{array}{l l}
-		\exsts{f'}& (l_1 \composeL f', l_2 \composeL f') \in \amod{2}(\ca{}) \;\land\; l_1 \composeL f' \leq p \composeL c \composeL q \composeL r \\
-%		&\land\;  l_1 \leq (c \composeL q \maxMeetL p \composeL c) 
-	\end{array}\label{LM:Ass62}\\
-	& \hspace*{3cm}\lor\; \nonumber\\
-	&\begin{array}{l l}
-		\neg\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{2}(\ca{}) \;\land\; l_1 \composeL f' \leq p \composeL c \composeL q \composeL r \\
-		\land\; (c \composeL q) \meetL l_1 = (c \composeL q) \meetL l_2
-	\end{array}  \label{LM:Ass63}
-\end{align}
-%
-There are two cases to consider:\\
-\textbf{Case 1.1.} 
-\[
-\begin{array}{l}
-		\neg\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{2}(\ca{}) \;\land\; l_1 \composeL f' \leq p \composeL c \composeL q \composeL r \\
-
-		\land\; (c \composeL q) \meetL l_1 = (c \composeL q) \meetL l_2
-\end{array}
-\]
-%
-Since $l_1 \leq p \composeL c \composeL q \composeL r$ (\ref{LM:Ass63}), from Lemma \ref{lem:divideUpper} we have:
-%
-\begin{align}
-	\begin{array}{l l}
-	\exsts{s_1, s_2, a, b}& l_3 = s_1 \composeL s_2 \\
-	& s_1 \composeL a =  p\\
-	& s_2 \composeL b = c \composeL q\\
-	&a \composeL  b = d 
-	\end{array} \label{LM:Ass64}
-\end{align}
-%
-Since $p \composeL c \composeL q  = s_1 \composeL a \composeL s_2 \composeL b $ and consequently $l_1 \composeL a \composeL b$ is defined, by definition of $\meetL$ we have:
-%
-\begin{align}
-	s_2 \in (l_1 \meetL c \composeL q) \nonumber
-\end{align} 
-%
-and thus from the assumption of case 1.1. we have $s_2 \leq l_2$. Since $s_2 \leq l_1$ (\ref{LM:Ass64}, \ref{LM:Ass48}), from (\ref{LM:Ass47}) we have $s_2 = \unitL$; thus from (\ref{LM:Ass64}):
-%
-\begin{align}
-	\begin{array}{l}
-	l_1 = s_1 \composeL l_4\\
-	b = c \composeL q
-	\end{array} \label{LM:Ass644}
-\end{align} 
-% 
-and consequently from (\ref{LM:Ass64}) we have:
-%
-\begin{align}
-	l_3 \composeL a = p \nonumber\\
-	l_1 \composeL a \composeL e = p \composeL r \label{LM:Ass65}
-\end{align}
-%
-From assumption of case 1, (\ref{LM:Ass6}), (\ref{LM:Ass47})-(\ref{LM:Ass51}) and (\ref{LM:Ass64}), (\ref{LM:Ass65}) we have:
-%
-\begin{align}
-	\begin{array}{l l}
-%	\for{l_6, l_7} & l_2 = l_6 \composeL l_7\;\implies\\
-	& (l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL a \composeL c}{q \composeL e}{\amod{1}}\\
-	& \;\;\lor (l_2 \composeL d \composeL e)\hspace*{0.2cm}\text{is undefined}
-	\end{array} \label{LM:Ass66}
-\end{align}
-%
-On the other hand, from (\ref{LM:Ass63}), (\ref{LM:Ass64}), (\ref{LM:Ass66}) and (\ref{LM:Ass7}) we can deduce:
-%
-\begin{align}
-	\begin{array}{l l}
-		&(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL a \composeL c}{q \composeL e}{\amod{1}}\\
-		& \hspace*{1cm}\land\; \extendsAMUpto{\amod{}}{(n-1)}{q \composeL c}{l_2 \composeL a \composeL e}{\amod{2}}\\
-		& \;\lor (l_2 \composeL d \composeL e)\hspace*{0.2cm}\text{is undefined}
-	\end{array} \label{LM:Ass67}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass1}), (\ref{LM:Ass2}), assumption of case 1, (\ref{LM:Ass47})-(\ref{LM:Ass51}), (\ref{LM:Ass65}), (\ref{LM:Ass66})  and definition of $\fences$ we have:
-%
-\begin{equation}
-	l_2 \composeL a \composeL c \in F_1 \label{LM:Ass68}
-\end{equation}
-%
-Assume 
-%
-\begin{align}
-	\begin{array}{l l}
-		\exsts{t > \unitL} & t \leq l_2 \composeL a \;\land\; t \leq q
-	\end{array} \label{LM:Con1}
-\end{align}
-%
-Now also assume 
-\begin{equation}
-	t \leq l_1 \label{LM:Con2}
-\end{equation}
-%
-From (\ref{LM:Con2}), (\ref{LM:Ass48}) and Lemma \ref{lem:divideUpper} we have:
-%
-\begin{align}
-	\begin{array}{l l}
-		\exsts{t_1, t_2} & t = t_1 \composeL t_2\\
-		& t_1 \leq l_3\\
-		& t_2 \leq l_4
-	\end{array} \label{LM:Con3}
-\end{align}
-%
-From (\ref{LM:Con3}) and (\ref{LM:Ass48}) and by definition of $\maxMeetL$, I can deduce: 
-%
-\begin{equation}
-	t_2 = \unitL \label{LM:Con4}
-\end{equation}
-%
-On the other hand from (\ref{LM:Con1}), (\ref{LM:Con3}), (\ref{LM:Ass65}) and (\ref{LM:Ass0}) I have: 
-%
-\begin{equation}
-	t_1 = \unitL \label{LM:Con5}
-\end{equation}
-% 
-From (\ref{LM:Con3}), (\ref{LM:Con4}) and (\ref{LM:Con5}) we have $t = \unitL$ which contradicts our assumption of (\ref{LM:Con1}). Therefore, we can deduce that our assumption of (\ref{LM:Con2}) was wrong and that:
-%
-\begin{equation}
-	t \not\leq l_1 \label{LM:Con6}
-\end{equation}
-%
-Consequently from (\ref{LM:Con1}) and (\ref{LM:Con6}) we can conclude
-%
-\begin{equation}
-	(c \composeL q) \meetL l_1 \not= (c \composeL q) \meetL l_2 \nonumber
-\end{equation}
-%
-This is however a contradiction to the assumption of case 1.1 and therefore, we can conclude that our assumption of (\ref{LM:Con1}) was wrong and that we have:
-%
-\begin{equation}
-	\for{s} t\leq l_2 \composeL a \land t \leq  q \implies t = \unitL \label{LM:Ass60}
-\end{equation}
-%
-From (\ref{LM:Ass68}), (\ref{LM:Ass2}), (\ref{LM:Ass3}), (\ref{LM:Ass4}), (\ref{LM:Ass5}), (\ref{LM:Ass67}), (\ref{LM:Ass60}) and (\ref{LM:I.H}), we can rewrite (\ref{LM:Ass66}) and (\ref{LM:Ass67}) as:
-%
-\begin{align}
-	\begin{array}{l l}
-		& (l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL a \composeL c \composeL q}{e}{\amod{1} \cup \amod{2}}\\
-		& \;\lor (l_2 \composeL d \composeL e)\hspace*{0.2cm}\text{is undefined}
-	\end{array} \label{LM:Ass69}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass64}) and (\ref{LM:Ass644}) we have: 
-%
-\begin{align}
-	\begin{array}{l l}
-		& (l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL d}{e}{\amod{1} \cup \amod{2}}\\
-		& \;\lor (l_2 \composeL d \composeL e)\hspace*{0.2cm}\text{is undefined}
-	\end{array} \nonumber
-\end{align}
-%
-%
-%
-
-\noindent\textbf{Case 1.2.}
-\[
-\begin{array}{l l}
-	\exsts{f'}& (l_1 \composeL f', l_2 \composeL f') \in \amod{2}(\ca{}) \;\land\; l_1 \composeL f' \leq p \composeL c \composeL q \composeL r \\
-%	&\land\; l_1 \leq (c \composeL q \maxMeetL p \composeL c)
-\end{array}
-\]
-%
-%
-Since $l_3 \leq p \composeL c \composeL q$ (\ref{LM:Ass49}), from Lemma \ref{lem:divideUpper} we have:
-%
-\begin{align}
-	\begin{array}{l l}
-		\exsts{l_5, l_6, l_7, e, g, h} \hspace*{0.2cm} & l_3 = l_5 \composeL l_6 \composeL l_7\\
-		& p = l_5 \composeL i\\
-		& c = l_6 \composeL g\\
-		& q = l_7 \composeL h\\
-		& d = i \composeL g \composeL h
-	\end{array} \label{LM:Ass70}
-\end{align} 
-%
-From (\ref{LM:Ass70}), assumption of case 1, (\ref{LM:Ass6}) and (\ref{LM:Ass50}) we have:
-%
-%
-\begin{align}
-	\begin{array}{l}
-		(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL i \composeL g}{h \composeL e}{\amod{1}}\\
-		\lor\; l_2 \composeL d \composeL e \hspace*{0.2cm}\text{ is undefined}
-	\end{array} \label{LM:Ass71}
-\end{align}
-%(\ref{LM:Ass})
-%(\ref{LM:Ass})
-Similarly, from (\ref{LM:Ass70}), assumption of case 1.2, (\ref{LM:Ass7}) and (\ref{LM:Ass50}) we have:
-%
-\begin{align}
-	\begin{array}{l}
-		(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL g \composeL h}{i \composeL e}{\amod{2}}\\
-		\lor\; l_2 \composeL d \composeL e \hspace*{0.2cm}\text{ is undefined}
-	\end{array} \label{LM:Ass72}
-\end{align}
-%(\ref{LM:Ass})
-%(\ref{LM:Ass})
-From (\ref{LM:Ass71}) and (\ref{LM:Ass72}) we have:
-%
-\begin{align}
-	\begin{array}{l}
-		(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;\\
-		\hspace*{0.6cm}\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL i \composeL g}{h \composeL e}{\amod{1}} \;\land\;
-		\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL g \composeL h}{i \composeL e}{\amod{2}}\\
-		\lor\; l_2 \composeL d \composeL e \hspace*{0.2cm}\text{ is undefined}
-	\end{array} \label{LM:Ass73}
-\end{align}
-%(\ref{LM:Ass})
-%
-From (\ref{LM:Ass1}), (\ref{LM:Ass2}), (\ref{LM:Ass70}), (\ref{LM:Ass47}), (\ref{LM:Ass50}), assumption of case 1 and definition of $\fences$ we have:
-%
-\begin{equation}
-	l_2 \composeL i \composeL g \in F_1 \label{LM:Ass74}
-\end{equation}
-%
-Similarly, from (\ref{LM:Ass3}), (\ref{LM:Ass4}), (\ref{LM:Ass70}), (\ref{LM:Ass47}), (\ref{LM:Ass50}), assumption of case 1.2, and definition of $\fences$ we have:
-%
-\begin{equation}
-	l_2 \composeL g \composeL h \in F_2 \label{LM:Ass75}
-\end{equation}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass0}) and (\ref{LM:Ass70}) we have:
-\begin{align}
-\begin{array}{l}
-	\for{l'} l' \leq i \;\land\; l' \leq h \implies l' = \unitL
-\end{array} \label{LM:Ass76}
-\end{align}
-From (\ref{LM:Ass74}), (\ref{LM:Ass2}), (\ref{LM:Ass75}), (\ref{LM:Ass4}), (\ref{LM:Ass5}), (\ref{LM:Ass0}),   (\ref{LM:Ass73}), (\ref{LM:Ass76}) and (\ref{LM:I.H}) we can rewrite (\ref{LM:Ass73}) as:
-%
-\begin{align}
-	\begin{array}{l}
-		(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL i \composeL g \composeL h}{e}{\amod{1} \cup \amod{2}} \\
-		\lor\; l_2 \composeL d \composeL e \hspace*{0.2cm}\text{ is undefined}
-	\end{array} \label{LM:Ass77}
-\end{align}
-%(\ref{LM:Ass})
-From (\ref{LM:Ass70}) we can rewrite (\ref{LM:Ass77}) as:
-%
-\begin{align}
-	\begin{array}{l}
-		(l_1 \composeL d \composeL e, l_2 \composeL d \composeL e) \in \amod{}(\ca{}) \;\land\;\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL d}{e}{\amod{1} \cup \amod{2}} \\
-		\lor\; l_2 \composeL d \composeL e \hspace*{0.2cm}\text{ is undefined}
-	\end{array}
-	 \label{LM:Case3.1.2}
-\end{align}
-%(\ref{LM:Ass})
-
-%Proof of this case is analogous to that of steps (\ref{LM:Ass21})-(\ref{LM:Case1.2}) and is omitted here.
-%
-%
-%
-%
-%
-
-\noindent\textbf{Case 2.} $(l_1 \composeL f, l_2 \composeL f) \in \amod{2}(\ca{}) \;\land\; (l_1 \composeL f, l_2 \composeL f) \not\in \amod{1}(\ca{})$\\
-The proof of this case is analogous o that of previous case and is omitted here.\\
-
-\noindent\textbf{Case 3.} $(l_1 \composeL f, l_1 \composeL f) \in \amod{2}(\ca{}) \;\land\; (l_1 \composeL f, l_2 \composeL f) \in \amod{2}(\ca{})$\\
-This case follows trivially from case 1 and case 2. \\
-
-
-\end{proof}
-\end{lemma}
-%
-%
+%%
 %\begin{lemma}[]\label{lem:amodExtension}
 %%
 %\[
@@ -1654,85 +1173,6 @@ and thus
 as required.
 \end{proof}
 \end{lemma}
-%%
-%\begin{lemma}[]\label{lem:fencedPostAction}
-%For $l, l_1, c, f, r \in \LState$, $F \in \pset{\LState}$, $\ca{} \in \Caps$ and $\amod{} \in \AMods$:
-%%
-%\[
-%\begin{array}{l}
-%	l = l_1 \composeL c \;\land\\
-%	l \in F \;\land\\
-%	F \fences \amod{} \;\land\\
-%	(l_1 \composeL f, l_2 \composeL f) \in  \amod{}(\ca{}) \;\land\\
-%	l_1 \composeL f \leq l \composeL r
-%\end{array}
-%\implies
-%l_2 \composeL c \in F
-%\]
-%%
-%\begin{proof}
-%Pick arbitrary $l, l_1, c, f, r \in \LState$, $F \in \pset{\LState}$, $\ca{} \in \Caps$ and $\amod{} \in \AMods$ such that
-%%
-%\begin{align}
-%	l = l_1 \composeL c \label{L8:Ass1}\\
-%	l \in F \label{L8:Ass2}\\
-%	F \fences \amod{} \label{L8:Ass3}\\
-%	(l_1 \composeL f, l_2 \composeL f) \in  \amod{}(\ca{}) \label{L8:Ass4}\\
-%	l_1 \composeL f \leq l \composeL r \label{L8:Ass5}
-%\end{align}
-%%
-%From (\ref{L8:Ass1}) and (\ref{L8:Ass5}) we have: $l_1 \composeL f \leq l_1 \composeL c \composeL r$ and consequently, $f \leq c \composeL r$. From Lemma \ref{lem:divideUpper} we can then deduce:
-%%
-%\begin{align}
-%	\exsts{a, b \in \LState} \hspace*{1cm}&f = a \composeL b \label{L8:Ass6}\\
-%	& a \leq c \label{L8:Ass7}\\
-%	& b \leq r \label{L8:Ass8}
-%\end{align}
-%%
-%From (\ref{L8:Ass6}) and (\ref{L8:Ass4}) we have:
-%%
-%\begin{equation}
-%	(l_1 \composeL a \composeL b, l_2 \composeL a \composeL b) \in \amod{}(\ca{}) \label{L8:Ass9}
-%\end{equation}
-%%
-%From (\ref{L8:Ass7}) we have:
-%%
-%\begin{equation}
-%	\exsts{d \in \LState} \hspace*{0.2cm}  a \composeL d = c \label{L8:Ass10}
-%\end{equation}
-%%
-%and consequently from (\ref{L8:Ass1}):
-%%
-%\begin{align}
-%	l = l_1 \composeL a \composeL d \label{L8:Ass11}
-%\end{align}
-%%
-%From (\ref{L8:Ass11}), (\ref{L8:Ass8}), Lemma \ref{lem:disjointByOrder} and since $l \composeL r$ is defined (\ref{L8:Ass5}), we have:
-%%
-%\begin{equation}
-%	l_1 \composeL a \composeL d \composeL b \hspace*{0.5cm}\text{is defined} \label{L8:Ass12}
-%\end{equation}
-%%
-%From (\ref{L8:Ass9}), (\ref{L8:Ass11}), (\ref{L8:Ass12}) and (\ref{L8:Ass3}) we have:
-%%
-%\begin{equation}
-%	l_2 \composeL a \composeL d \in F \nonumber
-%\end{equation}
-%%
-%and consequently from (\ref{L8:Ass10}):
-%%
-%\begin{equation}
-%	l_2 \composeL c \in F \nonumber
-%\end{equation}
-%%
-%as required.
-%%
-%\end{proof}
-%\end{lemma}
-%%
-%
-%
-%
 %
 %
 \begin{lemma}[]\label{lem:amodClosureImplication}
@@ -1773,7 +1213,7 @@ This holds trivially by definition of $\amod{}\!\downarrow_{0}$\\
 %			
 			\hspace*{0.8cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) 
 			\;\land\;
-			\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} 	
+			\extendsAMUpto{\amod{}, }{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} 	
 	\end{array}\label{L9:Goal1}\\
 %
   &\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = l \composeL r \implies \nonumber\\
@@ -1786,7 +1226,7 @@ This holds trivially by definition of $\amod{}\!\downarrow_{0}$\\
   \end{array} \nonumber\\
 %
 	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{}'} \label{L9:Goal2}
+	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod{}, L}{(n-1)}{l}{r'}{\amod{}'} \label{L9:Goal2}
 \end{align}
 %
 
@@ -1808,14 +1248,14 @@ From (\ref{L9:Ass1}) and (\ref{L9:Ass2}) we have:
 %
 \begin{align}
 	&\hspace*{1cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod}{n}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \nonumber
+	\extendsAMUpto{\amod{}, L}{n}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \nonumber
 \end{align}
 %
 From (\ref{L9:I.H}) we can rewrite the above as 
 %
 \begin{align}
 	&\hspace*{1cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \label{L9:Ass3}
+	\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined} \label{L9:Ass3}
 \end{align}
 %
 as required.\\
@@ -1840,7 +1280,7 @@ From (\ref{L9:Ass1}) and (\ref{L9:Ass4}) we have:
   \end{array} \nonumber\\
 %
 	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{n}{l}{r'}{\amod{}'} \label{L9:Ass5}
+	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod{}, L}{n}{l}{r'}{\amod{}'} \label{L9:Ass5}
 \end{align}
 %
 From (\ref{L9:I.H}) we can rewrite (\ref{L9:Ass5}) as
@@ -1856,7 +1296,7 @@ From (\ref{L9:I.H}) we can rewrite (\ref{L9:Ass5}) as
   \end{array} \nonumber\\
 %
 	&\hspace*{2cm}\lor  \nonumber\\
-	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{}'} \label{L9:Ass6}
+	&\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod{}, L}{(n-1)}{l}{r'}{\amod{}'} \label{L9:Ass6}
 \end{align}
 %
 as required.
@@ -1864,19 +1304,6 @@ as required.
 \end{lemma}
 %
 %
-%\begin{lemma}[]\label{lem:crossSplit}
-%Given any separation algebra ($\mathcal{M}, \compose{\mathcal{M}}, \unit{\mathcal{M}}$) with the cross-split property,
-%\[
-%\begin{array}{l}
-%	\for{l_1, l_2, l_3, l_4, f, g\in \mathcal{M}} l_1 \compose{\mathcal{M}} f = l_3 \compose{\mathcal{M}} g \;\land\; l_2 \compose{\mathcal{M}} f = l_4 \compose{\mathcal{M}} g  \implies \\
-%	\hspace*{1cm}\exsts{a, b, d, e \in \mathcal{M}} l_1 = a \compose{\mathcal{M}} d \;\land\; l_2 = b  \compose{\mathcal{M}} d \;\land\; l_3 = q  \compose{\mathcal{M}} e \;\land\; l_4 = b  \compose{\mathcal{M}} e
-%\end{array}
-%\]
-%%
-%\begin{proof}
-%
-%\end{proof}
-%\end{lemma}
 \begin{lemma}[]\label{lem:noMeetByOrder}
 Given any separation algebra ($\mathcal{M}, \compose{\mathcal{M}}, \unit{\mathcal{M}}$) with the cross-split property,
 \[
