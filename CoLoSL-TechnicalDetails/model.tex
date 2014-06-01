@@ -39,24 +39,24 @@ The \emph{maximal overlap} is defined as:
 \end{definition}
 %
 %
-%\begin{definition}[Containment]
-%Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{containment} function:
-%%
-%\[
-%	\contains{.\ }{\ .} : \pset{\mathbb{M}} \rightarrow \mathbb{M} \rightarrow \{true, false\}
-%\]
-%%
-%is defined as:
-%%
-%\[
-%	\contains{S}{m} \iffdef 
-%	\begin{array}{l}
-%		\exsts{M}\;\; m = \prod\limits_{m_{i} \in M}^{\compose{\mathbb{M}}} m_{i} \;\land\;
-%		\for{m_{i} \in M} \exsts{m' \in S} m_{i} \leq m'
-%	\end{array}
-%\]
-%%
-%\end{definition}
+\begin{definition}[Containment]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{containment} function:
+%
+\[
+	\contains{.\ }{\ .} : \pset{\mathbb{M}} \rightarrow \mathbb{M} \rightarrow \{true, false\}
+\]
+%
+is defined as:
+%
+\[
+	\contains{S}{m} \iffdef 
+	\begin{array}{l}
+		\exsts{M}\;\; m = \prod\limits_{m_{i} \in M}^{\compose{\mathbb{M}}} m_{i} \;\land\;
+		\for{m_{i} \in M} \exsts{m' \in S} m_{i} \leq m'
+	\end{array}
+\]
+%
+\end{definition}
 %
 %
 \begin{definition}[Extension]
@@ -72,30 +72,6 @@ is defined as:
 \begin{array}{l}
 	\extend{M} \eqdef \left\{S \;|\; \for{s \in S} \exsts{m \in M} \exsts{r} s = m \compose{\mathbb{M}} r \right\}
 \end{array}
-\]
-%
-\end{definition}
-%
-%
-\begin{definition}[Disjointness]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{disjointness} relation over elements of $\mathbb{M}$:
-%
-\[
-\disjoint : \mathbb{M} \times \mathbb{M}
-\]
-%
-is defined as:
-%
-\[
-\begin{array}{l}
-	m_1 \disjoint m_2 \iffdef \for{m} m \leq m_1 \;\land\; m \leq m_2 \implies m = \unit{\mathbb{M}}
-\end{array}
-\]
-%
-where $m_1 \disjoint m_2$ denotes $(m_1, m_2) \in \disjoint$. We lift disjointness to sets of elements in $\pset{\mathbb{M}}$ where
-%
-\[
-	M_1 \disjoint M_2 \iffdef \for{m_1 \in M_1}\for{m_2 \in M_2} m_1 \disjoint m_2
 \]
 %
 \end{definition}
@@ -123,6 +99,30 @@ where $m_1 \separate m_2$ denotes $(m_1, m_2) \in \separate$.
 %	M_1 \separate M_2 \iffdef \for{m_1 \in M_1}\for{m_2 \in M_2} m_1 \separate m_2
 %\]
 %%
+\end{definition}
+%
+%
+\begin{definition}[Disjointness]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{disjointness} relation over elements of $\mathbb{M}$:
+%
+\[
+\disjoint : \mathbb{M} \times \mathbb{M}
+\]
+%
+is defined as:
+%
+\[
+\begin{array}{l}
+	m_1 \disjoint m_2 \iffdef m_1 \separate m_2 \;\land\; \for{m} m \leq m_1 \;\land\; m \leq m_2 \implies m = \unit{\mathbb{M}}
+\end{array}
+\]
+%
+where $m_1 \disjoint m_2$ denotes $(m_1, m_2) \in \disjoint$. We lift disjointness to sets of elements in $\pset{\mathbb{M}}$ where
+%
+\[
+	M_1 \disjoint M_2 \iffdef \for{m_1 \in M_1}\for{m_2 \in M_2} m_1 \disjoint m_2
+\]
+%
 \end{definition}
 %
 %

@@ -197,7 +197,7 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL c \composeL q \composeL r)\\
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -209,24 +209,24 @@ as required.
 			\begin{array}{l}
 			(p \composeL c, 
 			(p \composeL c \composeL q \composeL r)
-			, \amod{}
+			, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
+			\right) \in \intermediateSem[\lenv]{P}\\
 			
 			\land\; \left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
 			(q \composeL c, 
 			(p \composeL c \composeL q \composeL r)
-			, \amod{}
+			, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{Q}\\
+			\right) \in \intermediateSem[\lenv]{Q}\\
 			
 			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
-			\extendsAM{\amod{}}{p \composeL c \composeL q}{\ r}{\ \amod{}'}
+			\extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{\ r}{\ \amod{}'}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -236,7 +236,7 @@ as required.
 	
 	
 	\text{By Lemma \ref{lemma:contextSwitch}} & 
-	= \left\{
+	\subseteq \left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
 		\left(
@@ -244,7 +244,7 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL c \composeL q \composeL r)\\
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -256,62 +256,24 @@ as required.
 			\begin{array}{l}
 			(p \composeL c, 
 			(p \composeL c \composeL q \composeL r)
-			, \amod{}
+			, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
+			\right) \in \intermediateSem[\lenv]{P}\\
 			
 			\land\; \left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
 			(q \composeL c, 
 			(p \composeL c \composeL q \composeL r)
-			, \amod{}
+			, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{Q}\\
+			\right) \in \intermediateSem[\lenv]{Q}\\
 			
 			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
-			\extendsAM{\amod{}}{p \composeL c}{\ q \composeL r}{\ \amod{}'}
-		\end{array}
-		\hspace*{-0.1cm}
-	\end{array}
-	\hspace*{-0.2cm}
-	\right\} \\
-	
-	
-	
-	& \subseteq
-	\left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
-		\left(
-		\hspace*{-0.15cm}
-		\begin{array}{l}
-		(\unitL, \\
-		(p \composeL c \composeL r)\\
-		, \amod{}
-		\end{array}
-		\hspace*{-0.15cm}
-		\right)
-		&
-		\hspace*{-0.1cm}
-		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(p \composeL c, 
-			(p \composeL c \composeL r)
-			, \amod{}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
-			
-			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
-			
-			\extendsAM{\amod{}}{p \composeL c}{\ r}{\ \amod{}'}
+			\extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\ \amod{}'}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -321,7 +283,9 @@ as required.
 	
 	
 	
-	& \subseteq
+	
+	
+	& =
 	\left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
@@ -330,7 +294,7 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL r)\\
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -342,15 +306,15 @@ as required.
 			\begin{array}{l}
 			(p, 
 			(p \composeL r)
-			, \amod{}
+			, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
+			\right) \in \intermediateSem[\lenv]{P}\\
 			
 			
 			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
-			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
+			\extendsAM{\amod{}, \amod{L}}{p}{\ r}{\ \amod{}'}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -366,137 +330,137 @@ as required.
 \end{proof}
 %
 \end{lemma}
+%%
+%%
+%\begin{lemma}[Interference Hiding]
+%%
+%\[
+%	\shared{P}{I}^{\ \fence{}} \;\land\; I \weakenI{\fence{}} I_1 \;\semimplies\;\; \shared{P}{I_1}
+%\]
+%%
+%\textbf{RTS.} 
+%\[
+%\begin{array}{l}
+%	\for{\lenv} 
+%		\fence{} \fences \left(\intermediateSemI{I}, \semL[\lenv]{P}\right) 
+%		\;\land\; 
+%		\intermediateSemI{I} \weakenI{\fence{}} \intermediateSemI{I_1} 
+%		\semimplies\\
+%	  \hspace*{2cm}\sem[\lenv]{\shared{P}{I}} \subseteq  \sem[\lenv]{\shared{P}{I_1}}
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%\[
+%\begin{array}{r l}
+%	\sem[\lenv]{\shared{P}{I}} &
+%	= \left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		\unitL,
+%		(p \composeL r)
+%		, \amod{}
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%			\left(
+%			\hspace*{-0.15cm}
+%			\begin{array}{l}
+%			p, 
+%			(p \composeL r)
+%			, \amod{}
+%			\end{array}
+%			\hspace*{-0.15cm}
+%			\right) \in \sem[\lenv]{P}\\
+%			
 %
+%			
+%			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
+%			
+%			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	
+%	\text{By Lemma \ref{lem:amodHiding}} & 
+%	\subseteq \left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		\unitL,
+%		(p \composeL r)
+%		, \amod{}
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%			\left(
+%			\hspace*{-0.15cm}
+%			\begin{array}{l}
+%			p, 
+%			(p \composeL r)
+%			, \amod{}
+%			\end{array}
+%			\hspace*{-0.15cm}
+%			\right) \in \sem[\lenv]{P}\\
+%			
 %
-\begin{lemma}[Interference Hiding]
-%
-\[
-	\shared{P}{I}^{\ \fence{}} \;\land\; I \weakenI{\fence{}} I_1 \;\implies\;\; \shared{P}{I_1}
-\]
-%
-\textbf{RTS.} 
-\[
-\begin{array}{l}
-	\for{\lenv} 
-		\fence{} \fences \left(\intermediateSemI{I}, \semL[\lenv]{P}\right) 
-		\;\land\; 
-		\intermediateSemI{I} \weakenI{\fence{}} \intermediateSemI{I_1} 
-		\implies\\
-	  \hspace*{2cm}\sem[\lenv]{\shared{P}{I}} \subseteq  \sem[\lenv]{\shared{P}{I_1}}
-\end{array}
-\]
-%
-\begin{proof}
-\[
-\begin{array}{r l}
-	\sem[\lenv]{\shared{P}{I}} &
-	= \left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
-		\left(
-		\hspace*{-0.15cm}
-		\begin{array}{l}
-		\unitL,
-		(p \composeL r)
-		, \amod{}
-		\end{array}
-		\hspace*{-0.15cm}
-		\right)
-		&
-		\hspace*{-0.1cm}
-		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			p, 
-			(p \composeL r)
-			, \amod{}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
-			
-
-			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
-			
-			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
-		\end{array}
-		\hspace*{-0.1cm}
-	\end{array}
-	\hspace*{-0.2cm}
-	\right\} \\
-	
-	
-	
-	\text{By Lemma \ref{lem:amodHiding}} & 
-	\subseteq \left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
-		\left(
-		\hspace*{-0.15cm}
-		\begin{array}{l}
-		\unitL,
-		(p \composeL r)
-		, \amod{}
-		\end{array}
-		\hspace*{-0.15cm}
-		\right)
-		&
-		\hspace*{-0.1cm}
-		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			p, 
-			(p \composeL r)
-			, \amod{}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
-			
-
-			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I_1} = \amod{}'\\
-			
-			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
-		\end{array}
-		\hspace*{-0.1cm}
-	\end{array}
-	\hspace*{-0.2cm}
-	\right\} \\
-	
-	
-	
-	
-	
-	
-	
-	
-	& = \sem[\lenv]{\shared{P}{I_1}}
-\end{array}
-\]
-%
-\end{proof}
-%
-\end{lemma}
-%
-%
+%			
+%			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I_1} = \amod{}'\\
+%			
+%			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	
+%	
+%	
+%	
+%	
+%	
+%	& = \sem[\lenv]{\shared{P}{I_1}}
+%\end{array}
+%\]
+%%
+%\end{proof}
+%%
+%\end{lemma}
+%%
+%%
 \begin{lemma}[Merge]
 %
 \[
-	\shared{P}{I_1}^{\ \fence{1}} * \shared{Q}{I_2}^{\;\fence{2}}\;\land\; (\fence{1}, I_1) \agrees (\fence{2}, I_2)  \;\implies\;\; \shared{P \sepish Q}{I_1 \cup I_2}
+	\shared{P}{I_1} * \shared{Q}{I_2} \;\implies\;\; \shared{P \sepish Q}{I_1 \cup I_2}
 \]
 %
 \textbf{RTS.} 
 \[
 \begin{array}{l l}
 	\for{\lenv} &
-		\fence{1} \fences \left(\intermediateSemI{I_1}, \sem[\lenv]{P}\right) \;\land\; 
-		\fence{2} \fences \left(\intermediateSemI{I_2}, \sem[\lenv]{Q}\right) \;\land\\
-		&
-		\left(\fence{1}, \intermediateSemI{I_1}\right) \agrees \left(\fence{2}, \intermediateSemI{I_2}\right) \\
-		& \hspace*{1cm} \implies\\
-	  &\sem[\lenv]{\shared{P}{I_1}} * \sem[\lenv]{\shared{Q}{I_2}} \subseteq  \sem[\lenv]{\shared{P \sepish Q}{I_1 \cup I_2}}
+%		\fence{1} \fences \left(\intermediateSemI{I_1}, \sem[\lenv]{P}\right) \;\land\; 
+%		\fence{2} \fences \left(\intermediateSemI{I_2}, \sem[\lenv]{Q}\right) \;\land\\
+%		&
+%		\left(\fence{1}, \intermediateSemI{I_1}\right) \agrees \left(\fence{2}, \intermediateSemI{I_2}\right) \\
+%		& \hspace*{1cm} \implies\\
+	  \sem[\lenv]{\shared{P}{I_1}} * \sem[\lenv]{\shared{Q}{I_2}} \subseteq  \sem[\lenv]{\shared{P \sepish Q}{I_1 \cup I_2}}
 \end{array}
 \]
 %
@@ -504,6 +468,62 @@ as required.
 \[
 \begin{array}{r l}
 	\sem[\lenv]{\shared{P}{I_1} * \shared{Q}{I_2}} &
+%	= \left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		\unitL,
+%		s
+%		, \amod{}, \amod{L}
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%			\left(
+%			\hspace*{-0.15cm}
+%			\begin{array}{l}
+%				p_0, 
+%				(p_0 \composeL r)
+%				, \amod{}
+%			\end{array}
+%			\hspace*{-0.15cm}
+%			\right) \in \sem[\lenv]{P}\\
+%			
+%			\land\; 
+%			\left(
+%			\hspace*{-0.15cm}
+%			\begin{array}{l}
+%				q_0, 
+%				(q_0 \composeL r')
+%				, \amod{}
+%			\end{array}
+%			\hspace*{-0.15cm}
+%			\right) \in \sem[\lenv]{Q}\\
+%
+%			
+%			\land\; r, r' \in \LState \;\land\;
+%			s = p \composeL r = q \composeL r'\\
+%			
+%			\land\; \extendsAM{\amod{}}{p_0}{\ r}{\intermediateSemI{I_1}}
+%			\;\land\; \extendsAM{\amod{}}{q_0}{\ r'}{\intermediateSemI{I_2}}\\
+%			
+%			\land\; p_0 \in F_1 \;\land\; q_0 \in F_2			
+%			\;\land\; F_1 \fences \intermediateSemI{I_1}\\
+%			
+%			\land\; F_2 \fences \intermediateSemI{I_2}
+%			\;\land\; \left(F_1, \intermediateSemI{I_1}\right) \agrees \left(F_2, \intermediateSemI{I_2} \right)
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	&
 	= \left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
@@ -511,64 +531,8 @@ as required.
 		\hspace*{-0.15cm}
 		\begin{array}{l}
 		\unitL,
-		s
-		, \amod{}
-		\end{array}
-		\hspace*{-0.15cm}
-		\right)
-		&
-		\hspace*{-0.1cm}
-		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				p_0, 
-				(p_0 \composeL r)
-				, \amod{}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P}\\
-			
-			\land\; 
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				q_0, 
-				(q_0 \composeL r')
-				, \amod{}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{Q}\\
-
-			
-			\land\; r, r' \in \LState \;\land\;
-			s = p \composeL r = q \composeL r'\\
-			
-			\land\; \extendsAM{\amod{}}{p_0}{\ r}{\intermediateSemI{I_1}}
-			\;\land\; \extendsAM{\amod{}}{q_0}{\ r'}{\intermediateSemI{I_2}}\\
-			
-			\land\; p_0 \in F_1 \;\land\; q_0 \in F_2			
-			\;\land\; F_1 \fences \intermediateSemI{I_1}\\
-			
-			\land\; F_2 \fences \intermediateSemI{I_2}
-			\;\land\; \left(F_1, \intermediateSemI{I_1}\right) \agrees \left(F_2, \intermediateSemI{I_2} \right)
-		\end{array}
-		\hspace*{-0.1cm}
-	\end{array}
-	\hspace*{-0.2cm}
-	\right\} \\
-	
-	
-	&
-	\subseteq \left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
-		\left(
-		\hspace*{-0.15cm}
-		\begin{array}{l}
-		\unitL,
 		p \composeL c \composeL q \composeL r
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -578,36 +542,29 @@ as required.
 			\left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
-				p_0, 
+				p \composeL c, 
 				(p \composeL c \composeL q\composeL r)
-				, \amod{}
+				, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P} \\
+			\right) \in \intermediateSem[\lenv]{P} \\
 			
 			\land\;\left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
-				q_0, 
+				q \composeL c, 
 				(p \composeL c \composeL q \composeL r)
-				, \amod{}
+				, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{Q} \\
+			\right) \in \intermediateSem[\lenv]{Q} \\
 			
-			\land\;c = p_0 \maxMeetL q_0 \;\land\; r \in \LState \\
+			\land\; r \in \LState\\
 			
-			\land\; p_0 = p \composeL c \;\land\; q_0 = c \composeL q \\
+			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\intermediateSemI{I_1}}\\
 			
-			\land\; \extendsAM{\amod{}}{p \composeL c}{\ q \composeL r}{\intermediateSemI{I_1}}\\
-			
-			\land\; \extendsAM{\amod{}}{c \composeL q}{\ p \composeL r}{\intermediateSemI{I_2}}\\
-			
-			\land\; p_0 \in F_1 \;\land\; q_0 \in F_2			
-			\;\land\; F_1 \fences \intermediateSemI{I_1}\\
-			
-			\land\; F_2 \fences \intermediateSemI{I_2}
-			\;\land\; \left(F_1, \intermediateSemI{I_1}\right) \agrees \left(F_2, \intermediateSemI{I_2} \right)
+			\land\; \extendsAM{\amod{}, \amod{L}}{c \composeL q}{\ p \composeL r}{\intermediateSemI{I_2}}
+
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -626,7 +583,7 @@ as required.
 		\begin{array}{l}
 		\unitL,
 		p \composeL c \composeL q \composeL r
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -636,28 +593,26 @@ as required.
 			\left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
-				p_0, 
+				p \composeL c, 
 				(p \composeL c \composeL q\composeL r)
-				, \amod{}
+				, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P} \\
+			\right) \in \intermediateSem[\lenv]{P} \\
 			
 			\land\;\left(
 			\hspace*{-0.15cm}
 			\begin{array}{l}
-				q_0, 
+				c \composeL q, 
 				(p \composeL c \composeL q \composeL r)
-				, \amod{}
+				, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{Q} \\
+			\right) \in \intermediateSem[\lenv]{Q} \\
 			
-			\land\;c = p_0 \maxMeetL q_0 \;\land\; r \in \LState \\
+			\land\; r \in \LState \\
 			
-			\land\; p_0 = p \composeL c \;\land\; q_0 = c \composeL q \\
-			
-			\land\; \extendsAM{\amod{}}{p \composeL c \composeL q}{r}{\intermediateSemI{I_1 \cup I_2}}
+			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{r}{\intermediateSemI{I_1 \cup I_2}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -677,7 +632,7 @@ as required.
 		\begin{array}{l}
 		\unitL,
 		pq \composeL r
-		, \amod{}
+		, \amod{}, \amod{L}
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
@@ -689,15 +644,15 @@ as required.
 			\begin{array}{l}
 				pq, 
 				(pq \composeL r)
-				, \amod{}
+				, \amod{}, \amod{L}
 			\end{array}
 			\hspace*{-0.15cm}
-			\right) \in \sem[\lenv]{P \sepish Q} \\
+			\right) \in \intermediateSem[\lenv]{P \sepish Q} \\
 			
 
 			
 			\land\; r \in \LState \\
-			\land\; \extendsAM{\amod{}}{pq}{r}{\intermediateSemI{I_1 \cup I_2}}
+			\land\; \extendsAM{\amod{}, \amod{L}}{pq}{r}{\intermediateSemI{I_1 \cup I_2}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}

@@ -146,8 +146,8 @@ is defined as:
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-	 \left( l, s, \amod{G}, \amod{L} \right) &
-	 		l \in \semL{p},\; s \in \LState,\; \amod{G} \in \AMods \land L \in \pset{\AMods}
+	 \left( l, s, \amod{}, \amod{L} \right) &
+	 		l \in \semL{p} \;\land\; s \in \LState,\;\land\; \amod{}, \amod{L} \in \AMods 
 	\end{array}
 	\hspace*{-0.1cm}
 	\right\}\\
@@ -156,14 +156,14 @@ is defined as:
 	\intermediateSem{\shared{P}{I}} & \eqdef & 
 	\left\{ 
 	\begin{array}{l | l}
-		(\unitL, l \composeL r, \amod{G}, L) & 
+		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
 		\begin{array}{l}
-			r \in \LState \;\land\; (l, l \composeL r, \amod{G}, L) \in \intermediateSem{P} \\
+			r \in \LState \;\land\; (l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P} \\
 %			\land\; \exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \fences \intermediateSemI{I} \\
 %			\land\; \amod{}' = \semI{I}{\fence{}} \;\land\; 
 	%		\exsts{\fence{}} \fence{} \fences \amod' \;\land\; l \in \fence{} \;\land\; \\
 	%		s \in \extendL{l} \;\land\; 
-			\extendsAM{\amod{G}, L}{l}{r}{\intermediateSemI{I} }
+			\extendsAM{\amod{}, \amod{L}}{l}{r}{\intermediateSemI{I} }
 	
 		\end{array}
 	\end{array} \right\}\\
@@ -172,10 +172,10 @@ is defined as:
 	\intermediateSem{P_1 * P_2} & \eqdef & 
 	\left\{ 
 	\begin{array}{l | l}
-		(l_1 \composeL l_2, s, \amod{G}, L)& 
+		(l_1 \composeL l_2, s, \amod{}, \amod{L})& 
 		\begin{array}{l}
-				 (l_1, s, \amod{G}, L) \in \intermediateSem{P_1} \;\land\\
-				 (l_2, s, \amod{G}, L) \in \intermediateSem{P_2} 
+				 (l_1, s, \amod{}, \amod{L}) \in \intermediateSem{P_1} \;\land\\
+				 (l_2, s, \amod{}, \amod{L}) \in \intermediateSem{P_2} 
 				 %(s_1, \amod_1) \agrees (s_2, \amod_2)
 		\end{array}
 	\end{array} 
@@ -187,103 +187,33 @@ with
 %
 \[
 \begin{array}{l}
-	\extendsAM{\amod{G}, L}{l}{r}{\amod{}'} \iffdef \exsts{F} l \composeL r \in F \;\land\; \for{\amod{L} \in L} F \strictfences \amod{L}  \;\land\; \for{n \in \Nats} \extendsAMUpto{\amod{G}, L}{n}{l}{r}{\amod{}'}  \;\land\; \amod{}' \in L\\\\ 
+	\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'}  \;\land\; \amod{}' \subseteq \amod{L}\\\\ 
 	
 	
-	\extendsAMUpto{\amod{G}, L}{0}{l}{r}{\amod{}'} \iffdef true \\ 
+	\extendsAMUpto{\amod{}, \amod{L}}{0}{l}{r}{\amod{}'} \iffdef true \\ 
 	
-	\extendsAMUpto{\amod{G}, L}{n}{l}{r}{\amod{}'} \iffdef \\ 
+	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \iffdef \\ 
 
-	\hspace*{0.2cm}\for{\ca{}, c, d, l_3, l_4}\for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{})} \\
-	\hspace*{0.4cm}\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right) \;\land\; l_1 \composeL f \leq  l \composeL r \implies\\
-	\hspace*{0.6cm} l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d\implies\\
-	\hspace*{1cm} \left((l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \land
-	\extendsAMUpto{\amod{}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\right) \lor l_2 \composeL c \composeL d \text{ is undefined}\\\\
+	\hspace*{0.2cm}\for{\ca{}, c, d, t, l_3, l_4}\for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{})} \\
+	\hspace*{0.4cm}\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right) \;\land\; l_1 \composeL f \leq  l \composeL r \composeL t \\
+	\hspace*{0.4cm} \land\; l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d \implies\\
+	\hspace*{1cm} \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'}\\
+	\hspace*{1cm}\land\; t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \lor l_2 \composeL c \composeL d \text{ is undefined} \\
 	
-%	\hspace*{0.6cm}  l = l_1 \composeL c \;\land\;  \implies\\
-%	\hspace*{1cm} \left((l_1 \composeL c \composeL r, l_2 \composeL c \composeL r) \in \amod{}(\ca{}) \land
-%	\extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{r}{\amod{}'}\right) \lor l_2 \composeL c \composeL r \text{ is undefined}\\
-%	
-%%	\hspace*{0.6cm} \land\;  r = l_1 \composeL c \;\land\;  (l \composeL l_1 \composeL c, l \composeL l_2 \composeL c) \in \amod{}(\ca{}) \implies\\
-%%	\hspace*{1cm} \extendsAMUpto{\amod}{(n-1)}{l}{l_2 \composeL c}{\amod{}'} \\
-%	
-%	\hspace*{0.6cm} \land\;  l_1 \not\leq l \;\land\; l_1 = l_3 \composeL l_4 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d \implies\\
-%	\hspace*{1cm} \implies\
-%  \hspace*{1cm}\for{l_5, l_6} l_2 = l_5 \composeL l_6 
-%%  \;\land\;  (\for{l'} l' \leq l_5 \land l' \leq l_6  \implies l' = \unitL) 
-%  \implies\\
-%  \hspace*{1.2cm}(l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{})\;\land\; \extendsAMUpto{\amod}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \\
-%  \hspace*{1.2cm} \lor\; l_2 \composeL c \composeL d \text{ is undefined}\\\\
-%%	\hspace*{2cm} \land\\
-	
-%  \hspace*{0.2cm}\land\; \for{l', r', \amod{}''} l' \composeL r' = l \composeL r \;\land\; \extendsAM{\amod{}}{l'}{r'}{\amod{}''} \implies\\
-%  \hspace*{0.4cm}\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}''(\ca{})} \\
-%  \hspace*{0.6cm}	\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right)
-%  \;\land\; \exsts{d} l_1 \composeL f \composeL d = l \composeL r \implies\\
-%  	\hspace*{0.8cm}\exsts{f'} (l_1 \composeL f',\ l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \leq l \composeL r\\
-%	\hspace*{0.8cm}\lor\;\left(l_2 \composeL f \composeL d \hspace*{0.2cm} \text{is undefined}\right)\\
-%\hspace*{0.8cm}	\lor\; l_1 \separate l \;\land\; (l_1 \composeL f \composeL d, l_2 \composeL f \composeL d) \in \amod{}(\ca{}) \;\land\;\exsts{r''} l_2 \composeL f \composeL d =  l \composeL r'' \;\land\; \extendsAMUpto{\amod{}}{(n-1)}{l}{r''}{\amod{}'}\\
-%
-%	\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAMUpto{\amod}{(n-1)}{l}{r'}{\amod{}'}
-
-  \hspace*{0.4cm}\for{\amod{L} \in L} \for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \\
-  \hspace*{0.6cm} l_1 \composeL f \meetL l \composeL r \not= \emptyset \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
-  \hspace*{0.8cm}\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}' \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset\\
+		\hspace*{2cm} \land\\
 	
 
-		\hspace*{0.8cm}\lor\;\for{c, d}  l_1 \composeL f \composeL c = l \composeL r \composeL d \implies\\
-		\hspace*{1cm}
-		\begin{array}{l l}
-			l_2 \composeL f \composeL c \text{ is undefined}\\
-			\lor\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \left( d = \unitL \implies \extendsAMUpto{\amod{G}, L}{(m-1)}{l}{r'}{\amod{}'}\right)
-		\end{array}
+  \hspace*{0.2cm}\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \for{c, d} \\
+  \hspace*{0.4cm} l_1 \composeL f \composeL c = l \composeL r \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
+  \hspace*{0.6cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
+	
 
-  \\\\
+		\hspace*{0.6cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
+		\hspace*{0.6cm}\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r'}{\amod{}'}
+
 \end{array}
-%\begin{array}{l}
-%	\extendsAM{\amod{}}{l}{r}{\amod{}'} \iffdef \\ 
-%
-%	\hspace*{0.2cm}\for{\ca{}, c}\for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{})}\\
-%	\hspace*{0.5cm} \left(\for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL\right) \;\land\;
-%	 l = l_1 \composeL c \;\land\; l_1 \composeL f \leq  l \composeL r \implies\\
-%	\hspace*{1cm} \left((l_1 \composeL c \composeL r, l_2 \composeL c \composeL r) \in \amod{}(\ca{}) \land
-%	\extendsAM{\amod}{l_2 \composeL c}{r}{\amod{}'}\right) \lor l_2 \composeL c \composeL r \text{ is undefined}\\
-%	
-%	\hspace*{2cm} \land\\
-%	\hspace*{0.2cm}\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = l \composeL r \;\implies\\
-%  \hspace*{0.5cm}\exsts{l_0, l'_0, f, f_0} \nonumber\\
-%  \hspace*{1cm}
-%  \begin{array}{l}
-%  	\left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)\;\land\\
-%  	l_1 = l_0 \composeL f_0 \composeL f \;\land\; l'_1 = l'_0 \composeL f_0 \composeL f \;\land\; l_0 \leq l \;\land\\
-%  	(l_0 \composeL f,\ l'_0 \composeL f) \in \amod{}'(\ca{}) 
-%  \end{array} \\
-%
-%	\hspace*{2cm}\lor  \\
-%	\hspace*{0.5cm}\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAM{\amod}{l}{r'}{\amod{}'}
-%	
-%%  \hspace*{0.5cm}\for{\ca{}} \for{(l_1, l'_1) \in \amod{}(\ca{})} l_1 = l \composeL r \land \\
-%% \hspace*{0.5cm} \neg\exsts{r_0, l_0, l'_0} (l_0, l'_0) \in \amod{}'(\ca{}) \;\land\; l_1 = l_0 \composeL r_0 \;\land\; l'_1 = l'_0 \composeL r_0 \implies\\
-%%  
-%%  \hspace*{1cm}\exsts{r'} l'_1 = l \composeL r' \;\land\; \extendsAM{\amod}{l}{r'}{\amod{}'}\\\\
-%\end{array}
 \]
 %
-%
-%\[
-%\begin{array}{r c l}
-%	\fence \fences \amod & \iffdef & \precise{\fence} \;\land\\	
-%	&&\for{\ca{} \in \dom{\amod}}\for{(l_1, l_2) \in \amod(\ca{})}\;
-%		l_1, l_2 \in \fence \\
-%
-%
-%	\precise{\fence} & \iffdef & 
-%		\forall l_1, l_2 \in \fence, \forall l.  l_1 \leq l \;\land\; l_2 \leq l \;
-%		\implies
-%		l_1 = l_2
-%		\vspace*{0.2cm}\\
-%\end{array}
-%\]
 %
 \end{definition}
 %
@@ -311,31 +241,22 @@ with
 where 
 %
 \[
-	\wf{l, s, \amod{}} \iffdef l \composeL s  \text{ is defined}
+	\wf{l, s, \amod{}, \amod{L}} \iffdef l \composeL s  \text{ is defined} \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}
 \]
 %
 \end{definition}
 %
-\[
-\begin{array}{r l}
- \fence{} \fences (I, P) \iffdef & 
- \for{\lenv} \for{(l, -, -) \in \sem[\lenv]{P}} l  \in \fence{} \;\land\\
- & \hspace*{0.8cm} \fence{} \fences \intermediateSemI{I}
-\end{array}
-\]
-% 
+%
 \[ 
 \begin{array}{r l}
+	\fence{} \strictfences \amod{} \iffdef
+ 		& \fence{} \fences \amod{} \;\land\; \local{\amod{}}{\fence{}}\\
+ 		
   \fence{} \fences \amod{} \iffdef 
  & \for{\ca{}} \for {(l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{})} (\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL ) \\
  & \hspace*{0.2cm} \for{l \in \fence{}} (l_1 \composeL f) \meetL l \not= \emptyset \implies \\
  & \hspace*{0.5cm} \for{c} \for{l_3 > \unitL} l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c\implies\\
- & \hspace*{1cm} l_2 \composeL c \in \fence{}\\
-
-
-
-	 \fence{} \strictfences \amod{} \iffdef
- 		& \fence{} \fences \amod{} \;\land\; \local{\amod{}}{\fence{}}
+ & \hspace*{1cm} l_2 \composeL c \in \fence{}	 
 \end{array}
 \]
 %
@@ -346,9 +267,14 @@ where
 	\hspace*{0.5cm}
 	\for{\ca{}} \for{l \in \fence{}} \for{l_1, l_2, f}\\
 	\hspace*{0.8cm} (\for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL) \;\land\; (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{})  \implies \\
-	 \hspace*{1cm} l_1 \leq l \;\;\lor\;\; l_1 \composeL f \meetL l = \emptyset\\
+	 \hspace*{1cm} \left(l_1 \leq l \;\land\; \for{r} l_1 \leq l \composeL r \implies l_1 \maxMeetL r = \unitL\right) \;\;\lor\;\; l_1 \composeL f \meetL l = \emptyset\\\\
+	 
+ \fence{} \fences (I, P) \iffdef  
+ \for{\lenv} \for{(l, -, -, -) \in \sem[\lenv]{P}} l  \in \fence{} \;\land\; \fence{} \fences \intermediateSemI{I}
 \end{array}
 \]
+%
+%
 %
 %\begin{definition}[Action Shifting]
 %%
@@ -637,13 +563,13 @@ where
 	   \left(
 	   \hspace*{-0.2cm}
 	   \begin{array}{l}
-	     (l \composeL l', s, \amod{}, L),\\
+	     (l \composeL l', s, \amod{}, \amod{L}),\\
  	     \left(
 	     \hspace*{-0.2cm}
 	     \begin{array}{l}
 	      l \composeL (\unitH, \ca{1}),\\
 	      s \composeL s',\\
-	      \amod{}', L \cup \{\amod{0}\}
+	      \amod{}', \amod{L} \uplus \amod{0}
 	     \end{array}
  	    \hspace*{-0.2cm}
  	    \right)
@@ -652,25 +578,17 @@ where
  	  \right)
 	   &
  	  \begin{array}{l}
- 	  	s' = l' \composeL (\unitH, \ca{2}) \;\land \\
- 	  	\exsts{\amod{0}, F}\\
- 	  	\hspace*{0.5cm}
- 	  	\for{\ca{} \in \left(\{\ca{1}, \ca{2}\} \cup \dom{\amod{0}}\right)} \\
- 	  	\hspace*{1cm} \for{\ca{}' \in \dom{\amod{}}}\;\; \ca{} \disjoint \ca{}'\\
+ 	  	s' = l' \composeL (\unitH, \ca{2})  \;\land\; \contains{\dom{\amod{0}}}{\ca{1} \composeL \ca{2}}\\
  	  	
- 	  	\hspace*{0.5cm}\land\;  s' \in \fence{} \;\land\; \fence{} \strictfences \amod{0} \\
- 	  	
-			\hspace*{0.5cm} \land\; \extendsAM{\amod{}', L \cup \{\amod{0} \}}{s'}{s}{\amod{0}}\;\land\;			
-			\extendsAM{\amod{}', L \cup \{\amod{0}\}}{s}{s'}{\bigcup\limits_{\amod{i} \in L} \amod{i}}
+ 	  	\land\; \dom{\amod{0}} \disjoint \dom{\amod{L}}
+			\land\; \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{s'}{s}{\amod{0}}\\
 			
+			\land\; \for{l_1, r_1, \amod{1} \subseteq \amod{L}} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
+			\hspace*{1cm} \implies\extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
 			
-%			\hspace*{0.5cm}\land\; \for{l_1, r_1, \amod{1}} l_1 \composeL r_1 = s \land \extendsAM{\amod{}}{l_1}{r_1}{\amod{1}}  \\
-%			\hspace*{1cm} \implies\extendsAM{\amod{}'}{l_1}{r_1 \composeL s'}{\amod{1}}
-			
-%			\land\; \extendsAM{\amod{}'}{s}{\;l' \composeL (\unitH, \ca{2})}{\ \amod{}} \\
-%			\land\; \extendsAM{\amod{}'}{l' \composeL (\unitH, \ca{2})}{\ s}{\amod{0}} \\
      	
    	\end{array}
+   	\hspace*{-0.15cm}
  	\end{array}
  	\hspace*{-0.2cm}
 	\right\}\\\\
@@ -682,8 +600,8 @@ where
 	   \left(
 	   \hspace*{-0.2cm}
 	   \begin{array}{l}
-	     (l, s, \amod{}, L),\\
-	     (l', s', \amod{}, L)\\
+	     (l, s, \amod{}, \amod{L}),\\
+	     (l', s', \amod{}, \amod{L})\\
 	   \end{array}
 	   \hspace*{-0.2cm}
  	  \right)
@@ -718,13 +636,13 @@ where
 	   \left(
 	   \hspace*{-0.2cm}
 	   \begin{array}{l}
-	     (l, s, \amod{}, L),\\
+	     (l, s, \amod{}, \amod{L}),\\
  	     \left(
 	     \hspace*{-0.2cm}
 	     \begin{array}{l}
 	      l,
 	      s,
-	      \amod{}, L \cup \{\amod{0}\}
+	      \amod{}, \amod{L} \cup \amod{0}
 	     \end{array}
  	    \hspace*{-0.2cm}
  	    \right)
@@ -733,8 +651,8 @@ where
  	  \right)
 	   &
  	  \begin{array}{l}
- 	  	\for{l, r} \for{\amod{i} \in L} \extendsAM{\amod{}, L}{l}{r}{\amod{i}} \implies \\
- 	  	\hspace*{0.5cm}\extendsAM{\amod{}, L \cup \{\amod{0}\}}{l}{r}{\amod{i}}
+ 	  	\for{l, r} \for{\amod{1} \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}} \implies \\
+ 	  	\hspace*{0.5cm}\extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{1}}
 %			\expandsAM{\amod{}, L \cup \{\amod{0}\}}{s}{\unitL}{L}{\amod{}}
 			
    	\end{array}
@@ -758,20 +676,26 @@ where
 	\begin{array}{l | l}
 		\left(
 		\begin{array}{l}
-			\left(l, s, \amod{}, L \right),\\
-			\left(l, s \composeL s', \amod{}', L \cup \{\amod{0}\} \right)
+			\left(l, s, \amod{}, \amod{L} \right),\\
+			\left(l, s \composeL s', \amod{}', \amod{L} \uplus \amod{0} \right)
 		\end{array}
 		\right)
 		&
 		\begin{array}{l}
-		
-			\extendsAM{\amod{}', L \cup \{\amod{0}\}}{s}{s'}{\bigcup\limits_{\amod{i} \in L} \amod{i}}	\\	
+			\dom{\amod{0}} \disjoint \dom{\amod{L}}
 			\;\land\;
-			\extendsAM{\amod{}', L \cup \{\amod{0}\}}{s'}{s}{\amod{0}}		
+			\extendsAM{\amod{}', \amod{L} \uplus \{\amod{0}\}}{s'}{s}{\amod{0}}		\\
+			
+			\land\;\for{l, r, \amod{1} \subseteq \amod{L}} l \composeL r = s \;\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}}\\
+			\hspace*{1cm} \implies \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{l}{r \composeL s'}{\amod{1}}\\
+%			\extendsAM{\amod{}', L \cup \{\amod{0}\}}{s}{s'}{\bigcup\limits_{\amod{i} \in L} \amod{i}}	\\	
+			
 %\bigcup\limits_{\amod{i} \in L} \amod{i}
 
 		\end{array}
+		\hspace*{-0.15cm}
 	\end{array}	
+	\hspace*{-0.2cm}
 	\right\}\\\\
 	
 	
@@ -780,8 +704,8 @@ where
 	\begin{array}{l | l}
 		\left(
 		\begin{array}{l}
-			\left(l, s, \amod{}, L \right),\\
-			\left(l, s', \amod{}, L \right)
+			\left(l, s, \amod{}, \amod{L} \right),\\
+			\left(l, s', \amod{}, \amod{L}\right)
 		\end{array}
 		\right)
 		&
@@ -806,13 +730,13 @@ where
 	   \left(
 	   \hspace*{-0.2cm}
 	   \begin{array}{l}
-	     (l, s, \amod{}, L),\\
+	     (l, s, \amod{}, \amod{L}),\\
  	     \left(
 	     \hspace*{-0.2cm}
 	     \begin{array}{l}
 	      l,
 	      s,
-	      \amod{}, L \cup \{\amod{0}\}
+	      \amod{}, \amod{L} \cup \amod{0}
 	     \end{array}
  	    \hspace*{-0.2cm}
  	    \right)
@@ -821,8 +745,8 @@ where
  	  \right)
 	   &
  	  \begin{array}{l}
- 	  	\for{l, r} \for{\amod{i} \in L} \extendsAM{\amod{}, L}{l}{r}{\amod{i}} \implies \\
- 	  	\hspace*{0.5cm}\extendsAM{\amod{}, L \cup \{\amod{0}\}}{l}{r}{\amod{i}}
+ 	  	\for{l, r} \for{\amod{1} \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}} \implies \\
+ 	  	\hspace*{0.5cm}\extendsAM{\amod{}, \amod{L} \cup \{\amod{0}\}}{l}{r}{\amod{1}}
 %			\expandsAM{\amod{}, L \cup \{\amod{0}\}}{s}{\unitL}{L}{\amod{}}
 			
    	\end{array}
