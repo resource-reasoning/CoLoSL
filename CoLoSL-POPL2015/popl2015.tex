@@ -54,13 +54,13 @@
                                   % (paid open-access papers, 
                                   % short abstracts)
 
-\titlebanner{banner above paper title}        % These are ignored unless
-\preprintfooter{short description of paper}   % 'preprint' option specified.
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
 
 \title{CoLoSL: Concurrent Local Subjective Logic}
 \subtitle{}
 
-\authorinfo{Philippa Gardner, Azalea Raad, Jules Villard}
+\authorinfo{Philippa Gardner\and Azalea Raad\and Jules Villard}
            {Imperial College London}
            {\{pg, azalea, j.villard\}@imperial.ac.uk}
 %\authorinfo{Name2\and Name3}
@@ -90,38 +90,10 @@ keyword1, keyword2
 \input{Sections/FurtherExamples/examples.tex}
 \input{Sections/Conclusions/conclusions.tex}
 
-
-
-\appendix
-\section{Appendix Title}
-
-This is the text of the appendix, if you need one.
-
-\acks
-
-Acknowledgments, if needed.
-
-% We recommend abbrvnat bibliography style.
-
+% POPL recommends abbrvnat bibliography style.
 \bibliographystyle{abbrvnat}
-
+\bibliography{biblio}
 % The bibliography should be embedded for final submission.
-
-\begin{thebibliography}{}
-\softraggedright
-
-\bibitem[Smith et~al.(2009)Smith, Jones]{smith02}
-P. Q. Smith, and X. Y. Jones. ...reference text...
-
-\end{thebibliography}
 
 
 \end{document}
-
-%                       Revision History
-%                       -------- -------
-%  Date         Person  Ver.    Change
-%  ----         ------  ----    ------
-
-%  2013.06.29   TU      0.1--4  comments on permission/copyright notices
-

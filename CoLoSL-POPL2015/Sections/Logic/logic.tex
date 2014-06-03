@@ -1,34 +1,48 @@
-\section{The \colosl\ Logic}\label{sec:logic}
+\section{The \colosl Logic}\label{sec:logic}
 \todo introductory paragraph?\\
 We present our assertion language and program logic. 
 
-\subsection{\colosl\ Assertions}
-Recall from \S\missref\ that our proof judgements are of the form $\vdash \{P\} C \{Q\}$ where $P$ and $Q$ are \emph{assertions} from the set \Assertions. Assertions are constructed from standard connectives and quantifiers of propositional and separation logic together with \emph{heap assertions} in \HAssertions\ and capability assertions in \KAssertions. Assertions describe both thread-local and \emph{shared} resources; we write $\shared{P}{I}$ to denote a shared resource characterised by $P$ where $I$ indicates an \emph{interference assertion} in \IAssertions. \colosl\ is parametric with respect to the heap and capability assertions and can be instantiated with any assertion language so long as they are interpreted over elements of a separation algebra \cite{\missref}. Typically, we take \HAssertions\ to be the standard heap assertions \cite{\missref} and use  capability assertions in the style of tokens in \cite{\missref} such as those in \S\ref{}.
+\subsection{\colosl Assertions}
+Recall from \S\ref{TODO} that our proof judgements are of the form
+$\hoare{P} C {Q}$ where $P$ and $Q$ are \emph{assertions} from the set
+\Assertions. Assertions are constructed from standard connectives and
+quantifiers of propositional and separation logic together with
+\emph{heap assertions} in \HAssertions and capability assertions in
+\KAssertions. Assertions describe both thread-local and \emph{shared}
+resources; we write $\shared{P}{I}$ to denote a shared resource
+characterised by $P$ where $I$ indicates an \emph{interference
+  assertion} in \IAssertions. \colosl is parametric with respect to
+the heap and capability assertions and can be instantiated with any
+assertion language so long as they are interpreted over elements of a
+separation algebra~\cite{asl}. Typically, we take
+\HAssertions to be the standard heap assertions~\cite{rey02} and
+use capability assertions in the style of tokens in~\cite{TODO}
+such as those in \S\ref{}.
 % 
-\begin{definition}[\colosl\ Assertions]\label{def:assertions}
-The assertions of \colosl\ are defined as follows where $\heapAss{} \in \HAssertions$, $\capAss{} \in \KAssertions$ and $x, y$ range over logical variables interpreted over a \emph{logical environment} $\lenv \in \LEnv$.
+\begin{definition}[\colosl Assertions]\label{def:assertions}
+The assertions of \colosl are defined as follows where $\heapAss{} \in \HAssertions$, $\capAss{} \in \KAssertions$ and $x, y$ range over logical variables interpreted over a \emph{logical environment} $\lenv \in \LEnv$.
 %
 \[
-\begin{array}{r l}
-	P, Q  ::= & \emp \;|\; \heapAss{} \;|\; \capAss{} \;|\; P * Q \;|\; P \ewand\ Q \:|\; P \sepish Q \;|\; \shared{P}{I} \;|\; \\
-	& \exsts{x} P \;|\; \m{false} \;|\; P \Rightarrow Q \\
-	I ::= & \interAss{\capAss{}}{\vec{y}}{P}{Q} \;|\; I_1,I_2
+\begin{array}{r@{}l}
+	P, Q  ::=\null& \emp \mid \heapAss{} \mid \capAss{} \mid P * Q \mid P \ewand Q \:|\; P \sepish Q \mid \shared{P}{I} \mid \\
+	& \exsts{x} P \mid \m{false} \mid P \Rightarrow Q \\
+	I ::=\null& \interAss{\capAss{}}{\vec{y}}{P}{Q} \mid I_1,I_2
 \end{array}
 \]
 %
-In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic \cite{\missref} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''. The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. For instance, in the example of \ref{\missref}, \fig\ref{} describes parts of the shared state that contains the $x$ and $z$ variables. However, the overall shared state contains the $z$ variable as well as $x$ and $y$ as depicted in \fig\ref{}. Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
+In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{TODO} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''. The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. For instance, in the example of~\ref{TODO}, \fig\ref{} describes parts of the shared state that contains the $x$ and $z$ variables. However, the overall shared state contains the $z$ variable as well as $x$ and $y$ as depicted in \fig\ref{}. Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
 
-In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with $\textsf{[X]}_{-}$ in \S\ref{\missref} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{\missref} where through action rewriting, $\textsf{[Z]}_{-}$ is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments as with the example of \S\ref{}. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
+In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with $\textsf{[X]}_{-}$ in \S\ref{TODO} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{TODO} where through action rewriting, $\textsf{[Z]}_{-}$ is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments as with the example of \S\ref{}. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
 \end{definition}
 %
 %
 \subsection{Assertion Model}
-Recall that \colosl\ assertions are parametric with respect to the heap and capability assertions so long as they are interpreted over elements of a separation algebra. 
+Recall that \colosl assertions are parametric with respect to the heap and capability assertions so long as they are interpreted over elements of a separation algebra. 
 %
 \begin{parameter}[Heap Separation Algebra]\label{par:heapSA}
-Let $(\Heaps, \composeH, \unitH)$ be any separation algebra\cite{sa} with the cross-split property\footnote{
+Let $(\Heaps, \composeH, \unitH)$ be any separation algebra with the cross-split property~\cite{dockins2009fresh}\footnote{%
 $	
-\begin{array}{l}
+\begin{array}[t]{l}
 	\for{h_1, h_2, h_3, h_4 \in \Heaps}
 	h_1 \composeH h_2 = h_3 \composeH h_4 \implies \\
 	\hspace*{0.3cm}	
@@ -38,7 +52,7 @@ $
 		& h_3 = h_{13} \composeH h_{23} \;\land\; h_4 = h_{14} \composeH h_{24}
 	\end{array}
 \end{array}
-$
+$%
 } representing heaps ranged over by $\h{}$. Assume a set of heap assertions $\HAssertions$ ranged over by $\heapAss{}$ and an associated semantics function:
 %
 \[
@@ -51,7 +65,7 @@ In the examples of this paper, we take $\Heaps$ to be the standard heap model: t
 %
 %
 \begin{parameter}[Capability Separation Algebra]\label{par:capSA}
-Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra~\cite{sa} with the cross-split property, representing capability resources ranged over by $\ca{}$. Assume a set of capability assertions $\KAssertions$ ranged over by $\capAss{}$ and an associated semantics function:
+Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra with the cross-split property, representing capability resources ranged over by $\ca{}$. Assume a set of capability assertions $\KAssertions$ ranged over by $\capAss{}$ and an associated semantics function:
 %
 \[
 	\semK[\blankArg]{.} : \KAssertions \rightarrow \LEnv \rightarrow \pset{\Caps}
@@ -63,7 +77,7 @@ Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra~\cite{
 We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from $\{0,1\}$; that is, $\Caps: \textsf{Token} \rightarrow \{0,1\}$ where $\composeCap$ is defined as addition. Intuitively, $1$ represents exclusive capability while $0$ represents no capability.
 %
 
-For simplicity, in this paper we assume that the separation algebras of both heaps and capability resources (\param s \ref{par:heapSA} and \ref{par:capSA}) have the disjointness property\footnote{$\for{h, h' \in \Heaps} h \composeH h = h' \implies h = h' = \unitH$}. However, the theory of \colosl\ as presented in \cite{techreport} does not require the disjointness property and can be instantiated with any separation algebra.
+For simplicity, in this paper we assume that the separation algebras of both heaps and capability resources (\param s~\ref{par:heapSA} and~\ref{par:capSA}) have the disjointness property\footnote{$\for{h, h' \in \Heaps} h \composeH h = h' \implies h = h' = \unitH$}. However, the theory of \colosl as presented in~\cite{techreport} does not require the disjointness property and can be instantiated with any separation algebra.
 
 Our assertions distinguish between thread-local and shared resources, where the former is private to the thread and the latter is shared amongst all threads and is thus subject to interference. Both thread-local and shared resources are described through heap and capability assertions. Heap assertions are used to represent the current state of the memory while capability assertions are used to specify how shared resources can be manipulated. We thus define \emph{logical states} which pair heaps with capabilities to represent both thread-local and shared states.
 %
@@ -129,7 +143,7 @@ The \emph{composition of worlds} is defined as
 	w \composeW w' \eqdef (\localPart{w} \composeL \localPart{w'},\; \sharedPart{w} \composeS \sharedPart{w'},\; \amodelPart{w} \composeAM \amodelPart{w'},\; \amodelPartL{w} \composeAM \amodelPartL{w'})
 \]
 %
-We defer the formal definition of \wf{.} to the proceeding section. Informally, well-formedness ensures that the local and shared state are disjointed from one another and that the updates permitted by the action model are well-behaved with respect to future extensions of the shared state. Later in \S\ref{\missref}, we justify the need for both local and global action models.
+We defer the formal definition of \wf{.} to the proceeding section. Informally, well-formedness ensures that the local and shared state are disjointed from one another and that the updates permitted by the action model are well-behaved with respect to future extensions of the shared state. Later in \S\ref{TODO}, we justify the need for both local and global action models.
 
 Finally, given a world $w \in \Worlds$, its \emph{collapse into a logical state},
 %
@@ -147,7 +161,7 @@ $
 %
 %
 \subsection{Shared State Extension}\label{subsec:extension}
-Recall from \ref{\missref} that a thread can always \emph{extend} a shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
+Recall from~\ref{TODO} that a thread can always \emph{extend} a shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
 %
 \begin{example}\label{ex:badExtension}
 Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}{-}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X}{1} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
@@ -255,7 +269,7 @@ An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} 
 \]
 %
 That is, given any capability $\ca{}$, and an action associated with it $(p, q) \in \amod{}(\ca{})$, where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition ($l \meetL p \not= \emptyset$), if there is an overlap between $l$ and the update precondition ($l_1 \maxMeetL l = l_3 > \unitL$), then the state resulting from the update ($l_2 \composeL c$) is also in $\fence{}$.
-For instance in \ex\ref{\missref} $\fence{\ref{}} = \left\{\cell{x}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots, 100\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \;|\; v \in \{0 ,\cdots, 99 \}\right\}$ of $I$ in \fig\ref{\missref}.
+For instance in \ex\ref{TODO} $\fence{\ref{}} = \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 100\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 99 \}\right\}$ of $I$ in \fig\ref{TODO}.
 % 
 \end{definition}
 %
@@ -328,11 +342,11 @@ That is, there exists an invariant $\fence{}$ that contains the current shared s
 %
 %
 \subsection{Assertion Semantics}\label{subsec:semantics}
-We proceed with the semantics of \colosl\ assertions as defined in \defin\ref{def:assertions}. We first define an intermediate semantics $\intermediateSem[(.)]{.}$ that does not enforce well-formedness and then describe the semantics $\sem[(.)]{.}$ by restricting them to the set of well-formed worlds. We then define the semantics of interference assertions $\semI[(.)]{.}$. 
+We proceed with the semantics of \colosl assertions as defined in \defin\ref{def:assertions}. We first define an intermediate semantics $\intermediateSem[(.)]{.}$ that does not enforce well-formedness and then describe the semantics $\sem[(.)]{.}$ by restricting them to the set of well-formed worlds. We then define the semantics of interference assertions $\semI[(.)]{.}$. 
 %
 %
 \begin{definition}[Assertion Semantics]
-Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics} of \colosl\ assertions $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\LStates \times \LStates \times \AMods \times \AMods}$ are given as follows where $\semI[(.)]{.}$ denotes the semantics of interference assertions described in \defin ~\ref{def:interferenceSemantics}.
+Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics} of \colosl assertions $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\LStates \times \LStates \times \AMods \times \AMods}$ are given as follows where $\semI[(.)]{.}$ denotes the semantics of interference assertions described in \defin ~\ref{def:interferenceSemantics}.
 %
 \[
 \hspace*{-0.2cm}
@@ -423,7 +437,7 @@ Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics}
 	
 	
 	
-	\intermediateSem{P \ewand\ Q} 
+	\intermediateSem{P \ewand Q} 
 	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
 	\left\{ 
 	\hspace*{-0.2cm}
@@ -488,7 +502,7 @@ Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics}
 \end{array}
 \]
 %
-The semantics of propositional formulae are standard and are omitted here. The semantics of heap and capability assertions are given in terms of their respective semantics functions (\param s ~\ref{par:heapSA} and ~\ref{par:capSA}). Note that the semantics of $\heapAss{}$, $\capAss{}$ and \emp\ use arbitrary shared states $s$ and action models $\amod{}, \amod{L}$. The semantics of separation logic connectives $*, \ewand$ and $\ \sepish$ are standard. 
+The semantics of propositional formulae are standard and are omitted here. The semantics of heap and capability assertions are given in terms of their respective semantics functions (\param s ~\ref{par:heapSA} and ~\ref{par:capSA}). Note that the semantics of $\heapAss{}$, $\capAss{}$ and \emp use arbitrary shared states $s$ and action models $\amod{}, \amod{L}$. The semantics of separation logic connectives $*, \ewand$ and $\sepish$ are standard. 
 
 $\shared{P}{I}$ states that $P$ holds for \emph{parts} of the shared state and thus the overall shared state is given by extension of the subjective view $l$ with an arbitrary logical state $r$ representing the \emph{context} not visible by the current subjective view. The interference associated with this part of the shared state is given by interference assertion $\semI[\lenv]{I}$ such that the global and local action models $\amod{}, \amod{L}$ are \emph{closed} under $\semI[\lenv]{I}$ with respect to the subjective view $l$ and context $r$. In \S\ref{subsec:localGlobalActionModels} we justify the need for global and local action models and formalise action model closuer $\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'}$. 
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
@@ -501,13 +515,13 @@ We permit nesting of shared state assertions since it is particularly useful in 
 %
 
 
-The \emph{semantics} of \colosl\ assertions $\sem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\Worlds}$ is defined as:
+The \emph{semantics} of \colosl assertions $\sem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\Worlds}$ is defined as:
 %
 \[
 	\sem[\lenv]{P} \eqdef 
 	\left\{ 
 		(l, s, \amod{}, \amod{L}) 
-		\;|\;
+		\mid
 		(l, s, \amod{}, \amod{L}) \in \intermediateSem[\lenv]{P} \cap \Worlds	
 	\right\}
 \]

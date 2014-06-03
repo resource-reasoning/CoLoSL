@@ -39,13 +39,12 @@
 \newtheorem{example}{Example}
 
 \newcommand{\blankArg}{(.)}
-\newcommand{\emp}{\textsf{emp}}
+\newcommand{\emp}{\ensuremath{\mathsf{emp}}\xspace}
 
-\newcommand{\colosl}{\text{CoLoSL}}
-\newcommand{\missref}{???}
-\newcommand{\fig}{Fig.}
+\newcommand{\colosl}{\text{CoLoSL}\xspace}
+\newcommand{\fig}{Fig.\ \xspace}
 \newcommand{\param}{Parameter}
-\newcommand{\defin}{Def.}
+\newcommand{\defin}{Def.\ \xspace}
 \newcommand{\ex}{Example}
 
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,8 +63,8 @@
 \newcommand{\dom}[1]{\textsf{dom}\left( #1 \right)}
 \newcommand{\codom}[1]{\textsf{co-dom}\left( #1 \right)}
 
-\newcommand{\for}[1]{\forall\; #1.\; }
-\newcommand{\exsts}[1]{\exists\; #1.\;}
+\newcommand{\for}[1]{\forall #1.\,}
+\newcommand{\exsts}[1]{\exists #1.\,}
 
 \newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
@@ -98,7 +97,7 @@
 \newcommand{\capSize}[1]{\size{#1}{\Caps}}
 
 %%%%Heaps
-\newcommand{\Heaps}{\ensuremath{\mathbb{H}}}
+\newcommand{\Heaps}{\ensuremath{\mathbb{H}}\xspace}
 \newcommand{\h}[1]{\ensuremath{h_{#1}}}
 \newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
 \newcommand{\composeH}{\ensuremath{\compose{\Heaps}}}
@@ -178,21 +177,21 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%% Assertions %%%%%%%%%%%%%%%%%%%%%%%%
 %
-\newcommand{\Assertions}{\textsf{Assn}}
-\newcommand{\LAssertions}{\textsf{LAssn}}
-\newcommand{\KAssertions}{\textsf{KAssn}}
-\newcommand{\HAssertions}{\textsf{HAssn}}
-\newcommand{\IAssertions}{\textsf{IAssn}}
-\newcommand{\PEnv}{\textsf{PEnv}}
-\newcommand{\LEnv}{\textsf{LEnv}}
-\newcommand{\penv}{\ensuremath{\Delta}}
-\newcommand{\lenv}{\ensuremath{\Gamma}}
+\newcommand{\Assertions}{\textsf{Assn}\xspace}
+\newcommand{\LAssertions}{\textsf{LAssn}\xspace}
+\newcommand{\KAssertions}{\textsf{KAssn}\xspace}
+\newcommand{\HAssertions}{\textsf{HAssn}\xspace}
+\newcommand{\IAssertions}{\textsf{IAssn}\xspace}
+\newcommand{\PEnv}{\textsf{PEnv}\xspace}
+\newcommand{\LEnv}{\textsf{LEnv}\xspace}
+\newcommand{\penv}{\ensuremath{\Delta}\xspace}
+\newcommand{\lenv}{\ensuremath{\Gamma}\xspace}
 \newcommand{\sepish}{\ocon}
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \newcommand{\shared}[2]{\boxed{#1}_{\; #2}}
 \newcommand{\swap}{\rightsquigarrow}
-\newcommand{\ewand}{-\!\!\circledast}
+\newcommand{\ewand}{\septraction}
 \newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 \newcommand{\multiInterAss}[5]{\ensuremath{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}}
 
@@ -202,7 +201,9 @@
 \newcommand{\shiftInterference}[2]{\left\lvert #1\right\rvert^{#2}}
 
 \newcommand{\token}[2]{\ensuremath{\left[\textsf{#1}\right]_{#2}}}
-%
+
+\newcommand{\hoare}[3]{\vdash\,\{#1\}\;#2\;\{#3\}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% Semantics %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\wf}[1]{\ensuremath{\textsf{wf}\left( #1 \right)}}
