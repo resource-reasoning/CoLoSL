@@ -41,6 +41,10 @@
 
 \newcommand{\colosl}{\text{CoLoSL}}
 \newcommand{\missref}{???}
+\newcommand{\fig}{Fig.}
+\newcommand{\param}{Parameter}
+\newcommand{\defin}{Def.}
+\newcommand{\ex}{Example}
 
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -59,7 +63,7 @@
 \newcommand{\for}[1]{\forall\; #1.\; }
 \newcommand{\exsts}[1]{\exists\; #1.\;}
 
-\newcommand{\cell}[2]{\text{#1} \mapsto #2}
+\newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
@@ -105,7 +109,7 @@
 \newcommand{\ms}[1]{\sigma_{#1}}
 
 %%%%Logical States
-\newcommand{\LState}{\textsf{LState}}
+\newcommand{\LStates}{\textsf{LState}}
 \newcommand{\composeL}{\compose{\textsf{L}}}
 \newcommand{\composeS}{\compose{=}}
 \newcommand{\meetL}{\meet{\textsf{L}}}
@@ -113,7 +117,7 @@
 \newcommand{\unitL}{\unit{\textsf{L}}}
 \newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
 \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-
+\newcommand{\updateFP}[1]{\ensuremath{\mathcal{U}\left(#1\right)}}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
@@ -179,18 +183,21 @@
 \newcommand{\LEnv}{\textsf{LEnv}}
 \newcommand{\penv}{\ensuremath{\Delta}}
 \newcommand{\lenv}{\ensuremath{\Gamma}}
-\newcommand{\sepish}{\cup \hspace*{-7pt} \text{\tiny *} \hspace*{4pt}}
+\newcommand{\sepish}{\cup \hspace*{-6pt} \text{\tiny *} \hspace*{4pt}}
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \newcommand{\shared}[2]{\boxed{#1}_{\; #2}}
-\newcommand{\swap}{\leadsto}
+\newcommand{\swap}{\rightsquigarrow}
+\newcommand{\ewand}{-\!\!\circledast}
 \newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
-\newcommand{\condInterAss}[6]{\ensuremath{\lambda #1. #2: \left\{ \exsts{#3} #4, #5 \swap #6 \right\} }}
+\newcommand{\multiInterAss}[5]{\ensuremath{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}}
 
 \newcommand{\strengthenAction}[2]{\left\lceil #1 \right\rceil^{#2}}
 \newcommand{\weakenAction}[2]{\left\lfloor #1 \right\rfloor_{#2}}
 \newcommand{\shiftAction}[2]{\left\lvert #1\right\rvert^{#2}}
 \newcommand{\shiftInterference}[2]{\left\lvert #1\right\rvert^{#2}}
+
+\newcommand{\token}[2]{\ensuremath{\left[\textsf{#1}\right]_{#2}}}
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Semantics %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -200,7 +207,7 @@
 \newcommand{\semH}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{H}}
 \newcommand{\semK}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{K}}
 \newcommand{\semL}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{\textsf{L}}}
-\newcommand{\semI}[2]{\left[ \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right]^{#2}}
+\newcommand{\semI}[2][\lenv]{\left\langle \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right\rangle_{#1}}
 \newcommand{\intermediateSemI}[1]{\ensuremath{\left( \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right)}}
 \newcommand{\intermediateSem}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}}
 \newcommand{\sem}[2][\lenv]{\left[ \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right]_{#1}}

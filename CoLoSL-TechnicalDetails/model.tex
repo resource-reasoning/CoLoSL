@@ -1,82 +1,5 @@
 \section*{General Definitions}
 %
-\begin{definition}[Separation Algebra Size]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{size} function:
-%
-\[
-\size{\blankArg}{\mathbb{M}} : \mathbb{M} \rightarrow \pset{\mathbb{M}}
-\]
-%
-is defined as:
-%
-\[
-	\size{m}{\mathbb{M}} \eqdef \left\{ m' \;|\; \exsts{m''}\; m \compose{\mathbb{M}} m' = m'' \right\}
-\]
-%
-%
-\end{definition}
-%
-%
-\begin{definition}[Overlap]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{overlap} function:
-%
-\[
-\meet{\mathbb{M}} : \left(\mathbb{M} \times \mathbb{M} \right)\rightarrow \pset{\mathbb{M}}
-\]
-%
-is defined as:
-%
-\[
-	m_1 \meet{\mathbb{M}} m_2 \eqdef \left\{ m \;|\; \exsts{m', m'', m_3} m_1 = m \compose{\mathbb{M}} m' \;\land\; m_2 = m \compose{\mathbb{M}} m'' \;\land\; m \compose{\mathbb{M}} m' \compose{\mathbb{M}} m'' = m_3 \right\}
-\]
-%
-The \emph{maximal overlap} is defined as:
-%
-\[
-	m_1 \maxMeet{\mathbb{M}} m_2 = m \iffdef m \in (m_1 \meet{\mathbb{M}} m_2) \;\land\; \for{m' \in (m_1 \meet{\mathbb{M}} m_2)} m' \leq m
-\]
-%
-\end{definition}
-%
-%
-\begin{definition}[Containment]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{containment} function:
-%
-\[
-	\contains{.\ }{\ .} : \pset{\mathbb{M}} \rightarrow \mathbb{M} \rightarrow \{true, false\}
-\]
-%
-is defined as:
-%
-\[
-	\contains{S}{m} \iffdef 
-	\begin{array}{l}
-		\exsts{M}\;\; m = \prod\limits_{m_{i} \in M}^{\compose{\mathbb{M}}} m_{i} \;\land\;
-		\for{m_{i} \in M} \exsts{m' \in S} m_{i} \leq m'
-	\end{array}
-\]
-%
-\end{definition}
-%
-%
-\begin{definition}[Extension]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{extension} function:
-%
-\[
-\extend{.} : \pset{\mathbb{M}} \rightarrow \pset{\pset{\mathbb{M}}}
-\]
-%
-is defined as:
-%
-\[
-\begin{array}{l}
-	\extend{M} \eqdef \left\{S \;|\; \for{s \in S} \exsts{m \in M} \exsts{r} s = m \compose{\mathbb{M}} r \right\}
-\end{array}
-\]
-%
-\end{definition}
-%
-%
 \begin{definition}[Separation]
 Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{separation} relation over elements of $\mathbb{M}$:
 %
@@ -127,6 +50,66 @@ where $m_1 \disjoint m_2$ denotes $(m_1, m_2) \in \disjoint$. We lift disjointne
 %
 %
 \noindent\textbf{Note: } When a separation algebra has the disjointness property, the definitions of disjointness ($\disjoint$) and separation ($\separate$) coincide.
+%
+%
+\begin{definition}[Separation Algebra Size]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{size} function:
+%
+\[
+\size{\blankArg}{\mathbb{M}} : \mathbb{M} \rightarrow \pset{\mathbb{M}}
+\]
+%
+is defined as:
+%
+\[
+	\size{m}{\mathbb{M}} \eqdef \left\{ m' \;|\; m \;\separate\; m'\right\}
+\]
+%
+%
+\end{definition}
+%
+%
+\begin{definition}[Overlap]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{overlap} function:
+%
+\[
+\meet{\mathbb{M}} : \left(\mathbb{M} \times \mathbb{M} \right)\rightarrow \pset{\mathbb{M}}
+\]
+%
+is defined as:
+%
+\[
+	m_1 \meet{\mathbb{M}} m_2 \eqdef \left\{ m \;|\; \exsts{m', m'', m_3} m_1 = m \compose{\mathbb{M}} m' \;\land\; m_2 = m \compose{\mathbb{M}} m'' \;\land\; m \compose{\mathbb{M}} m' \compose{\mathbb{M}} m'' = m_3 \right\}
+\]
+%
+The \emph{maximal overlap} is defined as:
+%
+\[
+	m_1 \maxMeet{\mathbb{M}} m_2 = m \iffdef m \in (m_1 \meet{\mathbb{M}} m_2) \;\land\; \for{m' \in (m_1 \meet{\mathbb{M}} m_2)} m' \leq m
+\]
+%
+\end{definition}
+%
+%
+%\begin{definition}[Extension]
+%Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{extension} function:
+%%
+%\[
+%\extend{.} : \pset{\mathbb{M}} \rightarrow \pset{\pset{\mathbb{M}}}
+%\]
+%%
+%is defined as:
+%%
+%\[
+%\begin{array}{l}
+%	\extend{M} \eqdef \left\{S \;|\; \for{s \in S} \exsts{m \in M} \exsts{r} s = m \compose{\mathbb{M}} r \right\}
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
+
 %
 %
 \section*{Model}
@@ -189,13 +172,13 @@ We write $\unitAM$ for an action model with empty domain.
 %
 %
 \begin{definition}[Worlds]
-A \emph{world} is a triple of a logical state (representing the local state), a second logical state (representing the shared state) and an action model, subject to a well-formedness condition.
+A \emph{world} is a quadruple of a logical state (representing the local state), a second logical state (representing the shared state), a global action model and a local action model, subject to a well-formedness condition.
 %
 \[
-	w \in \Worlds \eqdef \left\{ (l, s, \amod{}) \in \LState \times \LState \times \AMods \;|\; \wf{l, s, \amod{}} \right\}
+	w \in \Worlds \eqdef \left\{ (l, s, \amod{}, \amod{L}) \in \LState \times \LState \times \AMods \times \AMods \;|\; \wf{l, s, \amod{}, \amod{L}} \right\}
 \]
 % 
-Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$ and $\amodelPart{w}$, for the first, second and third projections, respectively.
+Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$, $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third and fourth projections, respectively.
 % 
 \end{definition}
 %
@@ -210,7 +193,7 @@ The \emph{composition of worlds}:
 is defined as:
 %
 \[
-	w \composeW w' \eqdef (\localPart{w} \composeL \localPart{w'},\; \sharedPart{w} \composeS \sharedPart{w'},\; \amodelPart{w} \composeAM \amodelPart{w'})
+	w \composeW w' \eqdef (\localPart{w} \composeL \localPart{w'},\; \sharedPart{w} \composeS \sharedPart{w'},\; \amodelPart{w} \composeAM \amodelPart{w'},\; \amodelPartL{w} \composeAM \amodelPartL{w'})
 \]
 %
 \end{definition}
@@ -226,22 +209,22 @@ The \emph{collapse function on worlds}:
 is defined as:
 %
 \[
-	\collapseW{l, s, \amod{}} \eqdef l \composeL s
+	\collapseW{l, s, \amod{}, \amod{L}} \eqdef l \composeL s
 \]
 %
 \end{definition}
 %
 %
-\begin{definition}[Well-formedness]
+%\begin{definition}[Well-formedness]
+%%
+%\[
+%	\wf{l, s, \amod{}, \amod{L}} \iffdef \exsts{r} \collapseW{l, s, \amod{}} = r \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}\;\land\; \contains{\dom{\amod{}}}{\capPart{r}}
+%\]
+%%
 %
-\[
-	\wf{l, s, \amod{}} \iffdef \exsts{r} \collapseW{l, s, \amod{}} = r \;\land\; \contains{\dom{\amod{}}}{\capPart{r}}
-\]
-%
-
-\end{definition}
-%
-%
+%\end{definition}
+%%
+%%
 \begin{parameter}[Machine States]
 Assume a set of machine states $\MStates$, ranged over by $\ms{}, \ms{1}, \cdots, \ms{n}$.
 \end{parameter}
@@ -271,3 +254,4 @@ is defined as:
 \]
 %
 \end{definition}
+%

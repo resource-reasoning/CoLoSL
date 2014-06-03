@@ -58,10 +58,10 @@ Given the set of logical state assertions $\LAssertions$, the assertions of \col
 %
 \[
 \begin{array}{r l}
-	P, Q \in \Assertions ::= & p \;|\; \shared{P}{I} \;|\; P_1 * P_2\\
+	P, Q \in \Assertions ::= & p \;|\; \shared{P}{I} \;|\; P * Q \;|\; P -\!\!\!* Q \;|\; P \implies Q \;|\; false \;|\; \exsts{x} P\\
 	I \in \IAssertions ::= & 
-	\left( \condInterAss{\vec{x}}{\capAss{}}{\vec{y}}{p}{r}{q} \right)
-	\;|\; I_1 \cup I_2
+	\left(\interAss{\capAss{}}{\vec{y}}{P}{Q} \right)
+	\;|\; I_1 , I_2
 \end{array}
 \]
 %
@@ -88,18 +88,18 @@ is given as
 			\hspace*{-0.2cm}(l_1, l_2)\hspace*{-0.1cm} & 
 			\hspace*{-0.2cm}
 			\begin{array}{l}
-				\exsts{\interAss{\vec{x}}{\capAss{}}{\vec{y}}{p}{q} \in I,\; \vec{v}, \vec{v'}}\\
+				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I,\; \vec{v}}\\
 	
 				\hspace*{0.2cm}
-				\semK[\text{[} \vec{x} \mapsto \vec{v} \text{]}]{\capAss{}} = \ca{} \; \land\\
+				\semK[]{\capAss{}} = \ca{} \; \land\\
 				
 				\hspace*{0.2cm}
-				l_1 \in \semL[\text{[} \left(\vec{x} \mapsto \vec{v}\right), \vec{y} \mapsto \vec{v'} \text{]}]{p} \;\land\\
+				(l_1, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \;\land\\
 				
 
 				
 				\hspace*{0.2cm}
-				l_2 \in \semL[\text{[} \left(\vec{x} \mapsto \vec{v}\right), \vec{y} \mapsto \vec{v'} \text{]}]{q} 
+				(l_2, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
 				
 			\end{array}
 		\end{array}
@@ -241,7 +241,15 @@ with
 where 
 %
 \[
-	\wf{l, s, \amod{}, \amod{L}} \iffdef l \composeL s  \text{ is defined} \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}
+\begin{array}{l l}
+	\wf{l, s, \amod{}, \amod{L}} \iffdef & \exsts{r} \collapseW{l, s, \amod{}, \amod{L}} = r  \;\land\; \contains{\amod{L}}{\capPart{r}} \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}\\
+	
+	\contains{S}{\ca{}} \iffdef & 
+	\begin{array}{l}
+		\exsts{K}\;\; \ca{} = \prod\limits_{\ca{i} \in K}^{\composeCap} \ca{i} \;\land\;
+		\for{\ca{i} \in K} \exsts{\ca{}' \in S} \ca{i} \leq \ca{}'
+	\end{array}
+\end{array}
 \]
 %
 \end{definition}
@@ -665,8 +673,26 @@ where
 \]
 %
 \end{definition}
-%
-%
+%\begin{definition}[Containment]
+%Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{containment} function:
+%%
+%\[
+%	\contains{.\ }{\ .} : \pset{\mathbb{M}} \rightarrow \mathbb{M} \rightarrow \{true, false\}
+%\]
+%%
+%is defined as:
+%%
+%\[
+%	\contains{S}{m} \iffdef 
+%	\begin{array}{l}
+%		\exsts{M}\;\; m = \prod\limits_{m_{i} \in M}^{\compose{\mathbb{M}}} m_{i} \;\land\;
+%		\for{m_{i} \in M} \exsts{m' \in S} m_{i} \leq m'
+%	\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
 \begin{definition}[Rely]
 %
 \[
