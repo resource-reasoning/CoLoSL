@@ -1,2 +1,49 @@
 \section{Informal Development}
-Informal development text goes here.
+\todo\ introductory text\\\\
+Consider the program in \fig\ref{fig:concurrentInc} and let us assume that the program variables x, y and z are initialised with value $0$ at the beginning. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially x=z=$0$, the if statement of the first thread is successful and thus the value of x is incremented. The effect is then cascaded down to the other threads and subsequently the values of y and z are incremented. At this point since once again x = z, the first thread takes over and the same process repeats until x = y = z = $100$. Since the program executed by each thread depends on the value of the variable at hand as well as the value of the variable that comes before it in the $x, y, z$ chain, the values of these variable must be \emph{shared} such that each thread has access to the required variables. 
+%
+%
+\begin{figure}
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-18pt}\\
+\hspace*{-0.2cm}
+\[
+	\color{blue}{\left\{ \cell{\text{x}}{0} * \cell{\text{y}}{0} * \cell{\text{z}}{0}\right\}}
+\] \vspace*{-5pt}\\
+\hspace*{-0.2cm}
+\begin{tabular}{l || l || l}
+	\hspace*{1cm}$\tau_X$& 
+	\hspace*{1cm}$\tau_Y$& 
+	\hspace*{1cm}$\tau_Z$ \\
+	 &&\\
+\begin{lstlisting}[mathescape]
+while(x<100){
+ if (x == z) 
+   x++ ;
+}
+\end{lstlisting}
+&
+\begin{lstlisting}[mathescape]
+while(y<100){
+ if (y < x) 
+   y++ ;
+}
+\end{lstlisting}
+&
+\begin{lstlisting}[mathescape]
+while(z<100){
+ if (z < y) 
+   z++ ;
+}
+\end{lstlisting}\vspace*{-5pt}
+
+\end{tabular} \vspace*{-5pt}\\
+\[
+	\color{blue}{\left\{ \cell{\text{x}}{100} * \cell{\text{y}}{100} * \cell{\text{z}}{100}\right\}}
+\] \vspace*{-15pt}\\
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-12pt}
+\caption{The concurrent increment program.}
+\label{fig:concurrentInc}
+\end{figure}
+%
+%
+We would like to reason about this example and establish that if the program does terminate, the final values of all three variables are $100$. 
