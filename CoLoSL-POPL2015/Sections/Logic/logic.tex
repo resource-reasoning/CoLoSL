@@ -464,12 +464,11 @@ Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics}
 	\left\{ 
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
-		(pq, s, \amod{}, \amod{L}) & 
+		(p \composeL c \composeL q, s, \amod{}, \amod{L}) & 
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-				 (p, s, \amod{}, \amod{L}) \in \intermediateSem{P}\land \\
-				 (q, s, \amod{}, \amod{L}) \in \intermediateSem{Q} \land
-				 pq \in p \meetL q
+				 (p \composeL c, s, \amod{}, \amod{L}) \in \intermediateSem{P}\land \\
+				 (c \composeL q , s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array} 

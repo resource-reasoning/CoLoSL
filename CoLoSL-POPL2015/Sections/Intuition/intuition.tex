@@ -1,49 +1,276 @@
 \section{Informal Development}
 \todo\ introductory text\\\\
-Consider the program in \fig\ref{fig:concurrentInc} and let us assume that the program variables x, y and z are initialised with value $0$ at the beginning. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially x=z=$0$, the if statement of the first thread is successful and thus the value of x is incremented. The effect is then cascaded down to the other threads and subsequently the values of y and z are incremented. At this point since once again x = z, the first thread takes over and the same process repeats until x = y = z = $100$. Since the program executed by each thread depends on the value of the variable at hand as well as the value of the variable that comes before it in the $x, y, z$ chain, the values of these variable must be \emph{shared} such that each thread has access to the required variables. 
+Consider the program $\mathbb{P} \eqdef \mathbb{P}_X \;\!\!||\;\! \mathbb{P}_Y \;\!\!||\;\! \mathbb{P}_Z$ as illustrated in \fig\ref{fig:concurrentInc} and let us assume that the program variables $x$, $y$ and $z$ are initialised with value $0$. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially $x=z=0$, $\tau_X$ proceeds by incrementing the value of $x$. The effect is then cascaded down to the other threads and subsequently the values of $y$ and $z$ are incremented. At this point since once again $x = z$, $\tau_X$ takes over and the same process repeats until $x = y = z = 10$. Since the program executed by each thread depends on the value of the variable at hand as well as the value of the variable that comes before it in the $x, y, z$ chain, the values of these variable must be \emph{shared} such that each thread has access to the required variables. 
 %
 %
 \begin{figure}
-\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-18pt}\\
-\hspace*{-0.2cm}
-\[
-	\color{blue}{\left\{ \cell{\text{x}}{0} * \cell{\text{y}}{0} * \cell{\text{z}}{0}\right\}}
-\] \vspace*{-5pt}\\
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-5pt}\\
+%\hspace*{-0.2cm}
+%\[
+%	\color{blue}{\left\{ \cell{\text{x}}{0} * \cell{\text{y}}{0} * \cell{\text{z}}{0}\right\}}
+%\] \vspace*{-5pt}\\
 \hspace*{-0.2cm}
 \begin{tabular}{l || l || l}
-	\hspace*{1cm}$\tau_X$& 
-	\hspace*{1cm}$\tau_Y$& 
-	\hspace*{1cm}$\tau_Z$ \\
-	 &&\\
+	\color{blue}{$\mathbb{P}_X$ :}& 
+	\color{blue}{$\mathbb{P}_Y$ :}& 
+	\color{blue}{$\mathbb{P}_Z$ :} \\
+	 &&\vspace*{-5pt}\\
 \begin{lstlisting}[mathescape]
-while(x<100){
- if (x == z) 
-   x++ ;
+while($x$<10){
+ if ($x$ == $z$) 
+   $x$++ ;
 }
 \end{lstlisting}
 &
 \begin{lstlisting}[mathescape]
-while(y<100){
- if (y < x) 
-   y++ ;
+while($y$<10){
+ if ($y$ < $x$) 
+   $y$++ ;
 }
 \end{lstlisting}
 &
 \begin{lstlisting}[mathescape]
-while(z<100){
- if (z < y) 
-   z++ ;
+while($z$<10){
+ if ($z$ < $y$) 
+   $z$++ ;
 }
-\end{lstlisting}\vspace*{-5pt}
+\end{lstlisting}
 
-\end{tabular} \vspace*{-5pt}\\
-\[
-	\color{blue}{\left\{ \cell{\text{x}}{100} * \cell{\text{y}}{100} * \cell{\text{z}}{100}\right\}}
-\] \vspace*{-15pt}\\
+\end{tabular} \vspace*{5pt}\\
+%\[
+%	\color{blue}{\left\{ \cell{\text{x}}{10} * \cell{\text{y}}{10} * \cell{\text{z}}{10}\right\}}
+%\] \vspace*{-15pt}\\
 \noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-12pt}
 \caption{The concurrent increment program.}
 \label{fig:concurrentInc}
 \end{figure}
 %
 %
-We would like to reason about this example and establish that if the program does terminate, the final values of all three variables are $100$. 
+
+The program state in \colosl\ is modelled by two components representing a thread-local (private) state exclusively visible to the thread, and a shared state accessible by all threads.
+Predicate $G$ in \fig\ref{fig:concurrentIncCoLoSLSpec} shows a specification of this program where a boxed assertion $\shared{P}{I}$ denotes a \emph{shared} resource satisfying $P$. In this example $x$, $y$, and $z$ are shared resources and are thus enclosed in a box. The contents of the box are specified as three disjuncts corresponding to various points in execution of $\mathbb{P}$. 
+The ways in which the contents of the box can be manipulated by both the current thread and the environment are specified by the \emph{interference assertion} $I$. Interference assertions are of the form $\textsf{A}: P \swap Q$ where $\textsf{A}$ denotes a \emph{capability} associated with \emph{action} $P \swap Q$. $P$ represents the action pre-condition and describes the part of the shared state required to carry out the action, while $Q$ is the action post-condition and describes the part of the shared region after the action. 
+A thread in possession of the required capability in its local state can perform the associated action and update the shared state accordingly provided that the contents of the shared state satisfy the action pre-condition.
+%$P$ and $Q$ indicate the action pre- and post-conditions, respectively. If the contents of a box satisfy the pre-condition of an action, a thread with the associated capability in its local state can perform that action and update the shared state accordingly. 
+For instance, the action associated with capability $\textsf{X}$, corresponds to the update of variable $x$: For any $v$, if $\cell{x}{v} * \cell{z}{v}$, a thread in possession of $\textsf{X}$ in its local state can increment $x$ by 1 such that $\cell{x}{v+1} * \cell{z}{v}$. 
+When writing boxed assertions of the form $\shared{P}{I}$ describing the shared state, the assertion inside the box ($P$) must be \emph{stable} with respect to $I$; that is, for any action permitted by $I$, the assertion must remain true. 
+%
+%
+\begin{figure}
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}}
+%
+\[
+\begin{array}{l }
+	\hspace*{-0.2cm}
+	G \eqdef 
+	\shared{
+		\hspace*{-0.2cm}
+		\begin{array}{l l l l l}
+			\exsts{v} \hspace*{-0.2cm}  & \hspace*{-0.2cm} & \cell{x}{v} \hspace*{-0.2cm}  & *\ \cell{y}{v} \hspace*{-0.2cm} & *\ \cell{z}{v}\\
+			& \lor \hspace*{-0.3cm}&  \cell{x}{v+1} \hspace*{-0.2cm}  & *\ \cell{y}{v} \hspace*{-0.2cm} &*\ \cell{z}{v}\\
+			&\lor \hspace*{-0.3cm}&  \cell{x}{v+1} \hspace*{-0.2cm}  & *\ \cell{y}{v+1} \hspace*{-0.2cm}  & *\ \cell{z}{v}
+		\end{array}	
+		\hspace*{-0.2cm}		
+	}{I}
+	
+	G' \eqdef 	
+	\shared{
+		\hspace*{-0.2cm}
+		\begin{array}{l l}
+			\hspace*{-0.3cm}  &\cell{x}{10} \\
+			*\hspace*{-0.3cm} &\cell{y}{10}\\
+			*\hspace*{-0.3cm} &\cell{z}{10}\\
+		\end{array}	
+		\hspace*{-0.2cm}		
+	}{I}
+	
+	\vspace*{5pt}\\
+	
+
+	\hspace*{-0.2cm}
+	I \eqdef \left\{
+		\hspace*{-0.1cm} 
+		\begin{array}{l l r c l }
+			\textsf{X}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{x}{v} * \cell{z}{v} & \swap & \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Y}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{x}{v+1} * \cell{y}{v} & \swap & \cell{x}{v+1} * \cell{y}{v+1}\\
+			\textsf{Z}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{y}{v+1} * \cell{z}{v} & \swap & \cell{y}{v+1} * \cell{z}{v+1}\\
+		\end{array}			
+	
+	\right.
+
+\end{array} 
+\]
+%
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}}
+\caption{\colosl\ specification of concurrent increment example.}
+\label{fig:concurrentIncCoLoSLSpec}
+\end{figure} 
+%
+%
+
+We can then pass the \textsf{X}, \textsf{Y} and \textsf{Z} capabilities to $\tau_X$, $\tau_Y$ and $\tau_Z$ and verify $\mathbb{P}$ as follows where the definition of $G'$ is as per \fig\ref{fig:concurrentIncCoLoSLSpec}.
+%
+\[
+\begin{array}{c}
+	\color{blue}{\left\{\textsf{X} * \textsf{Y} *  \textsf{Z} *  G \right\}}\vspace*{2pt}\\
+	
+	\begin{array}{c || c || c}
+		\color{blue}{\left\{\textsf{X} * G \right\}} & \color{blue}{\left\{\textsf{Y} * G \right\}} & \color{blue}{\left\{\textsf{Z} * G \right\}}\\
+		&&\vspace*{-7pt}\\
+		\mathbb{P}_X & \mathbb{P}_Y & \mathbb{P}_Z\\
+		&&\vspace*{-5pt}\\
+		\cdots & \cdots & \cdots
+%		\color{blue}{\left\{\textsf{X} * G' \right\}} & \color{blue}{\left\{\textsf{Y} * G' \right\}} & \color{blue}{\left\{\textsf{Z} * G' \right\}}\\
+	\end{array}\vspace*{3pt}\\
+	
+	\color{blue}{\left\{\textsf{X} * \textsf{Y} *  \textsf{Z} *  G' \right\}}\\
+\end{array}
+\]
+%
+Note that thread $\tau_X$ is only concerned with the values of $x$ and $z$; \emph{mutatis mutandis} for $\tau_Y$ and $\tau_Z$. However, with the specification of \fig\ref{fig:concurrentIncCoLoSLSpec}, all three variables are visible by $\tau_X$ and as such in verification of $\mathbb{P}_X$ it is necessary to account for the interference associated with $y$ even though its value is neither read nor modified by $\tau_X$. In other words, the specification of \fig\ref{fig:concurrentIncCoLoSLSpec} is not \emph{local} enough. Ideally, $\tau_X$'s view of the shared state would be $\shared{X}{I}$ with predicate $X$ as defined below where variable $y$ is \emph{forgotten}.
+%
+\[
+	X \eqdef \exsts{v}\;\; \cell{x}{v} * \cell{z}{v} \;\lor\; \cell{x}{v+1} * \cell{z}{v}
+\]
+%
+In \colosl\ it is always possible to forget parts of the shared state and arrive at a \emph{subjective}, more local and thus weaker view of the shared state. That is,
+%
+\[
+	\shared{P \sepish Q}{I} \vdash \shared{P}{I} \hspace*{1cm} \textsc{(Hide)}
+\]
+%
+where $P \sepish Q$ denotes the \emph{overlapping conjunction} or ``sepish'' \cite{}\footnote{Since $P * Q \vdash P \sepish Q$, from the \textsc{Hide} rule we have $\shared{P * Q}{I} \vdash \shared{P}{I}$}. However, the right-hand-side is not necessarily stable with respect to $I$. For instance, in the case of $\shared{X}{I}$ above where $I$ is as specified in \fig\ref{fig:concurrentIncCoLoSLSpec}, since we no longer know the value of $y$ in relation to $x$ and $z$, the action associated with capability \textsf{Z} can be carried out by the environment and change the value of $z$. As such, the strongest stable assertion we can derive is: 
+%
+\[
+	\shared{\exsts{v, v'}  \cell{x}{v} * \cell{z}{v'}}{I}
+\]
+%
+In the case of the less local predicate $G$, whenever the pre-condition of the action associated with \textsf{Z} is satisfied (third disjunct), it is also the case that $\cell{x}{v+1}$. In other words, in all the cases where the shared state satisfies $\cell{y}{v+1} * \cell{z}{v}$, it also satisfies $\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v}$. However, this information is not reflected in $I$ and as a result when weakening $G$, we need to stabilise the resultant assertion which proves to be very weak. To remedy this, in \colosl\ we introduce the notion of action \emph{shifting} (rewriting) with respect to the \emph{invariant} of the shared state. Given $\shared{P}{I'}$, we write $\fence{} \fences (P, I')$ - read ``$\fence{}$ fences $P$ with respect to $I'$'' - to indicate that i) $\fence{}$ contains all states associated with $P$ and ii) it is closed under $I'$; that is, given any action in $I'$ whose pre-condition is satisfied by a state in $\fence{}$, the state resulting from the action is also in $\fence{}$. For instance, given the $G$ predicate of \fig\ref{fig:concurrentIncCoLoSLSpec}, we have $\fence{G} \fences (P_G, I)$ where $P_G$ denotes the assertion inside the box and $\fence{G}$ is as specified below.
+%
+\[
+	\begin{array}{l l}
+		\fence{G} = \hspace*{-5pt}& \left\{\cell{x}{v} * \cell{y}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 10\} \right\} \\
+		& \cup \left\{\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 9 \} \right\} \\
+		& \cup \left\{\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v} \;|\; v \in \{0, \cdots 9\} \right\}\\
+	\end{array}
+\]
+%as well as the action associated with its update
+Given the above invariant, we can now \emph{shift} the action associated with \textsf{Z} in $I$ and arrive at $I'$ where
+%
+\[
+	I' \eqdef \left\{
+		\begin{array}{l}
+			\textsf{X}:\; \exsts{v}\; \cell{x}{v} * \cell{z}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Y}:\; \exsts{v}\; \cell{x}{v+1} * \cell{y}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{y}{v+1}\\
+			\textsf{Z}:\; \exsts{v}\; \cell{x}{v+1} *  \cell{y}{v+1} * \cell{z}{v}\hspace*{0.2cm}\swap\\
+			\hspace*{2.5cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
+		\end{array}			
+	\right.
+\]
+%
+Note that in doing so we have neither restricted nor relaxed the action of \textsf{Z} in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \textsc{(Shift)} rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
+%
+\[
+	\shared{P}{I} \;\land\; \fence{} \fences (P, I) \;\land\; I \weakenI{\fence{}} I' \hspace*{0.2cm}\Vvdash\hspace*{0.2cm} \shared{P}{I'} \hspace*{0.5cm} \textsc{(Shift)}
+\]
+%
+\todo describe the difference between $\vdash$ and $\Vvdash$.\\
+
+Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \textsc{Hide} rule to forget variable $y$ and obtain $\shared{X}{I'}$.
+%%
+%\[
+%	X' \eqdef \shared{\exsts{v} \cell{x}{v} * \cell{z}{v} \;\lor\; \cell{x}{v+1} * \cell{z}{v}}{I'} 
+%\]
+%%
+We have almost arrived at a local specification for $\mathbb{P}_X$. However, the action of \textsf{Y} is still visible in $I'$ even though it does not affect the values of $x$ or $z$. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{X} = \left\{\cell{x}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \;|\; v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of \textsf{Y}, given any state $p$ in the action pre-condition (e.g. $p = \cell{x}{1} * \cell{y}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{x}{1} * \cell{z}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{x}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
+%
+%
+\begin{figure}
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}}
+%
+\[
+\begin{array}{l }
+%\hline\vspace*{-5pt}\\
+	S_{X} \eqdef 
+	\shared{
+		\exsts{v}   \cell{x}{v}  * \cell{z}{v}  \;\;\lor\;\; \cell{x}{v+1}  *\ \cell{z}{v}	
+	}{I_x}\vspace*{5pt}\\
+	
+
+	
+	I_x \eqdef \left\{
+%		\hspace*{-0.1cm} 
+		\begin{array}{l}
+			\textsf{X}:\; \exsts{v}\; \cell{x}{v} * \cell{z}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Z}:\; \exsts{v}\; \cell{x}{v+1} *  \cell{y}{v+1} * \cell{z}{v}\hspace*{0.2cm}\swap\\
+			\hspace*{2.5cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
+		\end{array}			
+	
+	\right.
+	\vspace*{5pt}\\
+	
+\end{array} \vspace*{-5pt}
+\]
+%
+\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}}
+\caption{Subjective specification of concurrent increment for $\tau_X$.}
+\label{fig:concurrentIncSubjectiveSpec}
+\end{figure} 
+%
+%
+
+Given $I'$ and $\fence{X}$ we can again apply the \textsc{Shift} rule in order to forget about the action of \textsf{Y} and obtain $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec}. We can take analogous steps in order to obtain subjective views $S_Y$ and $S_Z$ for threads $\tau_Y$ and $\tau_Z$. We then pass the \textsf{X}, \textsf{Y} and \textsf{Z} capabilities to $\tau_X$, $\tau_Y$ and $\tau_Z$ and verify $\mathbb{P}$ as follows:
+%
+\[
+\hspace*{-0.2cm}
+\begin{array}{c}
+	\color{blue}{\left\{\textsf{X} * \textsf{Y} *  \textsf{Z} *  S_X * S_Y * S_Z \right\}}\vspace*{2pt}\\
+	
+	\begin{array}{c || c || c}
+		\color{blue}{\left\{\textsf{X} * S_X \right\}} & \color{blue}{\left\{\textsf{Y} * S_Y \right\}} & \color{blue}{\left\{\textsf{Z} * S_Z \right\}}\\
+		&&\vspace*{-7pt}\\
+		\mathbb{P}_X & \mathbb{P}_Y & \mathbb{P}_Z\\
+		&&\vspace*{-5pt}\\
+
+		\color{blue}{
+			\left\{
+					\textsf{X} * S'_X
+			\right\}
+		} 
+		& 
+		\color{blue}{
+			\left\{
+				\textsf{Y} * S'_Y
+			\right\}
+		} 
+
+		&
+		
+		\color{blue}{
+			\left\{
+				\textsf{Z} * S'_Z
+			\right\}
+		} 		
+		\vspace*{3pt}
+	\end{array}\\
+	\color{blue}{\left\{\textsf{X} * \textsf{Y} *  \textsf{Z} *  S'_X * S'_Y * S'_Z \right\}}\\
+\end{array}
+\]
+%
+with
+%
+\[
+\begin{array}{l l}
+	S'_X \eqdef & \shared{\cell{x}{10} * \cell{z}{10} \;\lor\; \cell{x}{10} * \cell{z}{9} }{I_X}\\
+	S'_Y \eqdef & \shared{\cell{x}{11} * \cell{y}{10} \;\lor\; \cell{x}{10} * \cell{y}{10} }{I_Y}\\
+	S'_Z \eqdef & \shared{\cell{y}{11} * \cell{z}{10} \;\lor\; \cell{y}{10} * \cell{z}{10} }{I_Z}
+\end{array}
+\]
+%
+In order to establish the desired post-condition, at this stage we need to \emph{merge} the subjective views of all three threads and obtain a stronger view such as that of $G'$ in \fig\ref{fig:concurrentIncCoLoSLSpec}. In \colosl\ it is always possible to merge two subjective views and obtain a stronger view of the shared state. 
+%
+\[
+	\shared{P}{I_1} * \shared{Q}{I_2} \vdash \shared{P \sepish Q}{I_1 \cup I_2} \hspace*{1cm} \textsc{(Merge)}
+\]
+%
+By two applications of the \textsc{Merge} rule, we can merge $S'_X$, $S'_Y$ and $S'_Z$ and obtain $\shared{\cell{x}{10} * \cell{y}{10} * \cell{z}{10}}{I_X \cup I_Y \cup I_Z}$. Finally, through an application of \textsc{Shift} rule, we can rewrite $I_X \cup I_Y \cup I_Z$ into $I$ as specified in \fig\ref{fig:concurrentIncCoLoSLSpec} and obtain $G'$.
