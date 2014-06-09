@@ -1,6 +1,6 @@
 \section{Informal Development}\label{sec:intuition}
 \todo\ introductory text\\\\
-Consider the program $\mathbb{P} \eqdef \mathbb{P}_X \;\!\!||\;\! \mathbb{P}_Y \;\!\!||\;\! \mathbb{P}_Z$ as illustrated in \fig\ref{fig:concurrentInc} and let us assume that the program variables $x$, $y$ and $z$ are initialised with value $0$. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially $x=z=0$, $\tau_X$ proceeds by incrementing the value of $x$. The effect is then cascaded down to the other threads and subsequently the values of $y$ and $z$ are incremented. At this point since once again $x = z$, $\tau_X$ takes over and the same process repeats until $x = y = z = 10$. 
+Consider the program $\mathbb{P} \eqdef \mathbb{P}_X || \mathbb{P}_Y || \mathbb{P}_Z$ as illustrated in \fig\ref{fig:concurrentInc} and let us assume that the program variables $x$, $y$ and $z$ are initialised with value $0$. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially $x=z=0$, $\tau_X$ proceeds by incrementing the value of $x$. The effect is then cascaded down to the other threads and subsequently the values of $y$ and $z$ are incremented. At this point since once again $x = z$, $\tau_X$ takes over and the same process repeats until $x = y = z = 10$. 
 %
 %
 \begin{figure}

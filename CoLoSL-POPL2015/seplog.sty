@@ -3,12 +3,19 @@
 
 \ProvidesPackage{seplog}[2008/09/25 Separation logics related macros]
 
-%\RequirePackage{mathabx}
-%\RequirePackage{wasysym}
+%\RequirePackage[only,varstar]{mathabx}
+\DeclareFontFamily{U}{matha}{\hyphenchar\font45}
+\DeclareFontShape{U}{matha}{m}{n}{
+      <5> <6> <7> <8> <9> <10> gen * matha
+      <10.95> matha10 <12> <14.4> <17.28> <20.74> <24.88> matha12
+      }{}
+\DeclareSymbolFont{matha}{U}{matha}{m}{n}
+\DeclareMathSymbol{\varstar}       {2}{matha}{"0F}
+\RequirePackage{wasysym}
 
-\newcommand{\scon}{\mathbin{*}}
+\newcommand{\scon}{\mathbin{\varstar}}
 \newcommand{\ocon}{%
-  \mathbin{\mbox{$\mathrlap{\cup}\hspace*{.02em}
+  \mathbin{\mbox{$\mathrlap{\cup}\hspace*{.09em}
       \raisebox{.01em}[0ex][0ex]{$\scon$}$\hspace*{.07em}}}}
 \newcommand{\subish}{%
   \mathbin{\mbox{$\mathrlap{\subset}\hspace*{.15em}
@@ -18,4 +25,17 @@
   \mathord{-}\hspace*{-0.36em}\mathord{\scon}$\hspace*{-0.005em}}}}
 \newcommand{\septraction}{%
   \mathrel{\mbox{$\hspace*{-0.03em}\mathord{-}\hspace*{-0.66em}
-  \mathord{-}\hspace*{-0.14em}\mathord{\circledast}$\hspace*{0.05em}}}}
+  \mathord{-}\hspace*{-0.155em}\mathord{\ocircle\hspace*{-.66em}\scon}$\hspace*{0.05em}}}}
+
+\AtBeginDocument{
+  %% ligatures
+  % to be safe, use only characters from the following list:
+  % ` " ' ~ ! ? @ * ( ) [ ] < > - + = | : ; . , / 0 1 2 3 4 5 6 7 8 9
+  % each lig must be defined after all ligs it prefixes
+  \mathlig{--*}{\mathrel{\magicwand}}
+  \mathlig{--o}{\mathrel{\septraction}}
+  \mathlig{|->}{\mathrel{\mapsto}} % tight points-to
+  \mathlig{||-}{\mathbin{\Vdash}}
+  \mathlig{**}{\mathbin{\ocon}}
+  \mathlig{*}{\mathbin{\scon}}
+}

@@ -1,5 +1,7 @@
-\usepackage{amsmath}
-\usepackage{amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{amsmath}
+%\usepackage{amsfonts}
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{caption}
@@ -10,18 +12,23 @@
 %\let\vec\relax
 \usepackage{amsthm}
 \usepackage{amssymb}
-\usepackage{stmaryrd}
+\usepackage[only,llbracket,rrbracket,llparenthesis,rrparenthesis]{stmaryrd}
 \usepackage[fleqn]{mathtools}
+\usepackage{empheq} % for boxes
 \usepackage{proof}
-\usepackage{MnSymbol}
+%\usepackage{MnSymbol}
 \usepackage{listings}
 \usepackage{alltt}
 %\usepackage{tikz}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
+\usepackage{microtype}
 
 \usepackage{seplog}
+
+\input mathlig
+
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
 \theoremstyle{definition}
@@ -49,6 +56,8 @@
 \newcommand{\defin}{Def.\ }
 \newcommand{\ex}{Example}
 
+\newcommand{\powerset}{\mathcal{P}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\m}[1]{\mathit{#1}}
@@ -56,8 +65,8 @@
 \definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
 %\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
-\newcommand{\eqdef}{\triangleq}
-\newcommand{\iffdef}{\stackrel{\mathrm{def}}{\iff}}
+\newcommand{\eqdef}{\mathrel{\triangleq}}
+\newcommand{\iffdef}{\mathrel{\stackrel{\mathrm{def}}{\iff}}}
 
 \newcommand{\Nats}{\mathbb{N}}
 \newcommand{\NatsPlus}{\Nats^{+}}
@@ -178,7 +187,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% Assertions %%%%%%%%%%%%%%%%%%%%%%%%
-%
+
 \newcommand{\Assertions}{\textsf{Assn}\xspace}
 \newcommand{\LAssertions}{\textsf{LAssn}\xspace}
 \newcommand{\KAssertions}{\textsf{KAssn}\xspace}
@@ -191,7 +200,8 @@
 \newcommand{\sepish}{\ocon}
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
-\newcommand{\shared}[2]{\boxed{#1}_{\; #2}}
+\addtolength{\fboxsep}{-1.5pt}
+\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; #2}}
 \newcommand{\swap}{\rightsquigarrow}
 \newcommand{\ewand}{\septraction}
 \newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
@@ -211,13 +221,13 @@
 \newcommand{\wf}[1]{\ensuremath{\textsf{wf}\left( #1 \right)}}
 %\newcommand{\precise}[1]{\ensuremath{\textsf{precise} \left( #1 \right)}}
 \newcommand{\exact}[1]{\ensuremath{\textsf{exact} \left( #1 \right)}}
-\newcommand{\semH}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{H}}
-\newcommand{\semK}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{K}}
-\newcommand{\semL}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{\textsf{L}}}
-\newcommand{\semI}[2][\lenv]{\left\langle \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right\rangle_{#1}}
-\newcommand{\intermediateSemI}[1]{\ensuremath{\left( \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right)}}
-\newcommand{\intermediateSem}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}}
-\newcommand{\sem}[2][\lenv]{\left[ \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right]_{#1}}
+\newcommand{\semH}[2][\lenv]{\llparenthesis {#2} \rrparenthesis_{#1}^{H}}
+\newcommand{\semK}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}^{K}}
+\newcommand{\semL}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}^{\textsf{L}}}
+\newcommand{\semI}[2][\lenv]{\left\langle \hspace*{-1.9pt}\left| #2 \right| \hspace*{-1.9pt} \right\rangle_{#1}}
+\newcommand{\intermediateSemI}[1]{\ensuremath{\llparenthesis #1 \rrparenthesis}}
+\newcommand{\intermediateSem}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}}
+\newcommand{\sem}[2][\lenv]{\llbracket #2 \rrbracket_{#1}}
 \newcommand{\sentails}{\Vvdash}
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Soundness %%%%%%%%%%%%%%%%%%%%%%%%
@@ -247,3 +257,44 @@
 %%%%%%%%%%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\atomic}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+
+\AtBeginDocument{
+  %% ligatures
+  % to be safe, use only characters from the following list:
+  % ` " ' ~ ! ? @ * ( ) [ ] < > - + = | : ; . , / 0 1 2 3 4 5 6 7 8 9
+  % each lig must be defined after all ligs it prefixes
+  \mathlig{<==>}{\mathrel{\Longleftrightarrow}} % equivalence
+  \mathlig{--->}{\mathrel{\longrightarrow}} % transitions
+  % 3 chars
+  %\mathlig{::=}{\mathrel{\Coloneqq}}
+  \mathlig{-->}{\mathrel{\rightarrow}} % set function space
+  \mathlig{<->}{\mathrel{\leftrightarrow}}
+  \mathlig{-|}{\dashv}
+  \mathlig{--`}{\mathrel{\rightharpoonup}} % partial function
+  \mathlig{===}{\mathrel{\equiv}} % syntactic equality
+  \mathlig{=/=}{\mathrel{\not\equiv}} % not syntactic equality
+  \mathlig{|/-}{\nvdash} % not entailment
+  \mathlig{|/=}{\nvDash} % not forces
+  \mathlig{<=>}{\mathrel{\Leftrightarrow}} % equivalence of expressions
+  \mathlig{==>}{\mathrel{\Rightarrow}} % meta implication
+  \mathlig{|||}{\mathrel{|}} % grammar
+  \mathlig{-|-}{\mathrel{\mathrlap{\dashv} \hspace{5pt} \vdash}} % entails
+  % 2 chars
+  \mathlig{==}{\mathrel{\stackrel{\smash{\scriptscriptstyle\mathrm{def}}}{=}}}
+% \mathlig{==}{\mathrel{\triangleq}}
+  \mathlig{/|}{\mathbin{\wedge}} % additive conjunction
+  \mathlig{|/}{\mathbin{\vee}} % additive disjunction
+  \mathlig{/=}{\mathrel{\neq}} % non-equality expression
+  \mathlig{<=}{\mathord{\leq}} % less than or equal expression
+  \mathlig{=>}{\mathrel{\Rightarrow}} % implication
+  \mathlig{|-}{\mathrel{\vdash}} % entails
+  \mathlig{|=}{\vDash} % models
+  \mathlig{|>}{\vartriangleright}
+  \mathlig{<|}{\vartriangleleft}
+  \mathlig{[|}{\llbracket} % open double bracket
+  \mathlig{|]}{\rrbracket} % close double bracket
+  \mathlig{->}{\mathord{\rightarrow}} % field dereference
+  \mathlig{<-}{\mathord{\leftarrow}} % assignement
+  \mathlig{||}{\mathbin{\parallel}}
+  % 1 char  WARNING: change standard spacing
+}
