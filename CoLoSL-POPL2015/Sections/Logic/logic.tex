@@ -594,8 +594,29 @@ Suppose at this point the current thread extends the shared state with the $\cel
 %
 %
 As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{L})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{L})$ represents the set of all localised action behaviour.
+%
+%
 \subsection{Action Model Closure}
-\todo Intuitively justify.
+Recall that interference assertions are interpreted into localised action models from which global action models are then calculated over the entire shared state. However, as we demonstrate through \ex~\ref{ex:closure}, in calculating the global action model we cannot simply extend the action pre- and post-conditions with arbitrary frames. 
+%
+\begin{example}[]\label{ex:closure}
+Let $P \eqdef \shared{\cell{y}{2} \lor \cell{z}{3}}{I} * \shared{\cell{y}{2}}{\emptyset}$ denote the subjective view of the current thread of the shared state with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{2}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then a thread in possession of the $\token{X}$ resource can update the value of $x$ such that $\cell{x}{2}$ and claim the $\cell{y}{2}$ resource by moving it into its local state. On the other hand, $\cell{y}{2}$ is an immutable shared resource since its associated interference corresponds to $\emptyset$.
+
+Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$. In calculating the semantics of $P$, we need to find a global action model $\amod{}$ that would encompass the behaviour of actions in $I \cup \emptyset$. A na\"\i ve attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{2} \composeL r ) \mid r \in \LStates \right\}$. That is, given the localised behaviour of $\ca{}$ as prescribed in $\semI[\lenv]{I}$, we extend it with arbitrary logical states so that if the shared state contains the $\cell{x}{1} \composeL \cell{y}{2}$ resource, regardless of the rest of the shared state ($r$), the action can be carried out accordingly while leaving $r$ untouched. Since the shared state currently contains the $\cell{y}{2}$ resource, with this interpretation when the shared state also contains $\cell{x}{1}$, it is possible to perform the action of \token{X} and remove $\cell{y}{2}$ from the shared state. However, this does not agree with the current view, since as explained above $\cell{y}{2}$ is an immutable shared resource that cannot be removed from the shared state. 
+%in exchange for $\cell{w}{4}$. Since the current thread holds the $\cell{y}{2}$ resource locally, it extends the shared state with this resource such that its subjective view is captured by $P' \eqdef \shared{\cell{x}{1} * \cell{z}{3}}{I} * \shared{\cell{y}{2}}{\emptyset}$. With this simple extension, $\cell{y}{2}$ is now an immutable shared resource since its associated interference corresponds to $\emptyset$.
+%
+%Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$. In calculating the semantics of $P$, we need to find a global action model $\amod{}$ that would encompass the behaviour of actions in $I \cup \emptyset$. A na\"\i ve attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{2} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$. That is, given the localised behaviour of $\ca{}$ as prescribed in $\semI[\lenv]{I}$, we extend it with arbitrary logical states so that if the shared state contains the $\cell{x}{1} \composeL \cell{y}{2}$ resource, regardless of the rest of the shared state ($r$), the action can be carried out accordingly while leaving $r$ untouched. With this interpretation,  
+\end{example}
+%
+%
+Recall from \S\ref{subsec:semantics} that when defining the semantics of $\shared{P}{I}$, the contents of the shared state are of the form $l \composeL r$ where $l$ denotes a subjective view as captured by $P$ while $r$ represents the context or parts of the shared state not visible by the subjective view. In order to remedy the problem illustrated in \ex~\ref{ex:closure}, when calculating the global behaviour of actions, rather than extending their localised behaviour with arbitrary frames, we relate them to the current subjective view $l$ and the context $r$. This is captured by the \emph{closure} relation as defined below.
+%
+%
+%\begin{example}[]\label{ex:closure}
+%Let $\tau_1$ and $\tau_2$ denote two distinct threads with $P \eqdef \token{X} * \cell{w}{4} * \shared{\cell{x}{1} * \cell{y}{2} \;\lor\; \cell{x}{1} * \cell{z}{3}}{I}$ and $Q \eqdef \cell{y}{2} * \shared{\cell{x}{1} * \cell{z}{3}}{I}$ as their subjective views of the shared state respectively with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{1} * \cell{w}{4}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then an action in possession of the $\cell{w}{4}$ resource can claim the $\cell{y}{2}$ resource in exchange for $\cell{w}{4}$. Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$ and $\amod{}$ denote the global interpretation of $I$. A naive attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{1} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$
+%
+%Since $\tau_2$ holds the $\cell{y}{2}$ resource locally, Suppose that at this point the current thread extends the shared state with 
+%\end{example}
 \begin{definition}[Action Model Closure]
 %
 \[
