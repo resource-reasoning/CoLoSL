@@ -1,3 +1,53 @@
 \section{Introduction}
-Introduction text goes here.\\
-\subsection{Paper Format}
+
+This paper: compositional reasoning for concurrent programs, even in
+the presence of sharing in data structures. Using \colosl, it is
+possible to write concise specifications that only talk about the
+portion of state actually accessed by the program, with respect to
+both the private memory and the region that is shared between several
+threads.
+
+This goes beyond the state of the art in concurrent program
+verification.
+
+Reasoning about concurrency: major advances since Owicki-Gries:
+compositional reasoning, from the seminal paper by Jones~\cite{rg} on
+the one hand, and O'Hearn~\cite{csl-orig,csl-tcs} on the other hand,
+later fused together in a series of increasingly compositional
+formalisms such as RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
+deny-guarantee~\cite{dg}, and the CAP
+family~\cite{cap-ecoop10,icap,tada}, to name a few.
+
+Reasoning about sequential programs: major advances in
+compositionality for pointer programs via separation
+logic~\cite{seplog}, recently extended to programs manipulating data
+structures with intrinsic sharing, such as graphs~\cite{ramification}.
+
+Main ingredients: ability to zoom in on the portion of the shared
+region under consideration, and to manipulate the interference
+relation between threads so as to project the global effect of
+interferences onto the subjective view of the shared state. The
+subjective views of concurrently running threads can be merged
+together at the end by \emph{overlapping} them.
+
+Contributions:
+\begin{enumerate}
+\item
+  We introduce the program logic \colosl, which achieves fully
+  compositional rely/guarantee style reasoning for concurrent
+  programs. Our soundness result is parametric in the underlying
+  programming language and separation algebra of states.
+\item
+  We evaluate \colosl on a range of key examples that were challenging
+  for previous work. We are able to derive natural and concise specs,
+  circumscribed to the part of the shared state accessed by each
+  thread, even in the case of threads operating on subparts of data
+  structures with unspecified sharing (directed acyclic graphs in our
+  example).
+\item
+  We demonstrate the generality of \colosl by deriving the main
+  reasoning principles of existing program logics for concurrency
+  within our framework.
+\end{enumerate}
+
+\paragraph{Outline}
