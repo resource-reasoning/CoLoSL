@@ -53,7 +53,7 @@
 
 \newcommand{\m}[1]{\mathit{#1}}
 
-\definecolor{darkgreen}{rgb}{0, 0.55, 0}
+\definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
 %\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
 \newcommand{\eqdef}{\triangleq}
@@ -202,7 +202,7 @@
 \newcommand{\shiftAction}[2]{\left\lvert #1\right\rvert^{#2}}
 \newcommand{\shiftInterference}[2]{\left\lvert #1\right\rvert^{#2}}
 
-\newcommand{\token}[2]{\ensuremath{\left[\textsf{#1}\right]_{#2}}}
+\newcommand{\token}[1]{\textsf{#1}}
 
 \newcommand{\hoare}[3]{\vdash\,\{#1\}\;#2\;\{#3\}}
 
@@ -218,6 +218,7 @@
 \newcommand{\intermediateSemI}[1]{\ensuremath{\left( \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right)}}
 \newcommand{\intermediateSem}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}}
 \newcommand{\sem}[2][\lenv]{\left[ \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right]_{#1}}
+\newcommand{\sentails}{\Vvdash}
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Soundness %%%%%%%%%%%%%%%%%%%%%%%%
 %

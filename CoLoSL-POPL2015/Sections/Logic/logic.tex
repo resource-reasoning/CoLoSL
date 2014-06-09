@@ -30,9 +30,9 @@ The assertions of \colosl are defined as follows where $\heapAss{} \in \HAsserti
 \end{array}
 \]
 %
-In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{TODO} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''. The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. For instance, in the example of~\ref{TODO}, \fig\ref{} describes parts of the shared state that contains the $x$ and $z$ variables. However, the overall shared state contains the $z$ variable as well as $x$ and $y$ as depicted in \fig\ref{}. Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
+In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{TODO} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''. The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. For instance, the $S_X$ predicate in \fig\ref{fig:concurrentIncSubjectiveSpec} describes parts of the shared state that contain the $x$ and $z$ variables, while the $G$ predicate of \fig~\ref{fig:concurrentIncCoLoSLSpec} defines parts of the shared state that contain the $z$ variable as well as $x$ and $y$. Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
 
-In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with $\textsf{[X]}_{-}$ in \S\ref{TODO} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{TODO} where through action rewriting, $\textsf{[Z]}_{-}$ is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments as with the example of \S\ref{}. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
+In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with \token{X} in \fig\ref{fig:concurrentIncCoLoSLSpec} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{sec:intuition} where through action rewriting, \token{Z} is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
 \end{definition}
 %
 %
@@ -74,8 +74,9 @@ Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra with t
 \end{parameter}
 %
 %We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from the range $[0,1]$; that is, $\Caps: \textsf{Token} \rightarrow [0,1]$ where $\composeCap$ is defined as addition with the proviso that the sum is within $[0,1]$ and is undefined otherwise. Intuitively, $1$ represents exclusive permission, $0$ represents no permission and any other value denotes a non-exclusive permission.
-We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from $\{0,1\}$; that is, $\Caps: \textsf{Token} \rightarrow \{0,1\}$ where $\composeCap$ is defined as addition. Intuitively, $1$ represents exclusive capability while $0$ represents no capability.
+%We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from $\{0,1\}$; that is, $\Caps: \textsf{Token} \rightarrow \{0,1\}$ where $\composeCap$ is defined as addition. Intuitively, $1$ represents exclusive capability while $0$ represents no capability.
 %
+We often take $\Caps$ to be the set of \emph{token names}; that is, $\Caps: \textsf{Token}$ where $\composeCap$ is defined for any two distinct elements. For instance, in the example of \S\ref{sec:intuition}, we had $\token{X}, \token{Y}, \token{Z} \in \textsf{Token}$.
 
 For simplicity, in this paper we assume that the separation algebras of both heaps and capability resources (\param s~\ref{par:heapSA} and~\ref{par:capSA}) have the disjointness property\footnote{$\for{h, h' \in \Heaps} h \composeH h = h' \implies h = h' = \unitH$}. However, the theory of \colosl as presented in~\cite{techreport} does not require the disjointness property and can be instantiated with any separation algebra.
 
@@ -161,14 +162,14 @@ $
 %
 %
 \subsection{Shared State Extension}\label{subsec:extension}
-Recall from~\ref{TODO} that a thread can always \emph{extend} a shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
+Recall from \S\ref{subsec:extend} that a thread can always \emph{extend} a shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
 %
 \begin{example}\label{ex:badExtension}
-Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}{-}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X}{1} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
+Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
 $
 	I' \eqdef 
 		\left(
-			\token{X}{-}: 
+			\token{X}: 
 			\left\{
 			\hspace*{-0.15cm}
 			\begin{array}{l} 
@@ -179,7 +180,7 @@ $
 			\right\}
 		 \right)
 $.
-In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $\token{X}{}$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $\token{Y}{}$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
+In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $\token{X}$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $\token{Y}$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
 \end{example}
 %
 %
@@ -269,7 +270,7 @@ An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} 
 \]
 %
 That is, given any capability $\ca{}$, and an action associated with it $(p, q) \in \amod{}(\ca{})$, where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition ($l \meetL p \not= \emptyset$), if there is an overlap between $l$ and the update precondition ($l_1 \maxMeetL l = l_3 > \unitL$), then the state resulting from the update ($l_2 \composeL c$) is also in $\fence{}$.
-For instance in \ex\ref{TODO} $\fence{\ref{}} = \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 100\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 99 \}\right\}$ of $I$ in \fig\ref{TODO}.
+For instance in example of \S\ref{sec:intuition}, $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec} is fenced by $\fence{X} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 9 \}\right\}$.
 % 
 \end{definition}
 %
