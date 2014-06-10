@@ -12,7 +12,7 @@
 %\let\vec\relax
 \usepackage{amsthm}
 \usepackage{amssymb}
-\usepackage[only,llbracket,rrbracket,llparenthesis,rrparenthesis]{stmaryrd}
+\usepackage{stmaryrd}
 \usepackage[fleqn]{mathtools}
 \usepackage{empheq} % for boxes
 \usepackage{proof}
@@ -24,6 +24,7 @@
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
 \usepackage{microtype}
+\usepackage{mathpartir}
 
 \usepackage{seplog}
 
@@ -88,8 +89,8 @@
 %
 \newcommand{\disjoint}{\sharp}
 \newcommand{\separate}{\text{\textreferencemark}}
-\newcommand{\fence}[1]{\ensuremath{F_{#1}}}
-\newcommand{\fences}{\ensuremath{\rhd}}
+\newcommand{\fence}[1]{F_{#1}}
+\newcommand{\fences}{\mathrel{\rhd}}
 \newcommand{\strictfences}{\ensuremath{\unrhd}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
@@ -215,6 +216,22 @@
 \newcommand{\token}[1]{\textsf{#1}}
 
 \newcommand{\hoare}[3]{\vdash\,\{#1\}\;#2\;\{#3\}}
+%% Inference rules
+\newcommand{\infrulestyle}[1]{\textsc{#1}}
+\newcommand{\SideCondition}[1]{\RightLabel{\scriptsize{#1}}}
+\renewcommand{\TirName}[1]{#1}
+\renewcommand{\RefTirName}[1]{#1}
+%\newcommand{\infrulelabel}[1]{\mbox{\normalfont\small\textsc{#1}}}
+\newcommand{\infrule}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},right=\mathrlap{\text{#5}}]
+                        {#3}{#4}}}
+\newcommand{\infruleR}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},right=\text{#5}]
+                        {#3}{#4}}}
+\newcommand{\infruleL}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},left=\mathllap{\text{#5}}]
+                        {#3}{#4}}}
+\newcommand{\infruleBC}[4]{\infrule{#1}{#2}{#3\\\\\rule{0pt}{3ex}
+                          {}^\dagger#4}{${}^\dagger$}}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%% Semantics %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -245,6 +262,7 @@
 \newcommand{\repartitions}[4]{\ensuremath{#1\semimplies^{\left\{#3\right\}\left\{#4\right\}}#2}}
 %\newcommand{\viewshift}[1]{\sqsubseteq^{#1}}
 \newcommand{\weakenI}[1]{\sqsubseteq^{#1}}
+\newcommand{\weakenIb}[1]{\sqsubseteq_{#1}}
 %\newcommand{\entangleI}[1]{\bowtie^{#1}}
 \newcommand{\agrees}{\bowtie}
 \newcommand{\respects}{\ltimes}

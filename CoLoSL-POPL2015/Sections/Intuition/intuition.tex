@@ -1,4 +1,5 @@
-\section{Informal Development}\label{sec:intuition}
+\section{Informal Development}
+\label{sec:intuition}
 \todo\ introductory text\\\\
 Consider the program $\mathbb{P} \eqdef \mathbb{P}_X || \mathbb{P}_Y || \mathbb{P}_Z$ as illustrated in \fig\ref{fig:concurrentInc} and let us assume that the program variables $x$, $y$ and $z$ are initialised with value $0$. Three threads $\tau_X, \tau_Y$ and $\tau_Z$ are spawned to increment their values in lock-step such that at any point, the values of any two variables are offset by at most 1. Since initially $x=z=0$, $\tau_X$ proceeds by incrementing the value of $x$. The effect is then cascaded down to the other threads and subsequently the values of $y$ and $z$ are incremented. At this point since once again $x = z$, $\tau_X$ takes over and the same process repeats until $x = y = z = 10$. 
 %
@@ -187,11 +188,15 @@ Note that thread $\tau_X$ is only concerned with the values of $x$ and $z$; \emp
 	X \eqdef \exsts{v} \cell{x}{v} * \cell{z}{v} \lor \cell{x}{v+1} * \cell{z}{v}
 \]
 %
-In \colosl\ it is always possible to forget parts of the shared state and arrive at a \emph{subjective}, more local and thus weaker view of the shared state. That is\footnote{Since $P * Q \vdash P \sepish Q$, from the \textsc{Hide} rule we have $\shared{P * Q}{I} \vdash \shared{P}{I}$},
+In \colosl\ it is always possible to forget parts of the shared state
+and arrive at a \emph{subjective}, more local and thus weaker view of
+the shared state. That is\footnote{Since $P ** Q |- P * \m{true}$, we
+  have $\shared{P ** Q}{I} \vdash \shared{P}{I}$ by~\eqref{eq:forget}.},
 %
-\[
-	\shared{P \sepish Q}{I} \vdash \shared{P}{I} \hspace*{1cm} \textsc{(Hide)}
-\]
+\begin{align*}
+  \label{eq:forget}
+  \shared{P * Q}{I} &\vdash \shared{P}{I}  \tag{\textsc{Forget}}
+\end{align*}
 %
 %where $P \sepish Q$ denotes the \emph{overlapping conjunction} or ``sepish'' \cite{}\footnote{Since $P * Q \vdash P \sepish Q$, from the \textsc{Hide} rule we have $\shared{P * Q}{I} \vdash \shared{P}{I}$}. 
 However, the right-hand-side is not necessarily stable with respect to $I$. For instance, in the case of $\shared{X}{I}$ above where $I$ is as specified in \fig\ref{fig:concurrentIncCoLoSLSpec}, since we no longer know the value of $y$ in relation to $x$ and $z$, the action associated with capability \textsf{Z} can be carried out by the environment and change the value of $z$. As such, the strongest stable assertion we can derive is: 
@@ -235,7 +240,7 @@ Note that in doing so we have neither restricted nor relaxed the action of \text
 	\shared{P}{I} \Vvdash \shared{P}{I'} \hspace*{0.5cm} \textsc{(Shift)}
 \]
 %
-Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \textsc{Hide} rule to forget variable $y$ and obtain $\shared{X}{I'}$.
+Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \textsc{Forget} rule to forget variable $y$ and obtain $\shared{X}{I'}$.
 %%
 %\[
 %	X' \eqdef \shared{\exsts{v} \cell{x}{v} * \cell{z}{v} \lor \cell{x}{v+1} * \cell{z}{v}}{I'} 
