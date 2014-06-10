@@ -24,7 +24,7 @@ The assertions of \colosl are defined as follows where $\heapAss{} \in \HAsserti
 %
 \[
 \begin{array}{r@{}l}
-	P, Q  ::=\null& \emp \mid \heapAss{} \mid \capAss{} \mid P * Q \mid P \ewand Q \:|\; P \sepish Q \mid \shared{P}{I} \mid \\
+	P, Q  ::=\null& \emp \mid \heapAss{} \mid \capAss{} \mid P * Q \mid P \ewand Q \mid P \sepish Q \mid \shared{P}{I} \mid\null \\
 	& \exsts{x} P \mid \m{false} \mid P \Rightarrow Q \\
 	I ::=\null& \interAss{\capAss{}}{\vec{y}}{P}{Q} \mid I_1,I_2
 \end{array}
@@ -47,11 +47,10 @@ $
 \begin{array}[t]{l}
 	\for{h_1, h_2, h_3, h_4 \in \Heaps}
 	h_1 \composeH h_2 = h_3 \composeH h_4 \implies \\
-	\hspace*{0.3cm}	
-	\begin{array}{l l}
+	\begin{array}{@{}l l@{}}
 		\exsts{h_{13}, h_{14}, h_{23}, h_{24}} &
-		h_1 = h_{13} \composeH h_{14} \;\land\; h_2 = h_{23} \composeH h_{24} \;\land\\
-		& h_3 = h_{13} \composeH h_{23} \;\land\; h_4 = h_{14} \composeH h_{24}
+		h_1 = h_{13} \composeH h_{14} \land h_2 = h_{23} \composeH h_{24} \land\null\\
+		& h_3 = h_{13} \composeH h_{23} \land h_4 = h_{14} \composeH h_{24}
 	\end{array}
 \end{array}
 $%
@@ -127,16 +126,13 @@ A \emph{world} is a 4-tuple of a logical state representing the thread-local sta
 \[
 	w \in \Worlds \eqdef 
 	\left\{
-	\hspace*{-0.15cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 		(l, s, \amod{}, \amod{L}) & 
- 		\begin{array}{l}
-	 		l, s \in \LStates \;\land\; \amod{}, \amod{L} \in \AMods\\
-	 		\land\; \wf{l, s, \amod{}, \amod{L}} 
+ 		\begin{array}{@{}l@{}}
+	 		l, s \in \LStates \land \amod{}, \amod{L} \in \AMods\\
+	 		\null\land \wf{l, s, \amod{}, \amod{L}} 
 	 	\end{array}
-	 	\hspace*{-0.1cm}
 	\end{array} 
-	\hspace*{-0.15cm}
 	\right\}
 \]
 % 
@@ -173,158 +169,102 @@ We proceed with the semantics of \colosl assertions as defined in \defin\ref{def
 \begin{definition}[Assertion Semantics]
 Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics} of \colosl assertions $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\LStates \times \LStates \times \AMods \times \AMods}$ are given as follows where $\semI[(.)]{.}$ denotes the semantics of interference assertions described in \defin ~\ref{def:interferenceSemantics}.
 %
-\[
-\hspace*{-0.2cm}
-\begin{array}{r c l}
+\begin{align*}
 	\intermediateSem{\heapAss{}} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	& \eqdef
 	\left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 	 	\left(\left(h, \unitCap \right), s, \amod{}, \amod{L} \right) &
-	 	\hspace*{-0.15cm}
-		\begin{array}{l}
+		\begin{array}{@{}l@{}}
 		 	h \in \semH{\heapAss{}} \land s \in \LStates \\
-		  \land\; \amod{}, \amod{L} \in \AMods
+		  \null\land \amod{}, \amod{L} \in \AMods
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array}
-	\hspace*{-0.2cm}
 	\right\}\\
-	
-	
 	\intermediateSem{\capAss{}} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	&  \eqdef
 	\left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 	 	\left(\left(\unitH, \ca{} \right), s, \amod{}, \amod{L} \right) &
-	 	\hspace*{-0.15cm}
-		\begin{array}{l}
+		\begin{array}{@{}l@{}}
 		 	\ca{} \in \semK{\capAss{}} \land s \in \LStates \\
-		  \land\; \amod{}, \amod{L} \in \AMods
+		  \null\land \amod{}, \amod{L} \in \AMods
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array}
-	\hspace*{-0.2cm}
 	\right\}\\
-	
-	
-	
 	\intermediateSem{\emp} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	&  \eqdef
 	\left\{
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 	 	\left(\unitL, s, \amod{}, \amod{L} \right) &
-	 	\hspace*{-0.15cm}
-		\begin{array}{l}
+		\begin{array}{@{}l@{}}
 		 	s \in \LStates 
-		  \;\land\; \amod{}, \amod{L} \in \AMods
+		  \land \amod{}, \amod{L} \in \AMods
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array}
-	\hspace*{-0.2cm}
 	\right\}\\
-
-
-
 	\intermediateSem{P * Q} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} &
-	\left\{ 
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	&  \eqdef
+	\left\{
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 		w_1 \composeW w_2& 
-		\hspace*{-0.15cm}
-		\begin{array}{l}
-				 w_1 \in \intermediateSem{P} \;\land\;
+		\begin{array}{@{}l@{}}
+				 w_1 \in \intermediateSem{P} \land
 				 w_2 \in \intermediateSem{Q} 
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array} 
-	\hspace*{-0.2cm}
 	\right\}\\
-	 
 %	\left\{ 
-%	\hspace*{-0.2cm}
+%	
 %	\begin{array}{l | l}
 %		(p \composeL q, s, \amod{}, \amod{L})& 
-%		\hspace*{-0.15cm}
-%		\begin{array}{l}
-%				 (p, s, \amod{}, \amod{L}) \in \intermediateSem{P} \;\land\\
+%		\begin{array}{@{}l@{}}
+%				 (p, s, \amod{}, \amod{L}) \in \intermediateSem{P} \land\null\\
 %				 (q, s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
 %		\end{array}
-%		\hspace*{-0.1cm}
+%		
 %	\end{array} 
-%	\hspace*{-0.2cm}
+%	
 %	\right\}\\
-	
-	
-	
-	
 	\intermediateSem{P \ewand Q} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	&  \eqdef
 	\left\{ 
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 		w & 
-		\hspace*{-0.15cm}
-		\begin{array}{l l}
+		\begin{array}{@{}l@{}l@{}}
 			\exsts{w_1, w_2} 
-			& \hspace*{-0.3cm} 
-				w_2 = w \composeW w_1 \;\land\\
-				
-			& \hspace*{-0.3cm} 
-				w_1 \in \intermediateSem[\lenv]{P} \;\land\;
+			&  
+				w_2 = w \composeW w_1 \land\null\\
+			&  
+				w_1 \in \intermediateSem[\lenv]{P} \land
 				w_2 \in \intermediateSem[\lenv]{Q}
-				
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array} 
-	\hspace*{-0.2cm}
 	\right\}\\
-	
 	\intermediateSem{P \!\sepish\! Q} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	&  \eqdef
 	\left\{ 
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 		(p \composeL c \composeL q, s, \amod{}, \amod{L}) & 
-		\hspace*{-0.15cm}
-		\begin{array}{l}
+		\begin{array}{@{}l@{}}
 				 (p \composeL c, s, \amod{}, \amod{L}) \in \intermediateSem{P}\land \\
 				 (c \composeL q , s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array} 
-	\hspace*{-0.2cm}
 	\right\}\\
-	
-	
-	
-	
-	
 	\intermediateSem{\shared{P}{I}} 
-	& \hspace*{-0.3cm} \eqdef \hspace*{-0.3cm} & 
+	&  \eqdef
 	\left\{ 
-	\hspace*{-0.2cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l@{\ }|@{\ }l@{}}
 		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
-		\hspace*{-0.15cm}
-		\begin{array}{l}
+		\begin{array}{@{}l@{}}
 			(l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P}\\
-			\land\; r \in \LStates \\
-			\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\semI{I} }
+			\null\land r \in \LStates \\
+			\null\land \extendsAM{\amod{}, \amod{L}}{l}{r}{\semI{I} }
 		\end{array}
-		\hspace*{-0.1cm}
 	\end{array} 
-	\hspace*{-0.2cm}
-	\right\}\\
-	
-	
-
-\end{array}
-\]
+	\right\}
+\end{align*}
 %
 The semantics of propositional formulae are standard and are omitted here. The semantics of heap and capability assertions are given in terms of their respective semantics functions (\param s ~\ref{par:heapSA} and ~\ref{par:capSA}). Note that the semantics of $\heapAss{}$, $\capAss{}$ and \emp use arbitrary shared states $s$ and action models $\amod{}, \amod{L}$. The semantics of separation logic connectives $*, \ewand$ and $\sepish$ are standard. 
 
@@ -363,35 +303,18 @@ $
 is defined as:
 %
 \[
-\begin{array}{r l}
-	\for{\kappa} \semI[\lenv]{I}(\ca{}) =
-	 	&
-%	 	\hspace*{0.2cm}
+	\for{\kappa} \semI[\lenv]{I}(\ca{}) ==
 	 	\left\{
-		\begin{array}{l | r}
-			
-			\hspace*{-0.2cm}(p, q)\hspace*{-0.1cm} & 
-			\hspace*{-0.2cm}
-			\begin{array}{l}
-				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\\
-	
-				\hspace*{0.2cm}
-				\ca{} \in \semK[\lenv]{\capAss{}} \;\land\\
-				
-				\hspace*{0.2cm}
-				(p, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \;\land\\
-				
-
-				
-				\hspace*{0.2cm}
-				(q, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
-				
+		\begin{array}{@{}l@{\ }|@{\ }r@{}}
+			(p, q)&
+			\begin{array}{@{}l@{}}
+				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
+				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\null\\
+				\quad(p, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
+				\quad(q, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
 			\end{array}
 		\end{array}
-	\hspace*{-0.2cm}
 	\right\}
-
-\end{array}
 \]
 %
 \end{definition}
@@ -409,12 +332,10 @@ $
 		\left(
 			\token{X}: 
 			\left\{
-			\hspace*{-0.15cm}
-			\begin{array}{l} 
+			\begin{array}{@{}l@{}} 
 				\cell{x}{1} \swap \cell{x}{2}\\
 				\cell{y}{1} \swap \cell{y}{3}
 			\end{array}
-			\hspace*{-0.15cm}
 			\right\}
 		 \right)
 $.
@@ -437,13 +358,11 @@ is defined as:
 \[
 	l_1 \meetL l_2 \eqdef 
 	\left\{ 
-	\hspace*{-0.15cm}
-	\begin{array}{l | l}
+	\begin{array}{@{}l|l@{}}
 	 	l 
 	 	\!\!&\!
 	  \exsts{l', l'', l_3}\! l_1 = l \composeL l' \land l_2 = l \composeL l'' \land l \composeL l' \composeL l'' = l_3 
 	\end{array}
-	\hspace*{-0.15cm}
 	\right\}
 \]
 %
@@ -498,7 +417,7 @@ An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} 
 	 	p \meetL l \not= \emptyset \\
 	 	
 	 & 
-	 	\land\; l_3 > \unitL \land
+	 	\null\land l_3 > \unitL \land
 	 	 l_1 \maxMeetL l = l_3 \land
 	 	 l = l_3 \composeL c
 	 	 \implies\\
@@ -554,13 +473,13 @@ A world $(l, s, \amod{}, \amod{L}) \in \Worlds$ is \emph{well-formed} iff
 	\hspace*{-0.2cm} & \hspace*{-0.2cm}
 	\exsts{r, \fence{}} 
 	\hspace*{-0.1cm} & \hspace*{-0.1cm} 
-		s \in \fence{} \;\land\; 
-		\fence{} \strictfences \amod{L} \;\land\;
+		s \in \fence{} \land 
+		\fence{} \strictfences \amod{L} \land
 		\collapseW{l, s, \amod{}, \amod{L}} = r\\
 	
 	\hspace*{-0.2cm} & \hspace*{-0.2cm} 
 	& \hspace*{-0.1cm} 	
-	\land\; \contains{\dom{\amod{L}}}{\capPart{r}}
+	\null\land \contains{\dom{\amod{L}}}{\capPart{r}}
 \end{array}
 \]
 %
@@ -622,7 +541,7 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 \[
 \hspace*{-0.2cm}
 \begin{array}{l}
-	\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'}  \;\land\; \amod{}' \subseteq \amod{L}\\
+	\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'}  \land \amod{}' \subseteq \amod{L}\\
 	
 	
 	\extendsAMUpto{\amod{}, \amod{L}}{0}{l}{r}{\amod{}'} \iffdef true \\ 
@@ -634,15 +553,15 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 	\hspace*{0.1cm}\for{\ca{}, c, d, t, p, q, l_1, l_2, l_3, l_4}\\
 	
 	\hspace*{0.2cm}(p, q) \in \amod{}'(\ca{}) 
-	\;\land\; \updateFP{p, q} = (l_1, l_2)
-	\;\land\; p \leq  l \composeL r \composeL t \;\land\\
+	\land \updateFP{p, q} = (l_1, l_2)
+	\land p \leq  l \composeL r \composeL t \land\null\\
 	
 	\hspace*{0.2cm}l_1 = l_3 \composeL l_4 
-	\;\land\; l_1 \maxMeetL l = l_3 
-	\;\land\; l = l_3 \composeL c 
-	\;\land\; r = l_4 \composeL d \implies\\
+	\land l_1 \maxMeetL l = l_3 
+	\land l = l_3 \composeL c 
+	\land r = l_4 \composeL d \implies\\
 	
-	\hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \;\land\\
+	\hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \land\null\\
 	\hspace*{0.4cm}t = \unitL \implies 
 	\left(
 	\begin{array}{l}
@@ -657,10 +576,10 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
   \hspace*{0.1cm}\for{\ca{}, p, q, l_1, l_2, c, d} \\
   
   \hspace*{0.2cm} (p, q) \in \amod{L}(\ca{})
-  \land\; \updateFP{p, q} = (l_1, l_2)
-  \land\; p \composeL c = l \composeL r \composeL d \implies\\
+  \land \updateFP{p, q} = (l_1, l_2)
+  \land p \composeL c = l \composeL r \composeL d \implies\\
   
-  \hspace*{0.4cm}\exsts{f, c'} (l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \land\; l_1 \composeL f \composeL c' =  l \composeL r \composeL d \;\;\lor\\
+  \hspace*{0.4cm}\exsts{f, c'} (l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \land l_1 \composeL f \composeL c' =  l \composeL r \composeL d \;\;\lor\\
 	
 
 		\hspace*{0.4cm}q \composeL c \text{ is undefined} \;\;\lor\\
@@ -682,20 +601,20 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 \[
 \begin{array}{l}
 	\amod{} \weakenI{F}  \amod{1} \iffdef \\
-	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2}\;\; l \in F \;\land\; \updateFP{p, q} = (l_1, l_2) \implies\\
+	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2}\;\; l \in F \land \updateFP{p, q} = (l_1, l_2) \implies\\
 	\hspace*{0.2cm}
 	\begin{array}{l}
 		(p, q) \in \amod{1}(\ca{}) 
-		\;\land\; p \leq l \composeL r \implies \\
-		\hspace*{0.4cm}\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{}) \;\land\; l_1 \composeL f \leq l \composeL r \\
+		\land p \leq l \composeL r \implies \\
+		\hspace*{0.4cm}\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
 
 		\hspace*{1cm} \land\\
 		
 		(p, q) \in \amod{}(\ca{})
-		\;\land\; p \leq l \composeL r \implies \\
+		\land p \leq l \composeL r \implies \\
 		\hspace*{0.2cm}
 		\begin{array}{l}
-			\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f \leq l \composeL r \\
+			\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{1}(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
 			\hspace*{1cm} \lor\\
 			\left( l \meetL l_1 \right) = \left\{ \unitL \right\}
 		\end{array}

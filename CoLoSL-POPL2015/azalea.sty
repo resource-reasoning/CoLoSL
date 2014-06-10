@@ -1,6 +1,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-%\usepackage{amsmath}
+\usepackage{amsmath}
 %\usepackage{amsfonts}
 \usepackage{color}
 \usepackage{graphicx}
@@ -18,7 +18,7 @@
 \usepackage{proof}
 %\usepackage{MnSymbol}
 \usepackage{listings}
-\usepackage{alltt}
+%\usepackage{alltt}
 %\usepackage{tikz}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
@@ -51,9 +51,9 @@
 \newcommand{\emp}{\ensuremath{\mathsf{emp}}\xspace}
 
 \newcommand{\colosl}{\text{CoLoSL}\xspace}
-\newcommand{\fig}{Fig.\ }
+\newcommand{\fig}{Fig.~}
 \newcommand{\param}{Parameter}
-\newcommand{\defin}{Def.\ }
+\newcommand{\defin}{Def.~}
 \newcommand{\ex}{Example}
 
 \newcommand{\powerset}{\mathcal{P}}
@@ -202,7 +202,7 @@
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \addtolength{\fboxsep}{-1.5pt}
 \newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; #2}}
-\newcommand{\swap}{\rightsquigarrow}
+\newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
 \newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 \newcommand{\multiInterAss}[5]{\ensuremath{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}}
@@ -280,8 +280,8 @@
   \mathlig{|||}{\mathrel{|}} % grammar
   \mathlig{-|-}{\mathrel{\mathrlap{\dashv} \hspace{5pt} \vdash}} % entails
   % 2 chars
-  \mathlig{==}{\mathrel{\stackrel{\smash{\scriptscriptstyle\mathrm{def}}}{=}}}
-% \mathlig{==}{\mathrel{\triangleq}}
+%  \mathlig{==}{\mathrel{\stackrel{\smash{\scriptscriptstyle\mathrm{def}}}{=}}}
+ \mathlig{==}{\mathrel{\triangleq}}
   \mathlig{/|}{\mathbin{\wedge}} % additive conjunction
   \mathlig{|/}{\mathbin{\vee}} % additive disjunction
   \mathlig{/=}{\mathrel{\neq}} % non-equality expression

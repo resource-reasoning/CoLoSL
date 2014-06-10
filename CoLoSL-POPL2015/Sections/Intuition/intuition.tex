@@ -9,38 +9,37 @@ Consider the program $\mathbb{P} \eqdef \mathbb{P}_X || \mathbb{P}_Y || \mathbb{
 %\[
 %	\color{blue}{\left\{ \cell{\text{x}}{0} * \cell{\text{y}}{0} * \cell{\text{z}}{0}\right\}}
 %\] \vspace*{-5pt}\\
-\hspace*{-0.2cm}
-\begin{tabular}{l || l || l}
+\begin{tabular}{@{}l@{\ }||@{\ }l@{\ }||@{\ }l@{}}
 	\color{blue}{$\mathbb{P}_X$ :}& 
 	\color{blue}{$\mathbb{P}_Y$ :}& 
 	\color{blue}{$\mathbb{P}_Z$ :} \\
 	 &&\vspace*{-5pt}\\
 \begin{lstlisting}[mathescape]
-while($x$<10){
+while($x$ < 10){
  if ($x$ == $z$) 
    $x$++ ;
 }
 \end{lstlisting}
 &
 \begin{lstlisting}[mathescape]
-while($y$<10){
+while($y$ < 10){
  if ($y$ < $x$) 
    $y$++ ;
 }
 \end{lstlisting}
 &
 \begin{lstlisting}[mathescape]
-while($z$<10){
+while($z$ < 10){
  if ($z$ < $y$) 
    $z$++ ;
 }
 \end{lstlisting}
-
-\end{tabular} \vspace*{5pt}\\
+\end{tabular}
 %\[
 %	\color{blue}{\left\{ \cell{\text{x}}{10} * \cell{\text{y}}{10} * \cell{\text{z}}{10}\right\}}
 %\] \vspace*{-15pt}\\
-\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-12pt}
+
+\vspace*{5pt}\noindent\makebox[\linewidth]{\rule{\linewidth}{1pt}} \vspace*{-12pt}
 \caption{The concurrent increment program.}
 \label{fig:concurrentInc}
 \end{figure}
@@ -58,7 +57,7 @@ The program state in \colosl\ is modelled by two components representing a threa
 However, since the program executed by each thread depends on the value of the variable to be incremented as well as the value of the variable that comes before it in the $x, y, z$ chain, the values of these variable must be \emph{shared} such that each thread has access to the required variables. In \colosl, a thread can always \emph{share} locally-held resources by pushing them into the shared state and \emph{extending} it such that the previously-local resources are now visible by all threads. In the case of the local resource $P_0$, it can be shared as follows where $I$ is as defined in \fig\ref{fig:concurrentIncCoLoSLSpec}.
 %
 \[
-	\exsts{\token{X}, \token{Y}, \token{Z}}\;\; \token{X} * \token{Y} * \token{Z} * \shared{P_0}{I}
+	\exsts{\token{X}, \token{Y}, \token{Z}} \token{X} * \token{Y} * \token{Z} * \shared{P_0}{I}
 \]
 %
 The boxed assertion $\shared{P_0}{I}$ denotes the newly-shared resource satisfying $P_0$. In this example $x$, $y$, and $z$ are shared resources and are thus enclosed in a box. 
@@ -78,7 +77,7 @@ The sharing of local resources in \colosl\ is then formalised by the \textsc{(Ex
 %
 \[
 \begin{array}{l c}
-	P \sentails \exsts{\capAss{1}, \capAss{2}}\;\; \capAss{1} * \shared{P * \capAss{2}}{I} & \textsc{(Extend)}\\
+	P \sentails \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P * \capAss{2}}{I} & \textsc{(Extend)}\\
 	& \text{[Side condition omitted]}
 \end{array}
 \]
@@ -103,24 +102,21 @@ When writing boxed assertions of the form $\shared{P}{I}$ describing the shared 
 	\hspace*{-0.2cm}
 	G \eqdef 
 	\shared{
-		\hspace*{-0.2cm}
-		\begin{array}{l l l l l}
-			\exsts{v} \hspace*{-0.2cm}  & \hspace*{-0.2cm} & \cell{x}{v} \hspace*{-0.2cm}  & *\ \cell{y}{v} \hspace*{-0.2cm} & *\ \cell{z}{v}\\
-			& \lor \hspace*{-0.3cm}&  \cell{x}{v+1} \hspace*{-0.2cm}  & *\ \cell{y}{v} \hspace*{-0.2cm} &*\ \cell{z}{v}\\
-			&\lor \hspace*{-0.3cm}&  \cell{x}{v+1} \hspace*{-0.2cm}  & *\ \cell{y}{v+1} \hspace*{-0.2cm}  & *\ \cell{z}{v}
+		\begin{array}{@{}l@{}l@{\,}l@{\,}l@{\,}l@{}}
+			\exsts{v}   &  & \cell{x}{v}   & *\ \cell{y}{v}  & *\ \cell{z}{v}\\
+			& \lor &  \cell{x}{v+1}   & *\ \cell{y}{v}  &*\ \cell{z}{v}\\
+			&\lor &  \cell{x}{v+1}   & *\ \cell{y}{v+1}   & *\ \cell{z}{v}
 		\end{array}	
-		\hspace*{-0.2cm}		
+				
 	}{I}
 	
 	G' \eqdef 	
 	\shared{
-		\hspace*{-0.2cm}
-		\begin{array}{l l}
-			\hspace*{-0.3cm}  &\cell{x}{10} \\
-			*\hspace*{-0.3cm} &\cell{y}{10}\\
-			*\hspace*{-0.3cm} &\cell{z}{10}\\
+		\begin{array}{@{}l@{\,}l@{}}
+			  &\cell{x}{10} \\
+			* &\cell{y}{10}\\
+			* &\cell{z}{10}\\
 		\end{array}	
-		\hspace*{-0.2cm}		
 	}{I}
 	
 	\vspace*{5pt}\\
@@ -129,10 +125,10 @@ When writing boxed assertions of the form $\shared{P}{I}$ describing the shared 
 	\hspace*{-0.2cm}
 	I \eqdef \left\{
 		\hspace*{-0.1cm} 
-		\begin{array}{l l r c l }
-			\textsf{X}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{x}{v} * \cell{z}{v} & \swap & \cell{x}{v+1} * \cell{z}{v}\\
-			\textsf{Y}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{x}{v+1} * \cell{y}{v} & \swap & \cell{x}{v+1} * \cell{y}{v+1}\\
-			\textsf{Z}:\hspace*{-0.2cm} & \exsts{v}\hspace*{-0.25cm} & \cell{y}{v+1} * \cell{z}{v} & \swap & \cell{y}{v+1} * \cell{z}{v+1}\\
+		\begin{array}{l@{\,}l@{}r@{\ }c@{\ }l}
+			\textsf{X}: & \exsts{v} & \cell{x}{v} * \cell{z}{v} & \swap & \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Y}: & \exsts{v} & \cell{x}{v+1} * \cell{y}{v} & \swap & \cell{x}{v+1} * \cell{y}{v+1}\\
+			\textsf{Z}: & \exsts{v} & \cell{y}{v+1} * \cell{z}{v} & \swap & \cell{y}{v+1} * \cell{z}{v+1}\\
 		\end{array}			
 	
 	\right.
@@ -188,7 +184,7 @@ Consequently, as in the case of the first and second lines of the above derivati
 Note that thread $\tau_X$ is only concerned with the values of $x$ and $z$; \emph{mutatis mutandis} for $\tau_Y$ and $\tau_Z$. However, with the specification of \fig\ref{fig:concurrentIncCoLoSLSpec}, all three variables are visible by $\tau_X$ and as such in verification of $\mathbb{P}_X$ it is necessary to account for the interference associated with $y$ even though its value is neither read nor modified by $\tau_X$. In other words, the specification of \fig\ref{fig:concurrentIncCoLoSLSpec} is not \emph{local} enough. Ideally, $\tau_X$'s view of the shared state would be $\shared{X}{I}$ with predicate $X$ as defined below where variable $y$ is \emph{forgotten}.
 %
 \[
-	X \eqdef \exsts{v}\;\; \cell{x}{v} * \cell{z}{v} \;\lor\; \cell{x}{v+1} * \cell{z}{v}
+	X \eqdef \exsts{v} \cell{x}{v} * \cell{z}{v} \lor \cell{x}{v+1} * \cell{z}{v}
 \]
 %
 In \colosl\ it is always possible to forget parts of the shared state and arrive at a \emph{subjective}, more local and thus weaker view of the shared state. That is\footnote{Since $P * Q \vdash P \sepish Q$, from the \textsc{Hide} rule we have $\shared{P * Q}{I} \vdash \shared{P}{I}$},
@@ -210,9 +206,9 @@ In the case of the less local predicate $G$, whenever the pre-condition of the a
 %
 \[
 	\begin{array}{l l}
-		\fence{G} = \hspace*{-5pt}& \left\{\cell{x}{v} * \cell{y}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 10\} \right\} \\
-		& \cup \left\{\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 9 \} \right\} \\
-		& \cup \left\{\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v} \;|\; v \in \{0, \cdots 9\} \right\}\\
+		\fence{G} = \hspace*{-5pt}& \left\{\cell{x}{v} * \cell{y}{v} * \cell{z}{v} ||| v \in \{0, \cdots 10\} \right\} \\
+		& \cup \left\{\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v} ||| v \in \{0, \cdots 9 \} \right\} \\
+		& \cup \left\{\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v} ||| v \in \{0, \cdots 9\} \right\}\\
 	\end{array}
 \]
 %as well as the action associated with its update
@@ -220,11 +216,12 @@ Given the above invariant, we can now \emph{shift} the action associated with \t
 %
 \[
 	I' \eqdef \left\{
-		\begin{array}{l}
-			\textsf{X}:\; \exsts{v}\; \cell{x}{v} * \cell{z}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{z}{v}\\
-			\textsf{Y}:\; \exsts{v}\; \cell{x}{v+1} * \cell{y}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{y}{v+1}\\
-			\textsf{Z}:\; \exsts{v}\; \cell{x}{v+1} *  \cell{y}{v+1} * \cell{z}{v}\hspace*{0.2cm}\swap\\
-			\hspace*{2.5cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
+		\begin{array}{@{}l@{}}
+			\textsf{X}:\, \exsts{v} \cell{x}{v} * \cell{z}{v}  \swap  \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Y}:\, \exsts{v} \cell{x}{v+1} * \cell{y}{v}  \swap  \cell{x}{v+1} * \cell{y}{v+1}\\
+			\textsf{Z}:\, \exsts{v} \cell{x}{v+1} *
+                        \cell{y}{v+1} * \cell{z}{v} \swap\null\\
+			\hspace*{2cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
 		\end{array}			
 	\right.
 \]
@@ -241,10 +238,10 @@ Note that in doing so we have neither restricted nor relaxed the action of \text
 Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \textsc{Hide} rule to forget variable $y$ and obtain $\shared{X}{I'}$.
 %%
 %\[
-%	X' \eqdef \shared{\exsts{v} \cell{x}{v} * \cell{z}{v} \;\lor\; \cell{x}{v+1} * \cell{z}{v}}{I'} 
+%	X' \eqdef \shared{\exsts{v} \cell{x}{v} * \cell{z}{v} \lor \cell{x}{v+1} * \cell{z}{v}}{I'} 
 %\]
 %%
-We have almost arrived at a local specification for $\mathbb{P}_X$. However, the action of \textsf{Y} is still visible in $I'$ even though it does not affect the values of $x$ or $z$. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{X} = \left\{\cell{x}{v} * \cell{z}{v} \;|\; v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \;|\; v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of \textsf{Y}, given any state $p$ in the action pre-condition (e.g. $p = \cell{x}{1} * \cell{y}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{x}{1} * \cell{z}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{x}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
+We have almost arrived at a local specification for $\mathbb{P}_X$. However, the action of \textsf{Y} is still visible in $I'$ even though it does not affect the values of $x$ or $z$. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{X} = \left\{\cell{x}{v} * \cell{z}{v} ||| v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} ||| v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of \textsf{Y}, given any state $p$ in the action pre-condition (e.g. $p = \cell{x}{1} * \cell{y}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{x}{1} * \cell{z}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{x}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
 %
 %
 \begin{figure}
@@ -255,17 +252,17 @@ We have almost arrived at a local specification for $\mathbb{P}_X$. However, the
 %\hline\vspace*{-5pt}\\
 	S_{X} \eqdef 
 	\shared{
-		\exsts{v}   \cell{x}{v}  * \cell{z}{v}  \;\;\lor\;\; \cell{x}{v+1}  *\ \cell{z}{v}	
+		\exsts{v}   \cell{x}{v}  * \cell{z}{v}  \lor \cell{x}{v+1}  * \cell{z}{v}
 	}{I_x}\vspace*{5pt}\\
 	
 
 	
 	I_x \eqdef \left\{
 %		\hspace*{-0.1cm} 
-		\begin{array}{l}
-			\textsf{X}:\; \exsts{v}\; \cell{x}{v} * \cell{z}{v}  \hspace*{0.2cm}\swap\hspace*{0.2cm}  \cell{x}{v+1} * \cell{z}{v}\\
-			\textsf{Z}:\; \exsts{v}\; \cell{x}{v+1} *  \cell{y}{v+1} * \cell{z}{v}\hspace*{0.2cm}\swap\\
-			\hspace*{2.5cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
+		\begin{array}{@{}l@{}}
+			\textsf{X}:\, \exsts{v} \cell{x}{v} * \cell{z}{v}  \swap  \cell{x}{v+1} * \cell{z}{v}\\
+			\textsf{Z}:\, \exsts{v} \cell{x}{v+1} *  \cell{y}{v+1} * \cell{z}{v}\swap\null\\
+			\hspace*{2cm} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}\\
 		\end{array}			
 	
 	\right.
@@ -323,9 +320,9 @@ with
 %
 \[
 \begin{array}{l l}
-	S'_X \eqdef & \shared{\cell{x}{10} * \cell{z}{10} \;\lor\; \cell{x}{10} * \cell{z}{9} }{I_X}\\
-	S'_Y \eqdef & \shared{\cell{x}{11} * \cell{y}{10} \;\lor\; \cell{x}{10} * \cell{y}{10} }{I_Y}\\
-	S'_Z \eqdef & \shared{\cell{y}{11} * \cell{z}{10} \;\lor\; \cell{y}{10} * \cell{z}{10} }{I_Z}
+	S'_X \eqdef & \shared{\cell{x}{10} * \cell{z}{10} \lor \cell{x}{10} * \cell{z}{9} }{I_X}\\
+	S'_Y \eqdef & \shared{\cell{x}{11} * \cell{y}{10} \lor \cell{x}{10} * \cell{y}{10} }{I_Y}\\
+	S'_Z \eqdef & \shared{\cell{y}{11} * \cell{z}{10} \lor \cell{y}{10} * \cell{z}{10} }{I_Z}
 \end{array}
 \]
 %
