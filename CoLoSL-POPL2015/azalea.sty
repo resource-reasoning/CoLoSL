@@ -1,5 +1,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{array}
 \usepackage{amsmath}
 %\usepackage{amsfonts}
 \usepackage{color}
@@ -23,12 +24,32 @@
 %\usepackage{dashrule}
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
+\usepackage{relsize}
+\usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{mathpartir}
 
 \usepackage{seplog}
 
 \input mathlig
+
+\newcommand{\comment}{\color{blue!80!black}}
+
+\lstset{%
+  language=C,
+  morecomment=[n][{\comment}]{/*}{*/},
+  morecomment=[l][{\comment}]{//},
+  morecomment=[n][{\ghost}]{[}{]},
+  sensitive=true,
+  mathescape=true,
+  showlines=true,
+  basicstyle=\normalfont\smaller\tt,
+  keywordstyle=\color{blue},
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  boxpos=t,
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -213,7 +234,7 @@
 \newcommand{\shiftAction}[2]{\left\lvert #1\right\rvert^{#2}}
 \newcommand{\shiftInterference}[2]{\left\lvert #1\right\rvert^{#2}}
 
-\newcommand{\token}[1]{\textsf{#1}}
+\newcommand{\token}[1]{\ensuremath{\mathsf{#1}}\xspace}
 
 \newcommand{\hoare}[3]{\vdash\,\{#1\}\;#2\;\{#3\}}
 %% Inference rules
