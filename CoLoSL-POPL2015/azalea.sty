@@ -44,12 +44,35 @@
   mathescape=true,
   showlines=true,
   basicstyle=\normalfont\smaller\tt,
-  keywordstyle=\color{blue},
-  numbers=left,
+  keywordstyle=\bf,
+  numbers=none,
   numberstyle=\tiny,
   numbersep=5pt,
   boxpos=t,
 }
+
+\newcommand{\azaleacomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Azalea's comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+\newcommand{\pgcomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Philippa's comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+\newcommand{\julescomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Jules' comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -223,7 +246,7 @@
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \addtolength{\fboxsep}{-1.5pt}
-\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; #2}}
+\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
 \newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
@@ -284,6 +307,7 @@
 %\newcommand{\viewshift}[1]{\sqsubseteq^{#1}}
 \newcommand{\weakenI}[1]{\sqsubseteq^{#1}}
 \newcommand{\weakenIb}[1]{\sqsubseteq_{#1}}
+\newcommand{\containI}{\mathrel{\copyright}}
 %\newcommand{\entangleI}[1]{\bowtie^{#1}}
 \newcommand{\agrees}{\bowtie}
 \newcommand{\respects}{\ltimes}
