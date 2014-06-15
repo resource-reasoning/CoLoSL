@@ -20,7 +20,7 @@
 %\usepackage{MnSymbol}
 \usepackage{listings}
 %\usepackage{alltt}
-%\usepackage{tikz}
+\usepackage{tikz}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
@@ -29,9 +29,17 @@
 \usepackage{microtype}
 \usepackage{mathpartir}
 
-\usepackage{seplog}
-
 \input mathlig
+
+\usepackage{seplog}
+\usepackage{url}
+\usepackage[colorlinks,%
+  pdftitle={CoLoSL: Concurrent Local Subjective Logic},
+  pdfauthor={Azalea Raad, Philippa Gardner, and Jules Villard}]{hyperref}
+\hypersetup{linkcolor=black,citecolor=black,filecolor=black,urlcolor=black}
+
+
+\usetikzlibrary{shapes}
 
 \newcommand{\comment}{\color{blue!80!black}}
 
@@ -106,6 +114,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\m}[1]{\mathit{#1}}
+\newcommand{\p}[1]{\mathsf{#1}}
 
 \definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
@@ -128,7 +137,17 @@
 \newcommand{\todo}{\textbf{TO DO }}
 \newcommand{\note}[1]{\noindent\framebox{\parbox{\textwidth}{\textbf{Note: }#1}}}
 \newcommand{\defstyle}[1]{\emph{#1}}
-%
+
+% inline code
+\makeatletter
+\newlength{\@mli}
+\newcommand{\mli}[1]{%
+  \settowidth{\@mli}{\lstinline/#1/}
+  \hspace{-.5ex}\begin{minipage}[t]{\@mli}\lstinline/#1/\end{minipage}}
+\makeatother
+\newcommand{\li}[1]{\ifmmode\mbox{\mli{#1}}\else\mbox{\lstinline/#1/}\fi}
+\newcommand{\tx}[1]{\text{#1}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% MODEL %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\disjoint}{\sharp}

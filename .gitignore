@@ -8,4 +8,5 @@
 *.bbl
 *.backup
 *.blg
+*.out
 *.*~
