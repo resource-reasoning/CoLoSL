@@ -9,3 +9,5 @@
 *.backup
 *.blg
 *.*~
+
+*.gz

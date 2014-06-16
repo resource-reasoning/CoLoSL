@@ -45,6 +45,7 @@
 
 \newtheorem{proposition}{Proposition}
 
+\theoremstyle{definition}
 \newtheorem{example}{Example}
 
 \newcommand{\blankArg}{(.)}
@@ -88,7 +89,8 @@
 %
 \newcommand{\disjoint}{\sharp}
 \newcommand{\separate}{\text{\textreferencemark}}
-\newcommand{\fence}[1]{\ensuremath{F_{#1}}}
+\newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
+\newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
 \newcommand{\fences}{\ensuremath{\rhd}}
 \newcommand{\strictfences}{\ensuremath{\unrhd}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
@@ -198,6 +200,9 @@
 \newcommand{\penv}{\ensuremath{\Delta}\xspace}
 \newcommand{\lenv}{\ensuremath{\Gamma}\xspace}
 \newcommand{\sepish}{\ocon}
+\newcommand{\intersect}{%
+  \mathbin{\mbox{$\mathrlap{\cap}\hspace*{.09em}
+      \raisebox{.01em}[0ex][0ex]{$\scon$}$\hspace*{.07em}}}}
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \addtolength{\fboxsep}{-1.5pt}

@@ -577,7 +577,7 @@ where
 	     \begin{array}{l}
 	      l \composeL (\unitH, \ca{1}),\\
 	      s \composeL s',\\
-	      \amod{}', \amod{L} \uplus \amod{0}
+	      \amod{}', \amod{L} \cup \amod{0}
 	     \end{array}
  	    \hspace*{-0.2cm}
  	    \right)
@@ -588,11 +588,11 @@ where
  	  \begin{array}{l}
  	  	s' = l' \composeL (\unitH, \ca{2})  \;\land\; \contains{\dom{\amod{0}}}{\ca{1} \composeL \ca{2}}\\
  	  	
- 	  	\land\; \dom{\amod{0}} \disjoint \dom{\amod{L}}
-			\land\; \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{s'}{s}{\amod{0}}\\
+ 	  	\land\; \{\ca{1} \composeL \ca{2}\} \disjoint \dom{\amod{L}}
+			\land\; \extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}}\\
 			
 			\land\; \for{l_1, r_1, \amod{1} \subseteq \amod{L}} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
-			\hspace*{1cm} \implies\extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
+			\hspace*{1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
 			
      	
    	\end{array}
@@ -703,17 +703,18 @@ where
 		\left(
 		\begin{array}{l}
 			\left(l, s, \amod{}, \amod{L} \right),\\
-			\left(l, s \composeL s', \amod{}', \amod{L} \uplus \amod{0} \right)
+			\left(l, s \composeL s', \amod{}', \amod{L} \cup \amod{0} \right)
 		\end{array}
 		\right)
 		&
 		\begin{array}{l}
-			\dom{\amod{0}} \disjoint \dom{\amod{L}}
-			\;\land\;
-			\extendsAM{\amod{}', \amod{L} \uplus \{\amod{0}\}}{s'}{s}{\amod{0}}		\\
+			\contains{\dom{\amod{0}} \cup \dom{\amod{L}}}{\capPart{s'}}\\
+%			\dom{\amod{0}} \disjoint \dom{\amod{L}}
+			\land\;
+			\extendsAM{\amod{}', \amod{L} \cup \{\amod{0}\}}{s'}{s}{\amod{0}}		\\
 			
 			\land\;\for{l, r, \amod{1} \subseteq \amod{L}} l \composeL r = s \;\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}}\\
-			\hspace*{1cm} \implies \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{l}{r \composeL s'}{\amod{1}}\\
+			\hspace*{1cm} \implies \extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l}{r \composeL s'}{\amod{1}}\\
 %			\extendsAM{\amod{}', L \cup \{\amod{0}\}}{s}{s'}{\bigcup\limits_{\amod{i} \in L} \amod{i}}	\\	
 			
 %\bigcup\limits_{\amod{i} \in L} \amod{i}
