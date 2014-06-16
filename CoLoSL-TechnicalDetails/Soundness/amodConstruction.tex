@@ -4,11 +4,13 @@
 \[
 \begin{array}{l}
 	\for{\amod{}, \amod{0}, \amod{L} \in \AMods} \for{F_0, F \in \pset{\LState}} \for{s, s_0}\\
-	\hspace*{0.2cm} s_0 \in F_0 \;\land\; F_0 \strictfences \amod{0} \;\land\; s \in F \;\land\; F \strictfences \amod{L} \;\land\;  \dom{\amod{L}} \disjoint \dom{\amod{0}} \implies \\
-	\hspace*{0.5cm} \exsts{\amod{}', \fence{}'} s \composeL s_0 \in \fence{}' \;\land\; \fence{}' \strictfences \amod{L} \uplus \amod{0} \;\land\; 
-	 \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{s_0}{s}{\amod{0}} \;\land\\
+	\hspace*{0.2cm} s_0 \in F_0 \;\land\; F_0 \strictfences \amod{0} \;\land\; s \in F \;\land\; F \strictfences \amod{L} 
+%	\;\land\;  \dom{\amod{L}} \disjoint \dom{\amod{0}} 
+	\implies \\
+	\hspace*{0.5cm} \exsts{\amod{}', \fence{}'} s \composeL s_0 \in \fence{}' \;\land\; \fence{}' \strictfences \amod{L} \cup \amod{0} \;\land\; 
+	 \extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s_0}{s}{\amod{0}} \;\land\\
 	 \hspace*{1.8cm}\for{l, r}\for{\amod{1} \subseteq \amod{L} } l \composeL r = s \;\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}} \implies\\
-	 \hspace*{2cm}  \extendsAM{\amod{}', \amod{L} \uplus \amod{0}}{l}{r \composeL s_0}{\amod{1}}
+	 \hspace*{2cm}  \extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l}{r \composeL s_0}{\amod{1}}
 
 \end{array}
 \]
@@ -18,7 +20,8 @@ Pick arbitrary $\amod{}$, $\amod{0}, \amod{L}, \amod{1} \subseteq \amod{L}, F_0,
 %
 \begin{align}
 		&s_0 \in F_0 \;\land\; F_0 \strictfences \amod{0} \label{LAW:AssFence}\\
-		& \dom{\amod{L}} \disjoint \dom{\amod{0}} \;\land\; F \strictfences \amod{L}\label{LAW:dd}\\
+%		& \dom{\amod{L}} \disjoint \dom{\amod{0}} \;\land\; 
+		&F \strictfences \amod{L}\label{LAW:dd}\\
 		& s \in F \label{LAW:sfence}
 \end{align}
 %
@@ -35,7 +38,7 @@ Let
 and pick  $\amod{}', \amod{0}'$ such that for each $\ca{} \in \Caps$:
 %
 \[
-\amod{}'(\ca{}) =
+\amod{1}'(\ca{}) =
 \left\{
 	\begin{array}{l | l}
 		(s_1 \composeL d \composeL f_0, s_2 \composeL d \composeL f_0)
@@ -80,12 +83,12 @@ Let
 %(\ref{LAW:Ass})
 \noindent\textbf{Show}
 \begin{align}
-	&F' \strictfences \amod{L} \uplus \amod{0} \label{LAW:Goal1}\\
+	&F' \strictfences \amod{L} \cup \amod{0} \label{LAW:Goal1}\\
 	&s \composeL s_0 \in F' \label{LAW:Goal2}\\
 	&\for{n \in \Nats}\for{s \in F} \for{s_0 \in F_0}  s \composeL s_0 \text{ defined} \implies 
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{n}{s_0}{s}{\amod{0}} \label{LAW:Goal4}\\
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{n}{s_0}{s}{\amod{0}} \label{LAW:Goal4}\\
 	&\for{n \in \Nats}\for{l \composeL r \in F} \for{s_0 \in F_0} l \composeL r \composeL s_0 \text{ defined} \;\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}} \nonumber\\
-	& \implies   \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{n}{l}{r \composeL s_0}{\amod{0}} \label{LAW:Goal5}
+	& \implies   \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{n}{l}{r \composeL s_0}{\amod{0}} \label{LAW:Goal5}
 \end{align}
 %
 \textbf{RTS. (\ref{LAW:Goal4})}\\
@@ -93,7 +96,7 @@ Let
 By induction on the number of steps $m$.\\
 
 \noindent\textbf{Base Case}\\
-\textbf{RTS. } $\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{0}{s_0}{s}{\amod{0}}$\\
+\textbf{RTS. } $\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{0}{s_0}{s}{\amod{0}}$\\
 This holds trivially by definition of $-\downarrow_{0}$.\\
 
 \noindent\textbf{Inductive Case}\\
@@ -106,13 +109,13 @@ This holds trivially by definition of $-\downarrow_{0}$.\\
 %	  \hspace*{3cm} \implies\\
 %	  \extendsAMUpto{\amod{}}{m-1}{l_i}{l_1 \composeL \cdots \composeL l_{i-1} \composeL l_{i+1} \composeL \cdots \composeL l_n}{\amod{i}}
 %	\end{array}
-	\for{s \in F}\for{s_0 \in F_0} s \composeL s_0 \text{ is defined} \implies \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_0}{s}{\amod{0}}
+	\for{s \in F}\for{s_0 \in F_0} s \composeL s_0 \text{ is defined} \implies \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_0}{s}{\amod{0}}
 	\tag{I.H} \label{LAW:I.H}
 \end{align}
 \textbf{Show } 
 %
 \begin{align}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{m}{s_0}{s}{\amod{0}} \nonumber
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{m}{s_0}{s}{\amod{0}} \nonumber
 \end{align}
 %
 That is:
@@ -122,16 +125,16 @@ That is:
 		\for{\ca{}, c, d, t, s_3, s_4}\for{(s_1 \composeL e, s_2 \composeL e) \in \amod{0}(\ca{})} \\
 	\hspace*{0.2cm}\left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \;\land\; s_1 \composeL e \leq  s \composeL s_0 \composeL t \;\land\\
 	\hspace*{0.2cm} s_1 = s_3 \composeL s_4 \;\land\; s_1 \maxMeetL s_0 = s_3 \;\land\; s_0 = s_3 \composeL c \;\land\; s = s_4 \composeL d \implies\\
-	\hspace*{0.4cm}\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \;\land\\
+	\hspace*{0.4cm}\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \;\land\\
 	\hspace*{0.4cm} t = \unitL \implies (s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\lor\; s_2 \composeL c \composeL d \text{ is undefined}
 	\end{array} \label{LAW:Goal8} \\\nonumber\\
 	&\begin{array}{l}
-		\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L} \uplus \amod{0}(\ca{})} \for{c, d} \\
+		\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L} \cup \amod{0}(\ca{})} \for{c, d} \\
   \hspace*{0.2cm} l_1 \composeL f \composeL c = s \composeL s_0 \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
   \hspace*{0.4cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{0}(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  s \composeL s_0 \composeL d\\
 		\hspace*{0.4cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
 		\hspace*{0.4cm}\lor\; l_1 \maxMeetL s_0 = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = s_0 \composeL r' \composeL d \;\land\\
-		\hspace*{0.6cm} \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_0}{r'}{\amod{0}}
+		\hspace*{0.6cm} \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_0}{r'}{\amod{0}}
 %		
 %  \hspace*{0.2cm} l_1 \composeL f \meetL l \composeL r \not= \emptyset \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
 %  \hspace*{0.4cm}\exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \amod{0} \;\land\; l_1 \composeL f' \meetL l \composeL r \not= \emptyset\\
@@ -186,7 +189,7 @@ From (\ref{LAW:AssFence}), (\ref{LAW:Ass12})-(\ref{LAW:Ass14}) and (\ref{LAW:I.H
 %
 \begin{align}
 \begin{array}{l}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \;\land\\
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{0}} \;\land\\
 	t = \unitL \implies (s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined}
 \end{array} \nonumber
 \end{align}
@@ -197,7 +200,7 @@ as required.\\
 Pick an arbitrary $\ca{}, l_1, l_2, f, c, d$ such that:
 %
 \begin{align}
-	& (l_1 \composeL f, l_2 \composeL f) \in \amod{L} \uplus \amod{0}(\ca{}) \label{LAW:Ass16}\\
+	& (l_1 \composeL f, l_2 \composeL f) \in \amod{L} \cup \amod{0}(\ca{}) \label{LAW:Ass16}\\
 	& l_1 \composeL f \composeL c = s \composeL s_0 \composeL d \label{LAW:Ass17}\\
 	& \for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL
 \end{align}
@@ -241,7 +244,7 @@ Now assume $l_2 \composeL f \composeL c$ is defined, then from (\ref{LAW:contain
 and consequently by the (\ref{LAW:I.H})
 %
 \begin{align}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_0}{r'}{\amod{0}}
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_0}{r'}{\amod{0}}
 \end{align}
 %(\ref{LAW:Ass})
 as required.
@@ -261,7 +264,7 @@ By induction on the number of steps $m$. Pick an arbitrary $l, r, s_0, \amod{1} 
 \end{align}
 
 \noindent\textbf{Base Case}\\
-\textbf{RTS. } $\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{0}{s}{s_0}{\amod{L}}$\\
+\textbf{RTS. } $\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{0}{s}{s_0}{\amod{L}}$\\
 This holds trivially by definition of $-\downarrow_{0}$.\\
 
 \noindent\textbf{Inductive Case}\\
@@ -269,13 +272,13 @@ This holds trivially by definition of $-\downarrow_{0}$.\\
 \noindent\textbf{Assume}
 \begin{align}
 	\for{l \composeL r \in F}\for{s_0 \in F_0} l \composeL r \composeL s_0  \text{ is defined}  \;\land\; \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{1}} \nonumber \\
-	\implies \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{r \composeL s_0}{\amod{1}}
+	\implies \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{r \composeL s_0}{\amod{1}}
 	\tag{I.H} \label{LAW2:I.H}
 \end{align}
 \textbf{Show } 
 %
 \begin{align}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{m}{l}{r \composeL s_0}{\amod{1}} \nonumber
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{m}{l}{r \composeL s_0}{\amod{1}} \nonumber
 \end{align}
 %
 That is:
@@ -285,17 +288,17 @@ That is:
 		\for{\ca{}, c, d, t, s_3, s_4}\for{(s_1 \composeL e, s_2 \composeL e) \in \amod{1}(\ca{})} \\
 	\hspace*{0.2cm}\left(\for{l'} l' \leq s_1 \land l' \leq s_2 \implies l' = \unitL\right) \;\land\; s_1 \composeL e \leq  l \composeL r \composeL s_0 \composeL t\;\land\\
 	\hspace*{0.2cm} s_1 = s_3 \composeL s_4 \;\land\; s_1 \maxMeetL l = s_3 \;\land\; l = s_3 \composeL c \;\land\; r \composeL s_0 = s_4 \composeL d \implies\\
-	\hspace*{0.4cm} \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{1}} \;\land\\
+	\hspace*{0.4cm} \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{1}} \;\land\\
 	\hspace*{0.4cm} t = \unitL \implies (s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) 
 	\;\lor\; s_2 \composeL c \composeL d \text{ is undefined}
 	\end{array} \label{LAW:Goal10} \\\nonumber\\
 	&\begin{array}{l}
-		\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L} \uplus \amod{0}(\ca{})} \for{c, d} \\
+		\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L} \cup \amod{0}(\ca{})} \for{c, d} \\
 		\hspace*{0.2cm} l_1 \composeL f \composeL c = l \composeL r \composeL s_0 \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
   \hspace*{0.4cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL s_0 \composeL d\\
 		\hspace*{0.4cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
 		\hspace*{0.4cm}\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\\
-		\hspace*{0.6cm} \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
+		\hspace*{0.6cm} \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
 	\end{array} \label{LAW:Goal11}
 \end{align}
 %
@@ -348,7 +351,7 @@ From (\ref{LAW:dd}), (\ref{LAW2:Ass12}), (\ref{LAW2:Assmid}), (\ref{LAW2:Assfenc
 %
 \begin{align}
 \begin{array}{l}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{L}} \;\land \\
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{s_2 \composeL c}{d}{\amod{L}} \;\land \\
 	t = \unitL \implies (s_1 \composeL c \composeL d, s_2 \composeL c \composeL d) \in \amod{}'(\ca{}) \;\lor\; s_2 \composeL c \composeL d \hspace*{0.2cm} \text{is undefined}
 \end{array} \nonumber
 \end{align}
@@ -359,7 +362,7 @@ as required.\\
 Pick an arbitrary $\ca{}, l_1, l_2, f, c, d$ such that:
 %
 \begin{align}
-	& (l_1 \composeL f, l_2 \composeL f) \in \amod{L} \uplus \amod{0}(\ca{}) \label{LAW2:Ass16}\\
+	& (l_1 \composeL f, l_2 \composeL f) \in \amod{L} \cup \amod{0}(\ca{}) \label{LAW2:Ass16}\\
 	& l_1 \composeL f \composeL c = l \composeL r \composeL s_0 \composeL d \label{LAW2:Ass17}\\
 	& \for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL \label{LAW2:Ass18}
 \end{align}
@@ -400,7 +403,7 @@ Now assume $l_2 \composeL f \composeL c$ is defined, then from (\ref{LAW2:contai
 and consequently from (\ref{LAW2:Ass1}), (\ref{LAW2:Ass4}) and (\ref{LAW2:I.H})
 %
 \begin{align}
-	\extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{r \composeL l_2 \composeL e}{\amod{1}}
+	\extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{r \composeL l_2 \composeL e}{\amod{1}}
 \end{align}
 %(\ref{LAW2:Ass})
 Pick $r' = l_2 \composeL e \composeL r$. Then above, (\ref{LAW2:Part2})we have:
@@ -408,7 +411,7 @@ Pick $r' = l_2 \composeL e \composeL r$. Then above, (\ref{LAW2:Part2})we have:
 \begin{align}
 \begin{array}{l l}
 	l_2 \composeL f \composeL c \text{ is undefined} \;\lor & l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d\\
-	& \hspace*{0.1cm}\land\; \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
+	& \hspace*{0.1cm}\land\; \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
 \end{array} \nonumber
 \end{align}
 %
@@ -453,7 +456,7 @@ From (\ref{LAW2:Ass2}), (\ref{LAW2:Ass4}), (\ref{LAW2:Ass21}), (\ref{LAW2:I.H}) 
 	\begin{array}{l}
   	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL s_0 \composeL d\\
 		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
-		\lor\; l_1 \maxMeetL l = \unitL \;\land\; l_2 \composeL f \composeL c = l \composeL l_2 \composeL g \composeL s_0 \composeL d \;\land\; \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{l_2 \composeL g \composeL s_0}{\amod{1}}
+		\lor\; l_1 \maxMeetL l = \unitL \;\land\; l_2 \composeL f \composeL c = l \composeL l_2 \composeL g \composeL s_0 \composeL d \;\land\; \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{l_2 \composeL g \composeL s_0}{\amod{1}}
 	\end{array} \label{LAW2:Ass22}
 \end{align}
 %(\ref{LAW2:Ass})
@@ -463,7 +466,7 @@ and consequently
 	\begin{array}{l}
   	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{1}(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL s_0 \composeL d\\
 		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
-		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}', \amod{L} \uplus \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
+		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}', \amod{L} \cup \amod{0}}{(m-1)}{l}{r'}{\amod{1}}
 	\end{array} \label{LAW2:Ass22}
 \end{align}
 %(\ref{LAW2:Ass})
