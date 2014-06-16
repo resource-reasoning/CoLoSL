@@ -10,10 +10,10 @@ Consider the program $\mathbb{INC}$ of \fig\ref{fig:concurrentInc},
 written in pseudo-code, where variables $x$, $y$ and $z$ are allocated
 on the heap and variable reading and mutation are understood as the
 corresponding heap operations. After initialisation of the variables
-to $0$, three threads are spawned to increment their values in
-lock-step: $\mathbb{P}_x$ is the first allowed to run its increment
-operation, then $\mathbb{P}_y$ and finally $\mathbb{P}_z$. This
-process repeats until $x = y = z = 10$.
+to $0$, three threads are spawned to increment each variable in a
+lock-step fashion: $\mathbb{P}_x$ is the first allowed to run its
+increment operation, then $\mathbb{P}_y$ and finally
+$\mathbb{P}_z$. This process repeats until $x = y = z = 10$.
 
 \begin{figure*}
 \centering
@@ -23,11 +23,11 @@ process repeats until $x = y = z = 10$.
   {$\mathbb{P}_z$:}&
   $\mathbb{INC}$:\\[.5ex]
 \begin{lstlisting}
-//$\comment\{\shared{\cell{x}{0} * \cell{z}{0}}{I_x} * \token a_x\}$
+//$\comment\{\shared{\cell{z}{0} * \cell{x}{0}}{I_x} * \token a_x\}$
 while($x$ != 10)
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{x}{v} * \cell{z}{v} \lor\\ \cell{x}{v+1} * \cell{z}{v}\end{array}}{I_x}\!\!\!\!\!\! * \token a_x\right\}$
+//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{z}{v} * \cell{x}{v} \lor\\ \cell{z}{v} * \cell{x}{v+1}\end{array}}{I_x}\!\!\!\!\!\! * \token a_x\right\}$
 { $\langle$if ($x$ == $z$) $x$++;$\rangle$ }
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{x}{10} * \cell{z}{10} \lor\\ \cell{x}{10} * \cell{z}{9}\end{array}}{I_x}\!\!\!\!\!\! * \token a_x\right\}$
+//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{z}{10} * \cell{x}{10} \lor\\ \cell{z}{9} * \cell{x}{10}\end{array}}{I_x}\!\!\!\!\!\! * \token a_x\right\}$
 \end{lstlisting}
 &
 \begin{lstlisting}
@@ -60,7 +60,7 @@ $x$ = 0; $y$ = 0; $z$ = 0;
 \begin{align*}
   I_x &\eqdef \left\{
   \begin{array}{@{}l@{}}
-    \token a_x:\, \exsts{v} \cell{x}{v} * \cell{z}{v}  \swap  \cell{x}{v+1} * \cell{z}{v}\\
+    \token a_x:\, \exsts{v} \cell{z}{v} * \cell{x}{v}  \swap  \cell{z}{v} * \cell{x}{v+1}\\
     \token a_z:\, \exsts{v} \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v}\swap \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}
   \end{array}
   \right.\\
@@ -82,8 +82,8 @@ $x$ = 0; $y$ = 0; $z$ = 0;
 \begin{align*}
   I &\eqdef \left\{
   \begin{array}{@{}l@{\,}l@{}l@{}}
-    \token a_x: & \exsts{v} & \cell{x}{v} * \cell{z}{v} \swap\\
-    &&\quad \cell{x}{v+1} * \cell{z}{v}\\
+    \token a_x: & \exsts{v} & \cell{z}{v} * \cell{x}{v} \swap\\
+    &&\quad \cell{z}{v} * \cell{x}{v+1}\\
     \token a_y: & \exsts{v} & \cell{x}{v+1} * \cell{y}{v} \swap \\
     &&\quad \cell{x}{v+1} * \cell{y}{v+1}\\
     \token a_z: & \exsts{v} & \cell{y}{v+1} * \cell{z}{v} \swap \\
@@ -128,9 +128,8 @@ subjective state satisfies $P$ and is subject to interferences in $I$.
 \end{tikzpicture}
 \quad$\swap$\quad
 \begin{tikzpicture}
-\draw[densely dotted] (0,0) circle (.4cm);
-\draw[densely dotted] (0,0) rectangle (.6cm,.4cm);
-\draw[thick] (.4cm,0) arc (0:-270:.4cm) -- (.6cm,.4cm) -- (.6cm,0) -- cycle;
+\draw[thick] (0,0) circle (.4cm);
+\draw[thick,fill=white] (0,0) rectangle (.6cm,.4cm);
 \end{tikzpicture}\\
 
 
@@ -160,19 +159,22 @@ $P \swap Q$. $P$ represents the action pre-condition and describes the
 part of the shared state required to carry out the action, while $Q$
 is the action post-condition and describes the part of the shared
 state after the action.  A thread in possession of a given capability
-in its local state can perform the associated action and update the
-shared state accordingly provided that the contents of the shared
-state satisfy the action pre-condition.  For instance, as the name
-suggests, the action associated with capability $\token a_x$ in $I_y$,
-corresponds to the update of variable $x$: for any $v$, if
-$\cell{x}{v} * \cell{y}{v} * \cell{z}{v}$, a thread in possession of
-$\token a_x$ in its local state can increment $x$.  A particularity of
-\colosl is that actions can be performed by the environment any time
-their precondition is \emph{compatible} with the current subjective
-state, as represented schematically in \fig\ref{fig:action}, and not
-only when the precondition is satisfied by a \emph{substate} of the
-subjective state (as is required for the program to perform the
-action). In particular, an action whose precondition is satisfiable is
+in its local state can perform the associated action to update the
+shared state.  For instance, as the name suggests, the action
+associated with capability $\token a_x$ in $I_y$, corresponds to the
+update of variable $x$: for any $v$, if $\cell{x}{v} * \cell{y}{v} *
+\cell{z}{v}$, a thread in possession of $\token a_x$ in its local
+state and which sees $x$, $y$, and $z$ with the same value in its
+subjective state can increment $x$.  A particularity of \colosl is
+that actions can be performed by the environment any time their
+precondition is \emph{compatible} with the current subjective state,
+and not only when the precondition is satisfied by a \emph{substate}
+of the subjective state (as is required for the program to perform the
+action). When that is the case, the piece of state corresponding to
+the overlap between the state and the precondition of the action is
+removed, and the entire postcondition of the action is added in its
+place, as represented schematically in \fig\ref{fig:action}.  In
+particular, an action whose precondition is satisfiable is
 \emph{always} enabled from the empty subjective view (which by
 definition is compatible with all other states).
 
@@ -196,22 +198,23 @@ hand, the assertion
 \]
 is not stable since a thread in possession of $\token a_x$ can
 potentially increment the value of $x$ and thus invalidate $x|->0 *
-y|->0$.
+y|->0$. A weaker, stable version of this assertion is the precondition
+of $\mathbb P_y$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Thread-local proofs}
+\label{subsec:threads}
 
 The proofs that $\mathbb P_x$, $\mathbb P_y$, and $\mathbb P_z$
 satisfy the assertions at each program point as shown in
 \fig\ref{fig:concurrentInc} are straightforward using standard
-techniques from concurrency reasoning, more specifically as inspired
-by concurrent abstract predicates~\cite{cap-ecoop10} (CAP). In
-particular, commands in angle brackets represent \emph{atomic
-  sections}. Since all such sections are operationally mutually
-exclusive, it is okay for the program to manipulate contents of the
-subjective region when executing an atomic command. Logically, this
-translates into the following (standard) proof rule
+techniques from concurrency reasoning. In particular, commands in
+angle brackets represent \emph{atomic sections}. Since all such
+sections are operationally mutually exclusive, the program may safely
+manipulate contents of the subjective region when executing an atomic
+command. Logically, this translates into the following proof rule,
+borrowed from concurrent abstract predicates~\cite{cap-ecoop10} (CAP):
 \[
 \infrule{Atomic}
         {\hoare p {\mathbb P} q\\
@@ -221,58 +224,25 @@ translates into the following (standard) proof rule
 \]
 \julescomment{TODO: explain rule}
 
+Pleasingly, the thread-local proofs are only concerned with very
+minimal subjective views of the state: the specification of each
+thread only talks about the variables relevant to that thread, and
+need only consider interferences that affect those variables, even
+though the program as a whole operates on all three variables in a
+fundamentally interdependent fashion. What may seem of little
+consequence for this simple program (reasoning about the whole global
+state would produce comparably short proofs in this example) is of
+crucial importance when analysing larger systems, where the burden of
+carrying the whole shared state around to analyse all threads, even
+those that use only a small fraction of it, can lead to intractable
+proofs. Subjectivity also enables the analysis of portions of code
+without access to the whole program, and allows one to reuse the
+established specifications in any environment that doesn't violate
+their subjective views.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Extending the shared region}
-\label{subsec:extend}
-
-At the very beginning of the execution of $\mathbb{INC}$, the state is
-purely local and contains the three variables $x$, $y$, and $z$, which
-allows $\mathbb P$ to initialise them to 0 without
-syncronisation. Since the purpose of the rest of the program is to
-share these variables between $\mathbb P_x$, $\mathbb P_y$, and
-$\mathbb P_z$, a logical shared region is created, ruled by
-interferences $I$ and the three capabilities $\token a_x$, $\token
-a_y$, and $\token a_z$. The capabilities are automatically added to
-the current local state upon region creation using the following
-principle:
-\begin{align}
-  \label{eq:extend}
-  P \containI I
-  &\text{ implies }
-  P ===>
-  \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
-    \capAss{2}}{I}
-  \tag{\textsc{Extend}}
-\end{align}
-A relation $P===> P'$ means that it is safe to substitute $P$ for
-$P'$ (resp.\ $P'$ for $P$) in the precondition (resp.\ postcondition)
-of any triple. In particular, if $P=> P'$ then $P===> P'$, hence
-this yield a more general Hoare rule of
-consequence~\cite{cap-ecoop10}:
-\[
-\infrule{Consequence}
-        {P===>P'\\
-          \hoare{P'}{\mathbb{P}}{Q'}\\
-          Q'===> Q}
-        {\hoare{P}{\mathbb{P}}{Q}}
-        {}
-\]
-The existential quantification of capabilities is to ensure the
-\emph{freshness} of the generated capabilities. The side condition $P
-\containI I$ ensures that the mutations performed by actions in $I$
-are confined to $P$, hence do not contradict existing views of the
-shared state. This notion will be formalised in
-\S\ref{subsec:extension}.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Combining Subjective Views}
-\label{subsec:merge}
-
-The next step is to distribute the state to the three threads. This is
-done, as is standard in the concurrent separation logic family, using
-the following concurrency rule:
+The three thread-local proofs are tied together in the main program
+$\mathbb{INC}$ using two applications of the following concurrency
+rule, as is standard in the concurrent separation logic family:
 \[
 \infrule{Parallel}
         {\hoare{P_1}{\mathbb{P}_1}{Q_1}\\
@@ -280,31 +250,20 @@ the following concurrency rule:
         {\hoare{P_1 * P_2}{\mathbb{P}_1 || \mathbb{P}_2}{Q_1 * Q_2}}
         {}
 \]
-Since a shared state assertion $\shared{P}{I}$ defines contents of
-parts of the shared state, multiple threads can view different,
-potentially overlapping parts of the shared state. As such, the
-separating conjunction $*$ behaves as \emph{overlapping conjunction}
-$\sepish$~\cite{rey-slnotes,ramification} (sometimes called
-\emph{sepish}~\cite{gareth-js12}) over subjective states (contrast
-with most existing formalisms, which would use \emph{classical
-  conjunction} instead).
-\begin{align}
-  \label{eq:merge}
-  \shared{P}{I} * \shared{Q}{I} &<=> \shared{P \sepish Q}{I} \tag{\textsc{Merge}}
-\end{align}
-On local states, $*$ behaves as \emph{disjoint union}, as is standard.
-
-In this instance, we use two successive applications of the rule and,
-accordingly, we need to split the current symbolic state three ways
-using $*$ such that each sub-formula is a valid precondition of the
-corresponding thread.  We proceed by assigning the capabilities
-$\token a_x$, $\token a_y$ and $\token a_z$ to $\mathbb P_x$, $\mathbb
-P_y$ and $\mathbb P_z$, respectively. The subjective shared state is
-split using the fact that, $P => P ** P$ for all $P$, and the
-following derivation, where the steps involving \eqref{eq:shift} and
-\eqref{eq:forget} will be explained in the next two sections. We let
-$P_0 == x|-> 0 * y|->0 * z|-> 0 $. We delay the definitions of $I_x'$,
-$I_y'$ and $I_z'$ until \S\ref{subsec:shift}.
+More precisely, we will use the derivation below, starting from the
+program state before the parallel composition and ending in the
+$*$-conjunction of the preconditions of the thread threads, as
+mandated by the \infrulestyle{Parallel} rule. The next sections are
+devoted to justifying informally the various reasoning steps
+involved. We let
+\[
+P_0 == x|-> 0 * y|->0 * z|-> 0
+\]
+and delay the definitions of $I_x'$, $I_y'$ and $I_z'$ until
+\S\ref{subsec:shift}. Below, the unlabelled step is a simple logical
+weakening of the boxed assertions, necessary to obtain stable
+assertions as the preconditions of all threads.
+\allowdisplaybreaks
 \begin{align*}
   &\shared{P_0}{I} *\token a_x * \token a_y * \token a_z\\
   =>\null&
@@ -319,21 +278,21 @@ $I_y'$ and $I_z'$ until \S\ref{subsec:shift}.
   &\eqref{eq:shift} \\
   =>\null&
   \begin{array}[t]{L}
-    (\shared{x|-> 0 * z|-> 0}{I_x'} *\token a_x)*\\
+    (\shared{z|-> 0 * x|-> 0}{I_x'} *\token a_x)*\\
     (\shared{x|-> 0 * y|-> 0}{I_y'} *\token a_y)*
-    \mathrlap{(\shared{x|-> 0 * z|-> 0}{I_z'} *\token a_z)}
+    \mathrlap{(\shared{y|-> 0 * z|-> 0}{I_z'} *\token a_z)}
   \end{array}
   &\eqref{eq:forget} \\
   =>\null&
   \begin{array}[t]{L}
-    (\shared{x|-> 0 * z|-> 0}{I_x} *\token a_x)*\\
+    (\shared{z|-> 0 * x|-> 0}{I_x} *\token a_x)*\\
     (\shared{x|-> 0 * y|-> 0}{I_y} *\token a_y)*
-    \mathrlap{(\shared{x|-> 0 * z|-> 0}{I_z} *\token a_z)}
+    \mathrlap{(\shared{y|-> 0 * z|-> 0}{I_z} *\token a_z)}
   \end{array}
   &\eqref{eq:shift} \\
   =>\null&
   \begin{array}[t]{L}
-    (\shared{\cell{x}{0} * \cell{z}{0}}{I_x} * \token a_x) *\\
+    (\shared{\cell{z}{0} * \cell{x}{0}}{I_x} * \token a_x) *\\
     \left(\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{x}{0} *
         \cell{y}{0} \lor\\ \cell{x}{1} *
         \cell{y}{0}\end{array}}{I_y}\!\!\!\!\!\! * \token a_y\right) *
@@ -343,31 +302,119 @@ $I_y'$ and $I_z'$ until \S\ref{subsec:shift}.
   \end{array}
 \end{align*}
 
-Similarly, $*$-conjoining the postconditions of $\mathbb P_x$,
-$\mathbb P_y$ and $\mathbb P_z$ yields the overall postcondition of
-$\mathbb P$ by \eqref{eq:merge}, except for the interference relation
-which is $I_x\cup I_y\cup I_z$.  This uses the fact that $|/$
-distributes over $**$, and, \textit{e.g.},
+Conversely, going from the postconditions of the three threads to the
+final state of $\mathbb{INC}$ is justified by the following reasoning
+steps. We write $\shared{Q_x}{I_x} * \token a_x$ for the postcondition
+of $\mathbb P_x$ as shown in \fig\ref{fig:concurrentInc}, and
+similarly for $\mathbb P_y$ and $\mathbb P_z$.
+\begin{align*}
+  &(\shared{Q_x}{I_x} * \token a_x)
+  * (\shared{Q_y}{I_y} * \token a_y)
+  * (\shared{Q_z}{I_z} * \token a_z)\\
+  =>\null&
+  \shared{Q_x ** Q_y ** Q_z}{I_x\cup I_y\cup I_z} *
+  \token a_x * \token a_y * \token a_z
+  &\quad\eqref{eq:merge}\\
+  =>\null&
+  \shared{x|->10 * y|->10 * z|->10}{I_x\cup I_y\cup I_z} *
+  \mathrlap{\token a_x * \token a_y * \token a_z}\\
+  =>\null&
+  \shared{x|->10 * y|->10 * z|->10}{I} *
+  \token a_x * \token a_y * \token a_z
+  &\eqref{eq:shift}
+\end{align*}
+Above, the unlabelled step is mere logical consequence, using the fact
+that $|/$ distributes over $**$ and combining the knowledge of all
+threads to get rid of spurious disjunctions (such as $x|-> 11 *
+y|->10$ in $Q_y$, when in fact we know from $Q_x$ that $x|->10$). Note
+moreover that, \textit{e.g.},
 \[
 \begin{array}{RL}
-&(\cell{x}{10} * \cell{z}{10}) ** (\cell{x}{10} * \cell{y}{10})\\
+&(\cell{z}{10} * \cell{x}{10}) ** (\cell{x}{10} * \cell{y}{10})\\
 <=>&
 \cell{x}{10} * \cell{y}{10} * \cell{z}{10}
 \end{array}
 \]
-Finally, the combined knowledge of all threads to get rid of spurious
-disjunctions (such as $x|-> 11 * y|->10$, when in fact we know from
-the postcondition of $\mathbb P_x$ that $x|->10$).
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Combining subjective views}
+\label{subsec:merge}
+
+As we have seen, a shared state assertion $\shared{P}{I}$ defines
+contents of parts of the shared state only. A central property of
+\colosl proofs is that multiple threads can view different,
+potentially overlapping parts of the shared state. As such, the
+separating conjunction $*$ behaves as \emph{overlapping conjunction}
+$\sepish$~\cite{rey-slnotes,ramification} (sometimes called
+\emph{sepish}~\cite{gareth-js12}) over subjective states (in contrast
+with most existing formalisms, which would use \emph{classical
+  conjunction} instead).
+\begin{align*}
+  \label{eq:merge}
+  \shared{P}{I} &=> \shared{P}{I} * \shared{Q}{I}
+  \tag{\textsc{Merge}}\\
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1\cup I_2}
+\end{align*}
+On local states, $*$ behaves as \emph{disjoint union}, as is standard.
+
+\julescomment{Azalea: what's the correct merge rule in the $=>$
+  direction?}
+
+This directly justifies the \eqref{eq:merge} steps of the two
+derivations above.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Forgetting shared state}
+\label{subsec:forget}
+
+In \colosl\ it is always possible to forget parts of the shared state
+and arrive at a more subjective, and thus weaker, view of the shared
+state. That is,
+\begin{align}
+  \label{eq:forget}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}
+\end{align}
+It is straightforward to justify the \eqref{eq:forget}-labelled steps
+of the derivations of \S\ref{subsec:threads} using this principle.
+
+Note that, in the implication above, the right-hand-side is not
+necessarily stable with respect to $I$. This is why we first make $I$
+more explicit using~\eqref{eq:shift} in the derivation of
+\S\ref{subsec:merge} (see below). Had we used~\eqref{eq:forget} at the
+second step instead, we would have gotten
+\[
+\begin{array}[t]{L}
+  (\shared{z|-> 0 * x|-> 0}{I} *\token a_x)*\\
+  (\shared{x|-> 0 * y|-> 0}{I} *\token a_y)*
+  (\shared{z|-> 0 * x|-> 0}{I} *\token a_z)
+\end{array}
+\]
+where we no longer know the value of $y$ in relation to $x$ and $z$ in
+the first conjunct $\shared{z|-> 0 * x|-> 0}{I} *\token a_x$, for
+instance. Hence the action associated with capability $\token a_z$ can
+now be carried out by the environment and change the value of $z$ at
+any point in time according to $I$, and a stable assertion
+corresponding to the first conjunct would have to be at least as weak
+as
+\[
+\shared{\exsts{v, v'}  \cell{z}{v'} * \cell{x}{v}}{I}
+\]
+This is too weak to prove the spec of our program, since the
+relationship between the values of $x$ and $z$ has been lost.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Action Shifting}
+\subsection{Action shifting}
 \label{subsec:shift}
 
 We now show how to use \colosl to change $I$ into $I_x$, $I_y$, and
 $I_z$ before the parallel composition and $I_x\cup I_y\cup I_z$ into
-$I$ afterwards (see above). This is all accomplished by the
+$I$ afterwards, as in the two derivations of
+\S\ref{subsec:threads}. This is all accomplished by the
 \emph{interference shifting} mechanism of \colosl, which allows one to
 rewrite the current inteference relation according to syntactic and
 semantic deductions.  As mentioned in the introduction, the
@@ -384,10 +431,9 @@ We will formalise the relation $\weakenIb{}$ in
 
 Let us consider the action $\token a_z: \exsts{v} \cell{y}{v+1} *
 \cell{z}{v} \swap \cell{y}{v+1} * \cell{z}{v+1}$ of $I$ and the state
-\[
-\shared{P_0}{I} *\token a_x *
-\token a_y * \token a_z
-\]
+$
+\shared{P_0}{I}
+$.
 We notice that, anytime the precondition of $\token a_z$ is satisfied
 in the shared state, then the larger formula $\exsts{v} \cell{x}{v+1}
 * \cell{y}{v+1} * \cell{z}{v}$ is also satisfied, even after the
@@ -401,7 +447,7 @@ the more precise
 \cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}
 \]
 As we will see in \S\ref{sec:weakenI}, we can use this intuition and
-similar reasoning for $I_y'$ and $I_z'$ to establish
+similar reasoning for $I_y$ and $I_z$ to establish
 \[
 I\weakenIb{P_0} I_x'
 \qquad
@@ -412,23 +458,35 @@ I\weakenIb{P_0} I_z'
 where
 \begin{align*}
  I_x' &==
- I_x \cup \{\token a_y: \exsts{v}\cell{x}{v+1} * \cell{y}{v} \swap
- \cell{x}{v+1} * \cell{y}{v+1} \}\\
+ \left[
+   \token a_y <-
+   \begin{array}{RL}
+     \exsts{v}&\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v} \swap\\
+     &\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v}
+ \end{array}\right]I_x\\
  I_y' &==
- I_y \cup \{\token a_z: \exsts{v}\cell{y}{v+1} * \cell{z}{v} \swap
- \cell{y}{v+1} * \cell{z}{v+1} \}\\
+ \left[
+   \token a_z <-
+   \begin{array}{RL}
+     \exsts{v}&\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v} \swap\\
+     &\cell{x}{v+1} * \cell{y}{v+1} * \cell{z}{v+1}
+   \end{array}\right]I_y\\
  I_z' &==
- I_z \cup \{\token a_x: \exsts{v}\cell{z}{v+1} * \cell{x}{v} \swap
- \cell{z}{v+1} * \cell{x}{v+1} \}
+ \left[
+   \token a_x <-
+   \begin{array}{RL}
+     \exsts{v}&\cell{x}{v} *\cell y v * \cell{z}{v}\swap\\
+     &\cell{x}{v+1} * \cell{y}{v} * \cell z v
+   \end{array}\right]I_z
 \end{align*}
 
 Now, consider for instance $\shared{x|->0 * y|->0}{I_y'}$.  The action
 $\token a_z: \exsts{v} \cell{y}{v+1} * \cell{z}{v} \swap \cell{y}{v+1}
 * \cell{z}{v+1}$ of $I_y'$ does not actually affect $x|->0 * y|->0$,
 and never will in the lifetime of this subjective view (\textit{i.e.},
-after any performing any number of actions from $I_y'$). Thus, it is
-semantically equivalent to drop this action, and similarly for $I_x'$
-and $I_y'$:
+after any performing any number of actions from $I_y'$). Thus, it does
+not matter semantically if this action this action is dropped from
+$I_x'$, and similarly for $I_x'$ and $I_y'$:
 \[
 I_x'\weakenIb{P_0} I_x
 \qquad
@@ -443,12 +501,12 @@ I_x\cup I_y\cup I_z\weakenIb{x|->10 * y|->10 * z|->10} I
 \]
 
 This finishes the justification of all uses of \eqref{eq:shift} in the
-derivation of \S\ref{subsec:merge}.  In this section, we have
-informally justified manipulations of the interference relation by
-semantic arguments. However, \S\ref{sec:shiftax} will show how the
-reasoning involved can be reduced to simple logical implications
-between separation logic formulas that do not mention the shared
-state.
+derivations of \S\ref{subsec:threads}, and thus the derivations
+themselves.  In this section, we have informally justified
+manipulations of the interference relation by semantic
+arguments. However, \S\ref{sec:shiftax} will show how the reasoning
+involved can be reduced to simple logical implications between
+separation logic formulas that do not mention the shared state.
 
 %% In the case of the less local predicate $G$, whenever the
 %% pre-condition of the action associated with $\token a_z$ is satisfied
@@ -549,42 +607,48 @@ state.
 %% \end{array}
 %% \]
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Forgetting shared state}
-\label{subsec:forget}
 
-We are now left with justifying the third step of the derivation of
-\S\ref{subsec:merge}.
 
-In \colosl\ it is always possible to forget parts of the shared state
-and arrive at a more subjective, and thus weaker, view of the shared
-state. That is,
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extending the shared region}
+\label{subsec:extend}
+
+All that remains to show is how the shared region is initially created
+in $\mathbb{INC}$.  At the very beginning of the execution of
+$\mathbb{INC}$, the state is purely local and contains the three
+variables $x$, $y$, and $z$, which allows $\mathbb P$ to initialise
+them to 0 without synchronisation. Since the purpose of the rest of
+the program is to share these variables between $\mathbb P_x$,
+$\mathbb P_y$, and $\mathbb P_z$, a logical shared region is created,
+ruled by interferences $I$ and the three capabilities $\token a_x$,
+$\token a_y$, and $\token a_z$. The capabilities are automatically
+added to the current local state upon region creation using the
+following principle:
 \begin{align}
-  \label{eq:forget}
-  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}
+  \label{eq:extend}
+  P \containI I
+  &\text{ implies }
+  P ===>
+  \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
+    \capAss{2}}{I}
+  \tag{\textsc{Extend}}
 \end{align}
-It is straightforward to finish the proof of \S\ref{subsec:merge}, and
-thus of the program of \fig\ref{fig:concurrentInc} using this fact.
-
-Note that the right-hand-side is not necessarily stable with respect
-to $I$. This is why we first made $I$ more explicit
-using~\eqref{eq:shift} in the derivation of \S\ref{subsec:merge}. Had
-we used~\eqref{eq:forget} at the second step instead, we would have gotten
+A relation $P===> P'$ means that it is safe to substitute $P$ for
+$P'$ (resp.\ $P'$ for $P$) in the precondition (resp.\ postcondition)
+of any triple. In particular, if $P=> P'$ then $P===> P'$, hence
+this yield a more general Hoare rule of
+consequence~\cite{cap-ecoop10}:
 \[
-\begin{array}[t]{L}
-  (\shared{x|-> 0 * z|-> 0}{I} *\token a_x)*\\
-  (\shared{x|-> 0 * y|-> 0}{I} *\token a_y)*
-  (\shared{x|-> 0 * z|-> 0}{I} *\token a_z)
-\end{array}
+\infrule{Consequence}
+        {P===>P'\\
+          \hoare{P'}{\mathbb{P}}{Q'}\\
+          Q'===> Q}
+        {\hoare{P}{\mathbb{P}}{Q}}
+        {}
 \]
-where we no longer know the value of $y$ in relation to $x$ and $z$ in
-the first conjunct $\shared{x|-> 0 * z|-> 0}{I} *\token a_x$, for
-instance. Hence the action associated with capability $\token a_z$ can
-now be carried out by the environment and change the value of $z$ at
-any point in time according to $I$, and a stable assertion
-corresponding to the first conjunct would have to be
-\[
-\shared{\exsts{v, v'}  \cell{x}{v} * \cell{z}{v'}}{I}
-\]
-This is too weak to prove the spec of our program, since the
-relationship between the values of $x$ and $z$ has been lost.
+The existential quantification of capabilities is to ensure the
+\emph{freshness} of the generated capabilities. The side condition $P
+\containI I$ ensures that the mutations performed by actions in $I$
+are confined to $P$, hence do not contradict existing views of the
+shared state. This notion will be formalised in
+\S\ref{subsec:extension}.
