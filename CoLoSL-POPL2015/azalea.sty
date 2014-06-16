@@ -111,6 +111,9 @@
 
 \newcommand{\powerset}{\mathcal{P}}
 
+\newcolumntype{L}{@{}>{\null}l<{\null}@{}}
+\newcolumntype{R}{@{}>{\null}r<{\null}@{}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\m}[1]{\mathit{#1}}
@@ -347,6 +350,7 @@
   % each lig must be defined after all ligs it prefixes
   \mathlig{<==>}{\mathrel{\Longleftrightarrow}} % equivalence
   \mathlig{--->}{\mathrel{\longrightarrow}} % transitions
+  \mathlig{===>}{\Rrightarrow}
   % 3 chars
   %\mathlig{::=}{\mathrel{\Coloneqq}}
   \mathlig{-->}{\mathrel{\rightarrow}} % set function space
@@ -378,5 +382,7 @@
   \mathlig{->}{\mathord{\rightarrow}} % field dereference
   \mathlig{<-}{\mathord{\leftarrow}} % assignement
   \mathlig{||}{\mathbin{\parallel}}
+  \mathlig{<<}{\langle}
+  \mathlig{>>}{\rangle}
   % 1 char  WARNING: change standard spacing
 }
