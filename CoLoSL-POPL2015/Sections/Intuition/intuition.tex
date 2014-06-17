@@ -352,10 +352,9 @@ $\sepish$~\cite{rey-slnotes,ramification} (sometimes called
 with most existing formalisms, which would use \emph{classical
   conjunction} instead).
 \begin{align*}
-  \label{eq:merge}
-  \shared{P}{I} &=> \shared{P}{I} * \shared{Q}{I}
-  \tag{\textsc{Merge}}\\
-  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1\cup I_2}
+  \shared{P}{I} &=> \shared{P}{I} * \shared{P}{I}
+  \tag{\textsc{Copy}}\\
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1\cup I_2} \tag{\textsc{Merge}}\label{eq:merge}
 \end{align*}
 On local states, $*$ behaves as \emph{disjoint union}, as is standard.
 

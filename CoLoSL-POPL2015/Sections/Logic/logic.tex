@@ -26,11 +26,14 @@ The assertions of \colosl are defined as follows where $\heapAss{} \in \HAsserti
 \begin{array}{r@{}l}
 	P, Q  ::=\null& \emp \mid \heapAss{} \mid \capAss{} \mid P * Q \mid P \ewand Q \mid P \sepish Q \mid P \intersect Q \mid \\
 	& \shared{P}{I} \mid  \exsts{x} P \mid \m{false} \mid P \Rightarrow Q \\
-	I ::=\null& \interAss{\capAss{}}{\vec{y}}{P}{Q} \mid I_1,I_2
+	I ::=\null& \interAss{\capAss{}}{\vec{y}}{P}{Q} \mid I_1 \cup I_2
 \end{array}
 \]
 %
-In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{todo} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''. The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. For instance, the $S_X$ predicate in \fig\ref{fig:concurrentIncSubjectiveSpec} describes parts of the shared state that contain the $x$ and $z$ variables, while the $G$ predicate of \fig~\ref{fig:concurrentIncCoLoSLSpec} defines parts of the shared state that contain the $z$ variable as well as $x$ and $y$. Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
+In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{todo} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''.
+The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. 
+For instance, the $S_X$ predicate in \fig\ref{fig:concurrentIncSubjectiveSpec} describes parts of the shared state that contain the $x$ and $z$ variables, while the $G$ predicate of \fig~\ref{fig:concurrentIncCoLoSLSpec} defines parts of the shared state that contain the $z$ variable as well as $x$ and $y$.
+ Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
 
 In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with \token{X} in \fig\ref{fig:concurrentIncCoLoSLSpec} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{sec:intuition} where through action rewriting, \token{Z} is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
 \end{definition}
@@ -320,9 +323,9 @@ is defined as:
 			(p, q)&
 			\begin{array}{@{}l@{}}
 				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
-				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\null\\
-				\quad(p, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
-				\quad(q, -, -, -) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
+				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\exsts{r, \amod{}, \amod{L}}\\
+				\quad(p, p \composeL r, \amod{}, \amod{L}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
+				\quad(q, q \composeL r, \amod{}, \amod{L}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
 			\end{array}
 		\end{array}
 	\right\}
@@ -433,13 +436,20 @@ An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} 
 	 	 l = l_3 \composeL c
 	 	 \implies\\
 	 	 
-	 & \hspace*{1cm} l_2 \composeL c \in \fence{}	 
+	 & \hspace*{1cm} l_2 \composeL c \in \fence{}	 \lor l_2 \composeL c \text{ is undefined}
 \end{array}
 \]
 %
 That is, given any capability $\ca{}$, and an action associated with it $(p, q) \in \amod{}(\ca{})$, where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition ($l \meetL p \not= \emptyset$), if there is an overlap between $l$ and the update precondition ($l_1 \maxMeetL l = l_3 > \unitL$), then the state resulting from the update ($l_2 \composeL c$) is also in $\fence{}$.
 For instance in example of \S\ref{sec:intuition}, $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec} is fenced by $\fence{X} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 9 \}\right\}$.
 % 
+
+We lift the notion of invariant fences to assertions and write $\fenceAss{} \fences I$  for $\fenceAss{} \in \Assertions$ and $I \in \IAssertions$ where
+%
+\[
+	\fenceAss{} \fences I \iffdef \for{\lenv \in \LEnv} \left\{ l \mid (l, -, -, -) \in \intermediateSem[\lenv]{F} \right\} \fences \semI[\lenv]{I}
+\]
+%
 \end{definition}
 %
 %
@@ -470,6 +480,14 @@ An action model $\amod{} \in \AMods$ is \emph{locally-fenced} by $\fence{} \in \
 \]
 %
 The above states that $\amod{}$ is fenced by invariant $\fence{}$ and given any capability $\ca{}$ and an action associated with it $(p, q) \in \amod{}(\ca{})$ where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition $p \meetL l \not= \emptyset$, the update precondition $l_1$ is \emph{contained} within $l$: $l_1 \leq l$. 
+%
+
+We lift the notion of local invariant fences to assertions and write $\fenceAss{} \strictfences I$  for $\fenceAss{} \in \Assertions$ and $I \in \IAssertions$ where
+%
+\[
+	\fenceAss{} \strictfences I \iffdef \for{\lenv \in \LEnv} \left\{ l \mid (l, -, -, -) \in \intermediateSem[\lenv]{F} \right\} \strictfences \semI[\lenv]{I}
+\]
+%
 \end{definition}
 %
 %
@@ -624,7 +642,7 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
 \begin{array}{l}
 	\amod{} \weakenI{\mathcal{P}}  \amod{}' \iffdef \\
 	\hspace*{0.2cm} \exsts{\fence{}} \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
-	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2}\;\; l \in F \land \updateFP{p, q} = (l_1, l_2) \implies\\
+	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2, c}\;\; l \in F \land \updateFP{p, q} = (l_1, l_2) \implies\\
 	\hspace*{0.2cm}
 	\begin{array}{l}
 		(p, q) \in \amod{}'(\ca{}) 
@@ -634,12 +652,14 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
 		\hspace*{1cm} \land\\
 		
 		(p, q) \in \amod{}(\ca{})
-		\land p \leq l \composeL r \implies \\
+		\land p \composeL c = l \composeL r \implies \\
 		\hspace*{0.2cm}
 		\begin{array}{l}
 			\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
 			\hspace*{1cm} \lor\\
-			\left( l \meetL l_1 \right) = \left\{ \unitL \right\}
+			\left( l \meetL l_1 \right) = \left\{ \unitL \right\}\\
+			\hspace*{1cm} \lor\\
+			l_2 \composeL c \text{ is undefined}.
 		\end{array}
 
 	\end{array}
@@ -649,6 +669,50 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
 Intuitively, there exists an invariant fence $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\amod{}$ and 
 \begin{enumerate}
 	\item if an action in $\amod{}'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\amod{}$ whose precondition is also satisfiable by $l \composeL r$. 
-	\item if an action in $\amod{}$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\amod{}'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL l_1 = \{\unitL\}$ where $(l_1, l_2)$ denotes the update footprint of the action.
+	\item if an action in $\amod{}$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\amod{}'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL l_1 = \{\unitL\}$ where $(l_1, l_2)$ denotes the update footprint of the action; \emph{or}  the resultant state ($l_2 \composeL c$) is undefined.
 \end{enumerate} 
 \end{definition}
+%
+%
+\subsection{Proof Rules}
+\begin{figure}
+\hrule\vspace*{5pt}
+\[
+\begin{array}{c }
+\infer{
+%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
+%	\shared{R}{ I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\}} 	
+	\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+}
+{	
+    R \entails \fenceAss{} 
+	& \fenceAss{} \fences I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&\bigwedge\limits_{i \in J} \exact{R_i}\\
+	& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
+}
+\\\\
+\infer{
+%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
+%	\shared{R}{I} 	
+	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+	I 	
+}{
+	R \entails \fenceAss{} 
+	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&\exact{\fenceAss{} \intersect Q}\\
+	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
+}\\\\
+\infer{	
+	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+	I 	
+}{
+	R \entails \fenceAss{} 
+	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&F \sepish Q \entails \m{false}
+}
+\end{array}
+\]
+\hrule\vspace*{5pt}
+\caption{Action Shifting Rules}
+\label{fig:shiftRules}
+\end{figure}
