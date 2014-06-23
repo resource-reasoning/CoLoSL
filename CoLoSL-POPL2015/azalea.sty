@@ -139,7 +139,7 @@
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
-\newcommand{\note}[1]{\noindent\framebox{\parbox{\textwidth}{\textbf{Note: }#1}}}
+\newcommand{\azaleaComment}[1]{\noindent\framebox{\parbox{\columnwidth}{\textbf{Azalea's comment: }#1}}}
 \newcommand{\defstyle}[1]{\emph{#1}}
 
 % inline code
@@ -348,7 +348,7 @@
 \newcommand{\extendAM}[2]{\left\lceil #1 \right\rceil^{#2}}
 \newcommand{\semimplies}{\ensuremath{\Rrightarrow}}
 %
-%%%%%%%%%%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%
 %
 \newcommand{\atomic}[1]{\ensuremath{\left\langle #1 \right\rangle}}
 
@@ -395,3 +395,18 @@
   \mathlig{>>}{\rangle}
   % 1 char  WARNING: change standard spacing
 }
+%
+%%%%%%%%%%%%%%% Examples %%%%%%%%%%%%%%%
+%
+\newcommand{\graph}[2]{\textsf{graph}\left(#1, #2\right)}
+\newcommand{\tree}[2]{\textsf{tree}\left(#1, #2\right)}
+\newcommand{\markT}[2]{\token{a}_{\textsf{m}}\left(#1, #2\right)}
+\newcommand{\rootEdge}{\mathcal{R}}
+\newcommand{\G}[2]{\textsf{G}\left(#1, #2\right)}
+\newcommand{\g}[2]{\textsf{g}\left(#1, #2\right)}
+\newcommand{\tr}[2]{\textsf{t}\left(#1, #2\right)}
+\newcommand{\unmarked}[3]{\textsf{U}\left(#1, #2, #3\right)}
+\newcommand{\marked}[1]{\textsf{M}\left(#1\right)}
+\newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
+\newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
+\newcommand{\nil}{\texttt{null}}
