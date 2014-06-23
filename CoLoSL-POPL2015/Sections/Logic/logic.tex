@@ -35,7 +35,9 @@ of shared-state assertions, whose notation is borrowed from previous
 rely-guarantee-based formalisms. Predicates and connectives from the
 first row have their standard classical meaning, and spatial
 predicates and connectives have been informally introduced in the
-previous section.
+previous section.\\
+\azaleaComment{The overlap connective $\intersect$ is new. We should explain that.}
+\azaleaComment{Why $--*$ and not $\ewand$?}
 
 \paragraph{Program states}
 Next, we present our model of program states over which these formulas
@@ -127,7 +129,7 @@ inspiration from CAP~\cite{cap-ecoop10}, we first define an
 intermediate semantics $\intermediateSem[(.)]{.}$ that does not
 enforce well-formedness. Later in \S\ref{}, we introduce
 \emph{well-formed} worlds, whose local and shared states are disjoint
-and where the updates permitted by the action model ares well-behaved
+and where the updates permitted by the action models are well-behaved
 with respect to future extensions of the shared state. The semantics
 $\sem[(.)]{.}$ of assertions is $\intermediateSem[(.)]{.}$ restricted
 to well-formed worlds. We then define the semantics of interference
@@ -225,6 +227,7 @@ assertions $\semI[(.)]{.}$.
 \end{align*}
 \end{definition}
 
+\azaleaComment{Why did you comment out the semantics of intersection $\intersect$?}
 The semantics of separation logic predicates and connectives is
 standard and depends only on the local state.  $\shared{P}{I}$ states
 that $P$ holds for only a sub-state $l$ of the current shared state
@@ -458,6 +461,7 @@ That is, there exists an invariant $\fence{}$ that contains the current shared s
 		\for{\ca{i} \!\in K}\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
 \]
 %
+\azaleaComment{Why does it need to be a $\biguplus$ as opposed to $\bigcup$?}
 \end{definition}
 %
 %
