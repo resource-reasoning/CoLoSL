@@ -119,12 +119,13 @@
 
 \newcommand{\m}[1]{\mathit{#1}}
 \newcommand{\p}[1]{\mathsf{#1}}
+\newcommand{\set}[1]{\mathsf{#1}}
 
 \definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
 %\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
-\newcommand{\eqdef}{\mathrel{\triangleq}}
-\newcommand{\iffdef}{\mathrel{\stackrel{\mathrm{def}}{\iff}}}
+\newcommand{\eqdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{=}}}
+\newcommand{\iffdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{\iff}}}
 
 \newcommand{\Nats}{\mathbb{N}}
 \newcommand{\NatsPlus}{\Nats^{+}}
@@ -173,20 +174,20 @@
 \newcommand{\Caps}{\ensuremath{\mathbb{K}}}
 \newcommand{\ca}[1]{\ensuremath{\kappa_{#1}}}
 \newcommand{\capAss}[1]{\ensuremath{\mathcal{K}_{#1}}}
-\newcommand{\composeCap}{\compose{\Caps}}
+\newcommand{\composeCap}{\uplus}
 \newcommand{\meetCap}{\meet{\Caps}}
 \newcommand{\maxMeetCap}{\maxMeet{\Caps}}
-\newcommand{\unitCap}{\unit{\Caps}}
+\newcommand{\unitCap}{\emptyset}
 \newcommand{\capSize}[1]{\size{#1}{\Caps}}
 
 %%%%Heaps
 \newcommand{\Heaps}{\ensuremath{\mathbb{H}}\xspace}
 \newcommand{\h}[1]{\ensuremath{h_{#1}}}
 \newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
-\newcommand{\composeH}{\ensuremath{\compose{\Heaps}}}
+\newcommand{\composeH}{\uplus}
 \newcommand{\meetH}{\meet{\Heaps}}
 \newcommand{\maxMeetH}{\maxMeet{\Heaps}}
-\newcommand{\unitH}{\unit{\Heaps}}
+\newcommand{\unitH}{\emptyset}
 \newcommand{\heapSize}[1]{\size{#1}{\Heaps}}
 \newcommand{\reifyH}[1]{\left\lfloor #1 \right\rfloor_{\Heaps}}
 
@@ -196,7 +197,7 @@
 
 %%%%Logical States
 \newcommand{\LStates}{\textsf{LState}}
-\newcommand{\composeL}{\compose{\textsf{L}}}
+\newcommand{\composeL}{\circ}
 \newcommand{\composeS}{\compose{=}}
 \newcommand{\meetL}{\meet{\textsf{L}}}
 \newcommand{\maxMeetL}{\maxMeet{\textsf{L}}}
@@ -207,13 +208,13 @@
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
-\newcommand{\composeW}{\compose{\textsf{W}}}
+\newcommand{\composeW}{\bullet}
 \newcommand{\unitW}{\unit{\textsf{W}}}
 \newcommand{\localPart}[1]{#1_{\textsf{L}}}
 \newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
 \newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
 \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
-\newcommand{\collapseW}[1]{\downarrow\left(#1\right)}
+\newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
 \newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
 
@@ -268,7 +269,7 @@
 \newcommand{\PEnv}{\textsf{PEnv}\xspace}
 \newcommand{\LEnv}{\textsf{LEnv}\xspace}
 \newcommand{\penv}{\ensuremath{\Delta}\xspace}
-\newcommand{\lenv}{\ensuremath{\Gamma}\xspace}
+\newcommand{\lenv}{\ensuremath{\iota}\xspace}
 \newcommand{\sepish}{\ocon}
 \newcommand{\intersect}{%
   \mathbin{\mbox{$\mathrlap{\cap}\hspace*{.09em}
@@ -279,8 +280,8 @@
 \newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
-\newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
-\newcommand{\multiInterAss}[5]{\ensuremath{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}}
+\newcommand{\interAss}[4]{#1: \left\{ \exsts{#2} #3 \swap #4 \right\}}
+\newcommand{\multiInterAss}[5]{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 
 \newcommand{\strengthenAction}[2]{\left\lceil #1 \right\rceil^{#2}}
 \newcommand{\weakenAction}[2]{\left\lfloor #1 \right\rfloor_{#2}}

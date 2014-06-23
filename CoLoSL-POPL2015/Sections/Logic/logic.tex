@@ -1,312 +1,247 @@
-\section{The \colosl Logic}\label{sec:logic}
-\todo introductory paragraph?\\
-We present our assertion language and program logic. 
+\section{The \colosl logic}
+\label{sec:logic}
 
-\subsection{\colosl Assertions}
-Recall from \S\ref{TODO} that our proof judgements are of the form
-$\hoare{P} C {Q}$ where $P$ and $Q$ are \emph{assertions} from the set
-\Assertions. Assertions are constructed from standard connectives and
-quantifiers of propositional and separation logic together with
-\emph{heap assertions} in \HAssertions and capability assertions in
-\KAssertions. Assertions describe both thread-local and \emph{shared}
-resources; we write $\shared{P}{I}$ to denote a shared resource
-characterised by $P$ where $I$ indicates an \emph{interference
-  assertion} in \IAssertions. \colosl is parametric with respect to
-the heap and capability assertions and can be instantiated with any
-assertion language so long as they are interpreted over elements of a
-separation algebra~\cite{asl}. Typically, we take
-\HAssertions to be the standard heap assertions~\cite{rey02} and
-use capability assertions in the style of tokens in~\cite{todo}
-such as \token{X}, \token{Y} and \token{Z} in \S\ref{sec:intuition}.
-% 
-\begin{definition}[\colosl Assertions]\label{def:assertions}
-The assertions of \colosl are defined as follows where $\heapAss{} \in \HAssertions$, $\capAss{} \in \KAssertions$ and $x, y$ range over logical variables interpreted over a \emph{logical environment} $\lenv \in \LEnv$.
-%
-\[
-\begin{array}{r@{}l}
-	P, Q  ::=\null& \emp \mid \heapAss{} \mid \capAss{} \mid P * Q \mid P \ewand Q \mid P \sepish Q \mid P \intersect Q \mid \\
-	& \shared{P}{I} \mid  \exsts{x} P \mid \m{false} \mid P \Rightarrow Q \\
-	I ::=\null& \interAss{\capAss{}}{\vec{y}}{P}{Q} \mid I_1 \cup I_2
-\end{array}
-\]
-%
-In $\Assertions$, $P \ewand Q$ denotes the existential magic wand of separation logic~\cite{todo} while $P \sepish Q$ denotes the overlapping conjunction or ``sepish''.
-The $\shared{P}{I}$ assertion is \emph{subjective} and describes only parts of the shared state that satisfy $P$. The overall (global) shared state can be expressed as $P * \m{true}$ where $\m{true}$ represents all states \emph{compatible} with $P$. 
-For instance, the $S_X$ predicate in \fig\ref{fig:concurrentIncSubjectiveSpec} describes parts of the shared state that contain the $x$ and $z$ variables, while the $G$ predicate of \fig~\ref{fig:concurrentIncCoLoSLSpec} defines parts of the shared state that contain the $z$ variable as well as $x$ and $y$.
- Both assertions are subjective views of the same underlying shared state and are compatible with one another; the former however yields a weaker and more localised description.
+We now introduce the program logic \colosl formally. Let us first give
+the syntax and semantics of our assertion language.
 
-In the interference assertion $\interAss{\capAss{}}{\vec{y}}{P}{Q}$, the capability assertion $\capAss{}$ is associated with \emph{action} $\exsts{\vec{y}} P \swap Q$, describing the transformation of the shared resource satisfying $P$ into one captured by $Q$. The existential quantification $\exists \vec{y}$ allows variables to be shared between $P$ and $Q$. For instance, the action associated with \token{X} in \fig\ref{fig:concurrentIncCoLoSLSpec} increments the value of $x$ from $v$ to $v+1$. The initial value ($v$) of $x$ does not matter ; however the resulting value must be the original value plus one ($v+1$). Interference assertions are not unique and capability assertions can be associated with multiple actions. This is particularly evident in the case of interference shifting of example in \S\ref{sec:intuition} where through action rewriting, \token{Z} is associated with multiple compatible actions. For brevity, we often parametrise capability assertions and interference environments. However, these parametrisations are merely a short-hand and can be substituted for their full definitions. 
+\subsection{\colosl assertions}
+
+\paragraph{Syntax}
+Our assertions extend standard separation logic with \emph{subjective
+  views}, as introduced in the previous section. \colosl is parametric
+with respect to the heap and capability assertions and can be
+instantiated with any assertion language so long as they are
+interpreted over elements of a separation
+algebra~\cite{asl,views}. For pedagogical purposes, we restrict the
+exposition in this paper to \emph{heap assertions} and models, and to
+sets of \emph{tokens} as capabilities.
+
+\begin{definition}[Assertion syntax]
+  \label{def:assertions}
+  The assertions of \colosl are elements of $\Assertions$ described by
+  the grammar below, where $\li x$ ranges over program variables, and
+  $x$ over logical variables.
+  \begin{align*}
+    E &::= \li x ||| x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
+    P, Q  &::= 
+    \m{false} \mid E_1 = E_2 \mid P \Rightarrow Q \mid \exsts{x} P \mid\\
+    &\emp \mid E_1 |-> E_2 \mid \token a \mid P * Q \mid P --* Q \mid P \sepish Q \mid P \intersect Q \mid \shared{P}{I} \\
+    I &::= \emptyset ||| \interAss{\token a}{\vec{y}}{P}{Q}, I
+  \end{align*}
 \end{definition}
-%
-%
-%
-%
-\subsection{Assertion Model}
-Recall that \colosl assertions are parametric with respect to the heap and capability assertions so long as they are interpreted over elements of a separation algebra. 
-%
-\begin{parameter}[Heap Separation Algebra]\label{par:heapSA}
-Let $(\Heaps, \composeH, \unitH)$ be any separation algebra with the cross-split property~\cite{dockins2009fresh}\footnote{%
-$	
-\begin{array}[t]{l}
-	\for{h_1, h_2, h_3, h_4 \in \Heaps}
-	h_1 \composeH h_2 = h_3 \composeH h_4 \implies \\
-	\begin{array}{@{}l l@{}}
-		\exsts{h_{13}, h_{14}, h_{23}, h_{24}} &
-		h_1 = h_{13} \composeH h_{14} \land h_2 = h_{23} \composeH h_{24} \land\null\\
-		& h_3 = h_{13} \composeH h_{23} \land h_4 = h_{14} \composeH h_{24}
-	\end{array}
-\end{array}
-$%
-} representing heaps ranged over by $\h{}$. Assume a set of heap assertions $\HAssertions$ ranged over by $\heapAss{}$ and an associated semantics function:
-%
-\[
-	\semH[\blankArg]{.} : \HAssertions \rightarrow \LEnv \rightarrow \pset{\Heaps}
-\]
-%
-\end{parameter}
-%
-In the examples of this paper, we take $\Heaps$ to be the standard heap model: that is, the set of finite partial functions from addresses to values where $\composeH$ denotes union of functions with disjoint domains.
-%
-%
-\begin{parameter}[Capability Separation Algebra]\label{par:capSA}
-Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra with the cross-split property, representing capability resources ranged over by $\ca{}$. Assume a set of capability assertions $\KAssertions$ ranged over by $\capAss{}$ and an associated semantics function:
-%
-\[
-	\semK[\blankArg]{.} : \KAssertions \rightarrow \LEnv \rightarrow \pset{\Caps}
-\]
-%
-\end{parameter}
-%
-%We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from the range $[0,1]$; that is, $\Caps: \textsf{Token} \rightarrow [0,1]$ where $\composeCap$ is defined as addition with the proviso that the sum is within $[0,1]$ and is undefined otherwise. Intuitively, $1$ represents exclusive permission, $0$ represents no permission and any other value denotes a non-exclusive permission.
-%We often take $\Caps$ to be the set of functions from \emph{token names} to permission values from $\{0,1\}$; that is, $\Caps: \textsf{Token} \rightarrow \{0,1\}$ where $\composeCap$ is defined as addition. Intuitively, $1$ represents exclusive capability while $0$ represents no capability.
-%
-We often take $\Caps$ to be the set of \emph{token names}; that is, $\Caps: \textsf{Token}$ where $\composeCap$ is defined for any two distinct elements. 
-%For instance, in the example of \S\ref{sec:intuition}, we had $\token{X}, \token{Y}, \token{Z} \in \textsf{Token}$.
 
-For simplicity, in this paper we assume that the separation algebras of both heaps and capability resources (\param s~\ref{par:heapSA} and~\ref{par:capSA}) have the disjointness property\footnote{$\for{h, h' \in \Heaps} h \composeH h = h' \implies h = h' = \unitH$}. However, the theory of \colosl as presented in~\cite{techreport} does not require the disjointness property and can be instantiated with any separation algebra.
+The syntax follows from standard separation logic, with the exception
+of shared-state assertions, whose notation is borrowed from previous
+rely-guarantee-based formalisms. Predicates and connectives from the
+first row have their standard classical meaning, and spatial
+predicates and connectives have been informally introduced in the
+previous section.
 
-Our assertions distinguish between thread-local and shared resources, where the former is private to the thread and the latter is shared amongst all threads and is thus subject to interference. Both thread-local and shared resources are described through heap and capability assertions. Heap assertions are used to represent the current state of the memory while capability assertions are used to specify how shared resources can be manipulated. We thus define \emph{logical states} which pair heaps with capabilities to represent both thread-local and shared states.
-%
-\begin{definition}[Logical States]A \emph{logical state} is a pair consisting of a heap and a capability:
-%
-\[
-	l, s \in \LStates \eqdef \Heaps \times \Caps
-\]
-%
-We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Given a logical state $l$, we write $\heapPart{l}$ and $\capPart{l}$ for the first and second projections, respectively. The \emph{composition of logical states}
-%
-$
-	\composeL : \LStates \times \LStates \rightharpoonup \LStates
-$
-%
-is defined as:
-%
-\[
-	l \composeL l' \eqdef (\heapPart{l} \composeH \heapPart{l'},\; \capPart{l} \composeCap \capPart{l'})
-\]
-%
-$(\LStates, \composeL, \unitL)$ form the \emph{separation algebra of logical states}.
+\paragraph{Program states}
+Next, we present our model of program states over which these formulas
+are interpreted. As mentioned in the previous section, program states
+have four components: a thread-local part, a shared part, and local
+and global interference relations. The thread-local and the shared
+parts are modeled in the same way, using the following notion of
+\emph{logical states}.  Logical states $l$, $s$ are pairs
+$(\heapPart{l}, \capPart{l})$ of a heap $\heapPart l\in\Heaps$
+(\textit{i.e.} a finite partial functions from addresses to values)
+and a capability $\capPart l\in\Caps$.
+
+\begin{definition}[Logical States]
+  A \emph{logical state} is a pair consisting of a heap and a capability:
+  \begin{align*}
+    \Heaps &== \set{Loc} --`_{\m{fin}} \set{Val}&
+    \Caps &== \powerset(\set{Token})&
+    \LStates &== \Heaps\times \Caps
+  \end{align*}
+  We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Given
+  a logical state $l$, we write $\heapPart{l}$ and $\capPart{l}$ for
+  the first and second projections, respectively. The
+  \emph{composition of logical states}
+  $
+  \composeL : \LStates \times \LStates \rightharpoonup \LStates
+  $
+  is defined as:
+  \[
+  l \composeL l' \eqdef
+  (\heapPart{l} \composeH \heapPart{l'},\, \capPart{l} \composeCap \capPart{l'})
+  \]
 \end{definition}
-%
-%
-Recall that interference assertions specify how shared resources can be manipulate by various threads through capability assertions. That is, the thread in possession of the necessary capabilities in its local (private) state, can carry out the associated action and update the shared state accordingly. We interpret interference assertions as \emph{action models} that associate capabilities with actions. 
-%
+
+One can check that, with these definitions, $(\LStates, \composeL,
+\unitL)$ forms a \emph{separation algebra}~\cite{asl}, \textit{i.e.} a
+cancellative commutative partial monoid.  For this presentation, the
+model of logical states is fixed as pairs of heaps and sets of tokens,
+but in general any pair of separation algebras would
+do~\cite{colosl-tr14}.
+
+\julescomment{Or maybe we just need the partial abelian monoid
+  structure for soundness?}
+
+We interpret interference assertions as \emph{action models} that
+associate capabilities with actions.
+
 \begin{definition}[Action Models]
 An \emph{action model} is a partial function associating capabilities with actions. An action is expressed as a relation between the original logical state and the new logical state reflecting the effects of the action:
-%
 \[
 	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
 \]
-%
 We write $\unitAM$ for an action model with empty domain.
-%
 \end{definition}
-%
-%
-\begin{definition}[Worlds]
-A \emph{world} is a 4-tuple of a logical state representing the thread-local state, a second logical state representing the shared state, a global action model and a local action model, subject to a well-formedness condition.
-%
-\[
-	w \in \Worlds \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		(l, s, \amod{}, \amod{L}) & 
- 		\begin{array}{@{}l@{}}
-	 		l, s \in \LStates \land \amod{}, \amod{L} \in \AMods\\
-	 		\null\land \wf{l, s, \amod{}, \amod{L}} 
-	 	\end{array}
-	\end{array} 
-	\right\}
-\]
-% 
-Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$, $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third and fourth projections, respectively.
-The \emph{composition of worlds} is defined as
-%
-\[
-	w \composeW w' \eqdef (\localPart{w} \composeL \localPart{w'},\; \sharedPart{w} \composeS \sharedPart{w'},\; \amodelPart{w} \composeAM \amodelPart{w'},\; \amodelPartL{w} \composeAM \amodelPartL{w'})
-\]
-%
-We defer the formal definition of \wf{.} to the proceeding section. Informally, well-formedness ensures that the local and shared state are disjointed from one another and that the updates permitted by the action model are well-behaved with respect to future extensions of the shared state. Later in \S\ref{TODO}, we justify the need for both local and global action models.
 
-Finally, given a world $w \in \Worlds$, its \emph{collapse into a logical state},
-%
-$
-	\collapseW{.}: \Worlds \rightarrow \LStates
-$
-%
-, is defined as:
-%
-\[
-	\collapseW{l, s, \amod{}, \amod{L}} \eqdef l \composeL s
+
+\begin{definition}[Worlds]
+  A \emph{world} is a 4-tuple of a logical state representing the
+  thread-local state, a second logical state representing the shared
+  state, a global action model and a local action model. Later in
+  \S\ref{subsec:localGlobalActionModels}, we justify the need for both
+  local and global action models.
+  \[
+  \Worlds \eqdef \LStates\times\LStates\times\AMods\times\AMods
+  \]
+  Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$,
+  $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third
+  and fourth projections, respectively.  The \emph{composition of
+    worlds} is defined as
+  \[
+  w \composeW w' \eqdef
+  \begin{cases}
+    (\localPart{w} \composeL \localPart{w'},
+    \sharedPart{w}, \amodelPart{w}, \amodelPartL{w})&
+    \begin{array}[t]{L}
+      \text{if }
+      \sharedPart{w} = \sharedPart{w'}\text{, } \amodelPart{w} =
+      \amodelPart{w'}\text{,}\\[-.7ex]
+      \text{and } \amodelPartL{w} = \amodelPartL{w'}
+    \end{array}\\
+    \textit{undefined}&\text{otherwise}
+  \end{cases}
 \]
-%
 \end{definition}
-%
-%
-%
-%
-\subsection{Assertion Semantics}\label{subsec:semantics}
-We proceed with the semantics of \colosl assertions as defined in \defin\ref{def:assertions}. We first define an intermediate semantics $\intermediateSem[(.)]{.}$ that does not enforce well-formedness and then describe the semantics $\sem[(.)]{.}$ by restricting them to the set of well-formed worlds. We then define the semantics of interference assertions $\semI[(.)]{.}$. 
-%
-%
+
+
+\paragraph{Semantics}
+We proceed with the semantics of \colosl assertions. Taking
+inspiration from CAP~\cite{cap-ecoop10}, we first define an
+intermediate semantics $\intermediateSem[(.)]{.}$ that does not
+enforce well-formedness. Later in \S\ref{}, we introduce
+\emph{well-formed} worlds, whose local and shared states are disjoint
+and where the updates permitted by the action model ares well-behaved
+with respect to future extensions of the shared state. The semantics
+$\sem[(.)]{.}$ of assertions is $\intermediateSem[(.)]{.}$ restricted
+to well-formed worlds. We then define the semantics of interference
+assertions $\semI[(.)]{.}$.
+
+
 \begin{definition}[Assertion Semantics]
-Given a logical environment $\lenv \in \LEnv$, the \emph{intermediate semantics} of \colosl assertions $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\LStates \times \LStates \times \AMods \times \AMods}$ are given as follows where $\semI[(.)]{.}$ denotes the semantics of interference assertions described in \defin ~\ref{def:interferenceSemantics}.
-%
+  Given a logical environment $\lenv\in\LEnv == \set{LVars} -->
+  \set{Val}$, the \emph{intermediate semantics} of \colosl assertions
+  $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow
+  \pset{\Worlds}$ are given as follows where $\semI[(.)]{.}$ denotes
+  the semantics of interference assertions described in
+  \defin~\ref{def:interferenceSemantics}.
 \begin{align*}
-	\intermediateSem{\heapAss{}} 
-	& \eqdef
-	\left\{
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-	 	\left(\left(h, \unitCap \right), s, \amod{}, \amod{L} \right) &
-		\begin{array}{@{}l@{}}
-		 	h \in \semH{\heapAss{}} \land s \in \LStates \\
-		  \null\land \amod{}, \amod{L} \in \AMods
-		\end{array}
+  \intermediateSem{\emp} 
+  &  \eqdef
+  \{ (l, s, \amod{}, \amod{\ell}) \mid l = \unitL \}\\
+  \intermediateSem{E_1|->E_2}
+  & \eqdef
+  \{
+  ((h, \unitCap ), s, \amod{}, \amod{\ell} ) \mid
+  h = [[|E_1|]_\lenv: [|E_2|]_\lenv]\}\\
+      \intermediateSem{\token a}
+      &  \eqdef
+      \{
+      \left(\left(\unitH, \ca{} \right), s, \amod{}, \amod{\ell}
+      \right) |||
+      \ca{} = \{\token a\} \}\\
+      \intermediateSem{P_1 * P_2}
+      &  \eqdef
+      \left\{
+      \begin{array}{@{}l@{\null\mid\null}l@{}}
+	w_1 \composeW w_2&
+	\begin{array}{@{}l@{}}
+	  w_1 \in \intermediateSem{P_1} \land
+	  w_2 \in \intermediateSem{P_2} 
 	\end{array}
-	\right\}\\
-	\intermediateSem{\capAss{}} 
-	&  \eqdef
-	\left\{
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-	 	\left(\left(\unitH, \ca{} \right), s, \amod{}, \amod{L} \right) &
-		\begin{array}{@{}l@{}}
-		 	\ca{} \in \semK{\capAss{}} \land s \in \LStates \\
-		  \null\land \amod{}, \amod{L} \in \AMods
-		\end{array}
-	\end{array}
-	\right\}\\
-	\intermediateSem{\emp} 
-	&  \eqdef
-	\left\{
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-	 	\left(\unitL, s, \amod{}, \amod{L} \right) &
-		\begin{array}{@{}l@{}}
-		 	s \in \LStates 
-		  \land \amod{}, \amod{L} \in \AMods
-		\end{array}
-	\end{array}
-	\right\}\\
-	\intermediateSem{P * Q} 
-	&  \eqdef
-	\left\{
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		w_1 \composeW w_2& 
-		\begin{array}{@{}l@{}}
-				 w_1 \in \intermediateSem{P} \land
-				 w_2 \in \intermediateSem{Q} 
-		\end{array}
-	\end{array} 
-	\right\}\\
+      \end{array} 
+      \right\}\\
 %	\left\{ 
 %	
 %	\begin{array}{l | l}
-%		(p \composeL q, s, \amod{}, \amod{L})& 
+%		(p \composeL q, s, \amod{}, \amod{\ell})& 
 %		\begin{array}{@{}l@{}}
-%				 (p, s, \amod{}, \amod{L}) \in \intermediateSem{P} \land\null\\
-%				 (q, s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
+%				 (p, s, \amod{}, \amod{\ell}) \in \intermediateSem{P} \land\null\\
+%				 (q, s, \amod{}, \amod{\ell}) \in \intermediateSem{Q} 
 %		\end{array}
 %		
 %	\end{array} 
 %	
 %	\right\}\\
-	\intermediateSem{P \ewand Q} 
-	&  \eqdef
-	\left\{ 
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		w & 
-		\begin{array}{@{}l@{}l@{}}
-			\exsts{w_1, w_2} 
-			&  
-				w_2 = w \composeW w_1 \land\null\\
-			&  
-				w_1 \in \intermediateSem[\lenv]{P} \land
-				w_2 \in \intermediateSem[\lenv]{Q}
-		\end{array}
-	\end{array} 
-	\right\}\\
-	\intermediateSem{P \!\sepish\! Q} 
-	&  \eqdef
-	\left\{ 
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		(p \composeL c \composeL q, s, \amod{}, \amod{L}) & 
-		\begin{array}{@{}l@{}}
-				 (p \composeL c, s, \amod{}, \amod{L}) \in \intermediateSem{P}\land \\
-				 (c \composeL q , s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
-		\end{array}
-	\end{array} 
-	\right\}\\
-	\intermediateSem{P \!\intersect\! Q} 
-	&  \eqdef
-	\left\{ 
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		(pq, s, \amod{}, \amod{L}) & 
-		\begin{array}{@{}l@{}}
-				 (p \composeL pq, s, \amod{}, \amod{L}) \in \intermediateSem{P}\land \\
-				 (pq \composeL q , s, \amod{}, \amod{L}) \in \intermediateSem{Q} 
-		\end{array}
-	\end{array} 
-	\right\}\\
-	\intermediateSem{\shared{P}{I}} 
-	&  \eqdef
-	\left\{ 
-	\begin{array}{@{}l@{\ }|@{\ }l@{}}
-		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
-		\begin{array}{@{}l@{}}
-			(l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P}\\
-			\null\land r \in \LStates \\
-			\null\land \extendsAM{\amod{}, \amod{L}}{l}{r}{\semI{I} }
-		\end{array}
-	\end{array} 
-	\right\}
+      \intermediateSem{P --* Q} 
+      &  \eqdef
+      \{ 
+      w \mid
+      \for{w'} 
+      w \sharp w_1 /| w\in\intermediateSem[\lenv]{P} =>
+      w\composeW w' \in \intermediateSem[\lenv]{Q}
+      \}\\
+      \intermediateSem{P_1 \sepish P_2} 
+      &  \eqdef
+      \left\{ 
+      \begin{array}{@{}l|l@{}}
+	(l \composeL l_1 \composeL l_2, s, \amod{}, \amod{\ell}) & 
+	\begin{array}{@{}l@{}}
+	  (l \composeL l_1, s, \amod{}, \amod{\ell}) \in \intermediateSem{P_1}\land\null \\
+	  (l \composeL l_2 , s, \amod{}, \amod{\ell}) \in \intermediateSem{P_2} 
+	\end{array}
+      \end{array} 
+      \right\}\\
+      %% \intermediateSem{P_1 \intersect P_2} 
+      %% &  \eqdef
+      %% \left\{ 
+      %% \begin{array}{@{}l@{\ }|@{\ }l@{}}
+      %%   (l, s, \amod{}, \amod{\ell}) & 
+      %%   \begin{array}{@{}l@{}}
+      %%     \exsts{l_1,l_2} (l \composeL l_1, s, \amod{}, \amod{\ell}) \in \intermediateSem{P_1}\land\null \\
+      %%     \quad(l \composeL l_2 , s, \amod{}, \amod{\ell}) \in \intermediateSem{P_2} 
+      %%   \end{array}
+      %% \end{array} 
+      %% \right\}\\
+      \intermediateSem{\shared{P}{I}} 
+      &  \eqdef
+      \left\{ 
+      \begin{array}{@{}l@{\ }|@{\ }l@{}}
+	(\unitL, l \composeL r, \amod{}, \amod{\ell}) & 
+	\begin{array}{@{}l@{}}
+	  (l, l \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem{P}\\
+	  \null\land \extendsAM{\amod{}, \amod{\ell}}{l}{r}{\semI{I} }
+	\end{array}
+      \end{array} 
+      \right\}\\
+      \sem[\lenv]{P} &\eqdef \{ w\in \intermediateSem[\lenv]{P} |||
+      \wf{w} \}
 \end{align*}
-%
-The semantics of propositional formulae are standard and are omitted here. The semantics of heap and capability assertions are given in terms of their respective semantics functions (\param s ~\ref{par:heapSA} and ~\ref{par:capSA}). Note that the semantics of $\heapAss{}$, $\capAss{}$ and \emp use arbitrary shared states $s$ and action models $\amod{}, \amod{L}$. The semantics of separation logic connectives $*, \ewand$ and $\sepish$ are standard. 
+\end{definition}
 
-$\shared{P}{I}$ states that $P$ holds for \emph{parts} of the shared state and thus the overall shared state is given by extension of the subjective view $l$ with an arbitrary logical state $r$ representing the \emph{context} not visible by the current subjective view. The interference associated with this part of the shared state is given by interference assertion $\semI[\lenv]{I}$ such that the global and local action models $\amod{}, \amod{L}$ are \emph{closed} under $\semI[\lenv]{I}$ with respect to the subjective view $l$ and context $r$. In \S\ref{subsec:localGlobalActionModels} we justify the need for global and local action models and formalise action model closuer $\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'}$. 
+The semantics of separation logic predicates and connectives is
+standard and depends only on the local state.  $\shared{P}{I}$ states
+that $P$ holds for only a sub-state $l$ of the current shared state
+$l\composeL r$. The interference associated with $l$ is given by
+interference assertion $\semI[\lenv]{I}$ such that the global and
+local action models $\amod{}$ and $\amod{\ell}$ are \emph{closed}
+under $\semI[\lenv]{I}$ with respect to the subjective view $l$ and
+context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
 
-We permit nesting of shared state assertions since it is particularly useful in describing inductively defined predicates, as we illustrate in \S\ref{sec:examples}. However our semantics of shared states does not include nesting; in our semantics, nested assertions are equivalent to flattened assertion with all nested assertions moved to the top level. That is, 
-%
+Note that, according to our semantics, nested subjective views behave
+like the appropriate flattening:
 \[
 	\shared{P * \shared{Q}{I'}}{I} \iff \shared{P}{I} * \shared{Q}{I'}
 \]
-%
 
 
-The \emph{semantics} of \colosl assertions $\sem[(.)]{.}: \Assertions \times \LEnv \rightarrow \pset{\Worlds}$ is defined as:
-%
-\[
-	\sem[\lenv]{P} \eqdef 
-	\left\{ 
-		(l, s, \amod{}, \amod{L}) 
-		\mid
-		(l, s, \amod{}, \amod{L}) \in \intermediateSem[\lenv]{P} \cap \Worlds	
-	\right\}
-\]
-%
-\end{definition}
-%
-%
 \begin{definition}[Localised Interference Semantics]\label{def:interferenceSemantics}
 The \emph{semantic of interference assertions}
 %
@@ -323,20 +258,19 @@ is defined as:
 			(p, q)&
 			\begin{array}{@{}l@{}}
 				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
-				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\exsts{r, \amod{}, \amod{L}}\\
-				\quad(p, p \composeL r, \amod{}, \amod{L}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
-				\quad(q, q \composeL r, \amod{}, \amod{L}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
+				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\exsts{r, \amod{}, \amod{\ell}}\\
+				\quad(p, p \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
+				\quad(q, q \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
 			\end{array}
 		\end{array}
 	\right\}
 \]
-%
 \end{definition}
-%
-%
-%
-%
-\subsection{Shared State Extension}\label{subsec:extension}
+
+
+\subsection{Shared State Extension}
+\label{subsec:extension}
+
 Recall from \S\ref{subsec:extend} that a thread can always \emph{extend} the shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
 %
 \begin{example}\label{ex:badExtension}
@@ -489,40 +423,39 @@ We lift the notion of local invariant fences to assertions and write $\fenceAss{
 \]
 %
 \end{definition}
-%
-%
-We're now in a position to formalise well-formedness.
-%
+
+We are now ready to formalise well-formedness.  Given a world $w \in
+\Worlds$, its \emph{collapse into a logical state}, $ \collapseW{.}:
+\Worlds --` \LStates $, is defined as:
+\[
+	\collapseW{l, s, \amod{}, \amod{\ell}} \eqdef l \composeL s
+\]
+
 \begin{definition}[Well-formedness]
-A world $(l, s, \amod{}, \amod{L}) \in \Worlds$ is \emph{well-formed} iff
+A world $(l, s, \amod{}, \amod{\ell}) \in \Worlds$ is \emph{well-formed} iff
 %
 \[
 \begin{array}{l l l}
-	\wf{l, s, \amod{}, \amod{L}} \iffdef 
+	\wf{l, s, \amod{}, \amod{\ell}} \iffdef 
 	\hspace*{-0.2cm} & \hspace*{-0.2cm}
 	\exsts{r, \fence{}} 
 	\hspace*{-0.1cm} & \hspace*{-0.1cm} 
 		s \in \fence{} \land 
-		\fence{} \strictfences \amod{L} \land
-		\collapseW{l, s, \amod{}, \amod{L}} = r\\
+		\fence{} \strictfences \amod{\ell} \land
+		\collapseW{l, s, \amod{}, \amod{\ell}} = r\\
 	
 	\hspace*{-0.2cm} & \hspace*{-0.2cm} 
 	& \hspace*{-0.1cm} 	
-	\null\land \contains{\dom{\amod{L}}}{\capPart{r}}
+	\null\land \contains{\dom{\amod{\ell}}}{\capPart{r}}
 \end{array}
 \]
 %
-That is, there exists an invariant $\fence{}$ that contains the current shared state $s$ and the update footprint of the local action model $\amod{L}$ is local with respect to $\fence{}$. The local and shared states are disjoint from one an other and finally that the capability resources of both local and shared states are contained within the domain of $\amod{L}$ where
+That is, there exists an invariant $\fence{}$ that contains the current shared state $s$ and the update footprint of the local action model $\amod{\ell}$ is local with respect to $\fence{}$. The local and shared states are disjoint from one an other and finally that the capability resources of both local and shared states are contained within the domain of $\amod{\ell}$ where
 %
 \[
-\hspace*{-0.2cm}
-\begin{array}{l l}
-	\contains{S}{\ca{}}\!\! \iffdef & \hspace*{-0.6cm}
-	\begin{array}{l}
-		\exsts{K}\! \ca{} = \prod\limits_{\ca{i} \in K}^{\composeCap} \ca{i} \land
-		\for{\ca{i} \!\in K}\!\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
-	\end{array}
-\end{array}
+	\contains{S}{\ca{}}\! \iffdef \!
+		\exsts{K}\! \ca{} = \!\!\biguplus_{\ca{i} \in K}\!\! \ca{i} \land
+		\for{\ca{i} \!\in K}\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
 \]
 %
 \end{definition}
@@ -541,8 +474,8 @@ Suppose at this point the current thread extends the shared state with the $\cel
 \end{example}
 %
 %
-As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{L})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{L})$ represents the set of all localised action behaviour.
-On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{L})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
+As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{\ell})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{\ell})$ represents the set of all localised action behaviour.
+On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{\ell})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
 %
 %
 \subsection{Action Model Closure}\label{subsec:amodClosure}
@@ -571,14 +504,14 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 \[
 \hspace*{-0.2cm}
 \begin{array}{l}
-	\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'}  \land \amod{}' \subseteq \amod{L}\\
+	\extendsAM{\amod{}, \amod{\ell}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r}{\amod{}'}  \land \amod{}' \subseteq \amod{\ell}\\
 	
 	
-	\extendsAMUpto{\amod{}, \amod{L}}{0}{l}{r}{\amod{}'} \iffdef true \\ 
+	\extendsAMUpto{\amod{}, \amod{\ell}}{0}{l}{r}{\amod{}'} \iffdef true \\ 
 
 
 
-	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \iffdef \\ 
+	\extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r}{\amod{}'} \iffdef \\ 
 
 	\hspace*{0.1cm}\for{\ca{}, c, d, t, p, q, l_1, l_2, l_3, l_4}\\
 	
@@ -591,7 +524,7 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 	\land l = l_3 \composeL c 
 	\land r = l_4 \composeL d \implies\\
 	
-	\hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \land\null\\
+	\hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \land\null\\
 	\hspace*{0.4cm}t = \unitL \implies 
 	\left(
 	\begin{array}{l}
@@ -605,7 +538,7 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 
   \hspace*{0.1cm}\for{\ca{}, p, q, l_1, l_2, c, d} \\
   
-  \hspace*{0.2cm} (p, q) \in \amod{L}(\ca{})
+  \hspace*{0.2cm} (p, q) \in \amod{\ell}(\ca{})
   \land \updateFP{p, q} = (l_1, l_2)
   \land p \composeL c = l \composeL r \composeL d \implies\\
   
@@ -613,22 +546,22 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 	
 
 		\hspace*{0.4cm}q \composeL c \text{ is undefined} \;\;\lor\\
-		\hspace*{0.4cm}l_1 \maxMeetL l = \unitL \land \exsts{r'}\! q \composeL c = l \composeL r' \composeL d \land \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r'}{\amod{}'}
+		\hspace*{0.4cm}l_1 \maxMeetL l = \unitL \land \exsts{r'}\! q \composeL c = l \composeL r' \composeL d \land \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{l}{r'}{\amod{}'}
 
 \end{array}
 \]
 %
-The above states that the $(\amod{}, \amod{L})$ pair is closed under $(l, r, \amod{}')$ if the closure relation holds for any number of steps $n \in \Nats$ where 1) $l$ denotes the subjective view of the shared state, 2) $r$ denotes the context, 3) $l \composeL r$ captures the entire shared state  and 4) a step corresponds to the occurrence of an action as prescribed in either the current action model $\amod{}'$ or $\amod{L}$. The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff:
+The above states that the $(\amod{}, \amod{\ell})$ pair is closed under $(l, r, \amod{}')$ if the closure relation holds for any number of steps $n \in \Nats$ where 1) $l$ denotes the subjective view of the shared state, 2) $r$ denotes the context, 3) $l \composeL r$ captures the entire shared state  and 4) a step corresponds to the occurrence of an action as prescribed in either the current action model $\amod{}'$ or $\amod{\ell}$. The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff:
 \begin{enumerate}
 	\item Given a capability $\ca{}$, its action $(p, q) \in \amod{}'(\ca{})$ and its update footprint $(l_1, l_2)$, if the action precondition $p$ is satisfiable through an arbitrary extension of the shared region ($t$), then after one step the closure relation holds for the resultant subjective state $l_2 \composeL c$ and context $d$ where $c$ and $d$ capture the residue subjective and context states, respectively; that is parts of the states unchanged by the action. Moreover, if the action requires no extension ($t = \unitL$) and thus the action precondition is satisfied by the current shared state $l \composeL r$, then the action should be included in the global action model $\amod{}$ unless the resultant state $l_2 \composeL c \composeL d$ is undefined.
 	
-	\item Given a capability $\ca{}$, its action $(p, q) \in \amod{L}$ and its update footprint $(l_1, l_2)$, if the action precondition is satisfiable by the current shared state then \emph{either} 1) a similar action is visible to $\amod{}'$, \emph{or} 2) the resultant state is undefined and thus the action can never take place, \emph{or} 3) the subjective state remains unchanged by the action $(l_1 \maxMeetL l = \unitL )$ and after one step the closure relation holds for the subjective state $l$ and the resultant context $r'$.
+	\item Given a capability $\ca{}$, its action $(p, q) \in \amod{\ell}$ and its update footprint $(l_1, l_2)$, if the action precondition is satisfiable by the current shared state then \emph{either} 1) a similar action is visible to $\amod{}'$, \emph{or} 2) the resultant state is undefined and thus the action can never take place, \emph{or} 3) the subjective state remains unchanged by the action $(l_1 \maxMeetL l = \unitL )$ and after one step the closure relation holds for the subjective state $l$ and the resultant context $r'$.
 \end{enumerate}
 %
 Intuitively, the closure relation ensures that given the current subjective state $l$ and context $r$, all possible actions of $\amod{}'$ are reflected in the global action model $\amod{}$ \emph{and} for all actions that are possible and are yet unbeknownst to $\amod{}'$, the subjective view $l$ remains unaffected.
 \end{definition}
 %
-As illustrated above, the global behaviour $\amod{}$ relies on the division between the subjective state $l$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\amod{L}$ without knowledge of the division between the subjective state and the context. 
+As illustrated above, the global behaviour $\amod{}$ relies on the division between the subjective state $l$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\amod{\ell}$ without knowledge of the division between the subjective state and the context. 
 
 %
 %
