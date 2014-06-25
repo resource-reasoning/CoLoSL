@@ -5,6 +5,7 @@
 \usepackage{caption}
 \usepackage{subcaption}\captionsetup{compatibility=false}
 \usepackage{xspace}
+\usepackage{xparse}
 %\let\proof\relax 
 %\let\endproof\relax
 %\let\vec\relax
@@ -59,7 +60,7 @@
 \newcommand{\for}[1]{\forall\; #1.\; }
 \newcommand{\exsts}[1]{\exists\; #1.\;}
 
-\newcommand{\cell}[2]{\text{#1} \mapsto #2}
+\newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
@@ -232,3 +233,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\atomic}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+
+
+%%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
+
+
+\DeclareDocumentCommand{\ghostCell}{ m O{} O{-}}{#1 \stackrel{#2}{\rightarrow} #3}
+
+\DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\rightarrow} #3}
+
+\DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\rightarrow} #3}
+
+\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.#2 \stackrel{#3}{\rightarrow} #4}
+
+\DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+
+\newcommand{\inSet}[2]{\textsf{in}\left(#1, #2\right)}
+\newcommand{\outSet}[2]{\textsf{out}\left(#1, #2\right)}
+
+\newcommand{\lsg}[4]{\textsf{lsg}\left(#1, #2, #3, #4\right)}
+
+\newcommand{\node}[3]{\textsf{node}\left(#1, #2, #3\right)}
+\newcommand{\lockedNode}[3]{\textsf{L}\left(#1, #2, #3\right)}
+\newcommand{\unlockedNode}[3]{\textsf{U}\left(#1, #2, #3\right)}
+
+\newcommand{\nil}{\texttt{null}}
