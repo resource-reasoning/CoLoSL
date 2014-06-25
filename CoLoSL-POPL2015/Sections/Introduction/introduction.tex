@@ -82,15 +82,19 @@ further on the subjective state:
 This allows one to reuse specifications written from a subjective view
 of the state in contexts where we know more about the share state.
 
-Second, the $*$ connective of separation logic splits and combines
+Second, the $*$ connective of separation logic combines
 subjective views by \emph{overlapping} them ($P ** Q$ denotes those
 states that result from overlapping a state satisfying $P$ with one
 satisfying $Q$):
 \begin{align*}
-  \shared{P}{I_1} * \shared{Q}{I_2} &<=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}
 \end{align*}
 Doing so also combines the interference relations. Pleasingly, the new
 interference relation is simply the union of previous interferences.
+Similarly, the shared state can always be duplicated:
+\begin{align*}
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\textsc{Split}}
+\end{align*}
 In combination with the usual law of parallel composition of
 separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
 distribute the shared state between several threads:

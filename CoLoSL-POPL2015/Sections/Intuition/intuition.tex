@@ -270,7 +270,7 @@ assertions as the preconditions of all threads.
     (\shared{P_0}{I} *\token a_x)*
     (\shared{P_0}{I} *\token a_y)*
     (\shared{P_0}{I} *\token a_z)
-  &\qquad\eqref{eq:merge}\\
+  &\qquad\eqref{eq:split}\\
   =>\null&
   (\shared{P_0}{I_x'} *\token a_x)*
   (\shared{P_0}{I_y'} *\token a_y) *
@@ -353,16 +353,15 @@ with most existing formalisms, which would use \emph{classical
   conjunction} instead).
 \begin{align*}
   \shared{P}{I} &=> \shared{P}{I} * \shared{P}{I}
-  \tag{\textsc{Copy}}\\
+  \tag{\textsc{Split}}\label{eq:split}\\
   \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1\cup I_2} \tag{\textsc{Merge}}\label{eq:merge}
 \end{align*}
 On local states, $*$ behaves as \emph{disjoint union}, as is standard.
 
-\julescomment{This should probably be two distinct rules. Out of steam
-  now.}
+\julescomment{This is actually two rules! Fix the words.}
 
-This directly justifies the \eqref{eq:merge} steps of the two
-derivations above.
+This directly justifies the \eqref{eq:split} and \eqref{eq:merge}
+steps of the two derivations above.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
