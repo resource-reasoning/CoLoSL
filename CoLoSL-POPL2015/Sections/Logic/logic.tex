@@ -23,9 +23,11 @@ sets of \emph{tokens} as capabilities.
   $x$ over logical variables.
   \begin{align*}
     E &::= \li x ||| x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
+    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| E_1 |-> E_2 \mid \token a\\
     P, Q  &::= 
-    \m{false} \mid E_1 = E_2 \mid P \Rightarrow Q \mid \exsts{x} P \mid\\
-    &\emp \mid E_1 |-> E_2 \mid \token a \mid P * Q \mid P --* Q \mid P \sepish Q \mid P \intersect Q \mid \shared{P}{I} \\
+    \p{A} \mid P \Rightarrow Q \mid \exsts{x} P \mid
+     P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
+     \mid \shared{P}{I} \\
     I &::= \emptyset ||| \interAss{\token a}{\vec{y}}{P}{Q}, I
   \end{align*}
 \end{definition}
@@ -35,56 +37,51 @@ of shared-state assertions, whose notation is borrowed from previous
 rely-guarantee-based formalisms. Predicates and connectives from the
 first row have their standard classical meaning, and spatial
 predicates and connectives have been informally introduced in the
-previous section.\\
-\azaleaComment{The overlap connective $\intersect$ is new. We should explain that.}
-\azaleaComment{Why $--*$ and not $\ewand$?}
+previous section.
+\azaleacomment{The intersection connective $\intersect$ is new. We should explain that.}
 
 \paragraph{Program states}
-Next, we present our model of program states over which these formulas
-are interpreted. As mentioned in the previous section, program states
-have four components: a thread-local part, a shared part, and local
-and global interference relations. The thread-local and the shared
-parts are modeled in the same way, using the following notion of
-\emph{logical states}.  Logical states $l$, $s$ are pairs
-$(\heapPart{l}, \capPart{l})$ of a heap $\heapPart l\in\Heaps$
-(\textit{i.e.} a finite partial functions from addresses to values)
-and a capability $\capPart l\in\Caps$.
+To interpret formulas in our assertion language, we build models using
+three ingredients. The first is a standard \emph{stack}, assigning
+values to program variables:
+\[
+\set{Stack} == \set{PVar} --> \set{Val}
+\]
 
-\begin{definition}[Logical States]
-  A \emph{logical state} is a pair consisting of a heap and a capability:
+The next ingredient are \emph{logical states}, which are used to
+describe resources held locally as well as those shared with other
+threads. 
+
+\begin{definition}[Logical states]
+  A \emph{logical state} is a pair $(h, \ca{})$ of a heap $h
+  l\in\Heaps$ (\textit{i.e.} a finite partial functions from addresses
+  to values) and a capability $\ca{} \in\Caps$.
   \begin{align*}
     \Heaps &== \set{Loc} --`_{\m{fin}} \set{Val}&
     \Caps &== \powerset(\set{Token})&
     \LStates &== \Heaps\times \Caps
   \end{align*}
-  We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Given
-  a logical state $l$, we write $\heapPart{l}$ and $\capPart{l}$ for
-  the first and second projections, respectively. The
+  We write $\unitL$ for the logical state $(\unitH, \unitCap)$. The
   \emph{composition of logical states}
   $
   \composeL : \LStates \times \LStates \rightharpoonup \LStates
   $
   is defined as:
   \[
-  l \composeL l' \eqdef
-  (\heapPart{l} \composeH \heapPart{l'},\, \capPart{l} \composeCap \capPart{l'})
+  (h,\ca{}) \composeL (h', \ca{}') \eqdef
+  (h\composeH h', \ca{}\composeCap \ca{}')
   \]
 \end{definition}
 
-One can check that, with these definitions, $(\LStates, \composeL,
-\unitL)$ forms a \emph{separation algebra}~\cite{asl}, \textit{i.e.} a
-cancellative commutative partial monoid.  For this presentation, the
-model of logical states is fixed as pairs of heaps and sets of tokens,
-but in general any pair of separation algebras would
-do~\cite{colosl-tr14}.
+Although, for this presentation, we build logical states out of heaps
+and sets of tokens, in general any pair of separation algebras
+(\textit{i.e.}, cancellative partial commutative monoids~\cite{asl})
+would do~\cite{colosl-tr14}.
 
-\julescomment{Or maybe we just need the partial abelian monoid
-  structure for soundness?}
+The last ingredient are \emph{action models}, used to interpret
+interference assertions.
 
-We interpret interference assertions as \emph{action models} that
-associate capabilities with actions.
-
-\begin{definition}[Action Models]
+\begin{definition}[Action models]
 An \emph{action model} is a partial function associating capabilities with actions. An action is expressed as a relation between the original logical state and the new logical state reflecting the effects of the action:
 \[
 	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
@@ -94,218 +91,174 @@ We write $\unitAM$ for an action model with empty domain.
 
 
 \begin{definition}[Worlds]
-  A \emph{world} is a 4-tuple of a logical state representing the
-  thread-local state, a second logical state representing the shared
-  state, a global action model and a local action model. Later in
-  \S\ref{subsec:localGlobalActionModels}, we justify the need for both
-  local and global action models.
+  A \emph{world} is a 5-tuple consisting of a stack, a logical state
+  representing the thread-local state, a second logical state
+  representing the shared state, a global action model and a local
+  action model. Later in \S\ref{subsec:localGlobalActionModels}, we
+  justify the need for both local and global action models. An extra
+  \emph{well-formedness} condition is imposed on worlds, that ensures
+  that the local and shared states are always compatible, and that the
+  updates permitted by the action models are well-behaved with respect
+  to future extensions of the shared state:
   \[
-  \Worlds \eqdef \LStates\times\LStates\times\AMods\times\AMods
+  \Worlds \eqdef \{w\in
+  \set{Stack}\times\LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
   \]
-  Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$,
-  $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third
-  and fourth projections, respectively.  The \emph{composition of
-    worlds} is defined as
-  \[
-  w \composeW w' \eqdef
-  \begin{cases}
-    (\localPart{w} \composeL \localPart{w'},
-    \sharedPart{w}, \amodelPart{w}, \amodelPartL{w})&
-    \begin{array}[t]{L}
-      \text{if }
-      \sharedPart{w} = \sharedPart{w'}\text{, } \amodelPart{w} =
-      \amodelPart{w'}\text{,}\\[-.7ex]
-      \text{and } \amodelPartL{w} = \amodelPartL{w'}
-    \end{array}\\
-    \textit{undefined}&\text{otherwise}
-  \end{cases}
-\]
+  The \emph{composition of worlds} is defined as
+  \begin{align*}
+    &\qquad (s,l,l_s,\amod{},\amod{\ell}) \composeW
+    (s',l',l_s',\amod{}',\amod{\ell}') \\
+    &\eqdef
+    \begin{cases}
+      (s,l\composeL l', l_s, \amod{}, \amod{\ell}) &
+      \begin{array}[t]{L}
+        \text{if }
+        s =s'\text{, }
+        l_s = l_s' \text{, }
+        \amod{} = \amod{}' \text{, and } \amod{\ell} = \amod{\ell}'\\[-.7ex]
+        \text{and }\p{wf}((s,l\composeL l', l_s, \amod{}, \amod{\ell}))
+      \end{array}\\
+      \textit{undefined}&\text{otherwise}
+    \end{cases}
+  \end{align*}
 \end{definition}
 
 
 \paragraph{Semantics}
-We proceed with the semantics of \colosl assertions. Taking
-inspiration from CAP~\cite{cap-ecoop10}, we first define an
-intermediate semantics $\intermediateSem[(.)]{.}$ that does not
-enforce well-formedness. Later in \S\ref{}, we introduce
-\emph{well-formed} worlds, whose local and shared states are disjoint
-and where the updates permitted by the action models are well-behaved
-with respect to future extensions of the shared state. The semantics
-$\sem[(.)]{.}$ of assertions is $\intermediateSem[(.)]{.}$ restricted
-to well-formed worlds. We then define the semantics of interference
-assertions $\semI[(.)]{.}$.
+We are now ready to give the semantics of \colosl assertions, defined
+as a forcing relation $|=$ between worlds and formulas. We use two
+auxiliary forcing relations, each between stack and logical state
+pairs and formulas. One of them, also written $|=$, interprets atomic
+formulas, while the other $|=_l$ interprets assertions about the
+shared state, given an original shared state $l$. Logical connectives
+are interpreted uniformly in all cases, hence we write $|=_{?}$ for
+either $|=$ or $|=_{l}$ for some $l$ (in which case subsequent
+occurences of $|=_{?}$ refer to the same $|=_l$), and then write $u$
+for elements of either $\Worlds$ or $LStates$, and $\gray$ for either
+$\composeW$ or $\composeL$.
 
-
-\begin{definition}[Assertion Semantics]
+\begin{definition}[Assertion semantics]
   Given a logical environment $\lenv\in\LEnv == \set{LVars} -->
-  \set{Val}$, the \emph{intermediate semantics} of \colosl assertions
-  $\intermediateSem[(.)]{.}: \Assertions \times \LEnv \rightarrow
-  \pset{\Worlds}$ are given as follows where $\semI[(.)]{.}$ denotes
-  the semantics of interference assertions described in
-  \defin~\ref{def:interferenceSemantics}.
-\begin{align*}
-  \intermediateSem{\emp} 
-  &  \eqdef
-  \{ (l, s, \amod{}, \amod{\ell}) \mid l = \unitL \}\\
-  \intermediateSem{E_1|->E_2}
-  & \eqdef
-  \{
-  ((h, \unitCap ), s, \amod{}, \amod{\ell} ) \mid
-  h = [[|E_1|]_\lenv: [|E_2|]_\lenv]\}\\
-      \intermediateSem{\token a}
-      &  \eqdef
-      \{
-      \left(\left(\unitH, \ca{} \right), s, \amod{}, \amod{\ell}
-      \right) |||
-      \ca{} = \{\token a\} \}\\
-      \intermediateSem{P_1 * P_2}
-      &  \eqdef
-      \left\{
-      \begin{array}{@{}l@{\null\mid\null}l@{}}
-	w_1 \composeW w_2&
-	\begin{array}{@{}l@{}}
-	  w_1 \in \intermediateSem{P_1} \land
-	  w_2 \in \intermediateSem{P_2} 
-	\end{array}
-      \end{array} 
-      \right\}\\
-%	\left\{ 
-%	
-%	\begin{array}{l | l}
-%		(p \composeL q, s, \amod{}, \amod{\ell})& 
-%		\begin{array}{@{}l@{}}
-%				 (p, s, \amod{}, \amod{\ell}) \in \intermediateSem{P} \land\null\\
-%				 (q, s, \amod{}, \amod{\ell}) \in \intermediateSem{Q} 
-%		\end{array}
-%		
-%	\end{array} 
-%	
-%	\right\}\\
-      \intermediateSem{P --* Q} 
-      &  \eqdef
-      \{ 
-      w \mid
-      \for{w'} 
-      w \sharp w_1 /| w\in\intermediateSem[\lenv]{P} =>
-      w\composeW w' \in \intermediateSem[\lenv]{Q}
-      \}\\
-      \intermediateSem{P_1 \sepish P_2} 
-      &  \eqdef
-      \left\{ 
-      \begin{array}{@{}l|l@{}}
-	(l \composeL l_1 \composeL l_2, s, \amod{}, \amod{\ell}) & 
-	\begin{array}{@{}l@{}}
-	  (l \composeL l_1, s, \amod{}, \amod{\ell}) \in \intermediateSem{P_1}\land\null \\
-	  (l \composeL l_2 , s, \amod{}, \amod{\ell}) \in \intermediateSem{P_2} 
-	\end{array}
-      \end{array} 
-      \right\}\\
-      %% \intermediateSem{P_1 \intersect P_2} 
-      %% &  \eqdef
-      %% \left\{ 
-      %% \begin{array}{@{}l@{\ }|@{\ }l@{}}
-      %%   (l, s, \amod{}, \amod{\ell}) & 
-      %%   \begin{array}{@{}l@{}}
-      %%     \exsts{l_1,l_2} (l \composeL l_1, s, \amod{}, \amod{\ell}) \in \intermediateSem{P_1}\land\null \\
-      %%     \quad(l \composeL l_2 , s, \amod{}, \amod{\ell}) \in \intermediateSem{P_2} 
-      %%   \end{array}
-      %% \end{array} 
-      %% \right\}\\
-      \intermediateSem{\shared{P}{I}} 
-      &  \eqdef
-      \left\{ 
-      \begin{array}{@{}l@{\ }|@{\ }l@{}}
-	(\unitL, l \composeL r, \amod{}, \amod{\ell}) & 
-	\begin{array}{@{}l@{}}
-	  (l, l \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem{P}\\
-	  \null\land \extendsAM{\amod{}, \amod{\ell}}{l}{r}{\semI{I} }
-	\end{array}
-      \end{array} 
-      \right\}\\
-      \sem[\lenv]{P} &\eqdef \{ w\in \intermediateSem[\lenv]{P} |||
-      \wf{w} \}
-\end{align*}
+  \set{Val}$, the semantics of \colosl assertions is as follows, where
+  $\semI[(.)]{.}$ denotes the semantics of interference assertions
+  described in \defin~\ref{def:interferenceSemantics}:
+\[
+\begin{array}{R>{\null}lcl}
+  (s,l),\lenv &|= \m{false}
+  &\text{iff}& \text{never}\\
+  (s,l),\lenv &|= E_1 = E_2
+  &\text{iff}& [|E_1|]_{s,\lenv} = [|E_2|]_{s,\lenv}\\
+  (s,l), \lenv &|= \emp &\text{iff}& l = \unitL\\
+  (s,l), \lenv &|= E_1|->E_2 
+  &\text{iff}&
+  l =
+  ([[|E_1|]_{s,\lenv}: [|E_2|]_{s,\lenv}],\unitCap)\\
+  (s,l), \lenv &|= \token a
+  &\text{iff}&
+  l = (\unitH, \{\token a\})\\
+  (s,l_s), \lenv &|=_{l} \p{A} &\text{iff}&(s,l_s), \lenv |= \p{A}\\
+  (s,l,l_s,\amod{},\amod{\ell}), \lenv &|= \p{A} &\text{iff}& (s,l),\lenv |= \p{A}\\
+  (s,l,l_s,\amod{},\amod{\ell}), \lenv &|= \shared P I &\text{iff}&
+  l = \unitH\text{ and }
+  \exsts{l_s',r}
+  l_s = l_s'\composeL r
+  \text{ and}\\
+  &&&(s,l_s'), \lenv |=_{l_s} P\text{ and }\\
+  &&&\extendsAM{\amod{}, \amod{\ell}}{l_s'}{r}{\semI{I}}\\
+  (s,l_s), \lenv &|=_{l} \shared P I &\text{iff}&
+  l = \unitH\text{ and }  
+  \exsts{l_s',r}
+  l = l_s'\composeL r
+  \text{ and}\\
+  &&&(s,l_s'), \lenv |=_{l} P\\
+  u,\lenv &|=_{?} P => Q
+  &\text{iff}& u,\lenv |=_{?} P\text{ implies }u,\lenv |=_{?} Q\\
+  u,\lenv &|=_{?} \exsts x P
+  &\text{iff}& \exsts v u, [\lenv|||x:v] |=_{?} P\\
+  u, \lenv &|=_{?} P_1 * P_2 &\text{iff}&
+  \exsts{u_1,u_2} u = u_1\gray u_2\text{ and}\\
+  &&& u_1, \lenv |=_{?} P_1 \text{ and }u_2, \lenv |=_{?} P_2\\
+  u, \lenv &|=_{?} P --* Q &\text{iff}&
+  \for{u'} u', \lenv |=_{?} P \text{ and }
+  u \sharp u'\\
+  &&&\text{ implies }u\gray u', \lenv |=_{?} Q\\
+  u, \lenv &|=_{?} P_1 ** P_2 &\text{iff}&
+  \exsts{u',u_1,u_2} u = u'\gray u_1\gray u_2\\
+  &&&\text{ and }
+  u'\gray u_1, \lenv |=_{?} P_1 \text{ and }\\
+  &&&u'\gray u_2, \lenv |=_{?} P_2
+\end{array}
+\]
 \end{definition}
 
-\azaleaComment{Why did you comment out the semantics of intersection $\intersect$?}
+\azaleacomment{Why did you comment out the semantics of intersection $\intersect$?}
+
 The semantics of separation logic predicates and connectives is
 standard and depends only on the local state.  $\shared{P}{I}$ states
-that $P$ holds for only a sub-state $l$ of the current shared state
-$l\composeL r$. The interference associated with $l$ is given by
+that $P$ holds for only a sub-state $l_s'$ of the current shared state
+$l_s'\composeL r$. The interference associated with $l_s'$ is given by
 interference assertion $\semI[\lenv]{I}$ such that the global and
 local action models $\amod{}$ and $\amod{\ell}$ are \emph{closed}
-under $\semI[\lenv]{I}$ with respect to the subjective view $l$ and
+under $\semI[\lenv]{I}$ with respect to the subjective view $l_s'$ and
 context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
 
-Note that, according to our semantics, nested subjective views behave
-like the appropriate flattening:
-\[
-	\shared{P * \shared{Q}{I'}}{I} \iff \shared{P}{I} * \shared{Q}{I'}
-\]
+\begin{lemma}
+  \label{lem:assertionFacts}
+  The following formulas are valid according to the semantics above:
+  \begin{align*}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}\\
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}\\
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\textsc{Split}}\\
+  \shared{P * \shared{Q}{I'}}{I} &<=> \shared{P}{I} * \shared{Q}{I'}
+  \end{align*}
+\end{lemma}
+\julescomment{TODO: Other interesting facts?}
+\begin{proof}
+  Immediate.
+\end{proof}
 
-
-\begin{definition}[Localised Interference Semantics]\label{def:interferenceSemantics}
-The \emph{semantic of interference assertions}
-%
-$
-	\semI[(.)]{.} : \IAssertions \times \LEnv \rightharpoonup (\Caps \rightharpoonup  \LStates \times \LStates )
-$
-%
-is defined as:
-%
-\[
-	\for{\kappa} \semI[\lenv]{I}(\ca{}) ==
-	 	\left\{
-		\begin{array}{@{}l@{\ }|@{\ }r@{}}
-			(p, q)&
-			\begin{array}{@{}l@{}}
-				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
-				\quad\ca{} \in \semK[\lenv]{\capAss{}} \land\exsts{r, \amod{}, \amod{\ell}}\\
-				\quad(p, p \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \land\null\\
-				\quad(q, q \composeL r, \amod{}, \amod{\ell}) \in \intermediateSem[\lenv\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
-			\end{array}
-		\end{array}
-	\right\}
-\]
+\begin{definition}[Localised interference semantics]
+  \label{def:interferenceSemantics}
+  The \emph{semantic of interference assertions}
+  $
+  \semI[(.)]{.} : \IAssertions \times \LEnv \rightharpoonup (\Caps \rightharpoonup  \LStates \times \LStates )
+  $
+  is defined as:
+  \[
+  \for{\kappa} \semI[\lenv]{I}(\ca{}) ==
+  \left\{
+  \begin{array}{@{}l@{\ }|@{\ }r@{}}
+    (p, q)&
+    \begin{array}{@{}l@{}}
+      \exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
+      \quad\ca{} = \capAss{} \land\exsts{r, \amod{}, \amod{\ell}}\\
+      \quad (\emptyset,p),[\lenv|||\vec y:\vec v] |=_{p \composeL r} P \land\null\\
+      \quad (\emptyset,q),[\lenv|||\vec y:\vec v] |=_{q \composeL r} Q
+    \end{array}
+  \end{array}
+  \right\}
+  \]
 \end{definition}
 
+\julescomment{Not sure about that $\ca{} = \capAss{}$ above\dots}
 
-\subsection{Shared State Extension}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fences}
 \label{subsec:extension}
 
-Recall from \S\ref{subsec:extend} that a thread can always \emph{extend} the shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
-%
-\begin{example}\label{ex:badExtension}
-Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
-$
-	I' \eqdef 
-		\left(
-			\token{X}: 
-			\left\{
-			\begin{array}{@{}l@{}} 
-				\cell{x}{1} \swap \cell{x}{2}\\
-				\cell{y}{1} \swap \cell{y}{3}
-			\end{array}
-			\right\}
-		 \right)
-$.
-In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $\token{X}$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $\token{Y}$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
-\end{example}
-%
-%
-In order to ensure sound extension of the shared state, we require that the \emph{update footprint} of extended actions are confined to the locally owned resources. That is, the resources mutated by the action do not \emph{overlap} with those already in the shared state.  
-%We proceed with the definitions necessary for formalising what it means for actions to have a local update footprint.
-%
-\begin{definition}[Overlap]
-The \emph{overlap} function over logical states 
-%
+fences are cool, let's define fences.
+
+
+\begin{definition}[Intersection]
+The \emph{intersection} function over logical states 
 $
 \meetL : \left(\LStates \times \LStates \right) \rightarrow \pset{\LStates}
 $
-%
 is defined as:
-%
 \[
 	l_1 \meetL l_2 \eqdef 
 	\left\{ 
@@ -316,25 +269,17 @@ is defined as:
 	\end{array}
 	\right\}
 \]
-%
-The \emph{maximal overlap} is defined as:
-%
+The \emph{maximal intersection} is defined as:
 \[
 	l_1 \maxMeetL l_2 = l \iffdef l \in (l_1 \meetL l_2) \land \for{l' \in (l_1 \meetL l_2)} l' \leq l
 \]
-%
 The $\leq$ relation denotes the standard ordering by extension where 
-%
 \[
 	l_1 \leq l \iffdef \exsts{l_2} l_1 \composeL l_2 = l
 \]
-%
 \end{definition}
-%
-%
 \begin{definition}[Update footprint]
 Given a pair of logical states $(p, q)$, its \emph{update footprint} is defined as:
-%
 \[
 \begin{array}{l l l}
 	\updateFP{p,q} = (l_1, l_2) \iffdef  
@@ -345,16 +290,12 @@ Given a pair of logical states $(p, q)$, its \emph{update footprint} is defined 
 	\hspace*{-0.2cm}\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL
 \end{array}
 \]
-%
 \end{definition}
 \todo\ Need a better segue here.\\
-%
 
 In order to ensure that the new actions agree with the existing actions, we need to guarantee that the update footprint of the new actions is local with respect to the \emph{current} state and \emph{all states reachable} from the current state. Inspired by the LRG logic~\cite{lrg} we introduce the concept of invariant-fenced action models to capture all possible states reachable from the current state.
-%
-\begin{definition}[Invariant Fenced Action Model]
+\begin{definition}[Invariant fenced action model]
 An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} \in \pset{\LStates}$ iff
-%
 \[
 \hspace*{-0.15cm}
 \begin{array}{l l}
@@ -376,25 +317,16 @@ An action model $\amod{} \in \AMods$ is \emph{fenced by an invariant} $\fence{} 
 	 & \hspace*{1cm} l_2 \composeL c \in \fence{}	 \lor l_2 \composeL c \text{ is undefined}
 \end{array}
 \]
-%
-That is, given any capability $\ca{}$, and an action associated with it $(p, q) \in \amod{}(\ca{})$, where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition ($l \meetL p \not= \emptyset$), if there is an overlap between $l$ and the update precondition ($l_1 \maxMeetL l = l_3 > \unitL$), then the state resulting from the update ($l_2 \composeL c$) is also in $\fence{}$.
-For instance in example of \S\ref{sec:intuition}, $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec} is fenced by $\fence{X} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 9 \}\right\}$.
-% 
+\end{definition}
 
 We lift the notion of invariant fences to assertions and write $\fenceAss{} \fences I$  for $\fenceAss{} \in \Assertions$ and $I \in \IAssertions$ where
-%
 \[
 	\fenceAss{} \fences I \iffdef \for{\lenv \in \LEnv} \left\{ l \mid (l, -, -, -) \in \intermediateSem[\lenv]{F} \right\} \fences \semI[\lenv]{I}
 \]
-%
-\end{definition}
-%
-%
+
 We now formalise what it means for the update footprint of actions to be local with respect to an invariant.
-%
-\begin{definition}[Locally-fenced Action Model]
+\begin{definition}[Locally-fenced action model]
 An action model $\amod{} \in \AMods$ is \emph{locally-fenced} by $\fence{} \in \pset{\LStates}$ iff
-%
 \[
 \hspace*{-0.2cm}
 \begin{array}{l l}
@@ -415,96 +347,111 @@ An action model $\amod{} \in \AMods$ is \emph{locally-fenced} by $\fence{} \in \
 		l_1 \leq l
 \end{array}
 \]
-%
 The above states that $\amod{}$ is fenced by invariant $\fence{}$ and given any capability $\ca{}$ and an action associated with it $(p, q) \in \amod{}(\ca{})$ where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition $p \meetL l \not= \emptyset$, the update precondition $l_1$ is \emph{contained} within $l$: $l_1 \leq l$. 
-%
 
 We lift the notion of local invariant fences to assertions and write $\fenceAss{} \strictfences I$  for $\fenceAss{} \in \Assertions$ and $I \in \IAssertions$ where
-%
 \[
 	\fenceAss{} \strictfences I \iffdef \for{\lenv \in \LEnv} \left\{ l \mid (l, -, -, -) \in \intermediateSem[\lenv]{F} \right\} \strictfences \semI[\lenv]{I}
 \]
-%
 \end{definition}
 
-We are now ready to formalise well-formedness.  Given a world $w \in
-\Worlds$, its \emph{collapse into a logical state}, $ \collapseW{.}:
-\Worlds --` \LStates $, is defined as:
-\[
-	\collapseW{l, s, \amod{}, \amod{\ell}} \eqdef l \composeL s
-\]
 
-\begin{definition}[Well-formedness]
-A world $(l, s, \amod{}, \amod{\ell}) \in \Worlds$ is \emph{well-formed} iff
-%
-\[
-\begin{array}{l l l}
-	\wf{l, s, \amod{}, \amod{\ell}} \iffdef 
-	\hspace*{-0.2cm} & \hspace*{-0.2cm}
-	\exsts{r, \fence{}} 
-	\hspace*{-0.1cm} & \hspace*{-0.1cm} 
-		s \in \fence{} \land 
-		\fence{} \strictfences \amod{\ell} \land
-		\collapseW{l, s, \amod{}, \amod{\ell}} = r\\
-	
-	\hspace*{-0.2cm} & \hspace*{-0.2cm} 
-	& \hspace*{-0.1cm} 	
-	\null\land \contains{\dom{\amod{\ell}}}{\capPart{r}}
-\end{array}
-\]
-%
-That is, there exists an invariant $\fence{}$ that contains the current shared state $s$ and the update footprint of the local action model $\amod{\ell}$ is local with respect to $\fence{}$. The local and shared states are disjoint from one an other and finally that the capability resources of both local and shared states are contained within the domain of $\amod{\ell}$ where
-%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Well-formed states}
+
+
+%% Jules: I've removed this definition as it's only used once
+%% immediately below, and the \downarrow notation conflicts with the
+%% action model closure notation
+%% 
+%%  Given a world $w \in
+%% \Worlds$, its \emph{collapse into a logical state}, $ \collapseW{.}:
+%% \Worlds --` \LStates $, is defined as:
+%% \[
+%% 	\collapseW{l, s, \amod{}, \amod{\ell}} \eqdef l \composeL s
+%% \]
+
+We are now ready to formalise well-formedness. A capability $\ca{}$
+is \emph{contained} in a set of capabilities if
 \[
 	\contains{S}{\ca{}}\! \iffdef \!
 		\exsts{K}\! \ca{} = \!\!\biguplus_{\ca{i} \in K}\!\! \ca{i} \land
 		\for{\ca{i} \!\in K}\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
 \]
-%
-\azaleaComment{Why does it need to be a $\biguplus$ as opposed to $\bigcup$?}
+
+\julescomment{We should have a definition instanciated with sets of
+  tokens here.}
+
+\begin{definition}[Well-formedness]
+A world $(l, s, \amod{}, \amod{\ell}) \in \Worlds$ is \emph{well-formed} iff
+\[
+\begin{array}{l l l}
+	\wf{l, s, \amod{}, \amod{\ell}} \iffdef 
+	\hspace*{-0.2cm} & \hspace*{-0.2cm}
+	\exsts{(h,\ca{}), \fence{}} 
+	\hspace*{-0.1cm} & \hspace*{-0.1cm} 
+		s \in \fence{} \land 
+		\fence{} \strictfences \amod{\ell} \land
+		\collapseW{l, s, \amod{}, \amod{\ell}} = (h,\ca{})\\
+	
+	\hspace*{-0.2cm} & \hspace*{-0.2cm} 
+	& \hspace*{-0.1cm} 	
+	\null\land \contains{\dom{\amod{\ell}}}{\ca{}}
+\end{array}
+\]
 \end{definition}
-%
-%
-%
-%
-\subsection{Local and Global Action Models}\label{subsec:localGlobalActionModels}
-Recall that a shared state assertion $\shared{R}{I}$ subjectively describes parts of the shared state that satisfy $R$. On the other hand, an action of the form $P \swap Q$ specified in $I$ captures the behaviour of the associated update in a \emph{localised} manner. That is, if \emph{parts} of the shared state satisfy the action precondition $P$, after the execution of the action, the shared state is mutated such that the said parts satisfy the action postcondition $Q$ and the rest of the shared state remains unchanged. As such, we interpret interference assertions over the entire shared state; however as we illustrate with the following example, recording the global interpretation of actions alone in the underlying model is not enough as the ways in which the shared state can be updated may vary with its extension. 
-%
-\begin{example}[]Let $P \eqdef \cell{w}{1} * \shared{\cell{x}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{X}: \left\{\cell{x}{2} * \cell{w}{1} \swap \cell{x}{3} * \cell{w}{1}\right\}\right)$. The action associated with \token{X} states that if the shared state contains the resource $\cell{x}{2} * \cell{w}{1}$, then the value of $x$ may be mutated such that $\cell{x}{3}$ while $w$ as well as other parts of the shared state remain unchanged. Given a logical environment $\lenv$, let $\amod{0} = \semI[\lenv]{I}$ denote the localised interpretation of $I$ (\defin\ref{def:interferenceSemantics}); and $\ca{\textsf{X}} \in  \semK[\lenv]{\token{X}}$ represent a capability captured by the assertion \token{X} (\param~\ref{par:capSA}). In calculating the semantics of $P$, we need to interpret the behaviour of actions specified in $I$ over the entire shared state.
 
-Since the current thread locally holds the $\cell{w}{1}$ resource and the contents of thread-local and shared states are always disjoint, we can safely deduce that $\cell{w}{2}$ is not a part of the shared state. Consequently, the action associated with $\ca{\textsf{X}}$ cannot be carried out by either the current thread or the environment; thus any $\amod{}'$ where $\amod{}'(\ca{\textsf{X}}) = \emptyset$, yields a valid extension of $\amod{0}$ to the entire shared state.
+That is, there exists an invariant $\fence{}$ that contains the current shared state $s$ and the update footprint of the local action model $\amod{\ell}$ is local with respect to $\fence{}$. The local and shared states are disjoint from one an other and finally that the capability resources of both local and shared states are contained within the domain of $\amod{\ell}$.
 
-Suppose at this point the current thread extends the shared state with the $\cell{w}{1}$ resource such that $\shared{\cell{x}{2}}{I} * \shared{\cell{w}{1}}{\emptyset}$ denotes its current view. Since the shared state now contains both $\cell{x}{2}$ and $\cell{w}{1}$ resources, it should be possible for a thread in possession of \token{X} to perform the associated action. However, this is not reflected in the global interpretation $\amod{}'$ and hence $\amod{}'$ needs to be recalculated upon extension of the shared state. On the other hand, from $\amod{}'$ alone and without keeping track of the localised interpretation $\amod{0}$, we cannot recalculate the global behaviour since $\amod{}'$ is lossy and does not reflect the original behaviour prescribed to $\ca{\textsf{X}}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Shared state extension}
+
+Recall from \S\ref{subsec:extend} that a thread can always \emph{extend} the shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
+\begin{example}\label{ex:badExtension}
+Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
+$
+	I' \eqdef 
+		\left(
+			\token{X}: 
+			\left\{
+			\begin{array}{@{}l@{}} 
+				\cell{x}{1} \swap \cell{x}{2}\\
+				\cell{y}{1} \swap \cell{y}{3}
+			\end{array}
+			\right\}
+		 \right)
+$.
+In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $\token{X}$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $\token{Y}$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
 \end{example}
-%
-%
-As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{\ell})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{\ell})$ represents the set of all localised action behaviour.
-On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{\ell})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
-%
-%
-\subsection{Action Model Closure}\label{subsec:amodClosure}
+In order to ensure sound extension of the shared state, we require that the \emph{update footprint} of extended actions are confined to the locally owned resources. That is, the resources mutated by the action do not \emph{intersect} with those already in the shared state.  
+%We proceed with the definitions necessary for formalising what it means for actions to have a local update footprint.
+That is, given any capability $\ca{}$, and an action associated with it $(p, q) \in \amod{}(\ca{})$, where its update footprint is given by $(l_1, l_2)$; and given any state $l \in \fence{}$ that is compatible with the action precondition ($l \meetL p \not= \emptyset$), if there is an intersection between $l$ and the update precondition ($l_1 \maxMeetL l = l_3 > \unitL$), then the state resulting from the update ($l_2 \composeL c$) is also in $\fence{}$.
+For instance in example of \S\ref{sec:intuition}, $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec} is fenced by $\fence{X} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 9 \}\right\}$.
+% 
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Action model closure}
+\label{subsec:amodClosure}
+
 Recall that interference assertions are interpreted into localised action models from which global action models are then calculated over the entire shared state. However, as we demonstrate through \ex~\ref{ex:closure}, in calculating the global action model we cannot simply extend the action pre- and post-conditions with arbitrary frames. 
-%
 \begin{example}[]\label{ex:closure}
 Let $P \eqdef \shared{\cell{y}{2} \lor \cell{z}{3}}{I} * \shared{\cell{y}{2}}{\emptyset}$ denote the subjective view of the current thread of the shared state with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{2}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then a thread in possession of the $\token{X}$ capability can update the value of $x$ such that $\cell{x}{2}$ and claim the $\cell{y}{2}$ resource by moving it into its local state. On the other hand, $\cell{y}{2}$ is an immutable shared resource since its associated interference corresponds to $\emptyset$.
 
 Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$. In calculating the semantics of $P$, we need to find a global action model $\amod{}$ that would encompass the behaviour of actions in $I \cup \emptyset$. A na\"\i ve attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{2} \composeL r ) \mid r \in \LStates \right\}$. That is, given the localised behaviour of $\ca{}$ as prescribed in $\semI[\lenv]{I}$, we extend it with arbitrary logical states so that if the shared state contains the $\cell{x}{1} \composeL \cell{y}{2}$ resource, regardless of the rest of the shared state ($r$), the action can be carried out accordingly while leaving $r$ untouched. Since the shared state currently contains the $\cell{y}{2}$ resource, with this interpretation when the shared state also contains $\cell{x}{1}$, it is possible to perform the action of \token{X} and remove $\cell{y}{2}$ from the shared state. However, this does not agree with the current view, since as explained above $\cell{y}{2}$ is an immutable shared resource that cannot be removed from the shared state. 
 %in exchange for $\cell{w}{4}$. Since the current thread holds the $\cell{y}{2}$ resource locally, it extends the shared state with this resource such that its subjective view is captured by $P' \eqdef \shared{\cell{x}{1} * \cell{z}{3}}{I} * \shared{\cell{y}{2}}{\emptyset}$. With this simple extension, $\cell{y}{2}$ is now an immutable shared resource since its associated interference corresponds to $\emptyset$.
-%
 %Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$. In calculating the semantics of $P$, we need to find a global action model $\amod{}$ that would encompass the behaviour of actions in $I \cup \emptyset$. A na\"\i ve attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{2} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$. That is, given the localised behaviour of $\ca{}$ as prescribed in $\semI[\lenv]{I}$, we extend it with arbitrary logical states so that if the shared state contains the $\cell{x}{1} \composeL \cell{y}{2}$ resource, regardless of the rest of the shared state ($r$), the action can be carried out accordingly while leaving $r$ untouched. With this interpretation,  
 \end{example}
-%
-%
 Recall from \S\ref{subsec:semantics} that when defining the semantics of $\shared{P}{I}$, the contents of the shared state are of the form $l \composeL r$ where $l$ denotes a subjective view as captured by $P$ while $r$ represents the context or parts of the shared state not visible by the subjective view. In order to remedy the problem illustrated in \ex~\ref{ex:closure}, when calculating the global behaviour of actions, rather than extending their localised behaviour with arbitrary frames, we relate them to the current subjective view $l$ and the context $r$. This is captured by the \emph{closure} relation as defined below.
-%
-%
 %\begin{example}[]\label{ex:closure}
 %Let $\tau_1$ and $\tau_2$ denote two distinct threads with $P \eqdef \token{X} * \cell{w}{4} * \shared{\cell{x}{1} * \cell{y}{2} \;\lor\; \cell{x}{1} * \cell{z}{3}}{I}$ and $Q \eqdef \cell{y}{2} * \shared{\cell{x}{1} * \cell{z}{3}}{I}$ as their subjective views of the shared state respectively with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{1} * \cell{w}{4}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then an action in possession of the $\cell{w}{4}$ resource can claim the $\cell{y}{2}$ resource in exchange for $\cell{w}{4}$. Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$ and $\amod{}$ denote the global interpretation of $I$. A naive attempt at calculating $\amod{}$ would be to define it such that $\amod{}(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{1} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$
-%
 %Since $\tau_2$ holds the $\cell{y}{2}$ resource locally, Suppose that at this point the current thread extends the shared state with 
 %\end{example}
-\begin{definition}[Action Model Closure]
-%
+\begin{definition}[Action model closure]
 \[
 \hspace*{-0.2cm}
 \begin{array}{l}
@@ -554,27 +501,26 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 
 \end{array}
 \]
-%
+\end{definition}
+
 The above states that the $(\amod{}, \amod{\ell})$ pair is closed under $(l, r, \amod{}')$ if the closure relation holds for any number of steps $n \in \Nats$ where 1) $l$ denotes the subjective view of the shared state, 2) $r$ denotes the context, 3) $l \composeL r$ captures the entire shared state  and 4) a step corresponds to the occurrence of an action as prescribed in either the current action model $\amod{}'$ or $\amod{\ell}$. The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff:
 \begin{enumerate}
 	\item Given a capability $\ca{}$, its action $(p, q) \in \amod{}'(\ca{})$ and its update footprint $(l_1, l_2)$, if the action precondition $p$ is satisfiable through an arbitrary extension of the shared region ($t$), then after one step the closure relation holds for the resultant subjective state $l_2 \composeL c$ and context $d$ where $c$ and $d$ capture the residue subjective and context states, respectively; that is parts of the states unchanged by the action. Moreover, if the action requires no extension ($t = \unitL$) and thus the action precondition is satisfied by the current shared state $l \composeL r$, then the action should be included in the global action model $\amod{}$ unless the resultant state $l_2 \composeL c \composeL d$ is undefined.
 	
 	\item Given a capability $\ca{}$, its action $(p, q) \in \amod{\ell}$ and its update footprint $(l_1, l_2)$, if the action precondition is satisfiable by the current shared state then \emph{either} 1) a similar action is visible to $\amod{}'$, \emph{or} 2) the resultant state is undefined and thus the action can never take place, \emph{or} 3) the subjective state remains unchanged by the action $(l_1 \maxMeetL l = \unitL )$ and after one step the closure relation holds for the subjective state $l$ and the resultant context $r'$.
 \end{enumerate}
-%
 Intuitively, the closure relation ensures that given the current subjective state $l$ and context $r$, all possible actions of $\amod{}'$ are reflected in the global action model $\amod{}$ \emph{and} for all actions that are possible and are yet unbeknownst to $\amod{}'$, the subjective view $l$ remains unaffected.
-\end{definition}
-%
+
 As illustrated above, the global behaviour $\amod{}$ relies on the division between the subjective state $l$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\amod{\ell}$ without knowledge of the division between the subjective state and the context. 
 
-%
-%
-%
-\subsection{Action Shifting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Action shifting}
+
+
 Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  actions that do not affect the subjective view of the hared state, as well as rewriting the behaviour of actions to gain a more accurate account of their effect. This is achieved through \emph{action shifting} as defined below.
-%
-\begin{definition}[Action Shifting] Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with respect to $\mathcal{P}$ iff
-%
+\begin{definition}[Action shifting] Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with respect to $\mathcal{P}$ iff
 \[
 \begin{array}{l}
 	\amod{} \weakenI{\mathcal{P}}  \amod{}' \iffdef \\
@@ -602,16 +548,39 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
 	\end{array}
 \end{array}
 \]
-%
+\end{definition}
+
 Intuitively, there exists an invariant fence $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\amod{}$ and 
 \begin{enumerate}
 	\item if an action in $\amod{}'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\amod{}$ whose precondition is also satisfiable by $l \composeL r$. 
 	\item if an action in $\amod{}$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\amod{}'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL l_1 = \{\unitL\}$ where $(l_1, l_2)$ denotes the update footprint of the action; \emph{or}  the resultant state ($l_2 \composeL c$) is undefined.
 \end{enumerate} 
-\end{definition}
-%
-%
-\subsection{Proof Rules}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Local and global action models}
+\label{subsec:localGlobalActionModels}
+
+Recall that a shared state assertion $\shared{R}{I}$ subjectively describes parts of the shared state that satisfy $R$. On the other hand, an action of the form $P \swap Q$ specified in $I$ captures the behaviour of the associated update in a \emph{localised} manner. That is, if \emph{parts} of the shared state satisfy the action precondition $P$, after the execution of the action, the shared state is mutated such that the said parts satisfy the action postcondition $Q$ and the rest of the shared state remains unchanged. As such, we interpret interference assertions over the entire shared state; however as we illustrate with the following example, recording the global interpretation of actions alone in the underlying model is not enough as the ways in which the shared state can be updated may vary with its extension. 
+\begin{example}[]Let $P \eqdef \cell{w}{1} * \shared{\cell{x}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{X}: \left\{\cell{x}{2} * \cell{w}{1} \swap \cell{x}{3} * \cell{w}{1}\right\}\right)$. The action associated with \token{X} states that if the shared state contains the resource $\cell{x}{2} * \cell{w}{1}$, then the value of $x$ may be mutated such that $\cell{x}{3}$ while $w$ as well as other parts of the shared state remain unchanged. Given a logical environment $\lenv$, let $\amod{0} = \semI[\lenv]{I}$ denote the localised interpretation of $I$ (\defin\ref{def:interferenceSemantics}); and $\ca{\textsf{X}} \in  \semK[\lenv]{\token{X}}$ represent a capability captured by the assertion \token{X} (\param~\ref{par:capSA}). In calculating the semantics of $P$, we need to interpret the behaviour of actions specified in $I$ over the entire shared state.
+
+Since the current thread locally holds the $\cell{w}{1}$ resource and the contents of thread-local and shared states are always disjoint, we can safely deduce that $\cell{w}{2}$ is not a part of the shared state. Consequently, the action associated with $\ca{\textsf{X}}$ cannot be carried out by either the current thread or the environment; thus any $\amod{}'$ where $\amod{}'(\ca{\textsf{X}}) = \emptyset$, yields a valid extension of $\amod{0}$ to the entire shared state.
+
+Suppose at this point the current thread extends the shared state with the $\cell{w}{1}$ resource such that $\shared{\cell{x}{2}}{I} * \shared{\cell{w}{1}}{\emptyset}$ denotes its current view. Since the shared state now contains both $\cell{x}{2}$ and $\cell{w}{1}$ resources, it should be possible for a thread in possession of \token{X} to perform the associated action. However, this is not reflected in the global interpretation $\amod{}'$ and hence $\amod{}'$ needs to be recalculated upon extension of the shared state. On the other hand, from $\amod{}'$ alone and without keeping track of the localised interpretation $\amod{0}$, we cannot recalculate the global behaviour since $\amod{}'$ is lossy and does not reflect the original behaviour prescribed to $\ca{\textsf{X}}$.
+\end{example}
+As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{\ell})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{\ell})$ represents the set of all localised action behaviour.
+On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{\ell})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Proof rules}
 \begin{figure}
 \hrule\vspace*{5pt}
 \[
@@ -650,6 +619,6 @@ Intuitively, there exists an invariant fence $\fence{}$ that contains the states
 \end{array}
 \]
 \hrule\vspace*{5pt}
-\caption{Action Shifting Rules}
+\caption{Action shifting rules.}
 \label{fig:shiftRules}
 \end{figure}
