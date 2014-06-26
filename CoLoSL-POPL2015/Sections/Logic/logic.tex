@@ -357,8 +357,8 @@ We lift the notion of local invariant fences to assertions and write $\fenceAss{
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Well-formed states}
+\paragraph{Well-formed states}
+We are now ready to formalise well-formedness.
 
 
 %% Jules: I've removed this definition as it's only used once
@@ -372,16 +372,14 @@ We lift the notion of local invariant fences to assertions and write $\fenceAss{
 %% 	\collapseW{l, s, \amod{}, \amod{\ell}} \eqdef l \composeL s
 %% \]
 
-We are now ready to formalise well-formedness. A capability $\ca{}$
-is \emph{contained} in a set of capabilities if
-\[
-	\contains{S}{\ca{}}\! \iffdef \!
-		\exsts{K}\! \ca{} = \!\!\biguplus_{\ca{i} \in K}\!\! \ca{i} \land
-		\for{\ca{i} \!\in K}\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
-\]
+%%  A capability $\ca{}$
+%% is \emph{contained} in a set of capabilities if
+%% \[
+%% 	\contains{S}{\ca{}}\! \iffdef \!
+%% 		\exsts{K}\! \ca{} = \!\!\biguplus_{\ca{i} \in K}\!\! \ca{i} \land
+%% 		\for{\ca{i} \!\in K}\! \exsts{\ca{}' \!\in S}\! \ca{i} \leq \ca{}'
+%% \]
 
-\julescomment{We should have a definition instanciated with sets of
-  tokens here.}
 
 \begin{definition}[Well-formedness]
 A world $(l, s, \amod{}, \amod{\ell}) \in \Worlds$ is \emph{well-formed} iff
@@ -397,17 +395,24 @@ A world $(l, s, \amod{}, \amod{\ell}) \in \Worlds$ is \emph{well-formed} iff
 	
 	\hspace*{-0.2cm} & \hspace*{-0.2cm} 
 	& \hspace*{-0.1cm} 	
-	\null\land \contains{\dom{\amod{\ell}}}{\ca{}}
+	\null\land \ca{}\subseteq \dom{\amod{\ell}}
 \end{array}
 \]
 \end{definition}
 
+\julescomment{Azalea: I think $\ca{}\subseteq \dom{\amod{\ell}}$ is
+  the right instantiation of $\contains{\dom{\amod{\ell}}}{\ca{}}$ for
+  sets of tokens.}
+
 That is, there exists an invariant $\fence{}$ that contains the current shared state $s$ and the update footprint of the local action model $\amod{\ell}$ is local with respect to $\fence{}$. The local and shared states are disjoint from one an other and finally that the capability resources of both local and shared states are contained within the domain of $\amod{\ell}$.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Shared state extension}
 
+
+
+
+
+\paragraph{Shared state extension}
 Recall from \S\ref{subsec:extend} that a thread can always \emph{extend} the shared state by handing over some of its private resources. In doing so, it can also extend the interference relation by actions that specify how the newly shared resources can be manipulated. However, the newly added behaviour must \emph{agree} with the existing actions and not invalidate other threads' view of how the existing resources can be mutated. We impose a locality condition on the newly added behaviour to ensure sound extension of the shared state. This is informally illustrated in the following example. 
 \begin{example}\label{ex:badExtension}
 Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{Y}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef \token{X} * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
@@ -431,6 +436,87 @@ That is, given any capability $\ca{}$, and an action associated with it $(p, q) 
 For instance in example of \S\ref{sec:intuition}, $I_X$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec} is fenced by $\fence{X} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0, \cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v \in \{0 ,\cdots, 9 \}\right\}$.
 % 
 
+
+
+\paragraph{Action shifting}
+Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  actions that do not affect the subjective view of the hared state, as well as rewriting the behaviour of actions to gain a more accurate account of their effect. This is achieved through \emph{action shifting} as defined below.
+\begin{definition}[Action shifting] Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with respect to $\mathcal{P}$ iff
+\[
+\begin{array}{l}
+	\amod{} \weakenI{\mathcal{P}}  \amod{}' \iffdef \\
+	\hspace*{0.2cm} \exsts{\fence{}} \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
+	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2, c}\;\; l \in F \land \updateFP{p, q} = (l_1, l_2) \implies\\
+	\hspace*{0.2cm}
+	\begin{array}{l}
+		(p, q) \in \amod{}'(\ca{}) 
+		\land p \leq l \composeL r \implies \\
+		\hspace*{0.4cm}\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
+
+		\hspace*{1cm} \land\\
+		
+		(p, q) \in \amod{}(\ca{})
+		\land p \composeL c = l \composeL r \implies \\
+		\hspace*{0.2cm}
+		\begin{array}{l}
+			\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
+			\hspace*{1cm} \lor\\
+			\left( l \meetL l_1 \right) = \left\{ \unitL \right\}\\
+			\hspace*{1cm} \lor\\
+			l_2 \composeL c \text{ is undefined}.
+		\end{array}
+
+	\end{array}
+\end{array}
+\]
+\end{definition}
+
+Intuitively, there exists an invariant fence $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\amod{}$ and 
+\begin{enumerate}
+	\item if an action in $\amod{}'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\amod{}$ whose precondition is also satisfiable by $l \composeL r$. 
+	\item if an action in $\amod{}$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\amod{}'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL l_1 = \{\unitL\}$ where $(l_1, l_2)$ denotes the update footprint of the action; \emph{or}  the resultant state ($l_2 \composeL c$) is undefined.
+\end{enumerate} 
+
+\begin{figure}
+\hrule\vspace*{5pt}
+\[
+\begin{array}{c }
+\infer{
+%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
+%	\shared{R}{ I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\}} 	
+	\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+}
+{	
+    R \entails \fenceAss{} 
+	& \fenceAss{} \fences I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&\bigwedge\limits_{i \in J} \exact{R_i}\\
+	& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
+}
+\\\\
+\infer{
+%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
+%	\shared{R}{I} 	
+	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+	I 	
+}{
+	R \entails \fenceAss{} 
+	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&\exact{\fenceAss{} \intersect Q}\\
+	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
+}\\\\
+\infer{	
+	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+	I 	
+}{
+	R \entails \fenceAss{} 
+	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+	&F \sepish Q \entails \m{false}
+}
+\end{array}
+\]
+\hrule\vspace*{5pt}
+\caption{Action shifting rules.}
+\label{fig:shiftRules}
+\end{figure}
 
 
 
@@ -515,53 +601,10 @@ As illustrated above, the global behaviour $\amod{}$ relies on the division betw
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Action shifting}
-
-
-Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  actions that do not affect the subjective view of the hared state, as well as rewriting the behaviour of actions to gain a more accurate account of their effect. This is achieved through \emph{action shifting} as defined below.
-\begin{definition}[Action shifting] Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with respect to $\mathcal{P}$ iff
-\[
-\begin{array}{l}
-	\amod{} \weakenI{\mathcal{P}}  \amod{}' \iffdef \\
-	\hspace*{0.2cm} \exsts{\fence{}} \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
-	\hspace*{0.2cm}\for{\ca{}, l, p, q, l_1, l_2, c}\;\; l \in F \land \updateFP{p, q} = (l_1, l_2) \implies\\
-	\hspace*{0.2cm}
-	\begin{array}{l}
-		(p, q) \in \amod{}'(\ca{}) 
-		\land p \leq l \composeL r \implies \\
-		\hspace*{0.4cm}\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
-
-		\hspace*{1cm} \land\\
-		
-		(p, q) \in \amod{}(\ca{})
-		\land p \composeL c = l \composeL r \implies \\
-		\hspace*{0.2cm}
-		\begin{array}{l}
-			\exsts{f} (l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \land l_1 \composeL f \leq l \composeL r \\
-			\hspace*{1cm} \lor\\
-			\left( l \meetL l_1 \right) = \left\{ \unitL \right\}\\
-			\hspace*{1cm} \lor\\
-			l_2 \composeL c \text{ is undefined}.
-		\end{array}
-
-	\end{array}
-\end{array}
-\]
-\end{definition}
-
-Intuitively, there exists an invariant fence $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\amod{}$ and 
-\begin{enumerate}
-	\item if an action in $\amod{}'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\amod{}$ whose precondition is also satisfiable by $l \composeL r$. 
-	\item if an action in $\amod{}$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\amod{}'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL l_1 = \{\unitL\}$ where $(l_1, l_2)$ denotes the update footprint of the action; \emph{or}  the resultant state ($l_2 \composeL c$) is undefined.
-\end{enumerate} 
 
 
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Local and global action models}
+\paragraph{On the need for local and global action models}
 \label{subsec:localGlobalActionModels}
 
 Recall that a shared state assertion $\shared{R}{I}$ subjectively describes parts of the shared state that satisfy $R$. On the other hand, an action of the form $P \swap Q$ specified in $I$ captures the behaviour of the associated update in a \emph{localised} manner. That is, if \emph{parts} of the shared state satisfy the action precondition $P$, after the execution of the action, the shared state is mutated such that the said parts satisfy the action postcondition $Q$ and the rest of the shared state remains unchanged. As such, we interpret interference assertions over the entire shared state; however as we illustrate with the following example, recording the global interpretation of actions alone in the underlying model is not enough as the ways in which the shared state can be updated may vary with its extension. 
@@ -573,52 +616,3 @@ Suppose at this point the current thread extends the shared state with the $\cel
 \end{example}
 As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{\ell})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{\ell})$ represents the set of all localised action behaviour.
 On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{\ell})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Proof rules}
-\begin{figure}
-\hrule\vspace*{5pt}
-\[
-\begin{array}{c }
-\infer{
-%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
-%	\shared{R}{ I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\}} 	
-	\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
-}
-{	
-    R \entails \fenceAss{} 
-	& \fenceAss{} \fences I \cup \left\{ \capAss{}: P \swap Q\right\}
-	&\bigwedge\limits_{i \in J} \exact{R_i}\\
-	& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
-}
-\\\\
-\infer{
-%	\shared{R}{ I \cup \left\{ \capAss{}: P \swap Q\right\}} \sentails 
-%	\shared{R}{I} 	
-	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
-	I 	
-}{
-	R \entails \fenceAss{} 
-	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
-	&\exact{\fenceAss{} \intersect Q}\\
-	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
-}\\\\
-\infer{	
-	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
-	I 	
-}{
-	R \entails \fenceAss{} 
-	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
-	&F \sepish Q \entails \m{false}
-}
-\end{array}
-\]
-\hrule\vspace*{5pt}
-\caption{Action shifting rules.}
-\label{fig:shiftRules}
-\end{figure}
