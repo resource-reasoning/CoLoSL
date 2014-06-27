@@ -348,6 +348,7 @@ fence.
   \]
 \end{definition}
 
+
 We lift the notion of fences and local fences to
 assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
 \IAssertions$:
@@ -361,7 +362,7 @@ assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
 \julescomment{Do we assume that $F$ does not contain subjective
   views?}
 
-\julescomment{Define $P \containI I$ here?}
+
 
 
 \paragraph{Well-formed states}
@@ -427,6 +428,7 @@ invalidate other threads' views of existing resources. We thus impose
 a locality condition on the newly added behaviour to ensure sound
 extension of the shared state. This is informally illustrated in the
 following example.
+
 \begin{example}\label{ex:badExtension}
 Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{b}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
 $
@@ -443,10 +445,21 @@ $
 $.
 In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $[\token{a}]$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $[\token{b}]$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
 \end{example}
+
+
 In order to ensure sound extension of the shared state, we require
-that the update footprint of extended actions are confined to the
-locally owned resources. That is, the resources mutated by the action
-do not \emph{intersect} with those already in the shared state.
+that the newly introduced interferences are confined to the locally
+owned resources (see \eqref{eq:extend}).
+
+\begin{definition}
+  A set of states $\mathcal P$ \emph{contains} an action model
+  $\amod{}$, written $\mathcal P \containI \amod{}$, if
+  \[
+  \E{\fence{}} \mathcal P\subseteq \fence{} /| \fence{} \strictfences \amod{}
+  \]
+\end{definition}
+
+TODO: we lift this to predicates\dots
 
 
 
@@ -455,31 +468,23 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
 \begin{definition}[Action shifting]
   Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in
   \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with
-  respect to $\mathcal{P}$ iff
+  respect to $\mathcal{P}$, written $\amod{} \weakenI{\mathcal{P}}
+  \amod{}'$, if there exists a fence $\fence{}$ such that
   \[
-  \begin{array}{l}
-    \amod{} \weakenI{\mathcal{P}}  \amod{}' \iffdef \\
-    \hspace*{0.2cm} \exsts{\fence{}} \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
-    \hspace*{0.2cm}\for{\ca{}, l, p, q, p', q', l'}\;\; l \in F \land \updateFP{p, q} = (p', q') =>\\
-    \hspace*{0.2cm}
-    \begin{array}{l}
+  \begin{array}{L}
+    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
+    \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
+    \left(\begin{array}{L}
       (p, q) \in \amod{}'(\ca{}) 
       \land p \leq l \composeL r => \\
-      \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \amod{}(\ca{}) \land p' \composeL f \leq l \composeL r \\
-      
-      \hspace*{1cm} \land\\
-      
-      (p, q) \in \amod{}(\ca{})
-      \land p \composeL l' = l \composeL r => \\
-      \hspace*{0.2cm}
-      \begin{array}{l}
-	\exsts{f} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \leq l \composeL r \\
-	\hspace*{1cm} \lor\\
-	\left( l \meetL p' \right) = \left\{ \unitL \right\}\\
-	\hspace*{1cm} \lor\\
-	q' \composeL l' \text{ is undefined}.
-      \end{array}
-    \end{array}
+      \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in
+      \amod{}(\ca{}) \land p' \composeL f \leq l \composeL r
+    \end{array}\right) /|\\
+    \left(\begin{array}{L}
+    (p, q) \in \amod{}(\ca{})
+      \land p \composeL l' = l \composeL r /| q'\compatL l' /| l \meetL p' /= \{ \unitL \} => \\
+      \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \leq l \composeL r
+    \end{array}\right)
   \end{array}
   \]
 \end{definition}
