@@ -54,7 +54,7 @@
   showlines=true,
   basicstyle=\normalfont\smaller\tt,
   keywordstyle=\bf,
-  numbers=none,
+  numbers=left,
   numberstyle=\tiny,
   numbersep=5pt,
   boxpos=t,
@@ -141,7 +141,6 @@
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
-\newcommand{\azaleaComment}[1]{\noindent\framebox{\parbox{\columnwidth}{\textbf{Azalea's comment: }#1}}}
 \newcommand{\defstyle}[1]{\emph{#1}}
 
 % inline code
@@ -161,10 +160,10 @@
 
 \newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
 \newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
-\newcommand{\fences}{\ensuremath{\rhd}}
+\newcommand{\fences}{\mathrel{\rhd}}
 
 
-\newcommand{\strictfences}{\ensuremath{\unrhd}}
+\newcommand{\strictfences}{\mathrel{\RHD}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
 \newcommand{\maxMeet}[1]{\sqcap_{#1}^{\textsf{m}}}
@@ -203,27 +202,29 @@
 \newcommand{\meetL}{\meet{\textsf{L}}}
 \newcommand{\maxMeetL}{\maxMeet{\textsf{L}}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
-\newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
+%% \newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
+%% \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
 \newcommand{\updateFP}[1]{\ensuremath{\mathcal{U}\left(#1\right)}}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
 \newcommand{\composeW}{\bullet}
 \newcommand{\unitW}{\unit{\textsf{W}}}
-\newcommand{\localPart}[1]{#1_{\textsf{L}}}
-\newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
-\newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
-\newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
+%% \newcommand{\localPart}[1]{#1_{\textsf{L}}}
+%% \newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
+%% \newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
+%% \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
 \newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
 \newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
+
+\newcommand{\gray}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
 
 %%%%Action Models
 \newcommand{\AMods}{\textsf{AMod}}
 \newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
 \newcommand{\composeAM}{\compose{=}}
-\newcommand{\unitAM}{\unit{\textsf{A}}}
+\newcommand{\unitAM}{\emptyset}
 
 
 \newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
