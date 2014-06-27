@@ -122,26 +122,28 @@ to change that partial shared state.
 After
 initialisation, line~?? of $\mathbb{INC}$  provides a standard assertion stating that 
 the thread-local state consists of three  heap cells,  which are referred to by  $x$,
-$y$ and $z$ and contain the value  $0$. Line~?? demonstates the
-creation of a subjective view $\shared{x|-> 0 * y|-> 0 * z|-> 0}I$
-
-
-
-and interpret \colosl assertions over a particular domain that
-includes a \emph{thread-local} (sometimes called private) state
-exclusively visible to the thread, a shared state accessible by all
-threads, and interference \emph{actions} dictating how the shared
-region can evolve. These instrumented states are linked to machine
-states in our soundness proof presented in \S\ref{sec:soundness},
-using the Views framework~\cite{views}. A ``points-to'' predicate $x
-|-> y$ denotes those states whose local heap is the singleton heap
-where the only allocated address is $x$, and it points to value
-$y$. An assertion $P_1 * P_2$ splits the local state into two
-\emph{disjoint} heaps and the subjective state into two
-\emph{overlapping} heaps such that the corresponding substates satisfy
-$P_1$ and $P_2$, respectively. A \emph{subjective view}
-$\shared{P}{I}$ is true if the subjective state satisfies $P$ and is
-subject to interferences in $I$.
+$y$ and $z$ and contain the value  $0$. This resource in the thread-local state is
+fully owned by  the thread. Using the extension axiom, the thread is able to give up  this local
+resource and transfer it  to the global shared state. For example, line~?? demonstates the
+creation of a subjective view $\shared{x|-> 0 * y|-> 0 * z|->
+  0}I$. This assertion states that {\em part} of the underlying
+global shared state now contains the three heap cells, with 
+interference relation $I$ declaring  how  this shared state  is able 
+change. For example,  the action 
+\[
+\token a_x:  \exsts{v}  \cell{z}{v} * \cell{x}{v} \swap
+    \cell{z}{v} * \cell{x}{v+1}
+\]
+describes how, when the value of the heap cells given  by   $x$
+and $z$ have the same value $v$, then the value for $x$ can be updated
+to $v+1$. This is only possible when the
+local state of a thread has the {\em capability} $\token a_x$. For  this
+particular 
+example, the assertion in line~?? simply has all the capabilities $\token
+a_x * \token a_y * \token a_z$   in the local state; in general,
+capablities can be buried inside boxes, only to emerge as a
+consequence of an action
+(see  ...). 
 
 \begin{figure}
 \centering
@@ -176,18 +178,14 @@ $\begin{tikzpicture}[baseline]
 \label{fig:action}
 \end{figure}
 
-Interferences in $I$ are of the form $\token{a}: P \swap Q$ where
-$\token{a}$ denotes a \emph{capability} associated with \emph{action}
-$P \swap Q$. $P$ represents the action pre-condition and describes the
-part of the shared state required to carry out the action, while $Q$
-is the action post-condition and describes the part of the shared
-state after the action.  A thread in possession of a given capability
-in its local state can perform the associated action to update the
-shared state.  For instance, the action associated with capability
-$\token a_x$ in $I_y$, corresponds to the update of variable $x$: for
-any $v$, if $\cell{x}{v} * \cell{y}{v} * \cell{z}{v}$, a thread in
-possession of $\token a_x$ in its local state and which sees $x$, $y$,
-and $z$ with the same value in its subjective state can increment $x$.
+
+
+\pgcomment{next bit somewhere else}
+
+
+
+
+
 A particularity of \colosl is that actions can be performed by the
 environment any time their precondition is \emph{compatible} with the
 current subjective state, and not only when the precondition is
@@ -673,3 +671,6 @@ The existential quantification of capabilities is to ensure the
 are confined to $P$, hence do not contradict existing views of the
 shared state. This notion will be formalised in
 \S\ref{subsec:extension}.
+
+
+
