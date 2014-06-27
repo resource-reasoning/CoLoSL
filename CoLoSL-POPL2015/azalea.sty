@@ -136,6 +136,8 @@
 
 \newcommand{\for}[1]{\forall #1.\,}
 \newcommand{\exsts}[1]{\exists #1.\,}
+\let\V\for
+\let\E\exsts
 
 \newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
@@ -166,7 +168,7 @@
 \newcommand{\strictfences}{\mathrel{\RHD}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
-\newcommand{\maxMeet}[1]{\sqcap_{#1}^{\textsf{m}}}
+\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
 \newcommand{\unit}[1]{\ensuremath{\mathbf{0}_{#1}}}
 \newcommand{\size}[2]{\left\lvert #1\right\rvert_{#2}}
 
@@ -200,8 +202,8 @@
 \newcommand{\composeL}{\circ}
 \newcommand{\compatL}{\mathrel{\sharp}}
 \newcommand{\composeS}{\compose{=}}
-\newcommand{\meetL}{\meet{\textsf{L}}}
-\newcommand{\maxMeetL}{\maxMeet{\textsf{L}}}
+\newcommand{\meetL}{\meet{}}
+\newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
 %% \newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
 %% \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}

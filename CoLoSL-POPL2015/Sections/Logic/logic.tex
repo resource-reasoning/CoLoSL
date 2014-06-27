@@ -251,8 +251,10 @@ context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 \subsection{Fences}
 \label{subsec:extension}
 
-fences are cool, let's define fences.
-
+The rest of the semantic development of this section concerns the
+formal definition of the notions of well-formed states, action
+shifting, and action model closure, which were informally introduced
+above. Central to these definitions is the concept of fences.
 
 \begin{definition}[Intersection]
 The \emph{intersection} function over logical states 
@@ -272,14 +274,18 @@ is defined as:
 \]
 The \emph{maximal intersection} $l_1 \maxMeetL l_2$ of $l_1$ and $l_2$
 is defined as the largest element of the intersection of $l_1$ and
-$l_2$. One can check that it is always uniquely
-defined~\cite{colosl-tr14}.
+$l_2$, when it exists.
 \end{definition}
 
+One can check that $l_1\maxMeetL l_2$ indeed yields at most one
+element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
+
 \begin{definition}[Update footprint]
-  Given a pair of logical states $(p, q)$, its \emph{update footprint} is defined as:
+  Given a pair of logical states $(p, q)$, its \emph{update footprint}
+  $\updateFP{p,q}$ is defined as the pair $(p', q')$ such that:
   \[
-    \updateFP{p,q} = (p - p\maxMeetL q, q - p\maxMeetL q)
+  \E f p = p' \composeL f /| q = q' \composeL f /| \V{f'} f'\leq p' /|
+  f'\leq q' => f' = \unitL
   \]
 \end{definition}
 
