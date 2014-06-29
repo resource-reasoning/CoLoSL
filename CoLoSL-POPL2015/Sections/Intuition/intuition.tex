@@ -120,7 +120,7 @@ $x$ = 0; $y$ = 0; $z$ = 0;
 
 
 \colosl
-can specify this complex behaviour of the
+can quite simply specify this complex behaviour of the
 resource associated with thread
 $\mathbb{P}_y$. 
 \colosl assertions comprise  standard assertions from the
@@ -135,7 +135,7 @@ gives {\em partial} information about the global
 shared state and interference relation $I$  which gives partial
 information about  how this
 part of the shared state may change by declaring actions of the form  $\token a :
-P' \swap Q$.  A capability $[\token a]$ provides a thread with permission to 
+P' \swap Q$.  A capability assertion $[\token a]$ provides a thread with permission to 
 change that partial shared state using action $\token a$.
 
 
@@ -159,9 +159,10 @@ change. For example,  the action
  \token a_y:  \exsts{v} \cell{x}{v+1} * \cell{y}{v} \swap 
     \quad \cell{x}{v+1} * \cell{y}{v+1}
 \]
-describes how, when the value $v+1$ of the heap cell given  by   $x$ is one
-more than the value given by $z$, then the value for $x$ can be updated
-to $v+1$. This is only possible when the
+can increment  the cell given by $y$ under the condition that the
+value of the  cell
+given by $x$ is one more than that of $y$. 
+This update is only possible when the
 local state of a thread has the { capability} $[\token a_y]$. For  this
 particular 
 example, the assertion in line~?? simply has all the capabilities $[\token
@@ -171,8 +172,136 @@ consequence of an action
 (see  ...). 
 
 
-\begin{figure}
-\centering
+
+Using the disjoint concurrency rule and the 
+split/merge principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_y$:
+\[
+\shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]
+\]
+However, this precondition  is more complicated than we
+need. Intuitively, 
+the specification of each thread should only use the resource 
+relevant to that thread, and need only consider actions that
+affect that resource.  In this example, it is possible to reason about
+the  whole global state to  produce comparably short proofs.
+However, for large systems, 
+the burden of carrying the whole shared state around to analyse
+all threads, even those that use only a small fraction of it, can lead
+to intractable proofs. 
+
+As a first try at simplifying the precondition, consider the following implication using the forget
+and shift principles given in the introduction:
+\[
+\begin{array}{lll}
+ & \shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]&\\[1em]
+=> & \shared{x|-> 0 * y|->0}{I} *[\token a_y ]&\eqref{eq:forget}\\[1em]
+ => & \shared{x|-> 0 * y|->0 }{I\backslash\token a_z} *[\token a_y]
+ &\eqref{eq:shift}\\[1em]
+=> & \shared{\exists v, v'.  (x|-> v * y|->v' ) \wedge v\geq v'}{I\backslash \token a_z} *[\token a_y]
+ & Stabalise\\[1em]
+\end{array}
+\]
+The thread $\mathbb{P}_y$ does not modify $z$ so we are able to  forget the
+cell referenced by $z$. Since there is now no cell given by $z$, the
+action $\token a_z$ does not affect the resource given by the
+assertion of the subjective view, and never will during the lifetime
+of this subjective view: that is,  after supporting any number of actions
+from $I$. Using the shift principle, we
+can therefore  remove the $\token{a}_z$ action. 
+Finally, as is normal when reasoning about concurrency, we stabalise so
+that, whatever the environment can do to the state, the assertion
+inside the box still holds. However, we have   lost information about
+$z$. Intuitively, we know that the value of $y$ depends on the value
+of $z$, but there is nothing now to constrain $z$. Hence, we can only
+stabalise in a general way as given, loosing information about how the
+values of $x$ and $y$ are connected together through $z$.
+
+It is possible to give a  stronger specification, as follows: 
+\[
+\begin{array}{lll}
+ & \shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]&\\[1em]
+=> & \shared{x|-> 0 * y|->0 * z|-> 0}{I'_y} *[\token a_y ]&\eqref{eq:shift}\\[1em]
+ => & \shared{x|-> 0 * y|->0 }{I'_y} *[\token a_y]
+ &\eqref{eq:forget}\\[1em]
+=> & \shared{x|-> 0 * y|->0 }{I_y} *[\token a_y]
+ &\eqref{eq:shift}\\[1em]
+ =>\null&
+    \left(\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{x}{0} *
+        \cell{y}{0} \lor\\ \cell{x}{1} *
+        \cell{y}{0}\end{array}}{I_y}\!\!\!\!\!\! * [\token a_y]\right) &
+  Stabalise
+\end{array}
+\]
+This implication involves subtle interaction between the assertion and
+the interference relation of the subjective view. 
+Consider the action 
+$\token a_x$ 
+of $I$ and the initial state with value $0$ in all the cells. This
+action can be replaced by:
+\[
+\token a_x : \exsts{v} \; 
+\cell{x}{v} * \cell{y}{v} * \cell{z}{v}
+\swap
+\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v}
+\]
+This is possible  because, as the programmer knows, whenever the cells
+of $x$ and
+$z$ have the same value then the $y$ cell also has the same value which, under these
+conditions, is not changed by the actions in $I$. This ammended action  gives full information about how the resource of
+the subjective view changes as $x$ is being updated. 
+  Let  $I_y' $ be  $I_y$ with the new version of $\token a_x$.
+As  justified in section~3, we can 
+use  the shift principle with  shift judgement 
+$
+I\weakenIb{\cell{x}{0} * \cell{y}{0} * \cell{z}{0}} I_y'
+$
+to replace $I_y$ by $I'_y$. 
+
+
+
+
+
+Using the forget principle,  it is now safe to loose the $z$ cell to
+obtain the subjective view  $\shared{x|-> 0 * y|->0 }{I'_y}$,  as 
+the new $\token a_x$ action in $I'_y$ retains enough information about how
+$x$, $y$ and $z$ are related.
+Since action $\token a_z$ only affects the $z$ cell, which has been
+forgotten, leaving  the cells $x$ and $y$ unaltered, we can again use the
+shift principle to change  the interface
+relation to $I_y = I'_y \backslash \token a_z$. The interface relation
+is now as simple as it can get, whilst retaining enough information
+about the 
+connection between the $x$, $y$ and $z$. We   stabalise
+the 
+assertion $x|-> 0 * y|->0$ with respect to $I_y$ to obtain our final
+precondition of thread $\mathbb{P}_y$, which retains much more
+information about the values of the $x$ and $y$ cells. 
+
+
+
+
+
+
+
+There is one more subtlety to mention about this precondition. 
+The thread has the capablity $[\token a_y]$ to use  action $\token a_y$ which
+only requires the resource described by the
+assertion. However, the action $\token a_x$ 
+depends on the resource given by $z$, which is not now part of  the
+subjective view of the thread. Actions performed by the environment can happen any time
+that the environment's subjective view is {\em compatible} with the
+thread's  subjective view. 
+To analyse how the environment can affect
+the subjective view of the thread using action $\token a_x$, consider the following diagrams
+
+
+\pgcomment{Ok, now I'm out of time. I don't know how to make the rest
+  work. I don't particularly think the diagrams help. Better to work
+  with the concrete examples. Explanation currently a mixture of
+  states and pre/postconditions. It's too confusing.} 
+
+
+
 \begin{tikzpicture}
 \draw[thick] (0,0) circle (.4cm);
 \draw[densely dotted] (0,0) rectangle (.4cm,.6cm);
@@ -200,190 +329,53 @@ $\begin{tikzpicture}[baseline]
 \hfill\null
 
 \vspace{5pt}\hrule\vspace{5pt}
-\caption{Effect of an action $P\swap Q$.}
-\label{fig:action}
-\end{figure}
-
-Using the disjoint concurrency rule and the 
-split/merge principle for subjective views, we obtain the following precondition for thread $\mathbb{P}_y$:
-\[
-\shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]
-\]
-However, this precondition  is more complicated than we need; 
-the specification of each thread should only use the resource 
-relevant to that thread, and need only consider actions that
-affect that resource.  What
-may seem of little consequence for this simple example program (reasoning
-about the whole global state would produce comparably short proofs in
-this example) is of crucial importance when analysing larger systems,
-where the burden of carrying the whole shared state around to analyse
-all threads, even those that use only a small fraction of it, can lead
-to intractable proofs. 
-
-As a first try at simplifying the precondition, consider the following implication using the forget
-and shift principles given in the introduction:
-\[
-\begin{array}{lll}
- & \shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]&\\[1em]
-=> & \shared{x|-> 0 * y|->0}{I} *[\token a_y ]&\eqref{eq:forget}\\[1em]
- => & \shared{x|-> 0 * y|->0 }{I\backslash\token a_z} *[\token a_y]
- &\eqref{eq:shift}\\[1em]
-=> & \shared{\exists v, v'.  (x|-> v * y|->v' ) \wedge v\geq v'}{I\backslash \token a_z} *[\token a_y]
- & Stabalise\\[1em]
-\end{array}
-\]
-The thread $\mathbb{P}_y$ does not modify $z$ so we can forget the
-cell referenced by $z$. Since there is now no cell given by $z$, the
-action $\token a_z$ does not affect the resource given by the
-assertion of the subjective view, and never will during the lifetime
-of this subjective view: that is,  after supporting any number of actions
-from $I$. USing the shift principle, we
-can therefore  remove the $\token{a}_z$ action. 
 
 
 
-Finally, we need to stabalise so
-that, whatever the environment can do to the state, the assertion
-inside the box still holds. However, we have lost information about
-$z$. Intuitively, we know that the value of $y$ depends on the value
-of $z$, but there is nothing now to constrain $z$. Hence, we can only
-stabalise in a general way as given, loosing information about how the
-values of $x$ and $y$ are connected together through $z$.
-
-It is possible to give a  stronger specification, as follows: 
-\[
-\begin{array}{lll}
- & \shared{x|-> 0 * y|->0 * z|-> 0}{I} *[\token a_y]&\\[1em]
-=> & \shared{x|-> 0 * y|->0 * z|-> 0}{I'_y} *[\token a_y ]&\eqref{eq:shift}\\[1em]
- => & \shared{x|-> 0 * y|->0 }{I'_y} *[\token a_y]
- &\eqref{eq:forget}\\[1em]
-=> & \shared{x|-> 0 * y|->0 }{I_y} *[\token a_y]
- &\eqref{eq:shift}\\[1em]
- =>\null&
-    \left(\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{x}{0} *
-        \cell{y}{0} \lor\\ \cell{x}{1} *
-        \cell{y}{0}\end{array}}{I_y}\!\!\!\!\!\! * [\token a_y]\right) &
-  Stablise
-\end{array}
-\]
-This implication involves subtle interaction between the assertion and
-the interference relation of the subjective view. 
-Consider the action 
-\[
-\token a_x: \exsts{v} \cell{z}{v} *
-\cell{x}{v} \swap \cell{z}{v} * \cell{x}{v+1}
-\]
-of $I$ and the initial state with value $0$ in all the cells. 
-Notice that, anytime the precondition of $\token a_x$ is satisfied
-in the shared state, then the larger formula $\exsts{v} \cell{x}{v}
-* \cell{y}{v} * \cell{z}{v}$ is also satisfied, even after the
-shared state has evolved from $x|-> 0 * y|-> 0 * z|-> 0$ using any
-action in $I$. Thus, as we justify in section~3, this action can be
-replaced  by 
-\[
-\token a_x : \exsts{v} \; 
-\cell{x}{v} * \cell{y}{v} * \cell{z}{v}
-\swap
-\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v}
-\]
-using the shift principle and shift judgement 
-$
-I\weakenIb{P_0} I_y'
-$
-where
-\begin{align*}
- I_y' &==
- I \left[
-   \token a_x : 
-   \begin{array}{RL}
-     \exsts{v}\; &\cell{x}{v} * \cell{y}{v} * \cell{z}{v} \swap\\
-     &\cell{x}{v+1} * \cell{y}{v} * \cell{z}{v}
-   \end{array}\right]
-\end{align*}
-This ammended action  gives full information about how the resource of
-the subjective view changes as $x$ is being updated. 
+The thread does not have the capability to do action
+$\token a_x$. However, the environment might. 
 
 
-Using the forget principle, we are able to loose the $z$ cell to
-obtain the subjective view  $\shared{x|-> 0 * y|->0 }{I'_y}$.
-Since action $\token a_z$ only affects the $z$ cell, which has been
-forgotten, leaving  the cells $x$ and $y$ unaltered, we can use the
-shift principle to change  the interface
-relation to $I_y = I'_y \backslash \token a_z$. The interface relation
-is now as simple as it can get. 
-The action $\token a_y$ is straightforward. It 
-acts only on the resource described by the subjective
-view. However, by forgetting the cell given by $z$,  the 
-action $\token a_x$ demonstrates a subtlety of the interpretations
-of actions. Actions performed by the environment can happen any time
-that a thread's preconditino is {\em compatible} with the current
-subjective state of the precondtion. When that is the cas, the piece
+The subjective view describes the thread's partial
+knowledge about the shared state. The environment can have both some
+of the knowledge  that the  thread has and some additional knowledge,
+as long as the view of the thread and the environment are compatible. 
+
+
+
+When that is the case, the piece
 of the state corresponding to the overlap between the state and the
 precondition of the action is removed, and the entire postcondition of
-the action is added in its place, as shown in fig~??. In particular,
-an action whose precondition is satisfiable is always enabled from the
-empty subjective assertion (which by definition is compatible with all
-other states). 
-Now we can stabalise
-the 
-assertion $x|-> 0 * y|->0$ with respect to $I_y$ to obtain our final
-precondition of thread $\mathbb{P}_y$. .........
+the action is added in its place, as shown in fig~??. 
 
 
-Now talk about the proof of Py.
-
-Now join up together. Done. 
+\pgcomment{Next bit fine, maybe a bit hurried, keep simple. }
 
 
+The proof of the specification of the thread $\mathbb{P}_y$ is 
+now relatively straightforward. By inspection, the invariant of the while loop is stable
+with respect to $I_y$. The final postcondition of $\mathbb{P}_y$ follows from the
+invariant and the boolean expression of the while. We join up the
+postconditions of the threads using the merge principle. Since $|/$
+distributes over $**$, the subjective view simplifies to $
+\shared{x|->10 * y|->10 * z|->10}{I_x\cup I_y\cup I_z} $.
+Finally, we have 
+\[
+I_x\cup I_y\cup I_z\weakenIb{x|->10 * y|->10 * z|->10} I
+\]
+so, by the shift principle, we get the postcondition of $\mathbb{INC}$. 
 
-----------------------------------------
 
-\pgcomment{might include }
+\pgcomment{needs an ending. \colosl is brilliant, yeah.} 
+
+\pgcomment{might include somewhere here, needn't}
+
 
 Subjectivity also enables the analysis of
 portions of code without access to the whole program, and allows one
 to reuse the established specifications in any environment that
 doesn’t violate their subjective views.
 
-
-Conversely, going from the postconditions of the three threads to the
-final state of $\mathbb{INC}$ is justified by the following reasoning
-steps. We write $\shared{Q_x}{I_x} * \token a_x$ for the postcondition
-of $\mathbb P_x$ as shown in \fig\ref{fig:concurrentInc}, and
-similarly for $\mathbb P_y$ and $\mathbb P_z$.
-\begin{align*}
-  &(\shared{Q_x}{I_x} * \token a_x)
-  * (\shared{Q_y}{I_y} * \token a_y)
-  * (\shared{Q_z}{I_z} * \token a_z)\\
-  =>\null&
-  \shared{Q_x ** Q_y ** Q_z}{I_x\cup I_y\cup I_z} *
-  \token a_x * \token a_y * \token a_z
-  &\quad\eqref{eq:merge}\\
-  =>\null&
-  \shared{x|->10 * y|->10 * z|->10}{I_x\cup I_y\cup I_z} *
-  \mathrlap{\token a_x * \token a_y * \token a_z}\\
-  =>\null&
-  \shared{x|->10 * y|->10 * z|->10}{I} *
-  \token a_x * \token a_y * \token a_z
-  &\eqref{eq:shift}
-\end{align*}
-Above, the unlabelled step is mere logical consequence, using the fact
-that $|/$ distributes over $**$ and combining the knowledge of all
-threads to get rid of spurious disjuncts (such as $x|-> 11 * y|->10$
-in $Q_y$, when in fact we know from $Q_x$ that $x|->10$). Note
-moreover that, \textit{e.g.},
-\[
-\begin{array}{RL}
-&(\cell{z}{10} * \cell{x}{10}) ** (\cell{x}{10} * \cell{y}{10})\\
-<=>&
-\cell{x}{10} * \cell{y}{10} * \cell{z}{10}
-\end{array}
-\]
-
-Using similar observations, we are able to make the deduction that
-\[
-I_x\cup I_y\cup I_z\weakenIb{x|->10 * y|->10 * z|->10} I
-\]
 
 This finishes the justification of all uses of \eqref{eq:shift} in the
 derivations of \S\ref{subsec:threads}, and thus the derivations
@@ -497,12 +489,19 @@ separation logic formulas that do not mention the shared state.
 \pgcomment{Next bits may be usedul somewhere else, }
 
 
+\pgcomment{Following too suble for section 2, should go somewhere in
+  section 3.}
+
+In particular,
+an action whose precondition is satisfiable is always enabled from the
+empty subjective assertion (which by definition is compatible with all
+other states). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Thread-local proofs}
 \label{subsec:threads}
 
-\pgcomment{Atomic rule when explaining proof rules in section 3}
+\pgcomment{Don't mention atomic rule until  section 3}
 
 
 
