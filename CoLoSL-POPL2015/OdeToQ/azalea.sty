@@ -6,7 +6,6 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{caption}
-\DeclareCaptionType{copyrightbox}
 \usepackage{subcaption}\captionsetup{compatibility=false}
 \usepackage{xspace}
 %\let\proof\relax 
@@ -28,8 +27,8 @@
 \usepackage{relsize}
 \usepackage{xcolor}
 \usepackage{microtype}
-\usepackage{mathpartir}
-
+%\usepackage{mathpartir}
+\usepackage{wasysym}
 \input mathlig
 
 \usepackage{seplog}
@@ -54,7 +53,7 @@
   showlines=true,
   basicstyle=\normalfont\smaller\tt,
   keywordstyle=\bf,
-  numbers=left,
+  numbers=none,
   numberstyle=\tiny,
   numbersep=5pt,
   boxpos=t,
@@ -136,13 +135,12 @@
 
 \newcommand{\for}[1]{\forall #1.\,}
 \newcommand{\exsts}[1]{\exists #1.\,}
-\let\V\for
-\let\E\exsts
 
 \newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
+\newcommand{\azaleaComment}[1]{\noindent\framebox{\parbox{\columnwidth}{\textbf{Azalea's comment: }#1}}}
 \newcommand{\defstyle}[1]{\emph{#1}}
 
 % inline code
@@ -162,13 +160,13 @@
 
 \newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
 \newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
-\newcommand{\fences}{\mathrel{\rhd}}
+\newcommand{\fences}{\ensuremath{\rhd}}
 
 
-\newcommand{\strictfences}{\mathrel{\RHD}}
+\newcommand{\strictfences}{\ensuremath{\unrhd}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
-\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
+\newcommand{\maxMeet}[1]{\sqcap_{#1}^{\textsf{m}}}
 \newcommand{\unit}[1]{\ensuremath{\mathbf{0}_{#1}}}
 \newcommand{\size}[2]{\left\lvert #1\right\rvert_{#2}}
 
@@ -200,34 +198,31 @@
 %%%%Logical States
 \newcommand{\LStates}{\textsf{LState}}
 \newcommand{\composeL}{\circ}
-\newcommand{\compatL}{\mathrel{\sharp}}
 \newcommand{\composeS}{\compose{=}}
-\newcommand{\meetL}{\meet{}}
-\newcommand{\maxMeetL}{\maxMeet{}}
+\newcommand{\meetL}{\meet{\textsf{L}}}
+\newcommand{\maxMeetL}{\maxMeet{\textsf{L}}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-%% \newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
-%% \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-\newcommand{\updateFP}[1]{\mathop{\Delta}(#1)}
+\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
+\newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
+\newcommand{\updateFP}[1]{\ensuremath{\mathcal{U}\left(#1\right)}}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
 \newcommand{\composeW}{\bullet}
 \newcommand{\unitW}{\unit{\textsf{W}}}
-%% \newcommand{\localPart}[1]{#1_{\textsf{L}}}
-%% \newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
-%% \newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
-%% \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
+\newcommand{\localPart}[1]{#1_{\textsf{L}}}
+\newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
+\newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
+\newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
 \newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
 \newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
-
-\newcommand{\gray}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
 
 %%%%Action Models
 \newcommand{\AMods}{\textsf{AMod}}
 \newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
 \newcommand{\composeAM}{\compose{=}}
-\newcommand{\unitAM}{\emptyset}
+\newcommand{\unitAM}{\unit{\textsf{A}}}
 
 
 \newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
@@ -285,7 +280,7 @@
 \newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
-\newcommand{\interAss}[4]{#1: \exsts{#2} #3 \swap #4\xspace}
+\newcommand{\interAss}[4]{#1: \left\{ \exsts{#2} #3 \swap #4 \right\}}
 \newcommand{\multiInterAss}[5]{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 
 \newcommand{\strengthenAction}[2]{\left\lceil #1 \right\rceil^{#2}}
@@ -299,8 +294,8 @@
 %% Inference rules
 \newcommand{\infrulestyle}[1]{\textsc{#1}}
 \newcommand{\SideCondition}[1]{\RightLabel{\scriptsize{#1}}}
-\renewcommand{\TirName}[1]{#1}
-\renewcommand{\RefTirName}[1]{#1}
+%\renewcommand{\TirName}[1]{#1}
+%\renewcommand{\RefTirName}[1]{#1}
 %\newcommand{\infrulelabel}[1]{\mbox{\normalfont\small\textsc{#1}}}
 \newcommand{\infrule}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},right=\mathrlap{\text{#5}}]
                         {#3}{#4}}}
@@ -416,3 +411,8 @@
 \newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
 \newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
 \newcommand{\nil}{\texttt{null}}
+
+\newcommand{\happyFace}{\scalebox{1.8}{\smiley{}}}
+\newcommand{\sadFace}{\scalebox{1.8}{\frownie{}}}
+\definecolor{grey}{rgb}{0.8, 0.8, 0.8}
+\newcommand{\shade}[1]{\colorbox{grey}{$#1$}}

@@ -1,4 +1,5 @@
-*.pdf
+popl2015.pdf
+CoLoSL.pdf
 *.aux
 *.tex~
 *.aux
@@ -8,5 +9,17 @@
 *.bbl
 *.backup
 *.blg
+*.out
 *.*~
 *.gz
+
+CoLoSL-POPL2015/Sections/FurtherExamples/Images/popl2015.graffle/image1.pdf
+
+CoLoSL-POPL2015/Sections/FurtherExamples/Images/popl2015-2.graffle/image1.pdf
+
+CoLoSL-POPL2015/Sections/FurtherExamples/Images/popl2015-2.graffle/data.plist
+
+CoLoSL-POPL2015/Sections/FurtherExamples/Images/popl2015.graffle/data.plist
+
+CoLoSL-POPL2015/OdeToQ/OdeToQ.pdf
+

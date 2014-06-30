@@ -1,3 +1,195 @@
 \section{Introduction}
-Introduction text goes here.\\
-\subsection{Paper Format}
+
+%% Jules: be more general than just program logics? Model-checking, etc.?
+
+Driven by the ever-increasing need for concurrency in software,
+%%  spurred by recent hardware developments, 
+program logics for shared-memory concurrency have progressed towards
+the twin ideals of fine-grain reasoning and compositionality. The
+former enables elegant proof techniques about increasingly subtle
+concurrency idioms~\cite{vv06popl,vv07msc,todo}, while the latter
+allows programs to be proved component-wise and their proofs to be
+reusable as-is in any client
+program~\cite{csl-tcs,cap-ecoop10,icap}.
+%%  Central to these compositional verification frameworks is the
+%% formalism used to describe both the state shared between program
+%% threads and the possible interference on that state.
+%%
+%% dating back from Owicki~\cite{owicki}, and later Jones who
+%% integrated the notion of interference in the logic
+%% itself~\cite{rg}.
+%% 
+The recent formalism of Views~\cite{views} pinpoints a common
+fundamental insight behind these program logics: assertions denote
+\emph{views} of the concrete machine state for each thread, which
+other threads cannot invalidate. Borrowing the vocabulary, existing
+formalisms (with the notable exception of Local Rely
+Guarantee~\cite{lrg}--henceforth LRG) require the view of all threads
+to map to the same portion of concrete state. This impedes
+compositionality: to use a given program specification in another
+context, the current shared state has to match that of the existing
+specification, instead of merely containing it.  While
+compositionality calls for specifications that talk only about the
+part of the state actually accessed by each thread (the thread's
+\emph{subjective view} of the state), the rigidity of existing
+frameworks forces us to adopt global specifications. Moreover, the
+reasoning has to be robust against interferences from the environment
+\emph{even on parts of the shared state not actually accessed by the
+  current thread}. Finally, while in some examples one will know what
+the entire global shared state is, this will not always be the case
+(\textit{e.g.}, when proving code from a library, independently of any
+client). For shared-memory reasoning to naturally apply to incomplete
+code and scale to large programs, better techniques are needed.
+
+%% Consider for instance
+%% a program where threads operate on subgraphs of a global graph.
+
+This paper presents the program logic \colosl, which achieves
+compositional reasoning for concurrent programs by enabling
+\emph{subjective} views of the shared state. Subjective views may be
+composed arbitrarily and manipulated so as to retain only the portions
+of local and shared state actually accessed by each thread in the
+program, and to consider only the interferences relevant to that piece
+of shared state. \colosl achieves a greater degree of compositionality
+than existing work by enabling \emph{finer-grained} sharing: the
+program logic can consider that threads share only what is relevant to
+their function, a key ingredient of compositionality.
+
+%%  dubbed their \emph{subjective states}.  One may then reuse these
+%%   specifications in the context of any larger local state (as is
+%%   standard in separation logic~\cite{rey02}), and, crucially for
+%%   compositional reasoning about concurrent programs, any larger
+%%   shared state. The subjective states of different threads in a
+%%   program are allowed to overlap arbitrarily, ensuring maximum
+%%   reusability of proofs.
+
+\colosl's subjective views are of the form $\shared P I$ where $P$ is
+a formula and $I$ a set of \emph{actions} (or interferences). These
+assertions mean that the formula $P$ is true of \emph{some part} of
+the shared state, and that this part of the shared state is subject to
+interferences in $I$ (which describes those actions mutating the
+shared state that are to be expected from the environment and,
+simultaneously, those actions that the current thread is allowed to
+perform).  Four novel principles allow us to reason about this novel
+interpretation of shared state assertions in \colosl.
+
+First, subjective views only capture fractions of the global shared
+state relevant to the program at hand, and we can always zoom in
+further on the subjective state:
+\begin{align*}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}
+\end{align*}
+This allows one to reuse specifications written from a subjective view
+of the state in contexts where we know more about the share state.
+
+Second, the $*$ connective of separation logic combines
+subjective views by \emph{overlapping} them ($P ** Q$ denotes those
+states that result from overlapping a state satisfying $P$ with one
+satisfying $Q$):
+\begin{align*}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}
+\end{align*}
+Doing so also combines the interference relations. Pleasingly, the new
+interference relation is simply the union of previous interferences.
+Similarly, the shared state can always be duplicated:
+\begin{align*}
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\textsc{Split}}
+\end{align*}
+In combination with the usual law of parallel composition of
+separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
+distribute the shared state between several threads:
+\[
+\infrule{Parallel}
+        {\hoare{P_1}{\mathbb{P}_1}{Q_1}\\
+          \hoare{P_2}{\mathbb{P}_2}{Q_2}}
+        {\hoare{P_1 * P_2}{\mathbb{P}_1 || \mathbb{P}_2}{Q_1 * Q_2}}
+        {}
+\]
+
+
+Third, a set of actions $I$ can be exchanged for any other $I'$ that
+has the same projected effect on the subjective state $P$; when that
+is the case, we write $ I \weakenIb{P} I'$ and say that the actions
+are \emph{shifted}:
+\begin{align*}
+  I \weakenIb{P} I'
+  &\text{ implies }
+  \shared{P}{I} ===> \shared{P}{I'}
+  \tag{\textsc{Shift}}
+\end{align*}
+This feature is in contrast with most existing formalisms, where the
+interference relation is fixed for the proof of the whole program. The
+semantic relation $\weakenIb{}$ is partially axiomitised so as to
+reduce shifting proofs to simple logical entailments. While
+incomplete, we found this axiomatisation to be enough for our
+examples.
+
+Finally, private resources can be incorporated into the shared state
+together with new actions:
+\begin{align}
+  P \containI I
+  &\text{ implies }
+  P ===>
+  \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
+    \capAss{2}}{I}
+  \tag{\textsc{Extend}}
+\end{align}
+The side condition $P \containI I$ ensures that the mutations
+performed by actions in $I$ are confined to $P$. The main novelty of
+this rule is that fact that new actions may refer to existing shared
+state. As we will see in our example of concurrent set operations,
+this enable flexible and powerful reasoning.
+
+Contributions:
+\begin{enumerate}
+\item
+  We introduce the program logic \colosl, which achieves fully
+  compositional rely/guarantee style reasoning for concurrent
+  programs. Our soundness result is parametric in the underlying
+  programming language and separation algebra of states. The four
+  principles above are simple semantic consequences of our generic
+  model of program states.
+\item
+  We evaluate \colosl on a range of key examples that were challenging
+  for previous work. We are able to derive natural and concise specs,
+  circumscribed to the part of the shared state accessed by each
+  thread, even in the case of threads operating on subparts of data
+  structures with unspecified sharing (directed acyclic graphs in our
+  example).
+\item
+  We demonstrate the generality of \colosl by deriving the main
+  reasoning principles of existing program logics for concurrency
+  within our framework.
+\end{enumerate}
+
+\paragraph{Related work}
+\julescomment{This section is mainly junk.}
+Reasoning about concurrency: major advances since Owicki-Gries:
+compositional reasoning, from the seminal paper by Jones~\cite{rg} on
+the one hand, and O'Hearn~\cite{csl-orig,csl-tcs} on the other hand,
+later fused together in a series of increasingly compositional
+formalisms such as RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
+deny-guarantee~\cite{dg}, and the CAP
+family~\cite{cap-ecoop10,icap,tada}, to name a few.
+
+%% [have pictures of the shared state throughout the ages, like in the
+%%   York talk? No: it's difficult to argue that the drawings accurately
+%%   represent the logics RGSep and LRG...]
+
+In some way, this mirrors the progression w.r.t.\ compositionality of
+reasoning about sequential programs with resources/heap: first Hoare
+logic~\cite{hoarelogic} carry around the whole of the heap. Major
+advances in compositionality for pointer programs via separation
+logic~\cite{seplog}, which enables \emph{local} proofs where
+irrelevant and disjoint pieces of state are \emph{framed}, recently
+extended to programs manipulating data structures with intrinsic
+sharing, such as graphs~\cite{ramification}.
+
+
+\paragraph{Outline}
+\S\ref{sec:intuition} motivates the four main mechanisms of \colosl on
+an illustrative example; \S\ref{sec:logic} formalises our program
+logic and the semantics of state assertions; \S\ref{sec:examples}
+sketches the proofs of more challenging examples;
+\S\ref{sec:soundness} presents our soundness result, and
+\S\ref{sec:conclusion} contrast with related work and concludes.
