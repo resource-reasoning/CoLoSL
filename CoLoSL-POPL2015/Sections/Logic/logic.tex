@@ -26,8 +26,8 @@ logical variables, and tokens, respectively.
   the grammar below, where $\li x$ ranges over program variables, $x$
   over logical variables, and $\token a$ over tokens.
   \begin{align*}
-    E &::= \li x ||| x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
-    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| E_1 |-> E_2 \mid [\token a]\\
+    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
+    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E ||| E_1 |-> E_2 \mid [\token a]\\
     P, Q  &::= 
     \p{A} \mid P \Rightarrow Q \mid \exsts{x} P \mid
      P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
@@ -36,50 +36,48 @@ logical variables, and tokens, respectively.
   \end{align*}
 \end{definition}
 
-The syntax follows from standard separation logic, with the exception
-of shared-state assertions, whose notation is borrowed from previous
-rely-guarantee-based formalisms. Predicates and connectives from the
-first row have their standard classical meaning, and spatial
-predicates and connectives have been informally introduced in the
-previous section.
-\azaleacomment{The intersection connective $\intersect$ is new. We should explain that.}
-\azaleacomment{As is, I hate this distinction between heaps and stack. Too much clutter. But at the very least we need to state that this division is not necessary and stacks could have been captured as part of the underlying heap SA. That is, for simplicity in this paper we have instantiated our heap SA as a standard heap+stack.}
+The syntax follows from standard separation logic with variables as
+resource~\cite{entcs06} (notice that expressions $E$ do not allow
+program variables), with the exception of shared-state assertions,
+whose notation is borrowed from previous rely-guarantee-based
+formalisms. Predicates and connectives from the first row have their
+standard classical meaning, and spatial predicates and connectives
+have been informally introduced in the previous section.
+
 \paragraph{Program states}
 To interpret formulas in our assertion language, we build models using
-three ingredients. The first is a standard \emph{stack}, assigning
-values to program variables:
-\[
-\set{Stack} == \set{PVar} --> \set{Val}
-\]
-
-The next ingredient are \emph{logical states}, which are used to
+two ingredients. The first is \emph{logical states}, which are used to
 describe resources held locally as well as those shared with other
-threads. 
+threads.
 
 \begin{definition}[Logical states]
-  A \emph{logical state} is a pair $(h, \ca{})$ of a heap $h \in\Heaps$ (\textit{i.e.} a finite partial functions from addresses
-  to values) and a capability $\ca{} \in\Caps$.
+  A \emph{logical state} is a triple $(s, h, \ca{})$ of a partial
+  \emph{stack} $s\in\set{Stack}$, assigning values to program
+  variables, a heap $h \in\Heaps$, represented as a finite partial
+  functions from addresses to values, and a capability $\ca{}
+  \in\Caps$.
   \begin{align*}
+    \set{Stack} &== \set{PVar} --` \set{Val}&
     \Heaps &== \set{Loc} --`_{\m{fin}} \set{Val}&
-    \Caps &== \powerset(\set{Token})&
-    \LStates &== \Heaps\times \Caps
+    \Caps &== \powerset(\set{Token})\\
+    &&\mathllap{\LStates} &== \Heaps\times \Caps
   \end{align*}
-  We write $\unitL$ for the logical state $(\unitH, \unitCap)$. The
+  We write $\unitL$ for the logical state $(\emptyset, \unitH, \unitCap)$. The
   \emph{composition of logical states}
   $
   \composeL : \LStates \times \LStates \rightharpoonup \LStates
   $
   is defined as:
   \[
-  (h,\ca{}) \composeL (h', \ca{}') \eqdef
-  (h\composeH h', \ca{}\composeCap \ca{}')
+  (s, h,\ca{}) \composeL (s', h', \ca{}') \eqdef
+  (s\uplus s', h\composeH h', \ca{}\composeCap \ca{}')
   \]
 \end{definition}
-\azaleacomment{Our \Heaps\ should be defined as $\set{Loc} --`_{\m{fin}} \set{Val} \times \set{Stack}$. In generalised \colosl\ we don't have a stack parameter. So it is important that stacks are part of \Heaps\ parameter.}
-Although, for this presentation, we build logical states out of heaps
-and sets of tokens, in general any pair of separation algebras
-(\textit{i.e.}, cancellative partial commutative monoids~\cite{asl})
-would do~\cite{colosl-tr14}.
+Although, for this presentation, we build logical states out of
+stacks, heaps, and sets of tokens, the general setting allows any pair
+(here we would group the stack and the heap as a single component) of
+separation algebras (\textit{i.e.}, cancellative partial commutative
+monoids~\cite{asl}) would do~\cite{colosl-tr14}.
 
 In the following, we write $l_1\leq l_2$ when there exists $l$ such
 that $l\composeL l_1 = l_2$. When that is the case, we also write $l_2
@@ -102,7 +100,7 @@ We write $\unitAM$ for an action model with empty domain.
 
 
 \begin{definition}[Worlds]
-  A \emph{world} is a 5-tuple consisting of a stack, a logical state
+  A \emph{world} is a 4-tuple consisting of a logical state
   representing the thread-local state, a second logical state
   representing the shared state, a global action model and a local
   action model. Later in \S\ref{subsec:localGlobalActionModels}, we
@@ -113,18 +111,17 @@ We write $\unitAM$ for an action model with empty domain.
   to future extensions of the shared state:
   \[
   \Worlds \eqdef \{w\in
-  \set{Stack}\times\LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
+  \LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
   \]
   The \emph{composition of worlds} is defined as
   \begin{align*}
-    &\qquad (s,l,l_s,\amod{},\amod{\ell}) \composeW
-    (s',l',l_s',\amod{}',\amod{\ell}') \\
+    &\qquad (l,l_s,\amod{},\amod{\ell}) \composeW
+    (l',l_s',\amod{}',\amod{\ell}') \\
     &\eqdef
     \begin{cases}
-      (s,l\composeL l', l_s, \amod{}, \amod{\ell}) &
+      (l\composeL l', l_s, \amod{}, \amod{\ell}) &
       \begin{array}[t]{L}
         \text{if }
-        s =s'\text{, }
         l_s = l_s' \text{, }
         \amod{} = \amod{}' \text{, and } \amod{\ell} = \amod{\ell}'\\[-.7ex]
         \text{and }\p{wf}((s,l\composeL l', l_s, \amod{}, \amod{\ell}))
@@ -135,52 +132,52 @@ We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 
 
-\azaleacomment{Yuck! This is totally mismatching the generalised definition of \colosl\ in the tech report. If one wants to use program variables, then they should instantiate their own model of program vars as part of the monoid, or otherwise. This is really horrible. I strongly dislike this. I am not willing to change the tech report now. We have precedents for this: iCAP, CAP, HOCAP.}
 \paragraph{Semantics}
 We are now ready to give the semantics of \colosl assertions, defined
 as a forcing relation $|=$ between worlds and formulas. We use two
-auxiliary forcing relations, each between stack and logical state
-pairs and formulas. One of them, also written $|=$, interprets atomic
-formulas, while the other $|=_l$ interprets assertions about the
-shared state, given an original shared state $l$. Logical connectives
-are interpreted uniformly in all cases, hence we write $|=_{?}$ for
-either $|=$ or $|=_{l}$ for some $l$ (in which case subsequent
-occurences of $|=_{?}$ refer to the same $|=_l$), and then write $u$
-for elements of either $\Worlds$ or $LStates$, and $\gray$ for either
-$\composeW$ or $\composeL$.
+auxiliary forcing relations. The first one, written $\slsat$,
+interprets \emph{atomic} formulas $\p{A}$ in the usual separation
+logic sense over a single logical state, while the other
+$|=_{l,\amod{},\amod{\ell}}$ interprets assertions over a single
+logical state representing a piece of shared state. Its three
+parameters are a top-level shared state $l$ and action models
+$\amod{}$ and $\amod{\ell}$. This third form of satisfaction is needed
+to deal with nesting of boxed formulas.
 
-\azaleacomment{I find this very confusing even though we have discussed it. Especially since in the semantics below you have pairs, quadruples and quintuples as elements of the interpretation. Can you give the type signature of semantics?}
+Moreover, since logical connectives are interpreted uniformly in all
+cases, we write $|=_{?}$ for either of the three satisfaction
+relations, and then write $u$ for elements of either $\Worlds$ or
+$\LStates$, and $\gray$ for either $\composeW$ or $\composeL$,
+depending on whether the satisfaction relation is
+$|=$, or either $\slsat$ or $|=_{l,\amod{},\amod{\ell}}$,
+respectively.
 
 \begin{definition}[Assertion semantics]
   Given a logical environment $\lenv\in\LEnv == \set{LVar} -->
   \set{Val}$, the semantics of \colosl assertions is as follows, where
-  $\semI[(.,.)]{.}$ denotes the semantics of interference assertions
+  $\semI[(.)]{.}$ denotes the semantics of interference assertions
   described in \defin~\ref{def:interferenceSemantics}:
 \[
-\begin{array}{R>{\null}lcl}
-  (s,l),\lenv &|= \m{false}
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  l,\lenv &\slsat \m{false}
   &\text{iff}& \text{never}\\
-  (s,l),\lenv &|= E_1 = E_2
-  &\text{iff}& [|E_1|]_{s,\lenv} = [|E_2|]_{s,\lenv}\\
-  (s,l), \lenv &|= \emp &\text{iff}& l = \unitL\\
-  (s,l), \lenv &|= E_1|->E_2 
+  l,\lenv &\slsat E_1 = E_2
+  &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
+  l, \lenv &\slsat \emp &\text{iff}& l = \unitL\\
+  l, \lenv &\slsat \li{x}|->E
   &\text{iff}&
   l =
-  ([[|E_1|]_{s,\lenv}: [|E_2|]_{s,\lenv}],\unitCap)\\
-  (s,l), \lenv &|= [\token a]
+  ([\li x: [|E|]_{\lenv}],\unitH,\unitCap)\\
+  l, \lenv &\slsat E_1|->E_2 
   &\text{iff}&
-  l = (\unitH, \{\token a\})\\
-  (s,l,l_s,\amod{},\amod{\ell}), \lenv &|= \p{A} &\text{iff}& (s,l),\lenv |= \p{A}\\
-  (s,l_s,\amod{},\amod{\ell}), \lenv &|=_{l} \p{A} &\text{iff}&(s,l_s), \lenv |= \p{A}\\
-  (s,l,l_s,\amod{},\amod{\ell}), \lenv &|= \shared P I &\text{iff}&
-  l = \unitH\text{ and }
-  \exsts{l_s',r}
-  l_s = l_s'\composeL r
-  \text{ and}\\
-  &&&(s,l_s',\amod{},\amod{\ell}), \lenv |=_{l_s} P\text{ and }\\
-  &&&\extendsAM{\amod{}, \amod{\ell}}{l_s'}{r}{\semI[s,\lenv]{I}}\\
-  (s,l_s,\amod{},\amod{\ell}), \lenv &|=_{l} \shared P I &\text{iff}&
-  (s,l_s,l,\amod{},\amod{\ell}), \lenv |= \shared P I\\
+  l =
+  (\emptyset,[[|E_1|]_{\lenv}: [|E_2|]_{\lenv}],\unitCap)\\
+  l, \lenv &\slsat [\token a]
+  &\text{iff}&
+  l = (\emptyset,\unitH, \{\token a\})\\
+  l_s, \lenv &|=_{l,\amod{},\amod{\ell}} \p{A} &\text{iff}& l_s, \lenv |= \p{A}\\
+  l_s, \lenv &|=_{l,\amod{},\amod{\ell}} \shared P I &\text{iff}&
+  (l_s,l,\amod{},\amod{\ell}), \lenv |= \shared P I\\
   u,\lenv &|=_{?} P => Q
   &\text{iff}& u,\lenv |=_{?} P\text{ implies }u,\lenv |=_{?} Q\\
   u,\lenv &|=_{?} \exsts x P
@@ -198,18 +195,29 @@ $\composeW$ or $\composeL$.
   u'\gray u_1, \lenv |=_{?} P_1 \text{ and }\\
   &&&u'\gray u_2, \lenv |=_{?} P_2
 \end{array}
+\vspace{-.8em}
+\]
+\[
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  (l,l_s,\amod{},\amod{\ell}), \lenv &|= \p{A} &\text{iff}& l,\lenv |= \p{A}\\
+  (l,l_s,\amod{},\amod{\ell}), \lenv &|= \shared P I &\text{iff}&
+  l = \unitH\text{ and }
+  \exsts{l_s',r}
+  l_s = l_s'\composeL r
+  \text{ and}\\
+  &&&l_s', \lenv |=_{l_s,\amod{},\amod{\ell}} P\text{ and }\\
+  &&&\extendsAM{\amod{}, \amod{\ell}}{l_s'}{r}{\semI[\lenv]{I}}
+\end{array}
 \]
 \end{definition}
-
-\azaleacomment{Why did you comment out the semantics of intersection $\intersect$?}
 
 The semantics of separation logic predicates and connectives is
 standard and depends only on the local state.  $\shared{P}{I}$ states
 that $P$ holds for only a sub-state $l_s'$ of the global shared state
 $l_s'\composeL r$. The interference associated with $l_s'$ is given by
-interference assertion $\semI[s,\lenv]{I}$ such that the global and
+interference assertion $\semI[\lenv]{I}$ such that the global and
 local action models $\amod{}$ and $\amod{\ell}$ are \emph{closed}
-under $\semI[s,\lenv]{I}$ with respect to the subjective view $l_s'$ and
+under $\semI[\lenv]{I}$ with respect to the subjective view $l_s'$ and
 context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
 
@@ -234,20 +242,20 @@ context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
   \label{def:interferenceSemantics}
   The semantics of an interference assertion $I$ is given by
   $
-  \semI[(.,.)]{I} : \set{Stack}\times\LEnv -->
+  \semI[(.)]{I} : \LEnv -->
   \Caps -->  \powerset(\LStates \times \LStates)
   $
   defined as follows:
   \begin{align*}
-  \semI[s,\lenv]{I}(\ca{}) &==
+  \semI[\lenv]{I}(\ca{}) &==
   \left\{
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
     (p, q)&
     \begin{array}{@{}l@{}}
-      \exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I} \exsts{\vec{v}}\null\\
-      \quad\ca{} = \capAss{} \land\exsts{r, \amod{}, \amod{\ell}}\\
-      \quad (s,p,\amod{}, \amod{\ell}),[\lenv|||\vec y:\vec v] |=_{p \composeL r} P \land\null\\
-      \quad (s,q,\amod{}, \amod{\ell}),[\lenv|||\vec y:\vec v] |=_{q \composeL r} Q
+      \exsts{\interAss{\ca{}}{\vec{y}}{P}{Q} \in I}
+      \exsts{\vec{v},r, \amod{}, \amod{\ell}}\\
+      \quad p,[\lenv|||\vec y:\vec v] |=_{p \composeL r,\amod{}, \amod{\ell}} P \land\null\\
+      \quad q,[\lenv|||\vec y:\vec v] |=_{q \composeL r,\amod{}, \amod{\ell}} Q
     \end{array}
   \end{array}
   \right\}
