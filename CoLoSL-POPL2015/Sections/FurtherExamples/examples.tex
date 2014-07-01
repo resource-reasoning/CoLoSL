@@ -203,5 +203,84 @@ When expanding the definition of $\G{x}{S}$, there are two cases to consider dep
 
 \todo Briefly touch the proof of \fig\ref{fig:conSpanningTree}.
 
-\subsection{Set Example}
-\azaleacomment{ We don't have enough space to cover this here, it will have to go into the tech report. We should mention it here though.}
+\subsection{Set Module}
+We now look at the specification of a concurrent set module implemented as a singly-linked list as as described in \cite{cap-ecoop10}. A typical set module provides three functionalities: \command{contains(h,v)}, \command{add(h,v)} and \command{remove(h,v)} specified as follows. The $\inSet{\var{h}}{\var{v}} $ predicate asserts that the set at \var{h} contains value \var{v}. Dually, $\outSet{\var{h}}{\var{v}}$ asserts that the set does not contain \var{v}. As the name suggests, the \command{contains} function checks whether value \var{v} is contained in the set; the \command{add(h,v)} and \command{remove(h,v)} functions add/remove value \var{v} to/from the list, respectively. 
+%
+\[
+\begin{array}{@{} r @{\hspace*{3pt}} c @{\hspace*{3pt}} l @{}}
+	\left\{ \inSet{\var{h}}{\var{v}} \right\} & \command{contains(h,v)} & \left\{ \inSet{\var{h}}{\var{v}} * \var{ret} = 1 \right\} \\
+	
+	\left\{ \outSet{\var{h}}{\var{v}} \right\} & \command{contains(h,v)} & \left\{ \outSet{\var{h}}{\var{v}} * \var{ret} = 0 \right\} \\
+	
+	\left\{ \inSet{\var{h}}{\var{v}} \lor \outSet{\var{h}}{\var{v}}  \right\} & \command{add(h,v)} & \left\{ \inSet{\var{h}}{\var{v}} \right\}\\ 
+	
+	\left\{ \inSet{\var{h}}{\var{v}} \lor \outSet{\var{h}}{\var{v}}  \right\} & \command{remove(h,v)} & \left\{ \outSet{\var{h}}{\var{v}} \right\} 
+\end{array}
+\]
+%
+%\azaleacomment{ We don't have enough space to cover this here, it will have to go into the tech report. We should mention it here though.}
+\begin{figure*}
+\hrule
+\[
+\begin{array}{@{} l @{}}
+\begin{array}{@{} r @{\hspace*{3pt}} l @{}}
+	\inSet{h}{v} \eqdef & \exsts{\pi, L} \sorted{L} \land v \in L \land \lockT{h}[\pi] * \lsg{h}{h}{-\infty:: L ++\{\infty\} }{\nil}\\
+
+	\outSet{h}{v} \eqdef & \exsts{\pi, L} \sorted{L} \land v \not\in L \land \lockT{h}[\pi] * \lsg{h}{h}{-\infty:: L ++ \{\infty\} }{\nil}\\
+	
+	\sorted{L} \eqdef & (L  = [] \land \emp) \lor( \exsts{v_0} L = [v_0] \land \emp) \lor \exsts{v_0, v_1, L'} L = v_0 :: (v_1 :: L') \land v_0 < v_1 \land \sorted{v_1:: L'}\\
+
+	\lsg{h}{x}{L}{y} \eqdef & (x = y \land L = [] \land \emp) \lor (\exsts{v, z, L'} L = v::L' \land \shared{\node{x}{v}{z}}{I(h, x)} * \lsg{h}{z}{L'}{y}) \\
+%		\lsg{h}{x}{v:: L}{y} \eqdef & \exsts{z} \shared{\node{x}{v}{z}}{I(h, x)} * \lsg{h}{z}{L}{y}\\
+
+
+	\node{a}{v}{b} \eqdef & \unlockedNode{a}{v}{b} \lor \lockedNode{a}{v}{b}\\
+
+		\unlockedNode{a}{v}{b} \eqdef  & \cell{a}{0, v, b} * \unlockT{a} * \nextT{a}{b} * \lockT{b}
+	\hspace*{1cm}
+	\lockedNode{a}{v}{b} \eqdef  \cell{a}{1, v} * \nextT{a}{b}\\
+\end{array}		\\\\
+		
+		
+	I(h, a) \eqdef 
+	\left\{
+	\begin{array}{@{} r @ {\hspace*{2pt}}l @{} }
+%		\text{//Locking}\hspace*{1.4cm}&\\
+		\lockT{a}: &\left\{ \exsts{v, b} \unlockedNode{a}{v}{b} \swap \lockedNode{a}{v}{b}\right\}\\
+		
+%		\text{//Unlocking}\hspace*{1.1cm}&\\
+		\unlockT{a}: & \left\{ \exsts{v, b} \lockedNode{a}{v}{b} \swap \unlockedNode{a}{v}{b}\right\}\\ 
+		
+%		\text{//Deletion of } v \hspace*{0.8cm}&\\
+		\unlockT{a} * \valueT{h}{v}: &
+		\left\{
+		\begin{array}{@{} l @{}}
+			\exsts{v_0, b, c} \lockedNode{a}{v_0}{b} * \lockedNode{b}{v}{c} \swap \lockedNode{a}{v_0}{c} * \lockedNode{b}{v}{c}\\
+			\exsts{v_0, b, c} \lockedNode{b}{v_0}{c} * \lockedNode{a}{v}{c} \swap \lockedNode{b}{v_0}{c}
+			
+		\end{array}
+		\right\}\\ 
+
+		
+%		\text{//Insertion of } v \hspace*{0.7cm}&\\
+		\unlockT{a} * \valueT{h}{v}: &
+		\left\{
+		\begin{array}{@{} l @{}}
+			\exsts{v_1, v_2, c, d} v_1 < v < v_2 \land \lockedNode{a}{v_1}{c} * \lockedNode{c}{v_2}{d} 
+			 \swap \lockedNode{a}{v_1}{b} * \node{b}{v}{c} *  \lockedNode{c}{v_1}{d}\\
+			 
+			 \exsts{v_1, v_2, c, d} v_1 < v < v_2 \land \lockedNode{a}{v_1}{c} * \unlockedNode{c}{v_2}{d} 
+			\swap \lockedNode{a}{v_1}{b} * \node{b}{v}{c} *  \unlockedNode{c}{v_1}{d}
+						
+		\end{array}
+		\right\}\\ 
+		
+	\end{array}
+	\right\}
+
+\end{array}
+\]
+\hrule
+\caption{Set specification where the definition of .}
+\label{fig:setExample}
+\end{figure*}

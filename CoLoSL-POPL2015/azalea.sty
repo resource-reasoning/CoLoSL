@@ -9,6 +9,7 @@
 \DeclareCaptionType{copyrightbox}
 \usepackage{subcaption}\captionsetup{compatibility=false}
 \usepackage{xspace}
+\usepackage{xparse}
 %\let\proof\relax 
 %\let\endproof\relax
 %\let\vec\relax
@@ -421,5 +422,32 @@
 \newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
 \newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
 \newcommand{\nil}{\texttt{null}}
+\newcommand{\command}[1]{\texttt{#1}}
+\newcommand{\var}[1]{\texttt{#1}}
+
+%%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
+
+\DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\rightarrow} #3}
+
+\DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\rightarrow} #3}
+
+\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.#2 \stackrel{#3}{\rightarrow} #4}
+
+\DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+
+\newcommand{\inSet}[2]{\textsf{in}\left(#1, #2\right)}
+\newcommand{\outSet}[2]{\textsf{out}\left(#1, #2\right)}
+\newcommand{\ownSet}[2]{\textsf{own}\left\{#1, #2\right\}}
+
+\newcommand{\lsg}[4]{\textsf{lsg}\left(#1, #2, #3, #4\right)}
+
+\newcommand{\node}[3]{\textsf{node}\left(#1, #2, #3\right)}
+\newcommand{\lockedNode}[3]{\textsf{L}\left(#1, #2, #3\right)}
+\newcommand{\unlockedNode}[3]{\textsf{U}\left(#1, #2, #3\right)}
+
+\newcommand{\sorted}[1]{\textsf{sorted}\left(#1\right)}
+
+
+
 
 \newcommand{\proofRule}[1]{\textsc{#1}}
