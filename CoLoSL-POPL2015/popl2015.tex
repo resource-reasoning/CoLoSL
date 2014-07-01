@@ -69,7 +69,32 @@
 \maketitle
 
 \begin{abstract}
-This is the text of the abstract.
+  A key difficulty in verifying the correctness of programs operating
+  concurrently over a shared memory is being able to reason about each
+  component in isolation of the others, even though in reality the
+  correctness of the whole system is the collaborative result of
+  intricately intertwined actions of all components.  Compositionality
+  of the reasoning is crucial if we are to ever verify large
+  concurrent systems, and also to replicate programmers intuitions
+  about why their implementations are correct. In the sequential
+  world, separation logic has demonstrated that a key ingredient to
+  achieve compositional reasoning is the ability to reason only about
+  portions of the machine state actually accessed by programs (their
+  footprints). Unfortunately, existing techniques for shared-memory
+  concurrency verification force us to reason globally about the
+  shared state and interferences, regardless of which portion of it is
+  actually used by the component under scrutiny.
+
+  This paper introduces the program logic \colosl, in which threads
+  can be verified with respect to their \emph{subjective view} of the
+  shared state, which may overlap with other threads's subjective
+  views in arbitrary ways. Interferences by the environment can be
+  rewritten as long as the projected effect on the subjective view
+  remains the same, and interferences on parts of the shared state
+  outside of the current view can be safely forgotten. This
+  flexibility yields compositional proofs for shared-memory
+  concurrency, which we demonstrate on a range of examples including a
+  concurrent computation of the spanning tree of a graph.
 \end{abstract}
 
 \category{CR-number}{subcategory}{third-level}
