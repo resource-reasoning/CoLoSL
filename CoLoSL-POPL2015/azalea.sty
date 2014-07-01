@@ -184,6 +184,7 @@
 
 %%%%Heaps
 \newcommand{\Heaps}{\ensuremath{\mathbb{H}}\xspace}
+\newcommand{\Stacks}{\ensuremath{\mathbb{S}}\xspace}
 \newcommand{\h}[1]{\ensuremath{h_{#1}}}
 \newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
 \newcommand{\composeH}{\uplus}
@@ -416,3 +417,10 @@
 \newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
 \newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
 \newcommand{\nil}{\texttt{null}}
+
+\newcommand{\proofRule}[1]{\textsc{#1}}
+\newcommand{\mergeRule}{\proofRule{Merge}}
+\newcommand{\forgetRule}{\proofRule{Forget}}
+\newcommand{\copyRule}{\proofRule{Copy}}
+\newcommand{\shiftRule}{\proofRule{Shift}}
+\newcommand{\extendRule}{\proofRule{Extend}}

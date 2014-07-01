@@ -43,7 +43,7 @@ first row have their standard classical meaning, and spatial
 predicates and connectives have been informally introduced in the
 previous section.
 \azaleacomment{The intersection connective $\intersect$ is new. We should explain that.}
-
+\azaleacomment{As is, I hate this distinction between heaps and stack. Too much clutter. But at the very least we need to state that this division is not necessary and stacks could have been captured as part of the underlying heap SA. That is, for simplicity in this paper we have instantiated our heap SA as a standard heap+stack.}
 \paragraph{Program states}
 To interpret formulas in our assertion language, we build models using
 three ingredients. The first is a standard \emph{stack}, assigning
@@ -57,8 +57,7 @@ describe resources held locally as well as those shared with other
 threads. 
 
 \begin{definition}[Logical states]
-  A \emph{logical state} is a pair $(h, \ca{})$ of a heap $h
-  l\in\Heaps$ (\textit{i.e.} a finite partial functions from addresses
+  A \emph{logical state} is a pair $(h, \ca{})$ of a heap $h \in\Heaps$ (\textit{i.e.} a finite partial functions from addresses
   to values) and a capability $\ca{} \in\Caps$.
   \begin{align*}
     \Heaps &== \set{Loc} --`_{\m{fin}} \set{Val}&
@@ -76,14 +75,14 @@ threads.
   (h\composeH h', \ca{}\composeCap \ca{}')
   \]
 \end{definition}
-
+\azaleacomment{Our \Heaps\ should be defined as $\set{Loc} --`_{\m{fin}} \set{Val} \times \set{Stack}$. In generalised \colosl\ we don't have a stack parameter. So it is important that stacks are part of \Heaps\ parameter.}
 Although, for this presentation, we build logical states out of heaps
 and sets of tokens, in general any pair of separation algebras
 (\textit{i.e.}, cancellative partial commutative monoids~\cite{asl})
 would do~\cite{colosl-tr14}.
 
 In the following, we write $l_1\leq l_2$ when there exists $l$ such
-that $l\composeL l1 = l_2$. When that is the case, we also write $l_2
+that $l\composeL l_1 = l_2$. When that is the case, we also write $l_2
 - l_1$ to denote the unique (by cancellativity) such $l$. When $l_1$
 and $l_2$ are compatible according to $\composeL$, we write
 $l_1\compatL l_2$.
@@ -136,7 +135,7 @@ We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 
 
-
+\azaleacomment{Yuck! This is totally mismatching the generalised definition of \colosl\ in the tech report. If one wants to use program variables, then they should instantiate their own model of program vars as part of the monoid, or otherwise. This is really horrible. I strongly dislike this. I am not willing to change the tech report now. We have precedents for this: iCAP, CAP, HOCAP.}
 \paragraph{Semantics}
 We are now ready to give the semantics of \colosl assertions, defined
 as a forcing relation $|=$ between worlds and formulas. We use two
@@ -149,6 +148,8 @@ either $|=$ or $|=_{l}$ for some $l$ (in which case subsequent
 occurences of $|=_{?}$ refer to the same $|=_l$), and then write $u$
 for elements of either $\Worlds$ or $LStates$, and $\gray$ for either
 $\composeW$ or $\composeL$.
+
+\azaleacomment{I find this very confusing even though we have discussed it. Especially since in the semantics below you have pairs, quadruples and quintuples as elements of the interpretation. Can you give the type signature of semantics?}
 
 \begin{definition}[Assertion semantics]
   Given a logical environment $\lenv\in\LEnv == \set{LVar} -->
@@ -227,6 +228,8 @@ context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
   Immediate.
 \end{proof}
 
+\azaleacomment{I'm not sure the proof is so immediate at least in the case of merge. I needed a separate lemma to show action model containment. We should cite the tech report for the proof?}
+
 \begin{definition}[Localised interference semantics]
   \label{def:interferenceSemantics}
   The semantics of an interference assertion $I$ is given by
@@ -258,7 +261,7 @@ context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 \label{subsec:extension}
 
 The rest of the semantic development of this section concerns the
-formal definition of the notions of well-formed states, action
+formalisation of the notions of well-formed states, action
 shifting, and action model closure, which were informally introduced
 above. Central to these definitions is the concept of fences.
 
@@ -280,6 +283,7 @@ is defined as the largest element of the intersection of $l_1$ and
 $l_2$, when it exists.
 \end{definition}
 
+\azaleacomment{I don't know why you have changed the max meet symbol. This is very subtle and not at all clear.}
 One can check that $l_1\maxMeetL l_2$ indeed yields at most one
 element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
 
@@ -297,7 +301,8 @@ fenced action models to capture all possible states reachable from the
 current state. A set of states $\fence{}$ \emph{fences} an action
 model if it is stable against interferences perpetrated by the
 corresponding actions.
-
+\azaleacomment{I think we agreed that stability does not imply being fenced. The above statement is wrong!}
+\azaleacomment{In future when making a change can you comment my stuff out rather than deleting them? It is time consuming to go back and forth between revisions to remember what I had. :(}
 \begin{definition}[Fenced action model]
   An action model $\amod{} \in \AMods$ is \emph{fenced} by $\fence{}
   \in \pset{\LStates}$, written $\fence{} \fences \amod{}$, if, for
@@ -460,7 +465,7 @@ owned resources (see \eqref{eq:extend}).
 \end{definition}
 
 TODO: we lift this to predicates\dots
-
+\azaleacomment{This is exactly why I used the MnSymbol package. Now our curly Ps look like powersets. I vote using MnSymbol for the powerset symbol. }
 
 
 \paragraph{Action shifting}

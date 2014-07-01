@@ -77,7 +77,7 @@ First, subjective views only capture fractions of the global shared
 state relevant to the program at hand, and we can always zoom in
 further on the subjective state:
 \begin{align*}
-  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
 \end{align*}
 This allows one to reuse specifications written from a subjective view
 of the state in contexts where we know more about the share state.
@@ -87,14 +87,15 @@ subjective views by \emph{overlapping} them ($P ** Q$ denotes those
 states that result from overlapping a state satisfying $P$ with one
 satisfying $Q$):
 \begin{align*}
-  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
 \end{align*}
 Doing so also combines the interference relations. Pleasingly, the new
 interference relation is simply the union of previous interferences.
 Similarly, the shared state can always be duplicated:
 \begin{align*}
-  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\textsc{Split}}
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
 \end{align*}
+\azaleacomment{I don't like the name ``Split'' for the rule above. To me split implies separation, or breaking things up. This is not at all what we do. I have macrod it as \copyRule\ at the moment. We can discuss it later and find a better name. }
 In combination with the usual law of parallel composition of
 separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
 distribute the shared state between several threads:
@@ -115,7 +116,7 @@ are \emph{shifted}:
   I \weakenIb{P} I'
   &\text{ implies }
   \shared{P}{I} ===> \shared{P}{I'}
-  \tag{\textsc{Shift}}
+  \tag{\shiftRule}
 \end{align*}
 This feature is in contrast with most existing formalisms, where the
 interference relation is fixed for the proof of the whole program. The
@@ -132,7 +133,7 @@ together with new actions:
   P ===>
   \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
     \capAss{2}}{I}
-  \tag{\textsc{Extend}}
+  \tag{\extendRule}
 \end{align}
 The side condition $P \containI I$ ensures that the mutations
 performed by actions in $I$ are confined to $P$. The main novelty of
