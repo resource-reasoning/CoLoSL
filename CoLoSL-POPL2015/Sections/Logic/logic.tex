@@ -299,10 +299,14 @@ element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
 Inspired by the LRG logic~\cite{lrg} we introduce the concept of
 fenced action models to capture all possible states reachable from the
 current state. A set of states $\fence{}$ \emph{fences} an action
-model if it is stable against interferences perpetrated by the
+model if it is invariant under interferences perpetrated by the
 corresponding actions.
-\azaleacomment{I think we agreed that stability does not imply being fenced. The above statement is wrong!}
-\azaleacomment{In future when making a change can you comment my stuff out rather than deleting them? It is time consuming to go back and forth between revisions to remember what I had. :(}
+
+%  F |> s <==> \forall p, q, k, l, l', p',
+%    (p,q)\in s(k) /\ l o l' o p' is defined /\ l o l'\in F /\ l o p' = p /\ l\neq\emptyset
+%      => \exists f, l'', q'. l = l'' o f /\ q = f o q' /\
+%            (l''\neq\emptyset /\ q # l' => l' o q\in F)
+
 \begin{definition}[Fenced action model]
   An action model $\amod{} \in \AMods$ is \emph{fenced} by $\fence{}
   \in \pset{\LStates}$, written $\fence{} \fences \amod{}$, if, for
@@ -328,9 +332,17 @@ update footprint actually interact with elements of the fence
 (condition $p'' \neq \unitL$).
 
 In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
-$\fence{x} \eqdef \left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
-\cdots, 10\} \right\} \cup \left\{\cell{x}{v+1} * \cell{z}{v} \mid v
-\in \{0 ,\cdots, 9 \}\right\}$.
+\[
+\fence{x} \eqdef\begin{array}[t]{L}
+\left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
+\cdots, 10\} \right\} \cup\\
+\left\{\cell{x}{v+1} * \cell{z}{v} \mid v
+\in \{0 ,\cdots, 9 \}\right\}
+\end{array}
+\]
+
+\julescomment{Find better/more examples, perhaps of non-fencing as
+  well.}
 
 We will often require that fences are \emph{local} with respect to the
 action model, \textit{i.e.}\ that the preconditions of all compatible
@@ -563,28 +575,18 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 %\end{example}
 \begin{definition}[Action model closure]
 \[
-\hspace*{-0.2cm}
 \begin{array}{l}
 	\extendsAM{\amod{}, \amod{\ell}}{l}{r}{\amod{}'} \iffdef \for{n \in \Nats} \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r}{\amod{}'}  \land \amod{}' \subseteq \amod{\ell}\\
-	
-	
 	\extendsAMUpto{\amod{}, \amod{\ell}}{0}{l}{r}{\amod{}'} \iffdef \m{true} \\ 
-
-
-
 	\extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r}{\amod{}'} \iffdef \\ 
-
 	\hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
-	
 	\hspace*{0.2cm}(p, q) \in \amod{}'(\ca{}) 
 	\land \updateFP{p, q} = (p', q')
 	\land p \leq  l \composeL r \composeL t \land\null\\
-	
 	\hspace*{0.2cm}p' = p_l \composeL p_r 
 	\land p' \maxMeetL l = p_l 
 	\land l = p_l \composeL l' 
 	\land r = p_r \composeL r' =>\\
-	
 	\hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{q' \composeL l'}{r'}{\amod{}'} \land\null\\
 	\hspace*{0.4cm}t = \unitL => 
 	\left(
@@ -593,22 +595,14 @@ Recall from \S\ref{subsec:semantics} that when defining the semantics of $\share
 		\lor\; q' \composeL l' \composeL r' \text{ is undefined} 
 	\end{array}
 	\right)\\
-	
 		\hspace*{2cm} \land\\
-	
-
   \hspace*{0.1cm}\for{\ca{}, p, q, p', q', l', r'} \\
-  
   \hspace*{0.2cm} (p, q) \in \amod{\ell}(\ca{})
   \land \updateFP{p, q} = (p', q')
   \land p \composeL l' = l \composeL r \composeL r' =>\\
-  
   \hspace*{0.4cm}\exsts{f, c'} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \composeL c' =  l \composeL r \composeL r' \;\;\lor\\
-	
-
 		\hspace*{0.4cm}q \composeL l' \text{ is undefined} \;\;\lor\\
 		\hspace*{0.4cm}p' \maxMeetL l = \unitL \land \exsts{r'}\! q \composeL l' = l \composeL r' \composeL r' \land \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{l}{r'}{\amod{}'}
-
 \end{array}
 \]
 \end{definition}
@@ -640,3 +634,19 @@ Suppose at this point the current thread extends the shared state with the $\cel
 \end{example}
 As demonstrated by the above example, it is necessary to record the localised interpretation of interference assertions at the model level. As a result, given a world $(l, s, \amod{}, \amod{\ell})$, the third component $(\amod{})$ denotes the global behaviour of actions while the fourth component $(\amod{\ell})$ represents the set of all localised action behaviour.
 On the other hand, it may seem sufficient for the model to track the localised action behaviour $(\amod{\ell})$ alone as the global behaviour can be calculated from the localised one. However, as we illustrate in \S\ref{subsec:amodClosure}, calculation of the global behaviour depends on the subjective view of the shared state and the context (parts of the shared state not visible) as well as the localised action behaviour. As a result, given $\lenv \in \LEnv$, when defining the semantics of a subjective shared assertion $\shared{P}{I}$, we calculate the global behaviour based on the subjective view as prescribed by $P$, the localised behaviour $\semI[\lenv]{I}$ and the choice of compatible contexts. 
+
+
+\section{Program logic}
+
+\subsection{Rely, guarantee, stability}
+
+In particular,
+an action whose precondition is satisfiable is always enabled from the
+empty subjective assertion (which by definition is compatible with all
+other states). 
+
+
+\subsection{Proof rules}
+
+Explain atomic rule. Others are standard.
+

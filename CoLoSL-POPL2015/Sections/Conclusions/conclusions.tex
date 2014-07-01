@@ -1,3 +1,28 @@
 \section{Conclusions}
 \label{sec:conclusion}
-Conclusions text goes here.
+
+Well, that was awesome.
+
+Future work: because we are able to specify shared state and
+interferences locally, there is hope that \colosl can be adapted to
+reason about distributed systems as well, as in our motivating example
+of \S\ref{sec:intuition}.
+
+\julescomment{This is a brain dump. Doesn't have to make it in the
+  submitted version.}
+
+One of the new paradigms of \colosl is the ability to manipulate the
+interference relation, via \emph{shifting}. The focus of this paper
+has largely been on manipulations of the spatial components of
+subjective views, and the treatment of shifting has been left at the
+minimum we needed to cover our range of examples. This opens the way
+to more fine-grained reasoning about interferences. For instance, a
+process who never receives a capability could safely over-approximate
+the corresponding interference. Conversely, a process who never gives
+a capability away could safely under-approximate the corresponding
+interference relation. In \colosl, this is not yet allowed, as
+interferences can only be shifted to equivalent ones, the only
+exception being the ability to forget actions that have no visible
+effect on the current subjective state. One could imagine tracking
+which process is allowed to own which capability to be more flexible
+in this instance. (if that can be useful at all?)
