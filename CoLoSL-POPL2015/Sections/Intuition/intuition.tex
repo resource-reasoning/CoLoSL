@@ -14,7 +14,7 @@ increment each variable in a lock-step fashion: $\mathbb{P}_{\li x}$
 is the first allowed to run its increment operation; then
 $\mathbb{P}_{\li y}$; and finally $\mathbb{P}_{\li z}$. This process
 repeats until $\li{x} = \li{y} = \li{z} = 10$.  This example code is
-interesting because the threads are intrically intertwinned. With
+interesting because the threads are intricately intertwined. With
 thread $\mathbb{P}_{\li y}$, the programmer knows that the resource
 directly affected by the thread involves the cells given by \li{x} and
 \li{y}. He knows the simple behaviour of the thread that it will
@@ -124,8 +124,7 @@ plus {\em subjective views} and {\em capabilities}. \colosl
 assertions are interpreted over a particular domain which includes:
 {thread-local} state exclusively visible to the thread; {\em one}
 global shared state accessible by all threads; and { interference
-actions}  describing how the global state can be updated. An 
-subjective view  $\shared{P} I$ comprises assertion $P$ which
+actions}  describing how the global state can be updated. A subjective view  $\shared{P} I$ comprises assertion $P$ which
 gives {\em partial} information about the global
 shared state and interference relation $I$  which gives partial
 information about  how this
@@ -147,17 +146,16 @@ referred to by  variables \li{x},
 \li{y} and \li{z} and contain the value  $0$. This resource in the thread-local state is
 fully owned by  the thread. Using the extension principle, the thread is able to give up  this local
 resource and transfer it  to the global shared state. For example,
-line~4 demonstates the
+line~4 demonstrates the
 creation of a subjective view $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|->
   0}I$, where {part} of the underlying
 global shared state now contains the three heap cells and the 
-interference relation $I$ declares  how  this  part of the  shared state  is able 
-change. For example,  the action 
+interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action 
 \[
  \token a_{\li y}:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}
 \]
-can increment  the cell given by \li{y} under the condition that the
+can increment  the cell addressed by \li{y} under the condition that the
 value of the  cell
 given by \li{x} is one more than that of \li{y}. 
 This update is only possible when the
@@ -165,14 +163,14 @@ local state of a thread has the { capability} $[\token a_{\li y}]$. For  this
 particular 
 example, the assertion in line~4 simply has all the capabilities $[\token
 a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the $I$-actions   in the local state; in general,
-capablities can be buried inside boxes, only to emerge as a
+capabilities can be buried inside boxes, only to emerge as a
 consequence of an action
 (see  TODO). 
 
 
 
 Using the disjoint concurrency rule and the 
-split/merge principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
+copy/merge principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
 \[
 \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
 \]
@@ -198,13 +196,11 @@ and shift principles given in the introduction:
 &=>  \shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]
  & \textsc{(Weaken)}\\
 \end{align*}
-The thread $\mathbb{P}_{\li y}$ does not modify \li{z} so we are able to  forget the
-cell referenced by \li{z}. Since there is now no cell given by \li{z}, the
-action $\token a_{\li z}$ does not affect the resource given by the
-assertion of the subjective view, and never will during the lifetime
-of this subjective view: that is,  after supporting any number of actions
-from $I$. Using the shift principle, we
-can therefore  remove the $\token{a}_{\li z}$ action. 
+The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the cell referenced by \li{z}. The cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
+action $\token a_{\li z}$ does not affect the resources described by the
+assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions
+from $I$, the resulting subjective view remains unaffected by $\token a_{\li z}$. Using the shift principle, we
+can therefore forget the $\token{a}_{\li z}$ action. 
 Finally, as is normal when reasoning about concurrency, we weaken so
 that, whatever the environment can do to the state, the assertion
 inside the box still holds (the assertion is \emph{stable}). However, we have   lost information about
@@ -213,7 +209,7 @@ of \li{z}, but there is nothing now to constrain \li{z}. Hence, we can only
 stabilise in a general way as given, losing information about how the
 values of \li{x} and \li{y} are connected together through \li{z}.
 
-It is possible to give a  stronger specification, as follows: 
+It is however possible to give a  stronger specification, as follows: 
 \begin{align*}
  & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]&\\
 &=>  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]&\eqref{eq:shift}\\
@@ -243,9 +239,9 @@ This is possible  because, as the programmer knows, whenever the cells
 of \li{x} and
 \li{z} have the same value then the \li{y} cell also has the same value which, under these
 conditions, is not changed by the actions in $I$. This ammended action  gives full information about how the resource of
-the subjective view changes as \li{x} is being updated. 
-  Let  $I_{\li y}' $ be  $I_{\li y}$ with the new version of $\token a_{\li x}$.
-As  justified in section~3, we can 
+the subjective view changes as \li{x} is being updated.
+Let  $I_{\li y}' $ be  $I_{\li y}$ with $\token a_{\li x}$ rewritten as above.
+As we justify in \S~\ref{sec:logic}, we can 
 use  the shift principle with  shift judgement 
 $
 I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
@@ -275,13 +271,15 @@ information about the values of the \li{x} and \li{y} cells.
 
 
 There is one more subtlety to mention about this precondition.  The
-thread has the capablity $[\token a_{\li y}]$ to use action $\token
+thread has the capablity $[\token a_{\li y}]$ to perform action $\token
 a_{\li y}$ which only requires the resource described by the
 assertion. However, the action $\token a_{\li x}$ depends on the
-resource given by \li{z}, which is not now part of the subjective view
-of the thread. Actions performed by the environment can happen any
+resource given by \li{z}, which is no longer a part of the subjective view
+of the thread. 
+Actions performed by the environment can happen any
 time that the environment's subjective view is {\em compatible} with
-the thread's subjective view.  When that is the case, the piece of the
+the thread's subjective view.
+\azaleacomment{This is very misleading. The environment's view IS AND ALWAYS SHOULD BE compatible with the subjective view of the current thread.}  When that is the case, the piece of the
 state corresponding to the overlap between the state and the
 precondition of the action is removed, and the entire postcondition of
 the action is added in its place. Diagramatically, a subjective state
