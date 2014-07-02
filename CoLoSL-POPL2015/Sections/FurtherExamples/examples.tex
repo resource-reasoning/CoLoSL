@@ -1,8 +1,9 @@
 \section{Further Examples}\label{sec:examples}
 \todo introductory paragraph about data structures with sharing.\\
 \subsection{Concurrent Spanning Tree}
-Let $\gamma$ denote a directed connected binary (DCB) graph with a finite set of vertices where each vertex is associated with at most two successors. Similarly, let $\theta$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
-For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph (left) and a possible spanning tree (right).
+%Let $\gamma$ denote a directed connected binary (DCB) graph with a finite set of vertices where each vertex is associated with at most two successors.
+Let $\gamma = (V, E)$ denote a connected directed binary graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\nil\}) \times (V \uplus \{\nil\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$ and $\gamma(n)$ for $E(n) $. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
+For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph (\subref{subfig:graph}) and a possible spanning tree (\subref{subfig:tree}).
 \begin{figure}
 \hrule
 \begin{tabular}{c c c}
@@ -33,11 +34,11 @@ For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph (left) and a possib
 \end{figure}
 %Let $\gamma = (V, E)$ denote a connected directed binary graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{0\}) \times (V \uplus \{0\})$ is a function associating each vertex with at most two successors. Given a graph $\gamma = (V, E)$, a \emph{tree} (acyclic connected directed graph) $\theta$ is a spanning tree of $\gamma$ if it includes all vertices of $\gamma$ and every edge in $\theta$ is also an edge in $\gamma$. In other words, $\theta = (V, E')$ where $E' \subseteq E$ and $E'$ is minimal. Given a graph $\gamma = (V, E)$, we write $x \in \gamma$ for $x \in V \uplus \{0\}$.
 
-In order to reason about graphs, we define an inductive predicate $\graph{x}{S}$ as given in \fig\ref{fig:globalCST} to describe a graph rooted at address $x$ with the finite set of vertices (addresses) $S$. It represents a spatial (in heap) graph shared amongst the threads spanning it where each node can be marked (visited) via any of its incoming edges from its predecessors. For instance, in the graph of \fig\ref{subfig:graph}, the $z$ node can be visited via the right edge of node $y$ ($y.r$) as well as the left edge of node $w$ ($w.l$). As such, in our reasoning we have \emph{marking} capabilities of the form $\markT{n}{e}$ where $n$ denotes the vertex (address) and $e$ the edge via which vertex $n$ is visited. For instance, the capabilities associated with marking of vertex $z$ in \fig\ref{subfig:graph} are $\markT{z}{y.r}$ and $\markT{z}{w.l}$. Recall from \S\ref{sec:logic} that the parameterisation of our actions are merely a notational convenience and can be substituted for their full definitions. Given a graph  at root address $x$, in order to account for the ability to mark the root vertex $x$, we introduce a logical (virtual) root edge $\rootEdge$ into $x$ as depicted in \fig\ref{subfig:graphWithRootEdge} together with its associated marking capability $\markT{x}{\rootEdge}$. The shared state contains node $x$ which can be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as well as the left and right subgraphs captured recursively by the $\G{l}{S}$ and $\G{r}{S}$ predicates. Note that the two subgraphs and vertex $x$ are combined by the overlapping conjunction $\sepish$ since the graph can be cyclic and each node may be reachable via more than one path. 
+In order to reason about graphs, we define an inductive predicate $\graph{x}{\gamma}$ as given in \fig\ref{fig:globalCST} to describe a spatial (in heap) graph rooted at address $x$ corresponding to the mathematical graph $\gamma$. It represents a spatial graph shared amongst the threads spanning it where each node can be marked (visited) via any of its incoming edges from its predecessors. For instance, in the graph of \fig\ref{subfig:graph}, the $z$ node can be visited via the right edge of node $y$ ($y.r$) as well as the left edge of node $w$ ($w.l$). As such, in our reasoning we have \emph{marking} capabilities of the form $\markT{n}{e}$ where $n$ denotes the vertex (address) and $e$ the edge via which vertex $n$ is visited. For instance, the capabilities associated with marking of vertex $z$ in \fig\ref{subfig:graph} are $\markT{z}{y.r}$ and $\markT{z}{w.l}$. Recall from \S\ref{sec:logic} that the parameterisation of our actions are merely a notational convenience and can be substituted for their full definitions. Given a graph  at root address $x$, in order to account for the ability to mark the root vertex $x$, we introduce a logical (virtual) root edge $\rootEdge$ into $x$ as depicted in \fig\ref{subfig:graphWithRootEdge} together with its associated marking capability $\markT{x}{\rootEdge}$. The shared state contains node $x$ which can be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as well as the left and right subgraphs captured recursively by the $\G{l}{\gamma}$ and $\G{r}{\gamma}$ predicates. Note that the two subgraphs and vertex $x$ are combined by the overlapping conjunction $\sepish$ since the graph can be cyclic and each node may be reachable via more than one path. 
 
 Each vertex is represented as three consecutive cells in the heap tracking the mark value ($0$ or $1$) and the addresses of the left ($l$) and right ($r$) subgraphs. For brevity, we write $\cell{x}{m, l, r}$ for $\cell{x}{m} * \cell{x+1}{l} * \cell{x+2}{r}$. Moreover, in order to increase readability we write $x.m$, $x.l$ and $x.r$ for $x$, $x+1$ and $x+2$, respectively. When vertex $x$ is in the unmarked state, the mark value corresponds to $0$ ($\cell{x.m}{0}$) and the left and right pointers ($\cell{x.l}{l} * \cell{x.r}{r}$) as well as the capability to mark them ($\markT{l}{x.l} * \markT{r}{x.r}$ reside in the shared state. In the marked state the mark value is $1$ ($\cell{x.m}{1}$) and the resources associated with the left and right subgraphs (pointers and capabilities) have been claimed by the marking thread. 
 
-The interference associated with the graph is described as the union of interferences pertaining to the vertices of the graph ($S$). For each vertex $n \in S$, the only permitted action is that of marking $n$ which can be carried out by any of the marking capabilities associated with node $n$ ($\markT{n}{-}$). Note that the anonymous quantification $-$ is yet another notational shorthand and can be substituted for the following more verbose definition.
+The interference associated with the graph is described as the union of interferences pertaining to the vertices of the graph ($n \in \gamma$). For each vertex $n \in \gamma$, the only permitted action is that of marking $n$ which can be carried out by any of the marking capabilities associated with node $n$ ($\markT{n}{-}$). Note that the anonymous quantification $-$ is yet another notational shorthand and can be substituted for the following more verbose definition.
 %%
 %\[
 %I(n) \eqdef \bigcup\limits_{p \in S} \left( \bigcup\limits_{e \in \{p.l, p.r, \rootEdge\}} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
@@ -45,7 +46,7 @@ The interference associated with the graph is described as the union of interfer
 %%
 %
 \[
-I(n) \eqdef \bigcup\limits_{e \in \textsf{Loc}} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} 
+I(n) \eqdef \bigcup\limits_{e \in \gamma} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} 
 \]
 %
 %
@@ -54,10 +55,10 @@ I(n) \eqdef \bigcup\limits_{e \in \textsf{Loc}} \markT{n}{e} : \exsts{l, r} \unm
 \hrule
 \[
 \begin{array}{r @{\hspace*{2pt}} l}
-	\graph{x}{S} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{S}}{\bigcup\limits_{n \in S}I(n)}\\
+	\graph{x}{\gamma} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{\bigcup\limits_{n \in \gamma}I(n)}\\
 %	
-	\G{x}{S} \eqdef & (x = \nil \land \emp) \lor x \in S \land \exsts{l, r}\\
-	& \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{S} \sepish \G{r}{S}\\
+	\G{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \\
+	& \land \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}\\
 %
 	\unmarked{x}{l}{r} \eqdef & \cell{x}{0, l, r} * \markT{l}{x.l} * \markT{r}{x.r}\\
 %	
@@ -65,7 +66,7 @@ I(n) \eqdef \bigcup\limits_{e \in \textsf{Loc}} \markT{n}{e} : \exsts{l, r} \unm
 %
 	I(n) \eqdef & \left\{ \markT{n}{-}: \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n}\right\}\\
 %
-%	\tree{x}{S} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{S}}{\bigcup\limits_{n \in S}I(n)}\\
+%	\tree{x}{\gamma} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{\bigcup\limits_{n \in \gamma}I(n)}\\
 \end{array}
 \]
 %
@@ -82,118 +83,164 @@ I(n) \eqdef \bigcup\limits_{e \in \textsf{Loc}} \markT{n}{e} : \exsts{l, r} \unm
 \hrule
 \[
 \begin{array}{r @{\hspace*{2pt}} l}
-	\g{x}{S} \eqdef & (x = \nil \land \emp) \lor x \in S \land \exsts{l, r}\\
-	& \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{S} * \g{r}{S}\\
+	\g{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
+	& \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma}\\
 	
-	\tr{x}{S} \eqdef & (x = \nil \land \emp) \lor \\
-	& x \in S \land \exsts{l, r}\exsts{l' \in \{l, \nil\}} \exsts{r' \in \{r, \nil\}}\\
-	&  \shared{\marked{x}}{I(x)} * \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{S} * \\
-	&  \markT{r}{x.r} * \cell{x.r}{r'} *\tr{r'}{S}
+	\tr{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
+	& \exsts{l' \in \{l, \nil\}} \exsts{r' \in \{r, \nil\}}\\
+	&  \shared{\marked{x}}{I(x)} * \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} * \\
+	&  \markT{r}{x.r} * \cell{x.r}{r'} *\tr{r'}{\gamma}
 \end{array}
 \]
 \hrule
-\label{fig:localCST}
 \caption{Local specification of the graph predicate.}
+\label{fig:localCST}
 \end{figure}
 %
-The $\graph{x}{S}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each $\texttt{span}(n)$ call (where $n \in S$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\texttt{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{S}$ as defined in \fig\ref{fig:localCST} such that for all $S in \pset{\textsf{Loc}}$ and $n, e \in S$  \\
-
-\todo explain the $\g{x}{S}$ and $\tr{x}{S}$ predicates. 
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each $\texttt{span}(n)$ call (where $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\texttt{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, e \in \gamma$  \\
 %
 \[
+\begin{array}{c}
 	\left\{
-	\begin{array}{@{} l @{}}
-		\markT{n}{p} * \\
-		\g{n}{S}
-	\end{array}
-	\right\}  
+		\cell{\tx{n}}{n} * \cell{\tx{b}}{-} * 
+		\markT{n}{e} * 
+		\g{n}{\gamma}
+	\right\}  \\
 %	
-	b\texttt{:= span(}n\texttt{)} 
+	\command{b:= span(n)} \\ 
 %
 	\left\{
-	\begin{array}{@{} l @{}}
-		\markT{n}{p} * 
+		\cell{\tx{n}}{n} *  
+		\markT{n}{e} * 
 		\left(
-		\begin{array}{@{} l @{}}
-			b \land \tr{n}{S} \lor\\
-			\neg b \land \tr{\nil}{S}
-		\end{array}
+%		\begin{array}{@{} l @{}}
+			\cell{\tx{b}}{1} * \tr{n}{\gamma} \lor
+			\cell{\tx{b}}{0} *  \tr{\nil}{\gamma}
+%		\end{array}
 		\right)
-	\end{array}
+%	\begin{array}{@{} l @{}}
+%		\markT{n}{p} * 
+%		\left(
+%		\begin{array}{@{} l @{}}
+%			b \land \tr{n}{\gamma} \lor\\
+%			\neg b \land \tr{\nil}{\gamma}
+%		\end{array}
+%		\right)
+%	\end{array}
 	\right\}
+\end{array}
 \]
 %
+\azaleacomment{explain the $\g{x}{\gamma}$ and $\tr{x}{\gamma}$ predicates. }
 
-
-We now demonstrate how to obtain the local specification $\g{x}{S}$ from the global specification of \fig\ref{fig:globalCST}. 
-When expanding the definition of $\G{x}{S}$, there are two cases to consider depending on whether or not $x = \nil$. In what follows we only consider the case where $x \not= \nil$ since the derivation in the case of $x = \nil$ is trivial.
+We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from the global specification of \fig\ref{fig:globalCST}. 
+When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \nil$. In what follows we only consider the case where $x \not= \nil$ since the derivation in the case of $x = \nil$ is trivial.
+Let $\gamma = (V, E)$ with $|V| = k$ and
+\[
+\begin{array}{l l}
+	P \eqdef & \iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n}) \; \right)\\
+	
+	Q \eqdef & \iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)} \right)\\
+\end{array}	
+\]
+Then we have: 
+\[
+\begin{array}{l @{\hspace*{1cm}} c @{\hspace*{1cm}} l}
+	\G{x}{\gamma} \iff  P & \text{and} & \g{x}{\gamma} \iff Q
+\end{array}
+\]
+%
+It thus suffices to show $\shared{P}{\bigcup\limits_{n \in \gamma} I(n)} \semimplies Q$.
 %
 \[
 \begin{array}{@{} c @{} l @{}}
-	&\shared{\G{x}{S}}{\bigcup\limits_{n \in S} I(n)}  \\
-	
-	\stackrel{(\textsf{G}\ \defin)}{\implies} & \shared{\exsts{l, r} (\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
-	
-	\implies &   \exsts{l, r}  \shared{(\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+	&\shared{P}{\bigcup\limits_{n \in \gamma} I(n)}  \\
 	
 	\stackrel{(\textsc{Copy})}{\implies} &
-	\exsts{l, r}  
-	\shared{(\unmarked{x}{l}{r} \lor \marked{x})  \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
-	& * \shared{(\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
-	& * \shared{(\unmarked{x}{l}{r} \lor \marked{x})  \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+	\underbrace{\shared{P}{\bigcup\limits_{n \in \gamma} I(n)} * \cdots * \shared{P}{\bigcup\limits_{n \in \gamma} I(n)} }_{k \text{ times}}\\
+	
 	
 	
 	\stackrel{(\textsc{Forget})}{\implies} &
-	\exsts{l, r}  
-	\shared{\unmarked{x}{l}{r} \lor \marked{x}  }{\bigcup\limits_{n \in S} I(n)} \\
-	& * \shared{\G{l}{S}}{\bigcup\limits_{n \in S} I(n)} * \shared{\G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
-	
-	
-	
-	\stackrel{(?)}{\semimplies} &
-	\exsts{l, r}  
-	\shared{\unmarked{x}{l}{r} \lor \marked{x}}{\bigcup\limits_{n \in S} I(n)} * \g{l}{S} * \g{r}{S}\\
+	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{\bigcup\limits_{n \in \gamma} I(n)}  \right)\\
 	
 	
 	\stackrel{(\textsc{Shift})}{\semimplies} &
-	\exsts{l, r}  
-	\shared{\unmarked{x}{l}{r} \lor \marked{x} }{I(x)} * \g{l}{S} * \g{r}{S}\\
+	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}  \right)\\
 	
 	
-	\iffdef & \g{x}{S}
+	\iffdef & Q
 	
 \end{array}
 \]
 %
+%%
+%\[
+%\begin{array}{@{} c @{} l @{}}
+%	&\shared{P}{\bigcup\limits_{n \in S} I(n)}  \\
+%	
+%	\stackrel{(\textsf{G}\ \defin)}{\implies} & \shared{\exsts{l, r} (\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	
+%	\implies &   \exsts{l, r}  \shared{(\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	
+%	\stackrel{(\textsc{Copy})}{\implies} &
+%	\exsts{l, r}  
+%	\shared{(\unmarked{x}{l}{r} \lor \marked{x})  \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	& * \shared{(\unmarked{x}{l}{r} \lor \marked{x}) \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	& * \shared{(\unmarked{x}{l}{r} \lor \marked{x})  \sepish \G{l}{S} \sepish \G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	
+%	
+%	\stackrel{(\textsc{Forget})}{\implies} &
+%	\exsts{l, r}  
+%	\shared{\unmarked{x}{l}{r} \lor \marked{x}  }{\bigcup\limits_{n \in S} I(n)} \\
+%	& * \shared{\G{l}{S}}{\bigcup\limits_{n \in S} I(n)} * \shared{\G{r}{S}}{\bigcup\limits_{n \in S} I(n)} \\
+%	
+%	
+%	
+%	\stackrel{(?)}{\semimplies} &
+%	\exsts{l, r}  
+%	\shared{\unmarked{x}{l}{r} \lor \marked{x}}{\bigcup\limits_{n \in S} I(n)} * \g{l}{S} * \g{r}{S}\\
+%	
+%	
+%	\stackrel{(\textsc{Shift})}{\semimplies} &
+%	\exsts{l, r}  
+%	\shared{\unmarked{x}{l}{r} \lor \marked{x} }{I(x)} * \g{l}{S} * \g{r}{S}\\
+%	
+%	
+%	\iffdef & \g{x}{S}
+%	
+%\end{array}
+%\]
+%%
 %
 \begin{figure}
 \hrule
 \begin{lstlisting}
- //$\comment\{\graph{x}{S}\}$
- //$\comment\{\markT{x}{\rootEdge} * \shared{\G{x}{S}}{\bigcup\limits_{n \in S} I(n)}\}$
- //$\comment\{\markT{x}{\rootEdge} * \g{x}{S}\}$
+ //$\comment\{ \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \graph{x}{\gamma}\}$
+ //$\comment\{\cell{\tx{x}}{x} *  \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{\bigcup\limits_{n \in \gamma} I(n)}\}$
+ //$\comment\{\cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \g{x}{\gamma}\}$
  b:= span(x) {
-   //$\comment\{\markT{x}{\rootEdge} * \shared{\exsts{l, r} \unmarked{x}{l}{r} * \g{l}{S} * \g{r}{S}  \lor \marked{x}}{I(x)} \}$
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge}\\ * \shared{\exsts{l, r} \unmarked{x}{l}{r} * \g{l}{\gamma} * \g{r}{\gamma}  \lor \marked{x}}{I(x)} \end{array} \right\}$
    res:= <CAS(x.m, 0, 1)>;
-   //$\comment\left\{\begin{array}{l}\markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} *\\ (\neg\texttt{res}\land\emp) \lor\\  \left(\begin{array}{l}\texttt{res}\land\exsts{l, r} \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \g{l}{S} * \markT{r}{x.r} * \g{r}{S} \end{array}\right)\end{array}\right\}$
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} *\\ (\cell{\tx{res}}{0}) \lor\\  \left(\begin{array}{l} \cell{\tx{res}}{1} * \exsts{l, r} \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma} \end{array}\right)\end{array}\right\}$
    if (res) then { 
-   //$\comment\left\{\begin{array}{l} \texttt{res} \land \exsts{l, r} \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \cell{x.l}{l} * \cell{x}{r} *\\\markT{l}{x.l} * \g{l}{S} * \markT{r}{x.r} * \g{r}{S} \end{array}\right\}$
-     //$\comment\left\{\markT{l}{x.l} * \g{l}{S} * \markT{r}{x.r} * \g{r}{S}  \right\}$   
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \end{array} \right\}$
+     //$\comment\left\{\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \right\}$   
      b1:= span(x.l) || b2:= span(x.r)
-     //$\comment\left\{\begin{array}{l}\markT{l}{x.l} * \left( (\texttt{b1} \land \tr{l}{S}) \lor (\neg\texttt{b1} \land \tr{\nil}{S})\right) *\\ \markT{r}{x.r} * \left( (\texttt{b2} \land \tr{r}{S}) \lor (\neg\texttt{b2} \land \tr{\nil}{S})\right)  \end{array}\right\}$   
-   //$\comment\left\{\begin{array}{l}  \texttt{res} \land \exsts{l, r} \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \left( (\texttt{b1} \land \tr{l}{S}) \lor (\neg\texttt{b1} \land \tr{\nil}{S})\right) *\\ \markT{r}{x.r} * \left( (\texttt{b2} \land \tr{r}{S}) \lor (\neg\texttt{b2} \land \tr{\nil}{S})\right)   \end{array}\right\}$  
+     //$\comment\left\{\begin{array}{@{} l @{}}  \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\nil}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\nil}{\gamma})\right)  \end{array}\right\}$   
+   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\nil}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\nil}{\gamma})\right)    \end{array}\right\}$  
      if (!b1) then 
        x.l:= null
      if (!b2) then 
        x.r:= null
-   //$\comment\left\{\begin{array}{l}  \texttt{res} \land \exsts{l, r} \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \\ \exsts{l' \in \{l, \nil\}} \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{S} *\\ \exsts{r' \in \{r, \nil\}} \markT{r}{x.r} * \cell{x}{r'} * \tr{r'}{S} \end{array}\right\}$      
-   //$\comment\{\texttt{res} \land \markT{x}{\rootEdge} *  \tr{x}{S}\}$      
+   //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \cell{\tx{res}}{1} * \\ \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} * \\ \exsts{l' \in \{l, \nil\}} \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \nil\}} \markT{r}{x.r} * \cell{x}{r'} * \tr{r'}{\gamma} \end{array}\right\}$      
+   //$\comment\{\texttt{res} \land \markT{x}{\rootEdge} *  \tr{x}{\gamma}\}$      
    }		
-   //$\comment\{(\texttt{res} \land \markT{x}{\rootEdge} * \tr{x}{S}) \lor (\neg \texttt{res} \land \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)}) \}$   
-   //$\comment\{\markT{x}{\rootEdge} *  (\texttt{res} \land \tr{x}{S}) \lor (\neg \texttt{res} \land \tr{\nil}{S}) \}$      
+   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)}) \end{array} \right\}$ 
+   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} * \tr{\nil}{\gamma}) \end{array} \right\}$      
    return res
  }
- //$\comment\{\markT{x}{\rootEdge} *  (\texttt{b} \land \tr{x}{S}) \lor (\neg \texttt{b} \land \tr{\nil}{S}) \}$      
+ //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \markT{x}{\rootEdge} *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\nil}{\gamma}) \end{array} \right\}$         
 \end{lstlisting}
 \hrule\vspace*{5pt}
 \caption{Concurrent Spanning Tree Implementation}
