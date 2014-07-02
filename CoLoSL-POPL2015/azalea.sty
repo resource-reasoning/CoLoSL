@@ -25,6 +25,7 @@
 \usepackage{listings}
 %\usepackage{alltt}
 \usepackage{tikz}
+\usepackage{fancybox}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
@@ -288,7 +289,8 @@
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \addtolength{\fboxsep}{-1.5pt}
-\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
+%\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
+\newcommand{\shared}[2]{{\ovalbox{$#1\vphantom{Qq}$}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
 \newcommand{\interAss}[4]{#1: \exsts{#2} #3 \swap #4\xspace}
@@ -388,7 +390,7 @@
   \mathlig{-|-}{\mathrel{\mathrlap{\dashv} \hspace{5pt} \vdash}} % entails
   % 2 chars
 %  \mathlig{==}{\mathrel{\stackrel{\smash{\scriptscriptstyle\mathrm{def}}}{=}}}
- \mathlig{==}{\mathrel{\triangleq}}
+ \mathlig{==}{\eqdef}
   \mathlig{/|}{\mathbin{\wedge}} % additive conjunction
   \mathlig{|/}{\mathbin{\vee}} % additive disjunction
   \mathlig{/=}{\mathrel{\neq}} % non-equality expression
