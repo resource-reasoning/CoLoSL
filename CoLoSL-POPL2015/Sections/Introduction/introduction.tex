@@ -64,21 +64,14 @@ their function, a key ingredient of compositionality.
 %%   reusability of proofs.
 
 \colosl's subjective views are of the form $\shared P I$ where $P$ is
-a formula and $I$ a set of \emph{actions} (or interferences). These
-assertions mean that the formula $P$ is true of \emph{some part} of
-the shared state, and that this part of the shared state is subject to
-interferences in $I$ (which describes those actions mutating the
-shared state that are to be expected from the environment and,
-simultaneously, those actions that the current thread is allowed to
-perform).  Four novel principles allow us to reason about this novel
-interpretation of shared state assertions in \colosl.
+a formula and $I$ is the \emph{interference} described as a set of \emph{actions}. The  $\shared P I$ assertion means that the formula $P$ is true of \emph{some part} of the shared state, and that this part of the shared state is subject to the interference captured by $I$. The interference $I$ contains actions that describe how the shared state can be mutated by the environment (known in the literature as ``Rely''), as well as those actions that the current thread is allowed to perform (known as ``Guarantee'').  Four novel principles allow us to reason about this novel interpretation of shared state assertions in \colosl.
 
 First, subjective views only capture fractions of the global shared
 state relevant to the program at hand, and we can always zoom in
 further on the subjective state:
 \begin{align*}
   \label{eq:forget}
-  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\textsc{Forget}}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
 \end{align*}
 This allows one to reuse specifications written from a subjective view
 of the state in contexts where we know more about the share state.
@@ -89,14 +82,14 @@ states that result from overlapping a state satisfying $P$ with one
 satisfying $Q$):
 \begin{align*}
   \label{eq:merge}
-  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\textsc{Merge}}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
 \end{align*}
 Doing so also combines the interference relations. Pleasingly, the new
 interference relation is simply the union of previous interferences.
-Similarly, the shared state can always be duplicated:
+Similarly, the subjective view can always be duplicated:
 \begin{align*}
   \label{eq:split}
-  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\textsc{Copy}}
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
 \end{align*}
 In combination with the usual law of parallel composition of
 separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
@@ -119,7 +112,7 @@ are \emph{shifted}:
   I \weakenIb{P} I'
   &\text{ implies }
   \shared{P}{I} ===> \shared{P}{I'}
-  \tag{\textsc{Shift}}
+  \tag{\shiftRule}
 \end{align*}
 This feature is in contrast with most existing formalisms, where the
 interference relation is fixed for the proof of the whole program. The
@@ -137,16 +130,16 @@ together with new actions:
   P ===>
   \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
     \capAss{2}}{I}
-  \tag{\textsc{Extend}}
+  \tag{\extendRule}
 \end{align}
 The side condition $P \containI I$ ensures that the mutations
 performed by actions in $I$ are confined to $P$. The existential
 quantification of capabilities is to ensure the \emph{freshness} of
-the generated capabilities. The main novelty of this rule is that fact
+the generated capabilities. The main novelty of this rule is the fact
 that new actions may refer to existing shared state. As we will see in
 our example of concurrent set operations, this enable flexible and
 powerful reasoning.
-
+\azaleacomment{We have not said what capabilities are. This is a bit rushed. Also, are we going to replace $\capAss{}$ with tokens?}
 Contributions:
 \begin{enumerate}
 \item
@@ -169,7 +162,7 @@ Contributions:
   for previous work. We are able to derive natural and concise specs,
   circumscribed to the part of the shared state accessed by each
   thread, even in the case of threads operating on subparts of data
-  structures with unspecified sharing (directed acyclic graphs in our
+  structures with unspecified sharing (directed graphs in our
   example).
 \item
   We demonstrate the generality of \colosl by deriving the main
