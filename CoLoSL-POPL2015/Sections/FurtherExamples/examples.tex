@@ -281,7 +281,7 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 	
 		\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h.lock}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
 		
-		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  _\triangleleft L \land \lsg{h}{\nil}{-\infty:: L ++ \{\infty\} }{h}\\
+		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{\nil}{-\infty:: L ++ \{\infty\} }{h} \hspace{1cm}\text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 	
 	%	\sorted{L} \eqdef & (L  = [] \land \emp) \lor( \exsts{v_0} L = [v_0] \land \emp) \lor \exsts{v_0, v_1, L'} L = v_0 :: (v_1 :: L') \land v_0 < v_1 \land \sorted{v_1:: L'}\\
 	
@@ -354,18 +354,26 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 %
 %
 
-We instantiate \colosl\ with a \emph{ghost fractional heap} to represent the separation algebra of capabilities and write heap-like assertions of the form $\setCap{a}[\pi][b]$ to denote capability $a$ with permission $\pi$. Moreover, our capabilities are \emph{stateful} in that they can capture some additional information ($b$). As we demonstrate below, this leads to conciser specifications. For readability we write $\setCap{a}[][b]$ for $\setCap{a}[1][b]$ and $\setCap{a}[\pi]$ for $\exsts{b}\setCap{a}[\pi][b]$.
+Since \colosl is parametric in the separation algebra of capabilities and capability assertions, we instantiate it with a \emph{ghost fractional heap} to represent the separation algebra of capabilities and write heap-like assertions of the form $\setCap{a}[\pi][b]$ to denote capability $a$ with permission $\pi$. Moreover, our capabilities are \emph{stateful} in that they can capture some additional information ($b$). As we demonstrate below, this leads to conciser specifications. For readability we write $\setCap{a}[][b]$ for $\setCap{a}[1][b]$ and $\setCap{a}[\pi]$ for $\exsts{b}\setCap{a}[\pi][b]$.
 
-\noindent\textbf{\textsf{isLock}(}$a, \pi$\textbf{) / }\textbf{\textsf{locked}(}$a$\textbf{)}    
-Every node in the singly-linked list is protected by a lock that is to be acquired prior to modification of the node. The $\isLock{a}{\pi}$ predicate is similar to that in \cite{cap-ecoop10} and states that the lock at address $a$ can be acquired with permission $\pi \in (0, 1]$. Multiple threads may attempt to acquire the lock at once and thus we use the $\pi$ argument to reflect this sharing where $1$ denotes exclusive right to acquisition while $\pi \in (0, 1)$ accounts for sharing of the lock between multiple threads. The $\isLock{a}{\pi}$ predicate asserts that the thread's local state contains the capability $\lockT{a}[\pi]$ to acquire the lock and that the lock resides in the shared state where at any one point either the lock is unlocked ($\cell{a}{0}$) and the shared state contains the capability to unlock it ($\unlockT{a}$); or it is locked ($\cell{a}{1}$) and the unlocking capability has been claimed by the locking thread. The $\locked{a}$ predicate asserts that the thread's local state contains the capability to unlock the lock $[\unlockT{a}]$ and that the $a$ is in the locked state ($\cell{a}{1}$).
+\noindent\textbf{\textsf{isLock}($a, \pi$) / \textsf{locked}($a$)} \hspace{0.3cm} 
+Every node in the singly-linked list is protected by a lock that is to be acquired prior to modification of the node. The $\isLock{a}{\pi}$ predicate is similar to that in \cite{cap-ecoop10} and states that the lock at address $a$ can be acquired with permission $\pi \in (0, 1]$. Multiple threads may attempt to acquire the lock at once and thus we use the $\pi$ argument to reflect this sharing where $1$ denotes exclusive right to acquisition while $\pi \in (0, 1)$ accounts for sharing of the lock between multiple threads. The $\isLock{a}{\pi}$ predicate asserts that the thread's local state contains the capability $\lockT{a}[\pi]$ to acquire the lock and that the lock resides in the shared state where at any one point either the lock is unlocked ($\cell{a}{0}$) and the shared state contains the capability to unlock it ($\unlockT{a}$); or it is locked ($\cell{a}{1}$) and the unlocking capability has been claimed by the locking thread. The $\locked{a}$ predicate asserts that the thread's local state contains the exclusive capability to unlock the lock $[\unlockT{a}]$ and that the $a$ is in the locked state ($\cell{a}{1}$). 
 
-\noindent\textbf{\textsf{in}(}$h, v$\textbf{) / }\textbf{\textsf{out}(}$h, v$\textbf{)}    
+\noindent\textbf{\textsf{in}($h, v$) / \textsf{out}($h, v$)} \hspace{0.3cm}
 The $\inSet{h}{v}$ predicate states that the set at head address $h$ contains value $v$ and captures exclusive right to alter the set by changing whether $v$ belongs to it. It asserts that the lock associated with head address can be acquired with some permission $\pi$ ($\isLock{h.lock}{\pi}$) and that the thread owns the exclusive capability to alter the set with respect to value $v$ ($\valueC{a}{v}$). The underlying singly-inked list is captured by the $\inList{h}{v}$ predicate. 
+The $\inList{h}{v}$ predicate uses an auxiliary mathematical (non-spatial) sorted list $L$ (such that $v \in L$) to capture the contents of the singly-linked list via the $\textsf{lsg}$ predicate. For simpler implementation, we extend $L$ with two sentinel values $-\infty$ and $\infty$, one at each end to avoid corner cases such as removing the first/last element of the list. The $\outSet{h}{v}$ predicate is analogous to $\inSet{h}{v}$ and corresponds to the case where the set at address $h$ does not contain $v$.
+
+\noindent\textbf{\textsf{lsg}($x, y, L, h$)} \hspace{0.3cm} This predicate is defined inductively and describes a \emph{segment} of the list at address $h$ that starts at address $x$ and extends upto (but not including) address $y$ and contains the elements in the mathematical list $L$. When $L$ is empty, it corresponds to a void segment and yields no resources (\emp); otherwise, it is defined as the composition of the first node of the segment at address $x$ with value $v$ and successor $z$, $\shared{\unlockedNode{x}{v}{z} \lor \locked{x}{v}{z}}{I(h, x)}$, and the tail of the list segment ($\lsg{z}{y}{L'}{h}$). Each node in the segment at address $x$ can be either unlocked ($\unlockedNode{x}{v}{z}$) or locked ($\lockedNode{x}{v}{z}$).
+
+\noindent\textbf{\textsf{U}($a, v, b$) / \textsf{L}($a, v, b$)} \hspace{0.3cm}
 \\
 
-\fig\ref{fig:capSetExample} shows the specification of the set module in Concurrent Abstract Predicates as defined in \cite{cap-ecoop10}. There are two main advantages to the \colosl\ specification of the set module. In the CAP specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$. Since the capabilities associated with a region are all allocated at the point of region creation, the shared region is required to keep track of all possible update capabilities $\capGapT{x}{y}{v}$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v$. For instance, since the value $v$ may be contained in the set at address $x$ before address $y$, the region must include the $\capGapT{x}{y}{v}$ capability to accommodate possible modifications of value $v$. This is captured by the $\gapsCAP{S}{s}$ and $\myGapsCAP{S}{s}$ predicates through the infinite multiplicative star operator $\iterStar$. On the other hand, since in \colosl\ allows for dynamic extension of the shared state, the capabilities associated with each address are generated upon extension of the shared state with those addresses. 
+The definitions of most of the predicates in \fig\ref{fig:coloslSetExample} are analogous to the correspondingly-named predicates in \cite{cap-ecoop10} specified in CAP. The difference however lies in the definitions of the 
+$\textsf{L}_{\triangleleft}$ and \textsf{lsg} predicates. 
+\fig\ref{fig:capSetExample} presents the definitions of these predicates in CAP as specified in \cite{cap-ecoop10}. 
+There are two main advantages to the \colosl\ specification of the set module. In the CAP specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$. Since the capabilities associated with a region are all allocated at the point of region creation, the shared region is required to keep track of all possible update capabilities $\capGapT{x}{y}{v}$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v$. For instance, since the value $v$ may be contained in the set at address $x$ before address $y$, the region must include the $\capGapT{x}{y}{v}$ capability to accommodate possible modifications of value $v$. This is captured by the $\gapsCAP{S}{s}$ and $\myGapsCAP{S}{s}$ predicates through the infinite multiplicative star operator $\iterStar$. The $\gapsCAP{S}{s}$ predicate uses an auxiliary mathematical set $S$ to track those nodes of the list that are currently locked and thus infer which \textsc{LGap} capabilities reside in the shared state and which ones have been removed. This results in an inevitably cluttered and a rather counter-intuitive specification since it seems unnatural to account for the capabilities pertaining to addresses and values not in the domain of the set. On the other hand, since \colosl\ allows for dynamic extension of the shared state, the capabilities associated with each address are generated upon extension of the shared state with those addresses and therefore it is not necessary to account for capabilities concerning the addresses and values absent from the list. 
 
-Moreover, since \colosl is parametric in the separation algebra of capabilities and capability assertions, we have chosen a \emph{ghost heap} and the corresponding assertions to model capabilities and their assertions. As such, since ghost heaps are \emph{stateful}, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we have a single capability of the form $\nextT{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextT{x}{y}$ is also updated as $\nextT{x}{z}$. 
+Moreover, since the ghost heaps used to represent the separation algebra of capabilities are \emph{stateful}, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we appeal to a single capability of the form $\nextT{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextT{x}{y}$ is also updated as $\nextT{x}{z}$. 
 
 %
 \begin{figure*}
@@ -377,9 +385,8 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 	
 		\outSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\outListCAP{h}{v}{s}}{F(s)}^{s}\\
 		
-		\sortedListCAP{\triangleleft}{h}{v}{s} \eqdef & \exsts{L, S} \sorted{L} \land v  _\triangleleft L \land \lsgCAP{h}{\nil}{S}{-\infty:: L ++ \{\infty\} } * \shade{\left( \gapsCAP{S}{s} \land \myGapsCAP{v}{s} \right) }\\
+		\sortedListCAP{\triangleleft}{h}{v}{s} \eqdef & \exsts{L, S} \sorted{L} \land v  \triangleleft L \land \lsgCAP{h}{\nil}{S}{-\infty:: L ++ \{\infty\} } * \shade{\left( \gapsCAP{S}{s} \land \myGapsCAP{v}{s} \right) } \text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 	  
-	%	\sorted{L} \eqdef & (L  = [] \land \emp) \lor( \exsts{v_0} L = [v_0] \land \emp) \lor \exsts{v_0, v_1, L'} L = v_0 :: (v_1 :: L') \land v_0 < v_1 \land \sorted{v_1:: L'}\\
 	
 		\lsg{x}{y}{S}{L} \eqdef & (L = [] \land S = \emptyset \land x = y \land \emp) \lor (\exsts{z, v, L'} L = v::L' \land \unlockedNode{x}{v}{z} * \lsg{z}{y}{S}{L'})\\
 		
@@ -387,7 +394,7 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 		
 	\end{array}\\
 	
-	\begin{array}{@{} r l @{\hspace{2cm}} r l @{}}
+%	\begin{array}{@{} r l @{\hspace{2cm}} r l @{}}
 		\unlockedNode{a}{v}{b} \eqdef & \linkCAP{a}{b} * \valCAP{a}{v} 
 		& \lockedNode{a}{v}{b} \eqdef & \locked{a} * \valCAP{a}{v}\\
 		
@@ -396,13 +403,6 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 	\end{array}\\
 		
 		
-		
-%		\node{a}{v}{b} \eqdef & \link{a}{b} * \valCAP{a}{v}\\		
-%%		\isLock{a}{\pi} \eqdef & \lockC{a}[\pi] * \shared{\cell{a.lock}{0} * \unlockC{a} \lor \cell{a.lock}{1}}{}
-%%		& \locked{a} \eqdef & \unlockC{a} * \shared{\cell{a.lock}{1}}{}	
-
-	
-	
 	\shade{
 	\begin{array}{@{} r @{\hspace*{3pt}} l @{}}
 		\gapsCAP{S}{s} \eqdef & \iterStar(x, y) \not\in S. \iterStar v. \capGapC{x}{y}{v}{s} *\\
@@ -413,12 +413,9 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 		
 	\end{array}
 	}
-
-		
-
 \end{array}
 \]
 \hrule
-\caption{CAP set specification where the definitions of $F(s)$, \textsf{isLock} and \textsf{locked} are provided in \cite{cap-ecoop10}.}
+\caption{CAP predicates of the set module that contrast with the \colosl\ specification of \fig\ref{fig:coloslSetExample}.}
 \label{fig:capSetExample}
 \end{figure*}
