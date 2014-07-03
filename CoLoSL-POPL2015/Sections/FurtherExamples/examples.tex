@@ -46,7 +46,7 @@ The interference associated with the graph is described as the union of interfer
 %%
 %
 \[
-I(n) \eqdef \bigcup\limits_{e \in \gamma} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} 
+I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r, \rootEdge\}} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
 \]
 %
 %
@@ -76,7 +76,7 @@ I(n) \eqdef \bigcup\limits_{e \in \gamma} \markT{n}{e} : \exsts{l, r} \unmarked{
 \end{figure}
 %
 %
-\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by recursively marking the vertices to keep track of those already visited; the return value b records the outcome of marking with b=$true$ when the top node $x$ is unmarked (not visited yet) and b=$false$ otherwise. Assuming that the root vertex $x$ is unmarked initially, the algorithm continues by first marking $x$ and subsequently spanning the left and right subgraphs concurrently. When the top node of the left subgraph is already marked (!b1), the edge from $x$ into it is replaced by a null pointer. This corresponds to the case where the node has already been visited by another thread and is thus reachable from the root; \emph{mutatis mutandis} for the right subgraph.
+\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by recursively marking the vertices to keep track of those already visited; the return value b records the outcome of marking with \li{b}$=1$ when the top node $x$ is unmarked (not visited yet) and \li{b}$=0$ otherwise. Assuming that the root vertex $x$ is unmarked initially, the algorithm continues by first marking $x$ and subsequently spanning the left and right subgraphs concurrently. When the top node of the left subgraph is already marked (\li{!b1}), the edge from $x$ into it is replaced by a null pointer. This corresponds to the case where the node has already been visited by another thread and is thus reachable from the root; \emph{mutatis mutandis} for the right subgraph.
 %
 \begin{figure}
 %
@@ -97,7 +97,7 @@ I(n) \eqdef \bigcup\limits_{e \in \gamma} \markT{n}{e} : \exsts{l, r} \unmarked{
 \label{fig:localCST}
 \end{figure}
 %
-The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each $\texttt{span}(n)$ call (where $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\texttt{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\tx{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\texttt{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
 %
 \[
 \begin{array}{@{} c @{} }
@@ -216,7 +216,7 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 \hrule
 \begin{lstlisting}
  //$\comment\{ \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \graph{x}{\gamma}\}$
- //$\comment\{\cell{\tx{x}}{x} *  \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{\bigcup\limits_{n \in \gamma} I(n)}\}$
+ //$\comment\{\cell{\tx{x}}{x} *  \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{I_{\gamma}}\}$
  //$\comment\{\cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \g{x}{\gamma}\}$
  b:= span(x) {
    //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge}\\ * \shared{\exsts{l, r} \unmarked{x}{l}{r} * \g{l}{\gamma} * \g{r}{\gamma}  \lor \marked{x}}{I(x)} \end{array} \right\}$
@@ -249,9 +249,10 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 
 %\todo Briefly touch the proof of \fig\ref{fig:conSpanningTree}.
 
+%
 \subsection{Set Module}
 \azaleacomment{Very rough and incomplete. Will work on it more tonight.}
-We now look at the specification of a concurrent set module implemented as a singly-linked list as as described in \cite{cap-ecoop10}. A typical set module provides three functionalities: \command{contains(h,v)}, \command{add(h,v)} and \command{remove(h,v)} specified as follows. The $\inSet{\var{h}}{\var{v}} $ predicate asserts that the set at \var{h} contains value \var{v}. Dually, $\outSet{\var{h}}{\var{v}}$ asserts that the set does not contain \var{v}. As the name suggests, the \command{contains} function checks whether value \var{v} is contained in the set; the \command{add(h,v)} and \command{remove(h,v)} functions add/remove value \var{v} to/from the list, respectively. 
+We now look at the specification of a concurrent set module implemented as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in \cite{cap-ecoop10}. A typical set module provides three functionalities: \command{contains(h,v)}, \command{add(h,v)} and \command{remove(h,v)} specified as follows. The $\inSet{\var{h}}{\var{v}} $ predicate asserts that the set at \var{h} contains value \var{v}. Dually, $\outSet{\var{h}}{\var{v}}$ asserts that the set does not contain \var{v}. As the name suggests, the \command{contains} function checks whether value \var{v} is contained in the set; the \command{add(h,v)} and \command{remove(h,v)} functions add/remove value \var{v} to/from the list, respectively. 
 %
 \[
 \begin{array}{@{} r @{\hspace*{3pt}} c @{\hspace*{3pt}} l @{}}
@@ -265,21 +266,20 @@ We now look at the specification of a concurrent set module implemented as a sin
 \end{array}
 \]
 %
-Figure \ref{fig:capSetExample} shows the specification of the set module in Concurrent Abstract Predicates as defined in \cite{cap-ecoop10}.\\
-\todo Describe the predicates?
 
-We provide a similar specification for the set module in \colosl\ as illustrated in \fig\ref{fig:coloslSetExample}. There are two main advantages to the \colosl\ specification of the set module. In the CAP specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$. Since the capabilities associated with a region are allocated at the point of region creation, the shared region is required to keep track of all possible update capabilities $\capGapC{x}{y}{v}{s}$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v$. For instance, since the value $v$ may be contained in the set at address $x$ before address $y$, the region must include the $\capGapC{x}{y}{v}{s}$ capability to accommodate possible modifications of value $v$. This is captured by the $\gapsCAP{S}{s}$ and $\myGapsCAP{S}{s}$ predicates through the infinite multiplicative star operator $\iterStar$. On the other hand, since in \colosl\ allows for dynamic extension of the shared state, the capabilities associated with each address are generated upon extension of the shared state with those addresses. 
 
-Moreover, since \colosl is parametric in the separation algebra of capabilities and capability assertions, we have chosen a \emph{stateful ghost heap} and the corresponding assertions to model capabilities and their assertions. As such, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we have a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextC{x}{y}$ is also updated as $\nextC{x}{z}$. 
-%\azaleacomment{ We don't have enough space to cover this here, it will have to go into the tech report. We should mention it here though.}
+\fig\ref{fig:coloslSetExample} shows a specification of the set module in \colosl\ similar to that of Concurrent Abstract Predicates (CAP) defined in \cite{cap-ecoop10}. We provide the implementation of the set operations as well as the specification proofs in \cite{colosl-tr14}.
+%We provide a similar specification for the set module in \colosl\ as illustrated in \fig\ref{fig:coloslSetExample}. 
+In what follows we first give a description of the predicates of \fig\ref{fig:coloslSetExample} and subsequently contrast our specification with that of CAP.
+%
 \begin{figure*}
 \hrule
 \[
 \begin{array}{@{} l @{}}
 	\begin{array}{@{} r @{\hspace*{3pt}} l @{}}
-		\inSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \inList{h}{v}\\
+		\inSet{h}{v} \eqdef & \exsts{\pi} \isLock{h.lock}{\pi} * \valueC{h}{v} * \inList{h}{v}\\
 	
-		\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
+		\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h.lock}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
 		
 		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  _\triangleleft L \land \lsg{h}{\nil}{-\infty:: L ++ \{\infty\} }{h}\\
 	
@@ -289,11 +289,14 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 		
 	\end{array}\\
 	
-	\begin{array}{@{} r l @{\hspace{2cm}} r l @{}}
+	\begin{array}{@{} r l @{\hspace{1.5cm}} r l @{}}
+		\isLock{a}{\pi} \eqdef & \lockT{a}[\pi] * \shared{\left(\cell{a}{0} * \unlockT{a}\right) \lor \cell{a}{1}}{L(a)}
+		& \locked{a} \eqdef & \shared{\cell{a}{1}}{L(a)}\\
+		
 		\unlockedNode{a}{v}{b} \eqdef & \link{a}{b} * \val{a}{v}{b}
 		& \lockedNode{a}{v}{b} \eqdef & \locked{a} * \val{a}{v}{b}\\
 		
-		\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b}{1} * \modC{a}
+		\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b.lock}{1} * \modC{a}
 		& \val{a}{v}{b} \eqdef & \cell{a.value}{v} * \nextC{a}{b}
 	\end{array}\\
 		
@@ -345,10 +348,25 @@ Moreover, since \colosl is parametric in the separation algebra of capabilities 
 \end{array}
 \]
 \hrule
-\caption{\colosl\ set specification where the definitions of $I(h, v)$, \textsf{isLock} and \textsf{locked} are analogous to \cite{cap-ecoop10} and are provided in \cite{techreport}.}
+\caption{\colosl\ set module specification where the definition of $I(h, v)$ is provided in \cite{colosl-tr14}.}
 \label{fig:coloslSetExample}
 \end{figure*}
 %
+%
+
+We instantiate \colosl\ with a \emph{ghost fractional heap} to represent the separation algebra of capabilities and write heap-like assertions of the form $\setCap{a}[\pi][b]$ to denote capability $a$ with permission $\pi$. Moreover, our capabilities are \emph{stateful} in that they can capture some additional information ($b$). As we demonstrate below, this leads to conciser specifications. For readability we write $\setCap{a}[][b]$ for $\setCap{a}[1][b]$ and $\setCap{a}[\pi]$ for $\exsts{b}\setCap{a}[\pi][b]$.
+
+\noindent\textbf{\textsf{isLock}(}$a, \pi$\textbf{) / }\textbf{\textsf{locked}(}$a$\textbf{)}    
+Every node in the singly-linked list is protected by a lock that is to be acquired prior to modification of the node. The $\isLock{a}{\pi}$ predicate is similar to that in \cite{cap-ecoop10} and states that the lock at address $a$ can be acquired with permission $\pi \in (0, 1]$. Multiple threads may attempt to acquire the lock at once and thus we use the $\pi$ argument to reflect this sharing where $1$ denotes exclusive right to acquisition while $\pi \in (0, 1)$ accounts for sharing of the lock between multiple threads. The $\isLock{a}{\pi}$ predicate asserts that the thread's local state contains the capability $\lockT{a}[\pi]$ to acquire the lock and that the lock resides in the shared state where at any one point either the lock is unlocked ($\cell{a}{0}$) and the shared state contains the capability to unlock it ($\unlockT{a}$); or it is locked ($\cell{a}{1}$) and the unlocking capability has been claimed by the locking thread. The $\locked{a}$ predicate asserts that the thread's local state contains the capability to unlock the lock $[\unlockT{a}]$ and that the $a$ is in the locked state ($\cell{a}{1}$).
+
+\noindent\textbf{\textsf{in}(}$h, v$\textbf{) / }\textbf{\textsf{out}(}$h, v$\textbf{)}    
+The $\inSet{h}{v}$ predicate states that the set at head address $h$ contains value $v$ and captures exclusive right to alter the set by changing whether $v$ belongs to it. It asserts that the lock associated with head address can be acquired with some permission $\pi$ ($\isLock{h.lock}{\pi}$) and that the thread owns the exclusive capability to alter the set with respect to value $v$ ($\valueC{a}{v}$). The underlying singly-inked list is captured by the $\inList{h}{v}$ predicate. 
+\\
+
+\fig\ref{fig:capSetExample} shows the specification of the set module in Concurrent Abstract Predicates as defined in \cite{cap-ecoop10}. There are two main advantages to the \colosl\ specification of the set module. In the CAP specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$. Since the capabilities associated with a region are all allocated at the point of region creation, the shared region is required to keep track of all possible update capabilities $\capGapT{x}{y}{v}$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v$. For instance, since the value $v$ may be contained in the set at address $x$ before address $y$, the region must include the $\capGapT{x}{y}{v}$ capability to accommodate possible modifications of value $v$. This is captured by the $\gapsCAP{S}{s}$ and $\myGapsCAP{S}{s}$ predicates through the infinite multiplicative star operator $\iterStar$. On the other hand, since in \colosl\ allows for dynamic extension of the shared state, the capabilities associated with each address are generated upon extension of the shared state with those addresses. 
+
+Moreover, since \colosl is parametric in the separation algebra of capabilities and capability assertions, we have chosen a \emph{ghost heap} and the corresponding assertions to model capabilities and their assertions. As such, since ghost heaps are \emph{stateful}, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we have a single capability of the form $\nextT{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextT{x}{y}$ is also updated as $\nextT{x}{z}$. 
+
 %
 \begin{figure*}
 \hrule

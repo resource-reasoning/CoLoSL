@@ -429,18 +429,22 @@
 
 %%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
 
+\DeclareDocumentCommand{\setCap}{m O{} O{-}}{#1 \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.#2 \stackrel{#3}{\rightarrow} #4}
+\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4}
 \DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
 
 \newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
 \newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
 
+\newcommand{\capChangeT}[1]{\textsc{LChange}(#1)}
+\newcommand{\capGapT}[3]{\textsc{LGap}(#1, #2, #3)}
+
 \DeclareDocumentCommand{\lockC}{m O{} O{-}}{\left[#1.\textsf{L} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\unlockC}{m O{} O{-}}{\left[#1.\textsf{U} \stackrel{#2}{\rightarrow} #3\right]}
-\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.#2 \stackrel{#3}{\rightarrow} #4\right]}
+\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
 
