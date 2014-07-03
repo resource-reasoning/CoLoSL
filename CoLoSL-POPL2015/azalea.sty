@@ -3,6 +3,7 @@
 \usepackage{array}
 \usepackage{amsmath}
 %\usepackage{amsfonts}
+\usepackage[scaled=.9]{beramono}
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{caption}
@@ -33,6 +34,7 @@
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{mathpartir}
+\usepackage{float}
 
 \input mathlig
 
@@ -249,7 +251,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%% Programming Language%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\newcommand{\skipC}{\texttt{skip}}
+\newcommand{\skipC}{\li{skip}}
 \newcommand{\opSem}[3]{\ensuremath{\left[\!\left| #1 \right |\! \right]_{#3}\left( #2 \right)}}
 \newcommand{\Axioms}[1]{\ensuremath{\textsf{Axiom}_{#1}}}
 
@@ -423,9 +425,8 @@
 \newcommand{\marked}[1]{\textsf{M}\left(#1\right)}
 \newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
 \newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
-\newcommand{\nil}{\texttt{null}}
-\newcommand{\command}[1]{\texttt{#1}}
-\newcommand{\var}[1]{\texttt{#1}}
+\newcommand{\command}[1]{\li{#1}}
+\newcommand{\var}[1]{\li{#1}}
 
 %%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
 
@@ -492,3 +493,18 @@
 
 \definecolor{grey}{rgb}{0.8, 0.8, 0.8}
 \newcommand{\shade}[1]{\colorbox{grey}{$#1$}}
+
+% floats
+\floatstyle{plain}
+\newfloat{figure}{tp}{los}
+\floatname{figure}{Figure}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.3}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.9}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text

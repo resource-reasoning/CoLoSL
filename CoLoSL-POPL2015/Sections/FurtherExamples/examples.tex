@@ -2,7 +2,7 @@
 \todo introductory paragraph about data structures with sharing.\\
 \subsection{Concurrent Spanning Tree}
 %Let $\gamma$ denote a directed connected binary (DCB) graph with a finite set of vertices where each vertex is associated with at most two successors.
-Let $\gamma = (V, E)$ denote a connected directed binary graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\nil\}) \times (V \uplus \{\nil\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
+Let $\gamma = (V, E)$ denote a connected directed binary graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
 For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph (\subref{subfig:graph}) and a possible spanning tree (\subref{subfig:tree}).
 \begin{figure}
 \hrule
@@ -57,7 +57,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \begin{array}{r @{\hspace*{2pt}} l}
 	\graph{x}{\gamma} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{I_\gamma} \hspace*{0.5cm} I_\gamma \eqdef \bigcup\limits_{n \in \gamma}I(n)\\
 %	
-	\G{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \\
+	\G{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \\
 	& \land \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}\\
 %
 	\unmarked{x}{l}{r} \eqdef & \cell{x}{0, l, r} * \markT{l}{x.l} * \markT{r}{x.r}\\
@@ -83,11 +83,11 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \hrule
 \[
 \begin{array}{r @{\hspace*{2pt}} l}
-	\g{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
+	\g{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
 	& \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma}\\
 	
-	\tr{x}{\gamma} \eqdef & (x = \nil \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
-	& \shared{\marked{x}}{I(x)} *  \exsts{l' \in \{l, \nil\}} \exsts{r' \in \{r, \nil\}}\\
+	\tr{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
+	& \shared{\marked{x}}{I(x)} *  \exsts{l' \in \{l, \li{null}\}} \exsts{r' \in \{r, \li{null}\}}\\
 	& \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} * \\
 	& \markT{r}{x.r} * \cell{x.r}{r'} * \tr{r'}{\gamma}
 \end{array}
@@ -97,7 +97,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \label{fig:localCST}
 \end{figure}
 %
-The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\tx{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\texttt{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\tx{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l) || span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \textsc{Par} rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
 %
 \[
 \begin{array}{@{} c @{} }
@@ -118,7 +118,7 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 		\left(
 %		\begin{array}{@{} l @{}}
 			\cell{\tx{b}}{1} * \tr{n}{\gamma} \lor
-			\cell{\tx{b}}{0} *  \tr{\nil}{\gamma}
+			\cell{\tx{b}}{0} *  \tr{\li{null}}{\gamma}
 %		\end{array}
 		\right)
 	\Big\}
@@ -128,11 +128,11 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 %
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the global view $\shared{\G{x}{\gamma}}{I_{\gamma}}$ that describes the resources associated with all $|\gamma|$ vertices has been replaced by $|\gamma|$ $*$-composed more local views, each describing the resources of a vertex $n \in \gamma$. Moreover, the interference of each local view concerning a vertex $n \in \gamma$ has been shifted from $I_{\gamma}$ to $I(n)$ as to reflect only those actions that affect $n$.  
 
-Similarly, the $\tr{x}{\gamma}$ predicate consists of $|\gamma|$ subjective views one for each vertex in $\gamma$. The assertion of each subjective view reflects that the corresponding vertex ($x$) has been marked $\shared{\marked{x}}{I(x)}$. The resources associated with each node $x$, namely the left and right pointers ($\cell{x.l}{l'}$ and $\cell{x.r}{r'}$) and the corresponding marking capabilities ($\markT{l}{x.l}$ and $\markT{r}{x.r}$) have been claimed by the marking thread and moved into the local state. The vertex addressed by the left pointer of $x$ (i.e. $l'$) corresponds to either the initial value prior to marking ($l$ where $\gamma(x) = (l, r)$) or \nil\ when $l$ has more than one predecessors and has been marked by another thread.
+Similarly, the $\tr{x}{\gamma}$ predicate consists of $|\gamma|$ subjective views one for each vertex in $\gamma$. The assertion of each subjective view reflects that the corresponding vertex ($x$) has been marked $\shared{\marked{x}}{I(x)}$. The resources associated with each node $x$, namely the left and right pointers ($\cell{x.l}{l'}$ and $\cell{x.r}{r'}$) and the corresponding marking capabilities ($\markT{l}{x.l}$ and $\markT{r}{x.r}$) have been claimed by the marking thread and moved into the local state. The vertex addressed by the left pointer of $x$ (i.e. $l'$) corresponds to either the initial value prior to marking ($l$ where $\gamma(x) = (l, r)$) or \li{null}\ when $l$ has more than one predecessors and has been marked by another thread.
 
 
 We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from the global specification of \fig\ref{fig:globalCST}. 
-When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \nil$. In what follows we only consider the case where $x \not= \nil$ since the derivation in the case of $x = \nil$ is trivial. \\
+When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial. \\
 Let
 %
 \[
@@ -226,20 +226,20 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
    //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \end{array} \right\}$
      //$\comment\left\{\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \right\}$   
      b1:= span(x.l) || b2:= span(x.r)
-     //$\comment\left\{\begin{array}{@{} l @{}}  \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\nil}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\nil}{\gamma})\right)  \end{array}\right\}$   
-   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\nil}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\nil}{\gamma})\right)    \end{array}\right\}$  
+     //$\comment\left\{\begin{array}{@{} l @{}}  \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma})\right)  \end{array}\right\}$   
+   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma})\right)    \end{array}\right\}$  
      if (!b1) then 
        x.l:= null
      if (!b2) then 
        x.r:= null
-   //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \cell{\tx{res}}{1} * \\ \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} * \\ \exsts{l' \in \{l, \nil\}} \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \nil\}} \markT{r}{x.r} * \cell{x}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
+   //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \cell{\tx{res}}{1} * \\ \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} * \\ \exsts{l' \in \{l, \tx{null}\}} \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \tx{null}\}} \markT{r}{x.r} * \cell{x}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \cell{\tx{res}}{1} *\cell{\tx{b1}}{-} * \cell{\tx{b2}}{-}\\ * \markT{x}{\rootEdge} *  \tr{x}{\gamma}  \\  \end{array}\right\}$         
    }		
    //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)}) \end{array} \right\}$ 
-   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} * \tr{\nil}{\gamma}) \end{array} \right\}$      
+   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} * \tr{\tx{null}}{\gamma}) \end{array} \right\}$      
    return res
  }
- //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \markT{x}{\rootEdge} *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\nil}{\gamma}) \end{array} \right\}$         
+ //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \markT{x}{\rootEdge} *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\tx{null}}{\gamma}) \end{array} \right\}$         
 \end{lstlisting}
 \hrule\vspace*{5pt}
 \caption{Concurrent Spanning Tree Implementation}
@@ -280,7 +280,7 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 %	
 %		\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h.lock}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
 %		
-%		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{\nil}{-\infty:: L ++ \{\infty\} }{h} \hspace{1cm}\text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
+%		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{\li{null}}{-\infty:: L ++ \{\infty\} }{h} \hspace{1cm}\text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 %	
 %	%	\sorted{L} \eqdef & (L  = [] \land \emp) \lor( \exsts{v_0} L = [v_0] \land \emp) \lor \exsts{v_0, v_1, L'} L = v_0 :: (v_1 :: L') \land v_0 < v_1 \land \sorted{v_1:: L'}\\
 %	
@@ -367,7 +367,7 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 	\begin{array}{@{} r @{\hspace*{3pt}} l @{}}
 		
 		
-		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{\nil}{-\infty:: L ++ \{\infty\} }{h} \hspace{1cm}\text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
+		\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{\li{null}}{-\infty:: L ++ \{\infty\} }{h} \hspace{1cm}\text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 	
 	%	\sorted{L} \eqdef & (L  = [] \land \emp) \lor( \exsts{v_0} L = [v_0] \land \emp) \lor \exsts{v_0, v_1, L'} L = v_0 :: (v_1 :: L') \land v_0 < v_1 \land \sorted{v_1:: L'}\\
 	
@@ -474,7 +474,7 @@ Moreover, since the ghost heaps used to represent the separation algebra of capa
 %	
 %		\outSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\outListCAP{h}{v}{s}}{F(s)}^{s}\\
 		
-		\sortedListCAP{\triangleleft}{h}{v}{s} \eqdef & \exsts{L, S} \sorted{L} \land v  \triangleleft L \land \lsgCAP{h}{\nil}{S}{-\infty:: L ++ \{\infty\} } * \shade{\left( \gapsCAP{S}{s} \land \myGapsCAP{v}{s} \right) } \text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
+		\sortedListCAP{\triangleleft}{h}{v}{s} \eqdef & \exsts{L, S} \sorted{L} \land v  \triangleleft L \land \lsgCAP{h}{\li{null}}{S}{-\infty:: L ++ \{\infty\} } * \shade{\left( \gapsCAP{S}{s} \land \myGapsCAP{v}{s} \right) } \text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 	  
 	
 		\lsg{x}{y}{S}{L} \eqdef & (L = [] \land S = \emptyset \land x = y \land \emp) \lor (\exsts{z, v, L'} L = v::L' \land \unlockedNode{x}{v}{z} * \lsg{z}{y}{S}{L'})\\
