@@ -56,17 +56,21 @@ threads.
 
 \begin{definition}[Logical states]
   A \emph{logical state} is a tuple $((s, h), \ca{})$, also written
-  $(s,h,\ca{})$, of a partial \emph{stack} $s\in\set{Stack}$,
+  $(s,h,\ca{})$, of a finite partial \emph{stack} $s\in\set{Stack}$,
   assigning values to program variables, a heap $h \in\Heaps$,
   represented as a finite partial functions from addresses to values,
   and a capability $\ca{} \in\Caps$.
-  \begin{align*}
-    \set{Stack} &== \set{PVar} --` \set{Val}&
-    \set{Heap} &== \set{Loc} --`_{\m{fin}} \set{Val}\\
-    \Heaps &== \set{Stack}\times \set{Heap}&
-    \Caps &== \powerset(\set{Token})&
-    \quad\mathllap{\LStates} &== \Heaps\times \Caps
-  \end{align*}
+  \begin{mathpar}
+    \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
+
+    \set{Heap} == \set{Loc} --`_{\m{fin}} \set{Val}
+
+    \Heaps == \set{Stack}\times \set{Heap}
+
+    \Caps == \powerset(\set{Token})
+
+    \LStates == \Heaps\times \Caps
+  \end{mathpar}
   We write $\unitL$ for the logical state $(\emptyset, \unitH, \unitCap)$. The
   \emph{composition of logical states}
   $
@@ -94,32 +98,30 @@ interference assertions.
 
 \begin{definition}[Action models]
 An \emph{action model} is a partial function from capabilities to
-their semantic actions, expressed as relations between the logical
-states:
+\emph{actions}, expressed as relations between the logical states:
 \[
 \amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
 \]
 We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 
-
 \begin{definition}[Worlds]
   A \emph{world} is a 4-tuple consisting of a logical state
   representing the thread-local state, a second logical state
   representing the shared state, a global action model and a local
-  action model. Later in \S\ref{subsec:localGlobalActionModels}, we
-  justify the need for both local and global action models. An extra
+  action model. An extra
   \emph{well-formedness} condition is imposed on worlds:
   the local and shared states must be compatible, and the capabilities
   found in the logical states must exist in the action models:
-  \begin{align*}
+  \begin{mathpar}
     \wf{l, l_s, \amod{}, \amod{\ell}}
-    &==
+    ==
     \exsts{h,\ca{}}
-    l \composeL l_s = (h,\ca{}) \land \ca{}\subseteq \dom{\amod{\ell}}\\
-  \Worlds &\eqdef \{w\in
-  \LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
-  \end{align*}
+    l \composeL l_s = (h,\ca{}) \land \ca{}\subseteq \dom{\amod{\ell}}
+
+    \Worlds \eqdef \{w\in
+    \LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
+  \end{mathpar}
   The \emph{composition of worlds} is defined as
   \begin{align*}
     &\qquad (l,l_s,\amod{},\amod{\ell}) \composeW
@@ -137,6 +139,36 @@ We write $\unitAM$ for an action model with empty domain.
     \end{cases}
   \end{align*}
 \end{definition}
+
+The local (logical) state $l$ in a world $(l, l_s, \amod{},
+\amod{\ell})$ represents the locally owned resources of a thread
+(\textit{e.g.} the capability $[\token a_{\li y}]$ for
+$\mathbb{P}_{\li y}$ in the previous section). The shared state $l_s$
+is typically the result of a composition $s\composeL r$ of the
+subjective view $s$ of a thread (\textit{e.g.} variables \li x and \li
+y for $\mathbb{P}_{\li y}$) together with a \emph{context}
+representing parts of the shared state not currently visible to that
+thread (variable \li z). As expressed in the definition of the
+composition $\composeW$ between worlds, different threads may have
+different subjective views, but must agree on the overall shared state
+$l_s = s \composeW r$.  The need for two action models in each world,
+a global one $\amod{}$ and a local one $\amod{\ell}$, arises from this
+decomposition of the shared state between the subjective view and the
+context. The local action model corresponds to actions as seen by the
+subjective view $s$, while the global action model describes the
+effect of these actions on the whole shared state $l_s$. Crucially,
+given a shared state assertion $\shared P I$, $\amod{\ell}$ must
+contain all actions specified by $I$, while $\amod{}$ is allowed to be
+any set of actions which have the same effect on the subjective
+state. In particular, it may be the case that some actions are
+irrelevant to the subjective view and thus omitted from the global
+action model. We must nonetheless record \emph{all} actions in the
+local action model to ensure consistency in the event that some thread
+has extended the shared state (using \eqref{eq:extend}). More
+precisely, we will require that $(\amod, \amod{\ell})$ be
+\emph{closed} with respect to $I$ and the decomposition $s$, $r$. We
+give a more formal account and justification of these concepts in
+\S\ref{subsec:localGlobalActionModels}.
 
 
 \paragraph{Semantics}
@@ -272,6 +304,28 @@ context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
 \end{proof}
 
 
+\subsection{The effect of actions}
+
+\begin{align*}
+  \m{visible}(a, l) &==
+  \E{p'} \m{fst}(\updateFP{a})\meetL l = p' /| p'/=\unitL\\
+  a[l,r] &==
+  (\m{snd}(\updateFP{a})\composeL l',r')\text{ s.t.\ }
+  \m{fst}(a)\meetL (l\composeL r) /= \emptyset /|\null\\
+  &\quad
+  \E{p_l,p_r}
+  l = p_l \composeL l' /|
+  r = p_r \composeL r' /|\null\\
+  &\quad
+  \m{fst}(\updateFP{a}) = p_l\composeL p_r /|
+  \m{snd}(\updateFP{a})\composeL l'\composeL r'\text{ is defined}\\
+  a[l] &== a[l,\m{fst}(a)\setminus l]\\
+  \m{enabled}(a, l) &== a[l]\text{ is defined}\\
+  \m{present}(a,l,A) &==\V r \m{fst}(a)\leq l\composeL r =>\null\\
+  &\quad \E{a'\in A} \updateFP{a'} = \updateFP{a} /| \m{fst}(a')\leq l\composeL r
+\end{align*}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Action model closure}
 \label{subsec:amodClosure}
@@ -353,31 +407,42 @@ account when extrapolating the global effects of local actions.
 \begin{array}{L}
   \extendsAMUpto{\amod{}, \amod{\ell}}{\mathrlap{0}\phantom{n}}{l}{r}{\amod{}'} \iffdef
   \m{true}\\
-  \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r}{\amod{}'} \iffdef\\
-  \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
-  \hspace*{0.2cm}(p, q) \in \amod{}'(\ca{}) 
-  \land \updateFP{p, q} = (p', q')
-  \land p \leq  l \composeL r \composeL t \land\null\\
-  \hspace*{0.2cm}p' = p_l \composeL p_r 
-  \land p' \maxMeetL l = p_l 
-  \land l = p_l \composeL l' 
-  \land r = p_r \composeL r' =>\\
-  \hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{q' \composeL l'}{r'}{\amod{}'} \land\null\\
-  \hspace*{0.4cm}t = \unitL => 
-  \left(
-  \begin{array}{l}
-    (p' \composeL l' \composeL r', q' \composeL l' \composeL r') \in \amod{}(\ca{})\\
-    \lor\; q' \composeL l' \composeL r' \text{ is undefined} 
-  \end{array}
-  \right)\\
-  \hspace*{2cm} \land\\
-  \hspace*{0.1cm}\for{\ca{}, p, q, p', q', l', r'} \\
-  \hspace*{0.2cm} (p, q) \in \amod{\ell}(\ca{})
-  \land \updateFP{p, q} = (p', q')
-  \land p \composeL l' = l \composeL r \composeL r' =>\\
-  \hspace*{0.4cm}\exsts{f, c'} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \composeL c' =  l \composeL r \composeL r' \;\;\lor\\
-  \hspace*{0.4cm}q \composeL l' \text{ is undefined} \;\;\lor\\
-  \hspace*{0.4cm}p' \maxMeetL l = \unitL \land \exsts{r'}\! q \composeL l' = l \composeL r' \composeL r' \land \extendsAMUpto{\amod{}, \amod{\ell}}{(n-1)}{l}{r'}{\amod{}'}
+  \extendsAMUpto{\amod{}, \amod{\ell}}{n+1}{l}{r}{\amod{}'} \iffdef\\
+  \V{\ca{}}\V{a\in \amod{}'(\ca{})}
+  \m{enabled}(a,l\composeL r) =>\null\\
+  \quad\extendsAMUpto{\amod{}, \amod{\ell}}{n}{\m{fst}(a[l,r])}{\m{snd}(a[l,r])}{\amod{}'} \land\null\\
+  \quad\m{fst}(a)\leq l\composeL r => (l\composeL r,
+  \m{fst}(a[l,r])\composeL \m{snd}(a[l,r]))\in \amod{}(\ca{})
+  /|\null\\
+  \V{\ca{}}\V{a\in \amod{\ell}(\ca{})}
+  \m{enabled}(a,l\composeL r) =>\null\\
+  \quad(\m{present}(a,l\composeL r,\amod{}'(\ca{})) |/\null\\
+  \quad\phantom{(}(\neg\m{visible}(a,l) /| \m{fst}(a[l,r]) = l /|
+  \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{\m{snd}(a[l,r])}{\amod{}'}))
+  %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
+  %% \hspace*{0.2cm}(p, q) \in \amod{}'(\ca{}) 
+  %% \land \updateFP{p, q} = (p', q')
+  %% \land p \leq  l \composeL r \composeL t \land\null\\
+  %% \hspace*{0.2cm}p' = p_l \composeL p_r 
+  %% \land p' \maxMeetL l = p_l 
+  %% \land l = p_l \composeL l' 
+  %% \land r = p_r \composeL r' =>\\
+  %% \hspace*{0.4cm} \extendsAMUpto{\amod{}, \amod{\ell}}{n}{q' \composeL l'}{r'}{\amod{}'} \land\null\\
+  %% \hspace*{0.4cm}t = \unitL => 
+  %% \left(
+  %% \begin{array}{l}
+  %%   (p' \composeL l' \composeL r', q' \composeL l' \composeL r') \in \amod{}(\ca{})\\
+  %%   \lor\; q' \composeL l' \composeL r' \text{ is undefined} 
+  %% \end{array}
+  %% \right)\\
+  %% \hspace*{2cm} \land\\
+  %% \hspace*{0.1cm}\for{\ca{}, p, q, p', q', l', r'} \\
+  %% \hspace*{0.2cm} (p, q) \in \amod{\ell}(\ca{})
+  %% \land \updateFP{p, q} = (p', q')
+  %% \land p \composeL l' = l \composeL r \composeL r' =>\\
+  %% \hspace*{0.4cm}\exsts{f, c'} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \composeL c' =  l \composeL r \composeL r' \;\;\lor\\
+  %% \hspace*{0.4cm}q \composeL l' \text{ is undefined} \;\;\lor\\
+  %% \hspace*{0.4cm}p' \maxMeetL l = \unitL \land \exsts{r''} q \composeL l' = l \composeL r' \composeL r'' \land \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{r''}{\amod{}'}
 \end{array}
 \]
 \end{definition}
@@ -483,19 +548,19 @@ corresponding actions.
 \begin{definition}[Fenced action model]
   An action model $\amod{} \in \AMods$ is \emph{fenced} by $\fence{}
   \in \pset{\LStates}$, written $\fence{} \fences \amod{}$, if, for
-  all $l \in \fence{}$ and all $\ca{}$, $p$, $q$, $l$, $p'$, $q'$,
-  $p''$, $l'$,
+  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\amod{})$,
 \[
 \begin{array}{L}
-  (p, q) \in \amod{}(\ca{}) /|
-  p \meetL l \not= \emptyset /|
-  \updateFP{p, q} = (p', q') \land\\
-  p' \maxMeetL l = p'' \land
-  p'' /= \unitL \land
-  l = p'' \composeL l' /|
-  q' \compatL l'
-  =>
-  q' \composeL l' \in \fence{}
+  \m{enabled}(a,l) /| \m{visible}(a,l) => a[l]\in\fence{}
+  %% (p, q) \in \amod{}(\ca{}) /|
+  %% p \meetL l \not= \emptyset /|
+  %% \updateFP{p, q} = (p', q') \land\\
+  %% p' \maxMeetL l = p'' \land
+  %% p'' /= \unitL \land
+  %% l = p'' \composeL l' /|
+  %% q' \compatL l'
+  %% =>
+  %% q' \composeL l' \in \fence{}
 \end{array}
 \]
 \end{definition}
@@ -608,19 +673,26 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those  
   \amod{}'$, if there exists a fence $\fence{}$ such that
   \[
   \begin{array}{L}
-    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{} \land\\
-    \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
-    \left(\begin{array}{L}
-      (p, q) \in \amod{}'(\ca{}) 
-      \land p \leq l \composeL r => \\
-      \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in
-      \amod{}(\ca{}) \land p' \composeL f \leq l \composeL r
-    \end{array}\right) /|\\
-    \left(\begin{array}{L}
-    (p, q) \in \amod{}(\ca{})
-      \land p \composeL l' = l \composeL r /| q'\compatL l' /| l \meetL p' /= \{ \unitL \} => \\
-      \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \leq l \composeL r
-    \end{array}\right)
+    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \amod{}
+    \land
+    \for{l\in \fence{}}\for{\ca{}}\\
+    \quad\for{a\in\amod{}'(\ca{})}
+    \m{present}(a,l,\amod{}(\ca{})) /|\null\\
+    \quad\for{a\in\amod{}(\ca{})}
+    \m{enabled}(a,l) /|\m{visible}(a,l) =>
+    \m{present}(a,l,\amod{}(\ca{}))
+    %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
+    %% \left(\begin{array}{L}
+    %%   (p, q) \in \amod{}'(\ca{}) 
+    %%   \land p \leq l \composeL r => \\
+    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in
+    %%   \amod{}(\ca{}) \land p' \composeL f \leq l \composeL r
+    %% \end{array}\right) /|\\
+    %% \left(\begin{array}{L}
+    %% (p, q) \in \amod{}(\ca{})
+    %%   \land p \composeL l' = l \composeL r /| q'\compatL l' /| l \meetL p' /= \{ \unitL \} => \\
+    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \amod{}'(\ca{}) \land p' \composeL f \leq l \composeL r
+    %% \end{array}\right)
   \end{array}
   \]
 \end{definition}
