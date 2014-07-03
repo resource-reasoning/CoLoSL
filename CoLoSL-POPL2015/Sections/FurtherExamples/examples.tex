@@ -381,9 +381,9 @@ Moreover, since the ghost heaps used to represent the separation algebra of capa
 \[
 \begin{array}{@{} l @{}}
 	\begin{array}{@{} r @{\hspace*{3pt}} l @{}}
-		\inSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\inListCAP{h}{v}{s}}{F(s)}^{s}\\
-	
-		\outSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\outListCAP{h}{v}{s}}{F(s)}^{s}\\
+%		\inSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\inListCAP{h}{v}{s}}{F(s)}^{s}\\
+%	
+%		\outSet{h}{v} \eqdef & \exsts{s} \exsts{\pi} \isLock{h}{\pi} * \capChangeC{v}{s} * \shared{\outListCAP{h}{v}{s}}{F(s)}^{s}\\
 		
 		\sortedListCAP{\triangleleft}{h}{v}{s} \eqdef & \exsts{L, S} \sorted{L} \land v  \triangleleft L \land \lsgCAP{h}{\nil}{S}{-\infty:: L ++ \{\infty\} } * \shade{\left( \gapsCAP{S}{s} \land \myGapsCAP{v}{s} \right) } \text{ where } \triangleleft = \in \text{ or } \triangleleft = \not\in \\
 	  
@@ -394,13 +394,13 @@ Moreover, since the ghost heaps used to represent the separation algebra of capa
 		
 	\end{array}\\
 	
-	\begin{array}{@{} r l @{\hspace{2cm}} r l @{}}
-		\unlockedNode{a}{v}{b} \eqdef & \linkCAP{a}{b} * \valCAP{a}{v} 
-		& \lockedNode{a}{v}{b} \eqdef & \locked{a} * \valCAP{a}{v}\\
-		
-		\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b}{1} 
-		& \valCAP{a}{v} \eqdef & \cell{a.value}{v}
-	\end{array}\\
+%	\begin{array}{@{} r l @{\hspace{2cm}} r l @{}}
+%		\unlockedNode{a}{v}{b} \eqdef & \linkCAP{a}{b} * \valCAP{a}{v} 
+%		& \lockedNode{a}{v}{b} \eqdef & \locked{a} * \valCAP{a}{v}\\
+%		
+%		\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b}{1} 
+%		& \valCAP{a}{v} \eqdef & \cell{a.value}{v}
+%	\end{array}\\
 		
 		
 	\shade{
