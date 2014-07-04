@@ -35,7 +35,7 @@
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{mathpartir}
-
+\usepackage{at}
 
 \input mathlig
 
@@ -216,7 +216,7 @@
 \newcommand{\unitL}{\unit{\textsf{L}}}
 \newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
 \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-\newcommand{\updateFP}[1]{\mathop{\Delta}(#1)}
+\newcommand{\updateFP}[1]{\Delta {#1}}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
@@ -510,3 +510,49 @@
 \setcounter{totalnumber}{4}     % 2 may work better
 \setcounter{dbltopnumber}{2}    % for 2-column pages
 \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+
+%% greek letters
+%% @a = alpha, @b = beta, etc.
+\newcommand{\asgreekstyle}{\mathrm} % overridde when greek letters are italic
+\newatcommand a {\ensuremath{\alpha}\xspace}
+\newatcommand b {\ensuremath{\beta}\xspace}
+\newatcommand c {\ensuremath{\xi}\xspace}
+\newatcommand C {\ensuremath{\Xi}\xspace}
+\newatcommand d {\ensuremath{\delta}\xspace}
+\newatcommand D {\ensuremath{\Delta}\xspace}
+\newatcommand e {\text{\normalfont\textvisiblespace}}
+\newatcommand E {\ensuremath{\epsilon}\xspace}
+\newatcommand f {\ensuremath{\phi}\xspace}
+\newatcommand F {\ensuremath{\Phi}\xspace}
+\newatcommand g {\ensuremath{\gamma}\xspace}
+\newatcommand G {\ensuremath{\Gamma}\xspace}
+\newatcommand h {\ensuremath{\varrho}\xspace}
+\renewatcommand i {\ensuremath{\iota}\xspace} % conflicts with something
+\newatcommand j {\ensuremath{\varsigma}\xspace}
+\newatcommand k {\ensuremath{\kappa}\xspace}
+\newatcommand l {\ensuremath{\lambda}\xspace}
+\newatcommand L {\ensuremath{\Lambda}\xspace}
+\newatcommand m {\ensuremath{\mu}\xspace}
+\newatcommand n {\ensuremath{\eta}\xspace}
+\newatcommand N {\ensuremath{\Eta}\xspace}
+\newatcommand o {\ensuremath{\theta}\xspace}
+\newatcommand O {\ensuremath{\Theta}\xspace}
+\newatcommand p {\ensuremath{\pi}\xspace}
+\newatcommand P {\ensuremath{\Pi}\xspace}
+\newatcommand q {\ensuremath{\epsilon}\xspace}
+\newatcommand Q {\ensuremath{\Phi}\xspace} % duplicate
+\newatcommand r {\ensuremath{\rho}\xspace}
+\newatcommand R {\ensuremath{\Rho}\xspace}
+\newatcommand s {\ensuremath{\sigma}\xspace}
+\newatcommand S {\ensuremath{\Sigma}\xspace}
+\newatcommand t {\ensuremath{\tau}\xspace}
+\newatcommand u {\ensuremath{\upsilon}\xspace}
+\newatcommand U {\ensuremath{\Upsilon}\xspace}
+\newatcommand v {\ensuremath{\nu}\xspace}
+\newatcommand w {\ensuremath{\omega}\xspace}
+\newatcommand W {\ensuremath{\Omega}\xspace}
+\newatcommand x {\ensuremath{\chi}\xspace}
+\newatcommand y {\ensuremath{\psi}\xspace}
+\newatcommand Y {\ensuremath{\Psi}\xspace}
+\newatcommand z {\ensuremath{\zeta}\xspace}
+
