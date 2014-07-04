@@ -2,7 +2,6 @@
 
 \subsection{Rely, Guarantee, Stability}
 %
-\azaleacomment{Include the size function.}
 %
 \paragraph{Stability}
 An assertion is \emph{stable} if and only if it cannot be falsified by the interference from other threads in the environment. That is, for all possible updates that the environment can do, the assertion must remain true. To capture the interference of the environment, we define the Rely relation.
@@ -242,13 +241,23 @@ with
 %
 The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\amod{0}$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\amod{L}}$). The last two conjunct are to enforce the closure of the new action models and can be justified as in the case of \extendR.
 
-The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities. Similarly, if the shared state is updated ($s \not= s'$),  then the heap resources may not grow ($\heapSize{\heapPart{(l \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:compatibleFrames}. That is, all previously compatible frames remain compatible. We illustrate the need for this constraint in \ex ~\ref{ex:compatibleFrames}.
+The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($s \not= s'$),  then the heap resources may not grow ($\heapSize{\heapPart{(l \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $s$ to $s'$) without extending the heap resources as illustrated in the following sequence.
+%
+\[
+\begin{array}{l}
+	(l, s, \amod{}, \amod{L}) \rightarrow (l \composeL l'', s, \amod{}, \amod{L}) \rightarrow (l', s', \amod{}, \amod{L})\\
+	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}
+\end{array}
+\]
+%
+Deallocation of local resources can be achieved in a similar fashion.
+%That is, all previously compatible frames remain compatible. We illustrate the need for this constraint in \ex ~\ref{ex:compatibleFrames}.
 
 Lastly, the current thread may extend the local action model by shifting some of the existing interference. This is modelled by the \shiftG\ relation and is analogous to \shiftR.
 %
 %
-\begin{definition}[Compatible Frames]\label{def:compatibleFrames}
-The \emph{compatible frames} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all heaps that are disjoint from it. That is, given a heap $m \in \Heaps$:
+\begin{definition}[Orthogonal]\label{def:orthogonal}
+The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all heaps that are disjoint from it. That is, given a heap $m \in \Heaps$:
 %
 \[
 	\heapSize{m} \eqdef \left\{ m' \mid m \disjoint m' \right\}
@@ -256,9 +265,9 @@ The \emph{compatible frames} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{
 %
 \end{definition}
 %
-\begin{example}\label{ex:compatibleFrames}
-\todo
-\end{example}
+%\begin{example}\label{ex:compatibleFrames}
+%\todo
+%\end{example}
 %%%
 %\begin{definition}[Repartitioning]
 %%
