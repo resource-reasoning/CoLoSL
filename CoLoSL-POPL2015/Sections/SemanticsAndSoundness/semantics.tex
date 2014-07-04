@@ -1,206 +1,237 @@
 \section{\colosl rules}
 
-\subsection{Rely, guarantee, stability}
+\subsection{Rely, Guarantee, Stability}
 %
 \azaleacomment{add the projections $\heapPart{.}, \capPart{.}$ to the definition of logical states.}
-%%
-%\begin{definition}[Guarantee]
-%\[
-%\begin{array}{@{} r @{} l @{}}
 %
-%	\extendG \eqdef &
-% 	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   \left(
-%	   \begin{array}{@{} l @{}}
-%	     (l \composeL l', s, \amod{}, \amod{L}),\\
-% 	     \left(
-%	     \begin{array}{@{} l @{}}
-%	      l \composeL (\unitH, \ca{1}),\\
-%	      s \composeL s',\\
-%	      \amod{}', \amod{L} \cup \amod{0}
-%	     \end{array}
-% 	    \right)
-%	   \end{array}
-% 	  \right)
-%	   &
-% 	  	\begin{array}{@{} l @{}}
+\paragraph{Stability}
+An assertion is \emph{stable} if and only if it cannot be falsified by the interference from other threads in the environment. That is, for all possible updates that the environment can do, the assertion must remain true. To capture the interference of the environment, we define the Rely relation.
+\begin{definition}[Rely] The \emph{Rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is defined as 
+%
+\[
+	\rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
+\]
+%
+where * denotes the reflexive transitive closure and 
+%
+\[
+\begin{array}{@{} r @{} l @{}}
+	\extendR \eqdef &
+ 	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   \left(
+	   \begin{array}{@{} l @{}}
+	     (l , s, \amod{}, \amod{L}),\\
+ 	     \left(
+	     \begin{array}{@{} l @{}}
+	      l,
+	      s \composeL s',\\
+	      \amod{}', \amod{L} \cup \amod{0}
+	     \end{array}
+ 	    \right)
+	   \end{array}
+ 	  \right)
+	   &
+ 	  	\begin{array}{@{} l @{}}
 %	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
-%	 	  	
-%	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}} \land \\
-%	 	  	
-%	 	  	\{\ca{1} \composeCap \ca{2}\} \disjoint \dom{\amod{L}} \land \\
-%	 	  	
-%			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
-%			
-%			\for{l_1, r_1, \amod{1} \subseteq \amod{L}} \\
-%			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
-%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
-%			
-%     	
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\
-%	
-%	\updateG \eqdef &
-% 	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   	\left(
-%	   	\begin{array}{@{} l @{}}
-%	     	(l, s, \amod{}, \amod{L}),\\
-%	     	(l', s', \amod{}, \amod{L})
-%	   	\end{array}
-%		\right)
-%	  	&
-%	  	\begin{array}{@{} l @{} }
-%	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL s)} \land\\
-%		  	\left(
-%		  	\begin{array}{@{} l @{} }
-%		 		s = s' \lor\\
-%		 	  	\left(
-%		 	  	\begin{array}{@{} l @{}}
-%		 	  		\exsts{\ca{} \subseteq \capPart{l}}
-%		 	  		(s, s') \in \amod{}(\ca{}) \land\\
-%		 	  	
-%		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} = 
-%		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
-%		 	  	\end{array}	
-%		 	  	\right)
-%		 	\end{array}
-%	   		\right)
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\
-%	
-%	
-%	
-%	\shiftG \eqdef & 
-%	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   \left(
-%	   \begin{array}{@{} l @{}}
-%	     (l, s, \amod{}, \amod{L}),\\
-% 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
-%	   \end{array}
-% 	  \right)
-%	   &
-% 	  	\begin{array}{@{} l @{}}
-%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
-%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\\\
-%	
-%	\guarantee \eqdef & \left( \updateG \cup \extendG \cup \shiftG \right)^{*} \\\\
-%\end{array}
-%\]
-%%
-%\end{definition}
-%%
-%%
-%\begin{definition}[Rely]
-%%
-%\[
-%\begin{array}{@{} r @{} l @{}}
-%	\extendR \eqdef &
-% 	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   \left(
-%	   \begin{array}{@{} l @{}}
-%	     (l , s, \amod{}, \amod{L}),\\
-% 	     \left(
-%	     \begin{array}{@{} l @{}}
-%	      l,
-%	      s \composeL s',\\
-%	      \amod{}', \amod{L} \cup \amod{0}
-%	     \end{array}
-% 	    \right)
-%	   \end{array}
-% 	  \right)
-%	   &
-% 	  	\begin{array}{@{} l @{}}
-%%	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
-%	 	  	
-%	 	  	\capPart{s'} \subseteq \dom{\amod{0}} \cup \dom{\amod{L}} \land \\
-%	 	  	
-%			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
-%			
-%			\for{l_1, r, \amod{1} \subseteq \amod{L}} \\
-%			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r}{\amod{1}}  \\
-%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
-%			
-%     	
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\
-%	
-%	
-%	
-%	\updateR \eqdef &
-% 	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   	\left(
-%	   	\begin{array}{@{} l @{}}
-%	     	(l, s, \amod{}, \amod{L}),\\
-%	     	(l, s', \amod{}, \amod{L})
-%	   	\end{array}
-%		\right)
-%	  	&
-%	  	\begin{array}{@{} l @{} }
-%		  	\left(
-%		  	\begin{array}{@{} l @{} }
-%		 		s = s' \lor\\
+	 	  	
+	 	  	\capPart{s'} \subseteq \dom{\amod{0}} \cup \dom{\amod{L}} \land \\
+	 	  	
+			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+			
+			\for{l_1, r, \amod{1} \subseteq \amod{L}} \\
+			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r}{\amod{1}}  \\
+			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
+			
+     	
+   		\end{array}
+ 	\end{array}
+	\right\}\\
+	
+	
+	
+	\updateR \eqdef &
+ 	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   	\left(
+	   	\begin{array}{@{} l @{}}
+	     	(l, s, \amod{}, \amod{L}),\\
+	     	(l, s', \amod{}, \amod{L})
+	   	\end{array}
+		\right)
+	  	&
+	  	\begin{array}{@{} l @{} }
+		  	\left(
+		  	\begin{array}{@{} l @{} }
+		 		s = s' \lor\\
+
+		 	  	\begin{array}{@{} l @{}}
+		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{s} \right) \disjoint \ca{} \land 
+		 	  		(s, s') \in \amod{}(\ca{}) \\
+		 	  	
+		 	  	\end{array}	
+
+		 	\end{array}
+	   		\right)
+   		\end{array}
+ 	\end{array}
+	\right\}\\
+	
+	
+	
+	\shiftR \eqdef & 
+	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   \left(
+	   \begin{array}{@{} l @{}}
+	     (l, s, \amod{}, \amod{L}),\\
+ 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
+	   \end{array}
+ 	  \right)
+	   &
+ 	  	\begin{array}{@{} l @{}}
+	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+   		\end{array}
+ 	\end{array}
+	\right\}
+
+\end{array}
+\]
 %
-%		 	  	\begin{array}{@{} l @{}}
-%		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{s} \right) \disjoint \ca{} \land 
-%		 	  		(s, s') \in \amod{}(\ca{}) \\
-%		 	  	
-%		 	  	\end{array}	
+\end{definition}
 %
-%		 	\end{array}
-%	   		\right)
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\
-%	
-%	
-%	
-%	\shiftR \eqdef & 
-%	\left\{
-%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-%	   \left(
-%	   \begin{array}{@{} l @{}}
-%	     (l, s, \amod{}, \amod{L}),\\
-% 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
-%	   \end{array}
-% 	  \right)
-%	   &
-% 	  	\begin{array}{@{} l @{}}
-%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
-%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
-%   		\end{array}
-% 	\end{array}
-%	\right\}\\
-%	
-%	
-%	\rely \eqdef & \left(\updateR \cup \extendR \cup \shiftR \right)^{*}
-%\end{array}
-%\]
-%%
-%\end{definition}
-%%
-%%
-%\begin{definition}[Stability]
+Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($s'$), introduce new interference to describe how the new resources can be manipulated ($\amod{0}$) and consequently rewrite the global action model ($\amod{}'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\amod{}', \amod{L} \cup \amod{0})$ must be closed under the newly added resources and interference: $\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\amod{1}$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}$. 
+
+Moreover, at any one point the environment may update the shared state by performing an action for which it has the sufficient capability ($\ca{}$). This is described by the \updateR\ relation. For this to be possible, the thread performing the action must have the $\ca{}$ capability in its own local state and thus the $\ca{}$ capability must be disjoint from both shared and local states of the current world. 
+
+Finally, the environment may extend the local action model by shifting (rewriting) some of the existing behaviour. This is modelled by the \shiftR\ relation. This is only possible if for any subjective state $l$, context $r$ and action model $\amod{}'$ under which the old action model pair was closed, the new action model pair is also closed: $\extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}$. 
+
+The rely $\rely$ enables us to define the stability of assertions with respect to the environment actions.
+%
+\begin{definition}[Stability] An assertion $P$ is stable ($\stable{P}$) iff for all $\lenv \in \LEnv$ and $w, w' \in \Worlds$, if $w \in \sem[\lenv]{P}$ and $(w, w') \in \rely$, then $w' \in \sem[\lenv]{P}$.
 %\[	
-%\begin{array}{r l}
+%\begin{array}{r @{} l}
 %	\stable{P} \iffdef &
 %	\for{\lenv}\for{w, w'} \\
-%	& \hspace*{0.2cm} w \in \sem[\lenv]{P} \;\land\; (w, w') \in \rely \implies
+%	& w \in \sem[\lenv]{P} \land (w, w') \in \rely \implies
 %	 w' \in \sem[\lenv]{P}
 %\end{array}
 %\]
-%\end{definition}
-%%
+\end{definition}
+%
+\begin{lemma}[Stability]
+An assertion $P$ is stable if it cannot be falsified by possible updates on the shared state from other threads:
+%
+\[
+\begin{array}{l}
+	\for{\lenv}\for{w, w'} 
+     w \in \sem[\lenv]{P} \land (w, w') \in \updateR \implies
+	 w' \in \sem[\lenv]{P}\\
+	 
+	 \implies \stable{P}
+\end{array}	 
+\]
+%
+\end{lemma}
+%
+That is, an assertion $P$ is always stable with respect to possible extensions of the shared state and action shifting. For an assertion to be stable it thus suffices to consider the interference on the shared state from other threads.
+%
+\begin{definition}[Guarantee]
+\[
+\begin{array}{@{} r @{} l @{}}
+
+	\extendG \eqdef &
+ 	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   \left(
+	   \begin{array}{@{} l @{}}
+	     (l \composeL l', s, \amod{}, \amod{L}),\\
+ 	     \left(
+	     \begin{array}{@{} l @{}}
+	      l \composeL (\unitH, \ca{1}),\\
+	      s \composeL s',\\
+	      \amod{}', \amod{L} \cup \amod{0}
+	     \end{array}
+ 	    \right)
+	   \end{array}
+ 	  \right)
+	   &
+ 	  	\begin{array}{@{} l @{}}
+	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
+	 	  	
+	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}} \land \\
+	 	  	
+	 	  	\{\ca{1} \composeCap \ca{2}\} \disjoint \dom{\amod{L}} \land \\
+	 	  	
+			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+			
+			\for{l_1, r_1, \amod{1} \subseteq \amod{L}} \\
+			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
+			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
+			
+     	
+   		\end{array}
+ 	\end{array}
+	\right\}\\
+	
+	\updateG \eqdef &
+ 	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   	\left(
+	   	\begin{array}{@{} l @{}}
+	     	(l, s, \amod{}, \amod{L}),\\
+	     	(l', s', \amod{}, \amod{L})
+	   	\end{array}
+		\right)
+	  	&
+	  	\begin{array}{@{} l @{} }
+	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL s)} \land\\
+		  	\left(
+		  	\begin{array}{@{} l @{} }
+		 		s = s' \lor\\
+		 	  	\left(
+		 	  	\begin{array}{@{} l @{}}
+		 	  		\exsts{\ca{} \subseteq \capPart{l}}
+		 	  		(s, s') \in \amod{}(\ca{}) \land\\
+		 	  	
+		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} = 
+		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
+		 	  	\end{array}	
+		 	  	\right)
+		 	\end{array}
+	   		\right)
+   		\end{array}
+ 	\end{array}
+	\right\}\\
+	
+	
+	
+	\shiftG \eqdef & 
+	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	   \left(
+	   \begin{array}{@{} l @{}}
+	     (l, s, \amod{}, \amod{L}),\\
+ 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
+	   \end{array}
+ 	  \right)
+	   &
+ 	  	\begin{array}{@{} l @{}}
+	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+   		\end{array}
+ 	\end{array}
+	\right\}\\\\
+	
+	\guarantee \eqdef & \left( \updateG \cup \extendG \cup \shiftG \right)^{*} \\\\
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+
 %%%
 %\begin{definition}[Repartitioning]
 %%
@@ -222,11 +253,10 @@
 %\end{definition}
 %%
 
-\paragraph{Stability}
-TODO: include this: In particular,
-an action whose precondition is satisfiable is always enabled from the
-empty subjective assertion (which by definition is compatible with all
-other states). 
+%TODO: include this: In particular,
+%an action whose precondition is satisfiable is always enabled from the
+%empty subjective assertion (which by definition is compatible with all
+%other states). 
 
 
 \subsection{Program logic}
