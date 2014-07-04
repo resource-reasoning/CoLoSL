@@ -2,7 +2,7 @@
 
 \subsection{Rely, Guarantee, Stability}
 %
-\azaleacomment{add the projections $\heapPart{.}, \capPart{.}$ to the definition of logical states.}
+\azaleacomment{add the projections $\heapPart{.}, \capPart{.}$ to the definition of logical states. Also include the size function.}
 %
 \paragraph{Stability}
 An assertion is \emph{stable} if and only if it cannot be falsified by the interference from other threads in the environment. That is, for all possible updates that the environment can do, the assertion must remain true. To capture the interference of the environment, we define the Rely relation.
@@ -136,8 +136,18 @@ An assertion $P$ is stable if it cannot be falsified by possible updates on the 
 \end{lemma}
 %
 That is, an assertion $P$ is always stable with respect to possible extensions of the shared state and action shifting. For an assertion to be stable it thus suffices to consider the interference on the shared state from other threads.
+
+We now define the Guarantee relation  that describes all possible updates the current thread can perform. Intuitively, the Guarantee relation is the dual of Rely.
 %
 \begin{definition}[Guarantee]
+The \emph{Guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
+%
+\[
+	\guarantee \eqdef  \left( \updateG \cup \extendG \cup \shiftG \right)^{\text{*}}
+\]
+%
+with
+%
 \[
 \begin{array}{@{} r @{} l @{}}
 
@@ -162,7 +172,7 @@ That is, an assertion $P$ is always stable with respect to possible extensions o
 	 	  	
 	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}} \land \\
 	 	  	
-	 	  	\{\ca{1} \composeCap \ca{2}\} \disjoint \dom{\amod{L}} \land \\
+	 	  	\ca{1} \composeCap \ca{2} \disjoint \dom{\amod{L}} \land \\
 	 	  	
 			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
 			
@@ -195,7 +205,7 @@ That is, an assertion $P$ is always stable with respect to possible extensions o
 		 	  		\exsts{\ca{} \subseteq \capPart{l}}
 		 	  		(s, s') \in \amod{}(\ca{}) \land\\
 		 	  	
-		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} = 
+		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} \subseteq 
 		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
 		 	  	\end{array}	
 		 	  	\right)
@@ -222,16 +232,20 @@ That is, an assertion $P$ is always stable with respect to possible extensions o
 	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
    		\end{array}
  	\end{array}
-	\right\}\\\\
-	
-	\guarantee \eqdef & \left( \updateG \cup \extendG \cup \shiftG \right)^{*} \\\\
+	\right\}
+
 \end{array}
 \]
 %
 \end{definition}
 %
 %
+The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\amod{0}$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\amod{L}}$). The last two conjunct are to enforce the closure of the new action models and can be justified as in the case of \extendR.
 
+The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities. Similarly, if the shared state is updated ($s \not= s'$),  then the total heap size may not increase. 
+\todo This needs more explanation.
+
+Lastly, the current thread may extend the local action model by shifting some of the existing interference. This is modelled by the \shiftG\ relation and is analogous to \shiftR.
 %%%
 %\begin{definition}[Repartitioning]
 %%
