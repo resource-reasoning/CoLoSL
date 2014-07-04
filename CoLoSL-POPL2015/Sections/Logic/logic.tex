@@ -71,7 +71,7 @@ threads.
 
     \LStates == \Heaps\times \Caps
   \end{mathpar}
-  We write $\unitL$ for the logical state $(\emptyset, \unitH, \unitCap)$. The
+  We write $\unitL$ for the logical state $(\emptyset, \unitH, \unitCap)$. Given a logical state $l = ((s, h), \ca{})$, we write $\heapPart{l}$ and $\capPart{l}$ for the first $(s, h)$ and second ($\ca{}$) projections respectively.  The
   \emph{composition of logical states}
   $
   \composeL : \LStates \times \LStates \rightharpoonup \LStates
@@ -84,7 +84,7 @@ threads.
 \end{definition}
 Although, for this presentation, we build logical states out of stacks
 and heaps and sets of tokens, the general setting allows any pair of
-separation algebras~\cite{colosl-tr14} (\textit{i.e.}, cancellative
+separation algebras~\cite{colosl-tr14} (\textit{i.e.} cancellative
 partial commutative monoids~\cite{asl}).
 
 In the following, we write $l_1\leq l_2$ when there exists $l$ such
@@ -518,8 +518,7 @@ The \emph{maximal intersection} $l_1 \maxMeetL l_2$ of $l_1$ and $l_2$
 is defined as the largest element of the intersection of $l_1$ and
 $l_2$, when it exists.
 \end{definition}
-
-\azaleacomment{I don't know why you have changed the max meet symbol. This is very subtle and not at all clear.}
+%
 One can check that $l_1\maxMeetL l_2$ indeed yields at most one
 element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
 

@@ -174,7 +174,8 @@
 \newcommand{\strictfences}{\mathrel{\RHD}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
-\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
+%\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
+\newcommand{\maxMeet}[1]{\meet{#1}^{\textsf{m}}}
 \newcommand{\unit}[1]{\ensuremath{\mathbf{0}_{#1}}}
 \newcommand{\size}[2]{\left\lvert #1\right\rvert_{#2}}
 
@@ -197,7 +198,7 @@
 \newcommand{\meetH}{\meet{\Heaps}}
 \newcommand{\maxMeetH}{\maxMeet{\Heaps}}
 \newcommand{\unitH}{\emptyset}
-\newcommand{\heapSize}[1]{\size{#1}{\Heaps}}
+\newcommand{\heapSize}[1]{\size{#1}{}}
 \newcommand{\reifyH}[1]{\left\lfloor #1 \right\rfloor_{\Heaps}}
 
 %%%%Machine States
