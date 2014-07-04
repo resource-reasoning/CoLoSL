@@ -1,7 +1,226 @@
 \section{\colosl rules}
 
 \subsection{Rely, guarantee, stability}
-
+%
+\azaleacomment{add the projections $\heapPart{.}, \capPart{.}$ to the definition of logical states.}
+%%
+%\begin{definition}[Guarantee]
+%\[
+%\begin{array}{@{} r @{} l @{}}
+%
+%	\extendG \eqdef &
+% 	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   \left(
+%	   \begin{array}{@{} l @{}}
+%	     (l \composeL l', s, \amod{}, \amod{L}),\\
+% 	     \left(
+%	     \begin{array}{@{} l @{}}
+%	      l \composeL (\unitH, \ca{1}),\\
+%	      s \composeL s',\\
+%	      \amod{}', \amod{L} \cup \amod{0}
+%	     \end{array}
+% 	    \right)
+%	   \end{array}
+% 	  \right)
+%	   &
+% 	  	\begin{array}{@{} l @{}}
+%	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
+%	 	  	
+%	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}} \land \\
+%	 	  	
+%	 	  	\{\ca{1} \composeCap \ca{2}\} \disjoint \dom{\amod{L}} \land \\
+%	 	  	
+%			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+%			
+%			\for{l_1, r_1, \amod{1} \subseteq \amod{L}} \\
+%			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
+%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
+%			
+%     	
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\
+%	
+%	\updateG \eqdef &
+% 	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   	\left(
+%	   	\begin{array}{@{} l @{}}
+%	     	(l, s, \amod{}, \amod{L}),\\
+%	     	(l', s', \amod{}, \amod{L})
+%	   	\end{array}
+%		\right)
+%	  	&
+%	  	\begin{array}{@{} l @{} }
+%	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL s)} \land\\
+%		  	\left(
+%		  	\begin{array}{@{} l @{} }
+%		 		s = s' \lor\\
+%		 	  	\left(
+%		 	  	\begin{array}{@{} l @{}}
+%		 	  		\exsts{\ca{} \subseteq \capPart{l}}
+%		 	  		(s, s') \in \amod{}(\ca{}) \land\\
+%		 	  	
+%		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} = 
+%		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
+%		 	  	\end{array}	
+%		 	  	\right)
+%		 	\end{array}
+%	   		\right)
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\
+%	
+%	
+%	
+%	\shiftG \eqdef & 
+%	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   \left(
+%	   \begin{array}{@{} l @{}}
+%	     (l, s, \amod{}, \amod{L}),\\
+% 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
+%	   \end{array}
+% 	  \right)
+%	   &
+% 	  	\begin{array}{@{} l @{}}
+%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\\\
+%	
+%	\guarantee \eqdef & \left( \updateG \cup \extendG \cup \shiftG \right)^{*} \\\\
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
+%\begin{definition}[Rely]
+%%
+%\[
+%\begin{array}{@{} r @{} l @{}}
+%	\extendR \eqdef &
+% 	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   \left(
+%	   \begin{array}{@{} l @{}}
+%	     (l , s, \amod{}, \amod{L}),\\
+% 	     \left(
+%	     \begin{array}{@{} l @{}}
+%	      l,
+%	      s \composeL s',\\
+%	      \amod{}', \amod{L} \cup \amod{0}
+%	     \end{array}
+% 	    \right)
+%	   \end{array}
+% 	  \right)
+%	   &
+% 	  	\begin{array}{@{} l @{}}
+%%	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
+%	 	  	
+%	 	  	\capPart{s'} \subseteq \dom{\amod{0}} \cup \dom{\amod{L}} \land \\
+%	 	  	
+%			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+%			
+%			\for{l_1, r, \amod{1} \subseteq \amod{L}} \\
+%			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r}{\amod{1}}  \\
+%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
+%			
+%     	
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\
+%	
+%	
+%	
+%	\updateR \eqdef &
+% 	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   	\left(
+%	   	\begin{array}{@{} l @{}}
+%	     	(l, s, \amod{}, \amod{L}),\\
+%	     	(l, s', \amod{}, \amod{L})
+%	   	\end{array}
+%		\right)
+%	  	&
+%	  	\begin{array}{@{} l @{} }
+%		  	\left(
+%		  	\begin{array}{@{} l @{} }
+%		 		s = s' \lor\\
+%
+%		 	  	\begin{array}{@{} l @{}}
+%		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{s} \right) \disjoint \ca{} \land 
+%		 	  		(s, s') \in \amod{}(\ca{}) \\
+%		 	  	
+%		 	  	\end{array}	
+%
+%		 	\end{array}
+%	   		\right)
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\
+%	
+%	
+%	
+%	\shiftR \eqdef & 
+%	\left\{
+%	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+%	   \left(
+%	   \begin{array}{@{} l @{}}
+%	     (l, s, \amod{}, \amod{L}),\\
+% 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
+%	   \end{array}
+% 	  \right)
+%	   &
+% 	  	\begin{array}{@{} l @{}}
+%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+%   		\end{array}
+% 	\end{array}
+%	\right\}\\
+%	
+%	
+%	\rely \eqdef & \left(\updateR \cup \extendR \cup \shiftR \right)^{*}
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
+%\begin{definition}[Stability]
+%\[	
+%\begin{array}{r l}
+%	\stable{P} \iffdef &
+%	\for{\lenv}\for{w, w'} \\
+%	& \hspace*{0.2cm} w \in \sem[\lenv]{P} \;\land\; (w, w') \in \rely \implies
+%	 w' \in \sem[\lenv]{P}
+%\end{array}
+%\]
+%\end{definition}
+%%
+%%%
+%\begin{definition}[Repartitioning]
+%%
+%\[
+%\begin{array}{@{} r l @{}}
+%	\repartitions{P}{Q}{\heapAss{1}}{\heapAss{2}} \iffdef 
+%	& \for{\lenv} \repartitions{\sem[\lenv]{P}}{\sem[\lenv]{Q}}{\semH[\lenv]{\heapAss{1}}}{\semH[\lenv]{\heapAss{2}}}\\\\
+%	
+%	\repartitions{W_1}{W_2}{H_{1}}{H_{2}} \iffdef &
+%	\begin{array}{l}
+%		\for{w_1 \in W_1} \exsts{h_1 \in H_1\ , h'}\\
+%		\hspace*{0.5cm} h_1 \composeH h' = \heapPart{(\collapseW{w_1})} \;\land\\
+%		\hspace*{0.5cm} \for{h_2 \in H_2} \exsts{w_2 \in W_2}\\
+%		\hspace*{1cm} h_2 \composeH h' = \heapPart{(\collapseW{w_2})} \;\land\; (w_1, w_2) \in \guarantee
+%	\end{array}
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
 
 \paragraph{Stability}
 TODO: include this: In particular,
