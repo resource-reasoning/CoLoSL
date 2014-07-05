@@ -57,7 +57,91 @@ We lift the notion of containment to assertions as follows where given $P \in \A
 
 
 \paragraph{Action shifting}
-Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those actions that do not affect the subjective view of the shared state, as well as rewriting the behaviour of actions to gain a more accurate account of their effect. This is achieved through \emph{action shifting} as defined below.
+Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
+of those actions that do not affect the subjective view of the shared
+state, as well as rewriting the behaviour of actions to gain a more
+accurate account of their effect. This is achieved through
+\emph{action shifting}, which allows the swapping of one global action
+model for another one that is equivalent. Here, being equivalent means
+that there is some fence that sees them as equivalent, in that actions
+from the new global acton model contains only actions with the same
+effect from the old one, and moreover any action from the old one that
+affects the subjective state has to remain in the new one. Since we
+are working at the level of a subjective view and not the whole shared
+state, we need to refine our notion of action application and fences.
+
+\begin{definition}[Subjective action application]
+  The \emph{subjective application} $a(l)$ of an action $a$ on a
+  logical state $l$ is defined as follows:
+  \[
+  a(l) == a[l,l - (l\meetL \m{fst}(\updateFP{a}))]
+  \]
+\end{definition}
+
+\begin{definition}[Fenced action model]
+  An action model $\amod{} \in \AMods$ is \emph{fenced} by $\fence{}
+  \in \pset{\LStates}$, written $\fence{} \fences \amod{}$, if, for
+  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\amod{})$,
+\[
+\begin{array}{L}
+  a(l)\text{ is defined} /| \m{visible}(a,l) => a(l)\in\fence{}
+  %% (p, q) \in \amod{}(\ca{}) /|
+  %% p \meetL l \not= \emptyset /|
+  %% \updateFP{p, q} = (p', q') \land\\
+  %% p' \maxMeetL l = p'' \land
+  %% p'' /= \unitL \land
+  %% l = p'' \composeL l' /|
+  %% q' \compatL l'
+  %% =>
+  %% q' \composeL l' \in \fence{}
+\end{array}
+\]
+\end{definition}
+
+Note that, in contrast with $a[l]$, only part of the active
+precondition has to intersect with the subjective view.
+
+In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
+\[
+\fence{x} \eqdef\begin{array}[t]{L}
+\left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
+\cdots, 10\} \right\} \cup\\
+\left\{\cell{x}{v+1} * \cell{z}{v} \mid v
+\in \{0 ,\cdots, 9 \}\right\}
+\end{array}
+\]
+
+\julescomment{Find better/more examples, perhaps of non-fencing as
+  well.}
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%% \paragraph{Fences}
+%% A subjective state represents the instantaneous view of a thread at a
+%% particular instant. However, this view is subject to interferences by
+%% other threads, as well as by the thread's own actions, as specified by
+%% an action model. To reason on such states, it makes sense to consider
+%% all its potential future incarnations with respect to these
+%% modifications.  
+
+%% %  F |> s <==> \forall p, q, k, l, l', p',
+%% %    (p,q)\in s(k) /\ l o l' o p' is defined /\ l o l'\in F /\ l o p' = p /\ l\neq\emptyset
+%% %      => \exists f, l'', q'. l = l'' o f /\ q = f o q' /\
+%% %            (l''\neq\emptyset /\ q # l' => l' o q\in F)
+
+
+%% We are now ready to describe what effect an action $a$ can have on a
+%% \emph{subjective} state $l$: because the subjective state is not the
+%% whole shared state, the precondition of $a$ only needs to be
+%% \emph{compatible} with $l$. When that is the case, the action consumes
+%% the part of its active precondition that intersects with $l$ and plugs
+%% in its active postcondition instead, provided that the result is
+%% defined.
+
+
+
+
+
 \begin{definition}[Action shifting]
   Given $\amod{}, \amod{}' \in \AMods$ and $\mathcal{P} \in
   \pset{\LStates}$, $\amod{}'$ is a \emph{shifting} of $\amod{}$ with
@@ -71,7 +155,7 @@ Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting of those a
     \quad\for{a\in\amod{}'(\ca{})}
     \m{present}(a,l,\amod{}(\ca{})) /|\null\\
     \quad\for{a\in\amod{}(\ca{})}
-    \m{enabled}(a,l) /|\m{visible}(a,l) =>
+    a(l)\text{ is defined} /|\m{visible}(a,l) =>
     \m{present}(a,l,\amod{}(\ca{}))
     %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
     %% \left(\begin{array}{L}
