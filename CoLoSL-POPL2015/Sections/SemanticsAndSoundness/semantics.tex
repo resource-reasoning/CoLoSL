@@ -5,6 +5,19 @@
 %
 \paragraph{Stability}
 An assertion is \emph{stable} if and only if it cannot be falsified by the interference from other threads in the environment. That is, for all possible updates that the environment can do, the assertion must remain true. To capture the interference of the environment, we define the Rely relation.
+%
+%
+\todo\ explain what this is and when we need it.
+\begin{definition}[Action Model Extension]
+An action model $\amod{}'$ \emph{extends}  ($s, \amod{}, \amod{L}$) with $(\amod{n}, s')$, written $\expandsAM{\amod{}'}{\amod{n}}{s'}{s}{\amod{}}{\amod{L}}$, iff for all $\amod{0} \subseteq \amod{L}$ and $l, r$ such that $l \composeL r = s$:
+%
+\[
+	\extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{0}} \implies \extendsAM{\amod{}', \amod{L} \cup \amod{n}}{l}{r\composeL s'}{\amod{0}}
+\]
+%
+\end{definition}
+%
+%
 \begin{definition}[Rely] The \emph{Rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is defined as 
 %
 \[
@@ -25,7 +38,7 @@ where * denotes the reflexive transitive closure and
 	     \begin{array}{@{} l @{}}
 	      l,
 	      s \composeL s',\\
-	      \amod{}', \amod{L} \cup \amod{0}
+	      \amod{}', \amod{L} \cup \amod{n}
 	     \end{array}
  	    \right)
 	   \end{array}
@@ -34,13 +47,15 @@ where * denotes the reflexive transitive closure and
  	  	\begin{array}{@{} l @{}}
 %	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
 	 	  	
-	 	  	\capPart{s'} \subseteq \dom{\amod{0}} \cup \dom{\amod{L}} \land \\
+	 	  	\capPart{s'} \subseteq \dom{\amod{n}} \cup \dom{\amod{L}} \land \\
 	 	  	
-			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+			\extendsAM{\amod{}', \amod{L} \cup \amod{n}}{s'}{s}{\amod{n}} \land \\
 			
-			\for{l_1, r, \amod{1} \subseteq \amod{L}} \\
-			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r}{\amod{1}}  \\
-			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
+%			\for{l_1, r, \amod{1} \subseteq \amod{L}} \\
+%			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r}{\amod{1}}  \\
+%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
+			
+			\expandsAM{\amod{}'}{\amod{n}}{s'}{s}{\amod{}}{\amod{L}}
 			
      	
    		\end{array}
@@ -60,9 +75,9 @@ where * denotes the reflexive transitive closure and
 		\right)
 	  	&
 	  	\begin{array}{@{} l @{} }
-		  	\left(
-		  	\begin{array}{@{} l @{} }
-		 		s = s' \lor\\
+%		  	\left(
+%		  	\begin{array}{@{} l @{} }
+%		 		s = s' \lor\\
 
 		 	  	\begin{array}{@{} l @{}}
 		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{s} \right) \disjoint \ca{} \land 
@@ -70,8 +85,8 @@ where * denotes the reflexive transitive closure and
 		 	  	
 		 	  	\end{array}	
 
-		 	\end{array}
-	   		\right)
+%		 	\end{array}
+%	   		\right)
    		\end{array}
  	\end{array}
 	\right\}\\
@@ -83,15 +98,17 @@ where * denotes the reflexive transitive closure and
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l, s, \amod{}, \amod{L}),\\
- 	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
+	     (l, s, \amod{}, \amod{L}),
+ 	     \left( l, s, \amod{}, \amod{L} \cup \amod{n}  \right)
 	   \end{array}
  	  \right)
 	   &
- 	  	\begin{array}{@{} l @{}}
-	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
-	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
-   		\end{array}
+% 	  	\begin{array}{@{} l @{}}
+%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+%   		\end{array}
+
+		\expandsAM{\amod{}}{\amod{n}}{\unitL}{s}{\amod{}}{\amod{L}}
  	\end{array}
 	\right\}
 
@@ -160,7 +177,7 @@ with
 	     \begin{array}{@{} l @{}}
 	      l \composeL (\unitH, \ca{1}),\\
 	      s \composeL s',\\
-	      \amod{}', \amod{L} \cup \amod{0}
+	      \amod{}', \amod{L} \cup \amod{n}
 	     \end{array}
  	    \right)
 	   \end{array}
@@ -169,15 +186,17 @@ with
  	  	\begin{array}{@{} l @{}}
 	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
 	 	  	
-	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}} \land \\
+	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{n}} \land \\
 	 	  	
 	 	  	\ca{1} \composeCap \ca{2} \disjoint \dom{\amod{L}} \land \\
 	 	  	
-			\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{s'}{s}{\amod{0}} \land \\
+			\extendsAM{\amod{}', \amod{L} \cup \amod{n}}{s'}{s}{\amod{n}} \land \\
 			
-			\for{l_1, r_1, \amod{1} \subseteq \amod{L}} \\
-			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
-			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
+%			\for{l_1, r_1, \amod{1} \subseteq \amod{L}} \\
+%			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\amod{}, \amod{L}}{l_1}{r_1}{\amod{1}}  \\
+%			\hspace*{0.1cm} \implies\extendsAM{\amod{}', \amod{L} \cup \amod{0}}{l_1}{r_1 \composeL s'}{\amod{1}}
+
+			\expandsAM{\amod{}'}{\amod{n}}{s'}{s}{\amod{}}{\amod{L}}
 			
      	
    		\end{array}
@@ -221,15 +240,17 @@ with
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l, s, \amod{}, \amod{L}),\\
+	     (l, s, \amod{}, \amod{L}),
  	     \left( l, s, \amod{}, \amod{L} \cup \amod{0}  \right)
 	   \end{array}
  	  \right)
 	   &
- 	  	\begin{array}{@{} l @{}}
-	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
-	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
-   		\end{array}
+	   
+	   \expandsAM{\amod{}}{\amod{n}}{\unitL}{s}{\amod{}}{\amod{L}}
+% 	  	\begin{array}{@{} l @{}}
+%	 	  	\for{l, r} \for{\amod{}' \subseteq \amod{L}} \extendsAM{\amod{}, \amod{L}}{l}{r}{\amod{}'} \\
+%	 	  	\hspace*{0.5cm} \implies \extendsAM{\amod{}, \amod{L} \cup \amod{0}}{l}{r}{\amod{}'}
+%   		\end{array}
  	\end{array}
 	\right\}
 
@@ -241,7 +262,7 @@ with
 %
 The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\amod{0}$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\amod{0}}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\amod{L}}$). The last two conjunct are to enforce the closure of the new action models and can be justified as in the case of \extendR.
 
-The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($s \not= s'$),  then the heap resources may not grow ($\heapSize{\heapPart{(l \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $s$ to $s'$) without extending the heap resources as illustrated in the following sequence.
+The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($s \not= s'$),  then the heap resources (the domain of the heap) may not grow ($\heapSize{\heapPart{(l \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $s$ to $s'$) without extending the heap resources, as illustrated in the following sequence.
 %
 \[
 \begin{array}{l}
@@ -265,10 +286,6 @@ The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}
 %
 \end{definition}
 %
-%\begin{example}\label{ex:compatibleFrames}
-%\todo
-%\end{example}
-%%%
 %\begin{definition}[Repartitioning]
 %%
 %\[
@@ -296,9 +313,48 @@ The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}
 
 
 \subsection{Program logic}
-
+We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. The view semigroup is the separation algebra of worlds as described in \defin\ref{todo}. 
+The machine states and the reification of worlds are as given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
+Generally, since \colosl\ is parametric in the separation algebra of heaps, the set of machine states and the reification function over heaps are also parameterised. Further details can be found in~\cite{colosl-tr14}.
+}. 
+The grammar of \colosl\ atomic commands is provided in \defin\ref{def:atomicCommands}; we show the soundness of \colosl\ atomic commands in the companion technical report~\cite{colosl-tr14}. 
+The axiomatisation of \colosl\ atomic commands are as per \defin\ref{todo}.
+%
+%
+\begin{definition}[Machine States]\label{def:machineStates}
+The set of \colosl\ \emph{Machine States} are $\MStates \eqdef \Heaps$.
+\end{definition}
+%
+%
+\begin{definition}[Reification]\label{def:reification}
+The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\MStates}$ is defined as:
+%
+\[
+	\reifyW{(l, l_s, \amod{}, \amod{L})} \eqdef \heapPart{(l \composeL l_s)}
+\]
+%
+\end{definition}
+%
+%
 \paragraph{Programming language}
-
+ \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of the \colosl programming language.
+%
+\begin{definition}[Atomic commands]\label{def:atomicCommands}
+The \emph{atomic commands} of \colosl\, $\atom{} \in \Atoms$ are defined by the following grammar.
+%
+\begin{mathpar}
+	\atom{} ::= \atomic{\seq{}}
+	
+	\seq{} ::= \bc{} \mid \li{skip} \mid \seq{1};\seq{2} \mid \seq{1}+\seq{2} \mid \seq{}^{\text{*}}
+\end{mathpar}
+%
+where $\bc{} \in \Basics$ denotes a set of basic commands that can be instantiated with any set of sequential commands. In the examples of this paper, our basic commands are given by the following grammar.
+%
+\[
+\bc{} ::= \li{x}:= E \mid \li{assume}(E)
+\]
+%
+\end{definition}
 \paragraph{Proof rules}
 Explain atomic rule. Others are standard.
 

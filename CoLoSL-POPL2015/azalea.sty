@@ -241,7 +241,7 @@
 
 \newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
 \newcommand{\extendsAMUpto}[5]{\left(#1\right) \!\downarrow_{#2} \left(#3, #4, #5\right)}
-\newcommand{\expandsAM}[5]{\left(#1\right) \!\uparrow \left(#2, #3, #4, #5\right)}
+\newcommand{\expandsAM}[6]{#1 \!\uparrow^{\left(#2, #3\right)} \left(#4, #5, #6\right)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
 %\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
 %\newcommand{\backwardClosure}[1]{#1^{\leftarrow}}
@@ -258,17 +258,17 @@
 \newcommand{\Axioms}[1]{\ensuremath{\textsf{Axiom}_{#1}}}
 
 \newcommand{\Basics}{\textsf{Basic}}
-\newcommand{\bc}[1]{\ensuremath{\mathbb{BC}_{#1}}}
+\newcommand{\bc}[1]{\ensuremath{\mathbb{B}_{#1}}}
 \newcommand{\AxiomsB}{\Axioms{\textsf{B}}}
 \newcommand{\opSemB}[2]{\opSem{#1}{#2}{\textsf{B}}}
 
 \newcommand{\Seqs}{\textsf{Seqs}}
-\newcommand{\seq}[1]{\ensuremath{\mathbb{SC}_{#1}}}
+\newcommand{\seq}[1]{\ensuremath{\mathbb{S}_{#1}}}
 \newcommand{\AxiomsSeq}{\Axioms{\textsf{S}}}
 \newcommand{\opSemSeq}[2]{\opSem{#1}{#2}{\textsf{S}}}
 
 \newcommand{\Atoms}{\textsf{Atom}}
-\newcommand{\atom}[1]{\ensuremath{a_{#1}}}
+\newcommand{\atom}[1]{\ensuremath{\mathbb{A}_{#1}}}
 \newcommand{\AxiomsA}{\Axioms{\textsf{A}}}
 \newcommand{\opSemA}[2]{\opSem{#1}{#2}{\textsf{A}}}
 
