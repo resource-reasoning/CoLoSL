@@ -184,7 +184,7 @@ Intuitively, there exists an invariant $\fence{}$ that contains the states in $\
 \end{enumerate} 
 %
 %
-We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\weakenI{R}\sqsupseteq$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \weakenI{R}\sqsupseteq I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
+We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
 %
 %
 \begin{figure*}
@@ -223,7 +223,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 
 
 	\infer[\proofRule{Expand/Contract}]{
-		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R}\sqsupseteq \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
 	}
 	{	
 	    R \entails \fenceAss{} 
