@@ -55,12 +55,12 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \hrule
 \[
 \begin{array}{r @{\hspace*{2pt}} l}
-	\graph{x}{\gamma} \eqdef & \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{I_\gamma} \hspace*{0.5cm} I_\gamma \eqdef \bigcup\limits_{n \in \gamma}I(n)\\
+	\graph{x}{\gamma} \eqdef & \left[\markT{x}{\rootEdge}\right] * \shared{\G{x}{\gamma}}{I_\gamma} \hspace*{0.5cm} I_\gamma \eqdef \bigcup\limits_{n \in \gamma}I(n)\\
 %	
 	\G{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \\
 	& \land \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}\\
 %
-	\unmarked{x}{l}{r} \eqdef & \cell{x}{0, l, r} * \markT{l}{x.l} * \markT{r}{x.r}\\
+	\unmarked{x}{l}{r} \eqdef & \cell{x}{0, l, r} * \left[\markT{l}{x.l}\right] * \left[\markT{r}{x.r} \right]\\
 %	
 	\marked{x} \eqdef & \cell{x}{1}\\
 %
@@ -88,8 +88,8 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 	
 	\tr{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\
 	& \shared{\marked{x}}{I(x)} *  \exsts{l' \in \{l, \li{null}\}} \exsts{r' \in \{r, \li{null}\}}\\
-	& \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} * \\
-	& \markT{r}{x.r} * \cell{x.r}{r'} * \tr{r'}{\gamma}
+	& \left[\markT{l}{x.l}\right] * \cell{x.l}{l'} * \tr{l'}{\gamma} * \\
+	& \left[\markT{r}{x.r}\right] * \cell{x.r}{r'} * \tr{r'}{\gamma}
 \end{array}
 \]
 \hrule
@@ -104,7 +104,7 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 	\color{blue}{
 	\Big\{
 		\cell{\tx{n}}{n} * \cell{\tx{b}}{-} * 
-		\markT{n}{e} * 
+		\left[\markT{n}{e}\right] * 
 		\g{n}{\gamma}
 	\Big\} 
 	} \\
@@ -114,7 +114,7 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 	\color{blue}{
 	\Big\{
 		\cell{\tx{n}}{n} *  
-		\markT{n}{e} * 
+		\left[\markT{n}{e}\right] * 
 		\left(
 %		\begin{array}{@{} l @{}}
 			\cell{\tx{b}}{1} * \tr{n}{\gamma} \lor
@@ -217,29 +217,29 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 \begin{lstlisting}
  //$\comment\{ \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \graph{x}{\gamma}\}$
  //$\comment\{\cell{\tx{x}}{x} *  \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\G{x}{\gamma}}{I_{\gamma}}\}$
- //$\comment\{\cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \g{x}{\gamma}\}$
+ //$\comment\{\cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[\markT{x}{\rootEdge}\right] * \g{x}{\gamma}\}$
  b:= span(x) $\{$
-   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge}\\ * \exsts{l, r} \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[\markT{x}{\rootEdge}\right]\\ * \exsts{l, r} \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$
    res:= $\langle$ CAS(x.m, 0, 1) $\rangle$;
-   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} *\\ \exsts{l, r} \g{l}{\gamma} * \g{r}{\gamma} *\\ \left(\cell{\tx{res}}{0} \lor  \left(\begin{array}{l} \cell{\tx{res}}{1} * \cell{x.l}{l} * \cell{x.r}{r}\\ * \markT{l}{x.l} * \markT{r}{x.r} \end{array}\right)\right)\end{array}\right\}$
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[\markT{x}{\rootEdge}\right] * \shared{\marked{x}}{I(x)} *\\ \exsts{l, r} \g{l}{\gamma} * \g{r}{\gamma} *\\ \left(\cell{\tx{res}}{0} \lor  \left(\begin{array}{l} \cell{\tx{res}}{1} * \cell{x.l}{l} * \cell{x.r}{r}\\ * \left[\markT{l}{x.l}\right] * \left[\markT{r}{x.r}\right] \end{array}\right)\right)\end{array}\right\}$
    if (res) then $\{$ 
-   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x.r}{r} *\\\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \end{array} \right\}$
-     //$\comment\left\{\markT{l}{x.l} * \g{l}{\gamma} * \markT{r}{x.r} * \g{r}{\gamma}  \right\}$   
+   //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[\markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x.r}{r} *\\ \left[\markT{l}{x.l} \right] * \g{l}{\gamma} * \left[\markT{r}{x.r}\right] * \g{r}{\gamma}  \end{array} \right\}$
+     //$\comment\left\{ \left[\markT{l}{x.l} \right] * \g{l}{\gamma} * \left[\markT{r}{x.r} \right] * \g{r}{\gamma}  \right\}$   
      b1:= span(x.l) || b2:= span(x.r)
-     //$\comment\left\{\begin{array}{@{} l @{}}  \markT{l}{x.l} * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \markT{r}{x.r} * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma}\right)  \end{array}\right\}$   
-   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \markT{l}{x.l} * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor (\cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma})\right) *\\ \markT{r}{x.r} * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor (\cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma})\right)    \end{array}\right\}$  
+     //$\comment\left\{\begin{array}{@{} l @{}}  \left[\markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma}\right)  \end{array}\right\}$   
+   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \left[ \markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma} \right)    \end{array}\right\}$  
      if (!b1) then 
        x.l:= null
      if (!b2) then 
        x.r:= null
-   //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} * \shared{\marked{x}}{I(x)} * \\ \cell{\tx{res}}{1} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} *  \exsts{l, r}  \\ \exsts{l' \in \{l, \tx{null}\}} \markT{l}{x.l} * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \tx{null}\}} \markT{r}{x.r} * \cell{x.r}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
+   //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} * \\ \cell{\tx{res}}{1} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} *  \exsts{l, r}  \\ \exsts{l' \in \{l, \tx{null}\}} \left[ \markT{l}{x.l} \right] * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \tx{null}\}} \left[ \markT{r}{x.r} \right] * \cell{x.r}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \cell{\tx{res}}{1} *\cell{\tx{b1}}{-} * \cell{\tx{b2}}{-}\\ * \markT{x}{\rootEdge} *  \tr{x}{\gamma}  \\  \end{array}\right\}$         
    $\}		$
-   //$\comment\left\{ \begin{array}{l @{}} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor \left(\begin{array}{@{} l @{}}\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)} \\  * \g{l}{\gamma} * \g{r}{\gamma} \end{array}\right) \end{array} \right\}$ 
-   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \markT{x}{\rootEdge} *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} ) \end{array} \right\}$      
+   //$\comment\left\{ \begin{array}{l @{}} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right]*  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor \left(\begin{array}{@{} l @{}}\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)} \\  * \g{l}{\gamma} * \g{r}{\gamma} \end{array}\right) \end{array} \right\}$ 
+   //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} ) \end{array} \right\}$      
    return res
  $\}$
- //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \markT{x}{\rootEdge} *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\tx{null}}{\gamma}) \end{array} \right\}$         
+ //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \left[ \markT{x}{\rootEdge} \right] *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\tx{null}}{\gamma}) \end{array} \right\}$         
 \end{lstlisting}
 \hrule\vspace*{5pt}
 \caption{Concurrent Spanning Tree Implementation}
