@@ -1,94 +1,93 @@
-\section{\colosl assertions}
+\section{\colosl worlds and assertions}
 \label{sec:logic}
 
-We now introduce the program logic \colosl formally. Let us first give
-the syntax and semantics of our assertion language.
+In this section, we formally introduce the assertion language of
+\colosl and their models. We start with the latter.
 
-\subsection{Syntax}
+\subsection{Overview}
 
-Our assertions extend standard separation logic with \emph{subjective
-  views}, as introduced in the previous section. \colosl is parametric
-with respect to the heap and capability assertions and can be
-instantiated with any assertion language so long as they are
-interpreted over elements of a separation
-algebra~\cite{asl,views}. For space reasons, we restrict the
-exposition in this paper to \emph{heap assertions} and models, and to
-sets of \emph{tokens} as capabilities. The parametric treatment of
-\colosl assertions can be found in the companion technical
-report~\cite{colosl-tr14}. We assume infinite disjoint sets
-$\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program variables,
-logical variables, and tokens, respectively.
-\julescomment{TODO: also parametric in the assertions over heaps and capabilities.}
+Incomplete, subjective view of the shared forces us to revisit many
+semantic concepts related to shared resources and interference. In
+doing so, we find that, although we pay a price of subtlety for some
+definitions, our more general setting makes for cleaner definitions
+(TODO: not good; not sure what I want to say here, something like
+``because we have to be more general, we cannot weasel out of some
+difficulties, but that actually makes the setting simpler in some
+respects, eg no token games, ability to manipulate the interference
+relations, etc.''). In this section, we gradually introduce the
+semantic model of \emph{worlds}, our representation of program
+states in the logic.
 
-\begin{definition}[Assertion syntax]
-  \label{def:assertions}
-  The assertions of \colosl are elements of $\Assertions$ described by
-  the grammar below, where $\li x$ ranges over program variables, $x$
-  over logical variables, and $\token a$ over tokens.
-  \begin{align*}
-    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
-    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
-    E_1 |-> E_2 \mid [\token a] \\
-    P, Q  &::= 
-    \p{A} \mid P \Rightarrow Q \mid \exsts{x} P \mid
-     P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
-     \mid \shared{P}{I} \\
-    I &::= \emptyset ||| \interAss{\token a}{\vec{y}}{P}{Q}, I
-  \end{align*}
-\end{definition}
+A \emph{world} is a 4-tuple $(l,l_s,\amod{},\amod{\ell})$ where $l$
+and $l_s$ are \emph{logical states} and $\amod{}$ and $\amod{}$ are
+\emph{action models}; let us explain the role of each component
+informally. The \emph{local (logical) state} $l$ represents the
+locally owned resources of a thread (\textit{e.g.} the capability
+$[\token a_{\li y}]$ for $\mathbb{P}_{\li y}$ in the previous
+section). The \emph{shared (logical) state} $l_s$ represents the
+\emph{whole} current shared state, and is subject to interferences as
+described by the action models. It is typically composed of the
+subjective view $s$ of the thread (\textit{e.g.}  variables \li x and
+\li y for $\mathbb{P}_{\li y}$) together with a disjoint
+\emph{context} representing parts of the shared state not currently
+visible to that thread (variable \li z).
 
-The syntax follows from standard separation logic with variables as
-resource~\cite{entcs06} (notice that expressions $E$ do not allow
-program variables), with the exception of shared-state assertions,
-whose notation is borrowed from previous rely-guarantee-based
-formalisms. Classical connectives have their standard classical
-meaning, and spatial predicates and connectives have been informally
-introduced in the previous section.
+An action model is a partial function from \emph{capabilities} to sets
+of \emph{actions}. An action is a pair $(l,l')$ of logical states
+where $l$ is the \emph{precondition} of the action and $l'$ its
+\emph{postcondition}.  The \emph{local action model} $\amod{\ell}$
+contains at least the interference relations associated to the known
+subjective states, and potentially more, to account for the
+interference relations seen by other threads with their own subjective
+states.  The \emph{global action model} $\amod{}$ contains actions
+from the interference relation of the subjective view of the
+\emph{current} thread, extrapolated to act on the whole shared
+state. In particular, actions in the global model always have a local
+counterpart, but the converse does not hold in general: the global
+action model may discard actions that are never possible, or that do
+not influence the subjective view of the thread. The global action
+model allows us to combine the knowledge of different subjective
+views, as well as to know which sets of worlds are stable under
+interferences from other threads; in particular, the rely and
+guarantee relations will be computed from actions in the global action
+model. The local action model ensures that different threads agree on
+the set of all possible actions (but whether an action is actually
+relevant to a given world is given by the global action model).
+%% In doing so, it is allowed to forget about actions that are
+%% equivalent, or that do not affect the subjective state. This leads to
+%% a rather subtle notion of \emph{action closure} which is only needed
+%% when defining the semantics of formulas (see \S TODO).
 
-\julescomment{TODO: explain capabilities and the singleton capability
-  assertion. Also, more explanations about the logic.}
+Finally, as $l_s$ represents the global shared state, we will also
+require that the visible effects of all actions in $\amod{\ell}$ (and
+thus in $\amod{}$) are confined to parts of $l_s$. This enables
+threads to safely start sharing new pieces of state without worrying
+about existing actions: since the new state will be disjoint from the
+previous shared state, no existing action can interfere with it.
+
+
 
 
 \subsection{Worlds and actions}
 
-To interpret formulas in our assertion language, we build models using
-two ingredients: \emph{logical states} and \emph{action models}.
-Logical states represent \emph{resources}, in the standard separation
-logic sense. In \colosl, resources have two components: one describes
-machine states, while the other represents \emph{capabilities}. The
-latter are inspired by the same notion in deny-guarantee
-reasoning~\cite{dg}: a thread in possession of a given capability is
-allowed to perform the associated actions (as prescribed by the
-\emph{action model} components of each world, defined below), while
-any capability \emph{not} owned by a thread means that the environment
-can perform the action.\footnote{In general, capabilities could be
-  fractionally owned, in which case ownership of a \emph{fraction} of
-  a capability grants the right to perform the action to both the
-  thread and the environment, while a fully-owned capability
-  \emph{denies} the right to the environment to perform the associated
-  action. For ease of exposition, we only consider the case of
-  fully-owned capabilities in our formal development. See the long
-  version for the general case.}  Action models interpret interference
-assertions and assign actions to capabilities.
-
-A \emph{world} is then a 4-tuple $(l,l_s,\amod{},\amod{\ell})\in
-\LStates\times\LStates\times\AMods\times\AMods$ together with a
-well-formedness condition.  The local (logical) state $l$ in a world
-$(l, l_s, \amod{}, \amod{\ell})$ represents the locally owned
-resources of a thread (\textit{e.g.} the capability $[\token a_{\li
-    y}]$ for $\mathbb{P}_{\li y}$ in the previous section). The shared
-state $l_s$ is typically the result of a composition $s\composeL r$ of
-the subjective view $s$ of a thread (\textit{e.g.} variables \li x and
-\li y for $\mathbb{P}_{\li y}$) together with a \emph{context}
-representing parts of the shared state not currently visible to that
-thread (variable \li z). The \emph{local action model} $\amod{\ell}$
-contains all the actions exactly as defined by the interference
-relations on subjective states, while the \emph{global action model}
-$\amod{}$ extrapolates the effect of actions in $\amod{\ell}$ on the
-shared state. In doing so, it is allowed to forget about actions that
-are equivalent, or that do not affect the subjective state. This leads
-to a rather subtle notion of \emph{action closure} which is only
-needed when defining the semantics of formulas (see \S TODO).
+We start by defining logical states, which are \colosl's central
+concept of \emph{resources}, in the standard separation logic
+sense. Logical states have two components: one describes machine
+states, while the other represents \emph{capabilities}. The latter are
+inspired by the same notion in deny-guarantee reasoning~\cite{dg}: a
+thread in possession of a given capability is allowed to perform the
+associated actions (as prescribed by the \emph{action model}
+components of each world, defined below), while any capability
+\emph{not} owned by a thread means that the environment can perform
+the action.\footnote{In general, capabilities could be fractionally
+  owned, in which case ownership of a \emph{fraction} of a capability
+  grants the right to perform the action to both the thread and the
+  environment, while a fully-owned capability \emph{denies} the right
+  to the environment to perform the associated action. For ease of
+  exposition, we only consider the case of fully-owned capabilities in
+  our formal development. See the long version for the general case.}
+Action models interpret interference assertions and assign actions to
+capabilities.
 
 \begin{definition}[Logical states]
   A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
@@ -177,7 +176,12 @@ l  \mid
 %% element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
 One can check that $l_1\meetL l_2$ yields at most one element for any
 given $l_1$ and $l_2$~\cite{colosl-tr14}. Thus, we will usually omit
-the set notation.
+the set notation.\footnote{In the general case, separation algebras
+  may lack the \emph{disjointness} property, in which case
+  intersection between two states may yield more than one state. Thus,
+  our general definition introduces \emph{maximal intersections} to
+  restore unicity. Since our logical states satisfy disjointness,
+  intersection is enough for our exposition.}
 
 An action $a = (l_1, l_2)$ is typically of the form $(l_1'\composeL c,
 l_2'\composeL c)$, \textit{i.e.} part of the state $c$ required for
@@ -358,17 +362,59 @@ algebra with multiple units, which are all the well-formed states of
 the form $(\unitL,l_s,\amod{},\amod{\ell})$.
 
 
-\subsection{Semantics}
-We are now ready to give the semantics of \colosl assertions, defined
-as a forcing relation $|=$ between worlds and formulas. We use two
-auxiliary forcing relations. The first one, written $\slsat$,
-interprets \emph{atomic} formulas $\p{A}$ in the usual separation
-logic sense over a single logical state, while the other
-$|=_{l,\amod{},\amod{\ell}}$ interprets assertions over a single
-logical state representing a piece of shared state. Its three
-parameters are a top-level shared state $l$ and action models
-$\amod{}$ and $\amod{\ell}$. This third form of satisfaction is needed
-to deal with nesting of boxed formulas.
+\subsection{Assertions}
+
+Our assertions extend standard separation logic with \emph{subjective
+  views}, as introduced in the previous section. \colosl is parametric
+with respect to the heap and capability assertions and can be
+instantiated with any assertion language so long as they are
+interpreted over elements of a separation
+algebra~\cite{asl,views}. For space reasons, we restrict the
+exposition in this paper to \emph{heap assertions} and models, and to
+sets of \emph{tokens} as capabilities. The parametric treatment of
+\colosl assertions can be found in the companion technical
+report~\cite{colosl-tr14}. We assume infinite disjoint sets
+$\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program variables,
+logical variables, and tokens, respectively.
+
+\begin{definition}[Assertion syntax]
+  \label{def:assertions}
+  The assertions of \colosl are elements of $\Assertions$ described by
+  the grammar below, where $\li x$ ranges over program variables, $x$
+  over logical variables, and $\token a$ over tokens.
+  \begin{align*}
+    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
+    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
+    E_1 |-> E_2 \mid [\token a] \\
+    P, Q  &::= 
+    \p{A} \mid P \Rightarrow Q \mid \exsts{x} P \mid
+     P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
+     \mid \shared{P}{I} \\
+    I &::= \emptyset ||| \interAss{\token a}{\vec{y}}{P}{Q}, I
+  \end{align*}
+\end{definition}
+
+The syntax follows from standard separation logic with variables as
+resource~\cite{entcs06} (notice that expressions $E$ do not allow
+program variables), with the exception of shared-state assertions,
+whose notation is borrowed from previous rely-guarantee-based
+formalisms. Classical connectives have their standard classical
+meaning, and spatial predicates and connectives have been informally
+introduced in the previous section.
+
+\julescomment{TODO: explain capabilities and the singleton capability
+  assertion. Also, more explanations about the logic.}
+
+
+The semantics of \colosl assertions is given by a forcing relation
+$|=$ between worlds and formulas. We use two auxiliary forcing
+relations. The first one, written $\slsat$, interprets \emph{atomic}
+formulas $\p{A}$ in the usual separation logic sense over a single
+logical state, while the other $|=_{l,\amod{},\amod{\ell}}$ interprets
+assertions over a single logical state representing a piece of shared
+state. Its three parameters are a top-level shared state $l$ and
+action models $\amod{}$ and $\amod{\ell}$. This third form of
+satisfaction is needed to deal with nesting of boxed formulas.
 
 Moreover, since logical connectives are interpreted uniformly in all
 cases, we write $|=_\dagger$ for either of the three satisfaction
@@ -651,9 +697,9 @@ following definition.
   /|\null\\
   \V{\ca{}}\V{a\in \amod{\ell}(\ca{})}
   \m{enabled}(a,l\composeL r) =>\null\\
-  \quad(\m{present}(a,l\composeL r,\amod{}'(\ca{})) |/\null\\
-  \quad\phantom{(}(\neg\m{visible}(a,l) /| \m{fst}(a[l,r]) = l /|
-  \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{\m{snd}(a[l,r])}{\amod{}'}))
+  \quad\m{present}(a,l\composeL r,\amod{}'(\ca{}) |/\null\\
+  \quad(\neg\m{visible}(a,l) /| \m{fst}(a[l,r]) = l /|
+  \extendsAMUpto{\amod{}, \amod{\ell}}{n}{l}{\m{snd}(a[l,r])}{\amod{}'})
   %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
   %% \hspace*{0.2cm}(p, q) \in \amod{}'(\ca{}) 
   %% \land \updateFP{p, q} = (p', q')
