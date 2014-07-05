@@ -286,11 +286,25 @@ The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}
 %
 \end{definition}
 %
-%\begin{definition}[Repartitioning]
-%%
+Using the guarantee relation, we introduce the notion of \emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$ with respect to an update from $p$ to $q$, written $\repartitions{P}{Q}{p}{q}$. While the guarantee states how a thread can modify the shared state, extend it or shift the interference, repartitioning describes how the local and shared \emph{heaps} are updated in such a way that is compatible with the guarantee as well as the update from $p$ to $q$.
+%
+\begin{definition}[Repartitioning] $\repartitions{P}{Q}{p}{q}$ holds iff for every $\lenv \in \LEnv$, and world $w_1$ where $w_1, \lenv |= P$, there exists a state $m_1 \in \Heaps$ where $(m_1, \emptyset), \lenv \slsat p$ and a residual state $m'$ such that 
+%
+\begin{itemize} 
+	\item $m_1 \composeH m' = \heapPart{\left(\collapseW{w_1}\right)}$; and
+	\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat q$, there exists a world $w_2$ where $w_2, \lenv |= Q$ such that:
+	\begin{itemize}
+		\item $m_2 \composeH m' = \heapPart{\left(\collapseW{w_2}\right)}$; and
+		\item $(w_1, w_2) \in \guarantee$
+	\end{itemize}	  
+\end{itemize}
+%
+where $\collapseW{l, s, \amod{}, \amod{L}} \eqdef l \composeL s$.
+
+Note that when $p = q = \emp$, then the repartitioning has no side effect in that it preserves the concrete state and only allows the world to be repartitioned. We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $.
 %\[
 %\begin{array}{@{} r l @{}}
-%	\repartitions{P}{Q}{\heapAss{1}}{\heapAss{2}} \iffdef 
+%	\repartitions{P}{Q}{p}{q} \iffdef 
 %	& \for{\lenv} \repartitions{\sem[\lenv]{P}}{\sem[\lenv]{Q}}{\semH[\lenv]{\heapAss{1}}}{\semH[\lenv]{\heapAss{2}}}\\\\
 %	
 %	\repartitions{W_1}{W_2}{H_{1}}{H_{2}} \iffdef &
@@ -303,8 +317,8 @@ The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}
 %\end{array}
 %\]
 %%
-%\end{definition}
-%%
+\end{definition}
+%
 
 %TODO: include this: In particular,
 %an action whose precondition is satisfiable is always enabled from the
@@ -337,7 +351,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\MState
 %
 %
 \paragraph{Programming language}
- \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of the \colosl programming language.
+ We use the programming language of the views framework \cite{views} instantiated with a set of atomic commands. \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of \colosl atomic commands.
 %
 \begin{definition}[Atomic commands]\label{def:atomicCommands}
 The \emph{atomic commands} of \colosl\, $\atom{} \in \Atoms$ are defined by the following grammar.
@@ -356,8 +370,12 @@ where $\bc{} \in \Basics$ denotes a set of basic commands that can be instantiat
 %
 \end{definition}
 \paragraph{Proof rules}
-Explain atomic rule. Others are standard.
+Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit assumption that the pre- and post-conditions of their judgements are stable. Most of the proof rules are standard as described in \cite{views} with the exception of the atomic and consequence rules. We proceed with the judgements of these rules.
+%
+%
+\begin{definition}[Proof rules]\label{def:proofRule}
 
+\end{definition}
 
 
 \subsection{Soundness}

@@ -91,9 +91,9 @@ to a rather subtle notion of \emph{action closure} which is only
 needed when defining the semantics of formulas (see \S TODO).
 
 \begin{definition}[Logical states]
-  A \emph{logical state} is a tuple $((s, h), \ca{})$, also written
-  $(s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$,
-  assigning values to program variables, a heap $h \in\Heaps$,
+  A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
+  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$,
+  assigning values to program variables, a heap $h \in \set{Heap}$,
   represented as a finite partial map from addresses to values,
   and a capability $\ca{} \in\Caps$.
   \begin{mathpar}
@@ -109,7 +109,7 @@ needed when defining the semantics of formulas (see \S TODO).
   \end{mathpar}
   We write $\unitL$ for the logical state $(\emptyset, \unitH,
   \unitCap)$. Given a logical state $l = ((@s, h), \ca{})$, we write
-  $\heapPart{l}$ and $\capPart{l}$ for the first ($(@s, h)$) and
+  $\heapPart{l}$ and $\capPart{l}$ for the first $(@s, h)$ and
   second ($\ca{}$) projections respectively.  The \emph{composition of
     logical states} $ \composeL : \LStates \times \LStates
   \rightharpoonup \LStates $ is defined as the disjoint union $\uplus$

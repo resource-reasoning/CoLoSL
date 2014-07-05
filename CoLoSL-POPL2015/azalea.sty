@@ -191,15 +191,15 @@
 \newcommand{\capSize}[1]{\size{#1}{\Caps}}
 
 %%%%Heaps
-\newcommand{\Heaps}{\ensuremath{\mathbb{H}}\xspace}
-\newcommand{\Stacks}{\ensuremath{\mathbb{S}}\xspace}
+\newcommand{\Heaps}{\ensuremath{\mathbb{M}}\xspace}
+%\newcommand{\Stacks}{\ensuremath{\mathbb{S}}\xspace}
 \newcommand{\h}[1]{\ensuremath{h_{#1}}}
 \newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
 \newcommand{\composeH}{\uplus}
 \newcommand{\meetH}{\meet{\Heaps}}
 \newcommand{\maxMeetH}{\maxMeet{\Heaps}}
 \newcommand{\unitH}{\emptyset}
-\newcommand{\heapSize}[1]{\size{#1}{}}
+\newcommand{\heapSize}[1]{\left(#1\right)^{\bot}}
 \newcommand{\reifyH}[1]{\left\lfloor #1 \right\rfloor_{\Heaps}}
 
 %%%%Machine States
@@ -214,7 +214,7 @@
 \newcommand{\meetL}{\meet{}}
 \newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
+\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{M}}}}
 \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
 \newcommand{\updateFP}[1]{\Delta {#1}}
 
