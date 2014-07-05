@@ -332,7 +332,7 @@ shared state.
   \]
 \end{definition}
 
-\begin{definition}[Worlds]
+\begin{definition}[Worlds]\label{def:worlds}
   A \emph{world} is a 4-tuple of two logical states and two action
   models subject that is well-formed:
   \begin{mathpar}
@@ -742,22 +742,17 @@ As illustrated above, the global behaviour $\amod{}$ relies on the division betw
 
 
 
-\begin{lemma}
-  \label{lem:semprinciples}
-  The logic implications \eqref{eq:forget}, \eqref{eq:split}, and
-  \eqref{eq:merge} are \emph{valid}.
-\end{lemma}
+\begin{lemma}\label{lem:semprinciples}
+The logic implications \eqref{eq:forget}, \eqref{eq:split}, and \eqref{eq:merge} are \emph{valid}.
+%
 \begin{proof}
-The case of \eqref{eq:split} is
-straightforward from the semantics of assertions.
-For \eqref{eq:forget}, TODO
-
-For \eqref{eq:merge}, TODO
-
-\julescomment{Azalea, do you want to fill that in? One sentence about
-  the idea + reference to the tech report.}
+The case of \eqref{eq:split} is straightforward from the semantics of assertions.
+For \eqref{eq:forget}, it suffices to show that the global and local action model pair is closed under the smaller subjective view while for \eqref{eq:merge} we need to show that the action model pair is closed under the combined subjective view. The full proof is provided in~\cite{colosl-tr14}.
+\renewcommand{\qed}{}
+%
 \end{proof}
-
+%
+\end{lemma}
 
 
 
