@@ -1,4 +1,5 @@
 \section{\colosl rules}
+\todo Section title must change.
 \todo introductory paragraph to summarise this section?
 \subsection{Interference manipulations}\label{subsec:extension}
 %The rest of the semantic development of this section concerns the
@@ -487,16 +488,21 @@ Note that when $p = q = \emp$, then the repartitioning has no side effect in tha
 %%
 \end{definition}
 %
-
-%TODO: include this: In particular,
-%an action whose precondition is satisfiable is always enabled from the
-%empty subjective assertion (which by definition is compatible with all
-%other states). 
-
-
+%
+\begin{lemma}[]
+The semantic implications (\extendRule) and (\shiftRule) are valid.
+%
+\begin{proof}
+It suffices to show that the respective repartitioning ($\semimplies$) is allowed by the guarantee relation. In the case of (\extendRule) the transition is contained in the \extendG\ relation, while with (\shiftRule) the transition is allowed by \shiftG. The full proof is provided in~\cite{colosl-tr14}.
+\renewcommand{\qed}{}
+\end{proof}
+%
+\end{lemma}
+%
+%
 \subsection{Program logic}
-We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. The view semigroup is the separation algebra of worlds as described in \defin\ref{todo}. 
-The machine states and the reification of worlds are as given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
+We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. Our view semigroup is the separation algebra of worlds as described in \defin\ref{def:worlds}. 
+The machine states and the reification of worlds are given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
 Generally, since \colosl\ is parametric in the separation algebra of heaps, the set of machine states and the reification function over heaps are also parameterised. Further details can be found in~\cite{colosl-tr14}.
 }. 
 The grammar of \colosl\ atomic commands is provided in \defin\ref{def:atomicCommands}; we show the soundness of \colosl\ atomic commands in the companion technical report~\cite{colosl-tr14}. 
