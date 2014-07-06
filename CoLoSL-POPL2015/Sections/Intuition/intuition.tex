@@ -1,5 +1,4 @@
-\section{Informal development}
-\label{sec:intuition}
+\section{Informal development}\label{sec:intuition}
 
 We illustrate all four new reasoning principles of \colosl by
 sketching a proof of a variation of Dijkstra's token ring mutual
@@ -188,14 +187,15 @@ small fraction of it, can lead to intractable proofs.
 
 As a first try at simplifying the precondition, consider the following implication using the forget
 and shift principles given in the introduction:
-\begin{align*}
- & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]&\\
-&=>  \shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]&\eqref{eq:forget}\\
- &=>  \shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\li z}} *[\token a_{\li y}]
- &\eqref{eq:shift}\\
-&=>  \shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]
- & \textsc{(Weaken)}\\
-\end{align*}
+%
+\[
+\begin{array}{c l}
+ & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
+\stackrel{(\forgetRule)}{=>}  &\shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
+ \stackrel{(\shiftRule)}{\semimplies}  &\shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\li z}} *[\token a_{\li y}]\\
+\stackrel{(\proofRule{Weaken})}{=>}  &\shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]\\
+\end{array}
+\]
 The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the cell referenced by \li{z}. The cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
 action $\token a_{\li z}$ does not affect the resources described by the
 assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions
@@ -210,19 +210,21 @@ stabilise in a general way as given, losing information about how the
 values of \li{x} and \li{y} are connected together through \li{z}.
 
 It is however possible to give a  stronger specification, as follows: 
-\begin{align*}
- & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]&\\
-&=>  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]&\eqref{eq:shift}\\
- &=>  \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]
- &\eqref{eq:forget}\\
-&=>  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}]
- &\eqref{eq:shift}\\
-& =>
-    \left(\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
+\[
+\begin{array}{c l}
+ & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
+ 
+\stackrel{(\shiftRule)}{\semimplies} &  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
+
+ \stackrel{(\forgetRule)}{=>} & \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
+ 
+\stackrel{(\shiftRule)}{\semimplies} &  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
+\stackrel{(\proofRule{Weaken})}{=>} &
+    \shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
         \cell{\li{y}}{0} \lor\\ \cell{\li{x}}{1} *
-        \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]\right) &
-  \textsc{(Weaken)}
-\end{align*}
+        \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]
+\end{array}
+\]
 This implication involves subtle interaction between the assertion and
 the interference relation of the subjective view. 
 Consider the action 
@@ -275,11 +277,8 @@ thread has the capablity $[\token a_{\li y}]$ to perform action $\token
 a_{\li y}$ which only requires the resource described by the
 assertion. However, the action $\token a_{\li x}$ depends on the
 resource given by \li{z}, which is no longer a part of the subjective view
-of the thread. 
-Actions performed by the environment can happen any
-time that the environment's subjective view is {\em compatible} with
-the thread's subjective view.
-\azaleacomment{This is very misleading. The environment's view IS AND ALWAYS SHOULD BE compatible with the subjective view of the current thread.}  When that is the case, the piece of the
+of the thread. Since another thread in the environment may own the $[\token{a_{\li x}}]$ capability, it may perform the $\token{a_{\li x}}$ action whenever its subjective view is {\em compatible} with the pre-condition of the action.
+When that is the case, the piece of the
 state corresponding to the overlap between the state and the
 precondition of the action is removed, and the entire postcondition of
 the action is added in its place. Diagramatically, a subjective state
