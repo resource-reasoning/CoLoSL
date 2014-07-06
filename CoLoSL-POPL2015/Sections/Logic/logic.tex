@@ -183,8 +183,8 @@ further, non-empty catalyst can be found in $(p',q')$.
   Given a pair of logical states $(p, q)$, its \emph{active part}
   $\updateFP{p,q}$ is defined as the pair $(p', q')$ such that:
   \[
-  \E f p = p' \composeL f /| q = q' \composeL f /| \V{f'} f'\leq p' /|
-  f'\leq q' => f' = \unitL
+  \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
+  c'\leq q' => c' = \unitL
   \]
 \end{definition}
 
@@ -323,15 +323,11 @@ the form $(\unitL,g,\lmod,\gmod)$.
 Our assertions extend standard separation logic with \emph{subjective
   views}, as introduced in the previous section. \colosl is parametric
 with respect to the heap and capability assertions and can be
-instantiated with any assertion language so long as they are
-interpreted over elements of a separation
-algebra~\cite{asl,views}. For space reasons, we restrict the
-exposition in this paper to \emph{heap assertions} and models, and to
-sets of \emph{tokens} as capabilities. The parametric treatment of
-\colosl assertions can be found in the companion technical
-report~\cite{colosl-tr14}. We assume infinite disjoint sets
-$\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program variables,
-logical variables, and tokens, respectively.
+instantiated with any assertion language over states $\Heaps$ and
+capabilities $\Caps$. Here, we instantiate these languages for our
+particular instantiation with respect to our model. We assume infinite
+disjoint sets $\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program
+variables, logical variables, and tokens, respectively.
 
 \begin{definition}[Assertion syntax]
   \label{def:assertions}
@@ -339,41 +335,62 @@ logical variables, and tokens, respectively.
   the grammar below, where $\li x$ ranges over program variables, $x$
   over logical variables, and $\token a$ over tokens.
   \begin{align*}
-    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
-    K &::= a ||| K * K\\
-    \p{A} &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
+    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots
+    \qquad\qquad
+    K ::= a ||| K * K\\
+    A &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
     E_1 |-> E_2 \mid [K] \\
     P, Q  &::= 
-    \p{A} \mid P \Rightarrow Q \mid \exsts{x} P \mid
+    A \mid P \Rightarrow Q \mid \exsts{x} P \mid
      P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
      \mid \shared{P}{I} \\
-    I &::= \emptyset ||| \interAss{\token a}{\vec{y}}{P}{Q}, I
+    I &::= \emptyset ||| \interAss{K}{\vec{y}}{P}{Q}, I
   \end{align*}
 \end{definition}
 
-The syntax follows from standard separation logic with variables as
+This syntax follows from standard separation logic with variables as
 resource~\cite{entcs06} (notice that expressions $E$ do not allow
-program variables), with the exception of shared-state assertions,
-whose notation is borrowed from previous rely-guarantee-based
-formalisms. Classical connectives have their standard classical
-meaning, and spatial predicates and connectives have been informally
-introduced in the previous section.
+program variables), with the exception of shared-state assertions
+$\shared P I$, which states that a subjective view satisfying $P$ and
+undergoing interferences $I$ can be found in the global shared
+state. $\emp$ is true of the units of $\composeW$. The predicates are
+interpreted over the logic state of a world: $\li{x}|-> E$
+(resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
+where only \li{x} (resp.\ address $E_1$) is allocated and has value
+$E$ (resp.\ points to $E_2$); capability assertions $[K]$ describe the
+capability component of the local state: $\token a$ is true of the
+singleton $\{a\}$, while the $*$ of capabilities is their disjoint
+union; the spatial connectives $*$ and $--*$ are standard in
+separation logic~\cite{rey02}, and $P**Q$ is the \emph{overlapping
+  conjunction}, which states that the world can be split into three
+disjoint sub-worlds, where the first two satisfy $P$ and the last two
+satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
+have their standard classical meaning. Interference assertions $I$
+describe actions enabled by a given capability, in the form of a pre
+and post-condition.
 
-\julescomment{TODO: explain capabilities and the singleton capability
-  assertion. Also, more explanations about the logic.}
-
+%% , and spatial predicates and connectives
+%% have been informally introduced in the previous section
 
 The semantics of \colosl assertions is given by a forcing relation
-$|=$ between worlds and formulas. It is parametric in the forcing
-relation $|=_K$ for capability assertions, which we instantiate below
-for tokens. We use two auxiliary forcing relations. The first one,
-written $\slsat$, interprets \emph{atomic} formulas $\p{A}$ in the
-usual separation logic sense over a single logical state, while the
-other $|=_{l,\lmod,\gmod}$ interprets assertions over a single
-logical state representing a piece of shared state. Its three
-parameters are a top-level shared state $l$ and action models
-$\lmod$ and $\gmod$. This third form of satisfaction is needed
-to deal with nesting of boxed formulas.
+$w,\lenv|= P$ between a world $w$, an interpretation of logical
+variables $\lenv\in\LEnv == \set{LVar} --> \set{Val}$ and a formula
+$P$. We use three auxiliary forcing relations. The first one
+$\ca{},\lenv|=_K K$ interprets capability assertions. The second one
+$l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
+logic sense over a logical state $l$ (and ignores shared state
+assertions). The third one $s,\lenv|=_{g,\lmod,\gmod} P$ interprets
+assertions over a \emph{subjective view} $s$ that is part of the
+global shared state $g$, subject to action models $\lmod$ and
+$\gmod$. This third form of satisfaction is needed to deal with
+nesting of boxed formulas.\footnote{This presentation with several
+  forcing relations differs from the usual CAP
+  presentation~\cite{cap-ecoop10}, where formulas are interpreted over
+  worlds that are not necessarily well-formed, and then cut down to
+  well-formed ones. We found that the CAP presentation strays away
+  from separation logic models in some ways. For instance, in CAP, $*$
+  and $--*$ and not adjoints of each other; they are in our
+  presentation.}
 
 Moreover, since logical connectives are interpreted uniformly in all
 cases, we write $|=_\dagger$ for either of the three satisfaction
@@ -384,10 +401,9 @@ $|=$, or either $\slsat$ or $|=_{l,\lmod,\gmod}$,
 respectively.
 
 \begin{definition}[Assertion semantics]
-  Given a logical environment $\lenv\in\LEnv == \set{LVar} -->
-  \set{Val}$, the semantics of \colosl assertions is as follows, where
-  $\semI[(.)]{.}: \LEnv --> \AMods$ denotes the semantics of
-  interference assertions:
+  Given a logical environment $\lenv$, the semantics of \colosl
+  assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$
+  denotes the semantics of interference assertions:
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   \ca{},\lenv &|=_K \token a
@@ -413,7 +429,7 @@ respectively.
   && \text{never}\\
   l, \lenv &\slsat \emp &\text{iff}&   l, \lenv \slsat \shared P I
   \text{ iff } l = \unitL\\
-  s, \lenv &|=_{g,\lmod,\gmod} \p{A} &\text{iff}& s, \lenv \slsat \p{A}\\
+  s, \lenv &|=_{g,\lmod,\gmod} A &\text{iff}& s, \lenv \slsat A\\
   s, \lenv &|=_{g,\lmod,\gmod} \shared P I &\text{iff}&
   (s,g,\lmod,\gmod), \lenv |= \shared P I\\
   u,\lenv &|=_\dagger P => Q
@@ -436,7 +452,7 @@ respectively.
 \]
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  (l,g,\lmod,\gmod), \lenv &|= \p{A} &\text{iff}& l,\lenv \slsat \p{A}\\
+  (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
   (l,g,\lmod,\gmod), \lenv &|= \shared P I &\text{iff}&
   l = \unitH\text{ and }
   \exsts{s,r}
@@ -471,7 +487,7 @@ $s\composeL r$. The interference associated with $s$ is given by
 interference assertion $\semI[\lenv]{I}$ such that the global and
 local action models $\lmod$ and $\gmod$ are \emph{closed}
 under $\semI[\lenv]{I}$ with respect to the subjective view $s$ and
-context $r$. This will be formalised in \S\ref{subsec:localGlobalActionModels}.
+context $r$. This will be formalised just after this lemma.
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
 
 \begin{lemma}
