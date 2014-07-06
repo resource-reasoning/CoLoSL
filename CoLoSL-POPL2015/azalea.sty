@@ -193,7 +193,7 @@
 %%%%Heaps
 \newcommand{\Heaps}{\ensuremath{\mathbb{M}}\xspace}
 %\newcommand{\Stacks}{\ensuremath{\mathbb{S}}\xspace}
-\newcommand{\h}[1]{\ensuremath{h_{#1}}}
+\newcommand{\h}[1]{\ensuremath{m_{#1}}}
 \newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
 \newcommand{\composeH}{\uplus}
 \newcommand{\meetH}{\meet{\Heaps}}
@@ -214,9 +214,9 @@
 \newcommand{\meetL}{\meet{}}
 \newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{M}}}}
-\newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-\newcommand{\updateFP}[1]{\Delta {#1}}
+\newcommand{\heapPart}[1]{\m{fst}(#1)}
+\newcommand{\capPart}[1]{\m{snd}(#1)}
+\newcommand{\updateFP}[1]{\mathop{\Delta} #1}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
@@ -228,13 +228,16 @@
 %% \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
 \newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
 \newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
-\newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
+%\newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
+\newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor}
 
 \newcommand{\gray}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
 
 %%%%Action Models
 \newcommand{\AMods}{\textsf{AMod}}
-\newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
+%\newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
+\newcommand{\lmod}{\mathscr{I}}
+\newcommand{\gmod}{\mathscr{G}}
 \newcommand{\composeAM}{\compose{=}}
 \newcommand{\unitAM}{\emptyset}
 
@@ -556,3 +559,5 @@
 \newatcommand Y {\ensuremath{\Psi}\xspace}
 \newatcommand z {\ensuremath{\zeta}\xspace}
 
+
+\allowdisplaybreaks

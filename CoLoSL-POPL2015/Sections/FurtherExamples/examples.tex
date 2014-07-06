@@ -229,9 +229,9 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
      //$\comment\left\{\begin{array}{@{} l @{}}  \left[\markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma}\right)  \end{array}\right\}$   
    //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \left[ \markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma} \right)    \end{array}\right\}$  
      if (!b1) then 
-       x.l:= null
+       $\text{[}$x.l$\text{]}$:= null
      if (!b2) then 
-       x.r:= null
+       $\text{[}$x.r$\text{]}$:= null
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} * \\ \cell{\tx{res}}{1} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} *  \exsts{l, r}  \\ \exsts{l' \in \{l, \tx{null}\}} \left[ \markT{l}{x.l} \right] * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \tx{null}\}} \left[ \markT{r}{x.r} \right] * \cell{x.r}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \cell{\tx{res}}{1} *\cell{\tx{b1}}{-} * \cell{\tx{b2}}{-}\\ * \markT{x}{\rootEdge} *  \tr{x}{\gamma}  \\  \end{array}\right\}$         
    $\}		$
