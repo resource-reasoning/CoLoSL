@@ -42,7 +42,7 @@ By definition of \updateG and from (\ref{L11:Ass2}) and (\ref{L11:Ass4}) we know
 	& s' = s_1 \lor 
 	\left(\begin{array}{l}
 		\exsts{\ca{} \leq \capPart{(l_1)}}  (s_1, s') \in \amod{1}(\ca{}) \;\land \\
-		\heapSize{\heapPart{l_1 \composeL s_1)}} = \heapSize{\heapPart{(l'_1 \composeL s')}}
+		\heapSize{\heapPart{l_1 \composeL s_1)}} \subseteq \heapSize{\heapPart{(l'_1 \composeL s')}}
 	\end{array} \right) \nonumber
 \end{align}
 %
@@ -65,7 +65,7 @@ By definition of \updateR\ and from (\ref{L11:Ass6}) we can conclude:
 %
 \begin{align}
 	\exsts{\ca{} \leq \capPart{(l_1)}} & (s_1, s') \in \amod{1}(\ca{}) \label{L11:Ass8} \;\land\\
-	&\heapSize{\heapPart{l_1 \composeL s_1)}} = \heapSize{\heapPart{(l'_1 \composeL s')}} \label{L11:Ass9}
+	&\heapSize{\heapPart{l_1 \composeL s_1)}} \subseteq \heapSize{\heapPart{(l'_1 \composeL s')}} \label{L11:Ass9}
 \end{align}
 %
 From (\ref{L11:Ass1}), (\ref{L11:Ass3}) and (\ref{L11:Ass4}) we know that 
@@ -151,15 +151,15 @@ By definition of \extendG and from (\ref{L12:Ass2}), (\ref{L12:Ass3}) and (\ref{
 	\exsts{l_3, l_4, \ca{1}, \ca{2}, s''} \hspace*{0.2cm}& l_1 = l_3 \composeL l_4 \;\land\; l'_1 = l_3 \composeL (\unitH, \ca{1}) \;\land \label{L12:Ass5}\\
 	& s'' = l_4 \composeL (\unitH, \ca{2}) \;\land\; s' = s_2 \composeL s'' \label{L12:Ass6}\\
 %
-	\exsts{\amod{0}} \hspace*{0.2cm} & \contains{\dom{\amod{0}}}{\{\ca{1}, \ca{2}\}} \;\land\;  \dom{\amod{0}} \disjoint \dom{\amod{L}} \label{L12:Ass7}\\
+	\exsts{\amod{0}} \hspace*{0.2cm} & \contains{\dom{\amod{0}}}{\{\ca{1}, \ca{2}\}} \;\land\;  \{\ca{1}, \ca{2}\} \disjoint \dom{\amod{L}} \label{L12:Ass7}\\
 %
-	& \amod{L}' = \amod{L1} \uplus \amod{0} \label{L12:fence}\\
+	& \amod{L}' = \amod{L1} \cup \amod{0} \label{L12:fence}\\
 %	
 	&\for{l_7, r_7, \amod{7}} l_7 \composeL r_7 = s_2 \land \extendsAM{\amod{}, \amod{L1}}{l_7}{r_7}{\amod{7}} \implies \nonumber\\ 
-	&\hspace*{0.8cm}\extendsAM{\amod{}', \amod{L1} \uplus \amod{0}}{l_7}{r_7 \composeL s''}{\amod{7}}  \label{L12:Ass9}\\
+	&\hspace*{0.8cm}\extendsAM{\amod{}', \amod{L1} \cup \amod{0}}{l_7}{r_7 \composeL s''}{\amod{7}}  \label{L12:Ass9}\\
 %	& \extendsAM{\amod{}'}{s_2}{s''}{\amod{2}} \label{L12:Ass9}\\
 %
-	& \extendsAM{\amod{}', \amod{L1} \uplus \amod{0}}{s''}{s_2}{\amod{0}}  \label{L12:Ass10}
+	& \extendsAM{\amod{}', \amod{L1} \cup \amod{0}}{s''}{s_2}{\amod{0}}  \label{L12:Ass10}
 \end{align}
 %
 From (\ref{L12:Ass4})-(\ref{L12:Ass7}), (\ref{L12:Ass9}) and (\ref{L12:Ass10}) we have:

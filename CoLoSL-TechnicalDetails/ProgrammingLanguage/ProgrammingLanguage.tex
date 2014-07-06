@@ -5,7 +5,7 @@ Assume a set of basic commands \Basics, ranged over by $\bc{}, \bc{1}, \cdots, \
 %
 %
 \begin{parameter}[Basic Commands Axioms]
-Given the separation algebra of heaps $\left(\Heaps, \composeH, \unitH \right)$, assume a set of axioms associated with basic commands:
+Given the separation algebra of states $\left(\Heaps, \composeH, \unitH \right)$, assume a set of axioms associated with basic commands:
 %
 \[
 	\AxiomsB : \pset{\Heaps} \times \Basics \times \pset{\Heaps}
@@ -31,10 +31,10 @@ We lift the interpretation function to a set of machine states such that for $S 
 %
 %
 \begin{parameter}[Basic Command Soundness]
-Assume for each basic command $\bc{} \in \Basics$ and $\left(H_1, \bc{}, H_2\right) \in \AxiomsB$ and for all $h \in \Heaps$:
+Assume for each basic command $\bc{} \in \Basics$ and $\left(M_1, \bc{}, M_2\right) \in \AxiomsB$ and for all $\h \in \Heaps$:
 %
 \[
-	\opSemB{\bc{}}{\reifyH{H_1 \composeH \{h\}}} \subseteq  \reifyH{H_2 \composeH \{h\}}
+	\opSemB{\bc{}}{\reifyH{M_1 \composeH \{\h{}\}}} \subseteq  \reifyH{M_2 \composeH \{\h{}\}}
 \]
 %
 \end{parameter}
@@ -63,17 +63,17 @@ is defined as follows.
 \begin{array}{r l}
 	\AxiomsSeq \eqdef & \AxiomsB \cup A_{\skipC} \cup A_{Seq} \cup A_{Choice} \cup A_{Loop}\\
 	
-	A_{\skipC} \eqdef & \left\{(H, \skipC, H) \;|\; H \in \pset{\Heaps} \right\} \\
+	A_{\skipC} \eqdef & \left\{(M, \skipC, M) \;|\; M \in \pset{\Heaps} \right\} \\
 	
 	A_{Seq} \eqdef & 
 	\left\{
 	\begin{array}{l | l}
-		\left(H, \seq{1} ; \seq{2}, H' \right) 
+		\left(M, \seq{1} ; \seq{2}, M' \right) 
 		&
 		\begin{array}{l}
-			\seq{1}, \seq{2} \in \Seqs \;\land\; H \in \pset{\Heaps} \\
-			\land\; \left(H, \seq{1}, H'' \right) \in \AxiomsSeq\\
-			\land\; \left(H'', \seq{2}, H' \right) \in \AxiomsSeq 
+			\seq{1}, \seq{2} \in \Seqs \;\land\; M \in \pset{\Heaps} \\
+			\land\; \left(M, \seq{1}, M'' \right) \in \AxiomsSeq\\
+			\land\; \left(M'', \seq{2}, M' \right) \in \AxiomsSeq 
 		\end{array}
 	\end{array}
 	\right\}\\
@@ -81,12 +81,12 @@ is defined as follows.
 	A_{Choice} \eqdef & 
 	\left\{
 	\begin{array}{l | l}
-		\left(H, \seq{1} + \seq{2}, H' \right) 
+		\left(M, \seq{1} + \seq{2}, M' \right) 
 		&
 		\begin{array}{l}
-			\seq{1}, \seq{2} \in \Seqs \;\land\; H \in \pset{\Heaps}\\
-			\land\; \left(H, \seq{1}, H' \right) \in \AxiomsSeq \\
-			\land\; \left(H, \seq{2}, H' \right) \in \AxiomsSeq
+			\seq{1}, \seq{2} \in \Seqs \;\land\; M \in \pset{\Heaps}\\
+			\land\; \left(M, \seq{1}, M' \right) \in \AxiomsSeq \\
+			\land\; \left(M, \seq{2}, M' \right) \in \AxiomsSeq
 		\end{array}
 	\end{array}
 	\right\}\\
@@ -94,11 +94,11 @@ is defined as follows.
 	A_{Loop} \eqdef & 
 	\left\{
 	\begin{array}{l | l}
-		\left(H, \seq{1}^{*}, H \right) 
+		\left(M, \seq{1}^{*}, M \right) 
 		&
 		\begin{array}{l}
-			\seq{1} \in \Seqs \;\land\; H \in \pset{\Heaps}\\
-			\land\; \left(H, \seq{1}, H \right) \in \AxiomsSeq 
+			\seq{1} \in \Seqs \;\land\; M \in \pset{\Heaps}\\
+			\land\; \left(M, \seq{1}, M \right) \in \AxiomsSeq 
 		\end{array}
 	\end{array}
 	\right\}
@@ -172,8 +172,8 @@ is defined as follows.
 	\begin{array}{l | l}
 		\left(W_1, \atomic{\seq{}}, W_2 \right)	& 
 		\begin{array}{l}
-			\left(H_1, \seq{}, H_2 \right) \in \Seqs \;\land\\ 
-			\repartitions{W_1}{W_2}{H_1}{H_2}	
+			\left(M_1, \seq{}, M_2 \right) \in \Seqs \;\land\\ 
+			\repartitions{W_1}{W_2}{M_1}{M_2}	
 		\end{array}
 	\end{array}
 	\right\}

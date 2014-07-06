@@ -25,7 +25,7 @@ where
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
 		 \left(W_1, \atomic{\seq{}}, W_2 \right) &
-		 (H_1, \seq{}, H_2) \in \AxiomsSeq \;\land\; \repartitions{W_1}{W_2}{H_1}{H_2}
+		 (\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \;\land\; \repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}
 	\end{array}
 	\hspace*{-0.15cm}
 	\right\}
@@ -43,12 +43,12 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-		\reifyW{\left(l \composeL \localPart{w}, s, \amod{}\right)}
+		\reifyW{\left(l \composeL \localPart{w}, s, \amod{}, \amod{L} \right)}
 		&
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			(H_1, \seq{}, H_2) \in \AxiomsSeq \\
-			\land\;\repartitions{W_1}{W_2}{H_1}{H_2}
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
+			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}
 		\end{array}			
 	\end{array}
 	\hspace*{-0.15cm}
@@ -65,9 +65,9 @@ By calculation.\\
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			(H_1, \seq{}, H_2) \in \AxiomsSeq \\
-			\land\;\repartitions{W_1}{W_2}{H_1}{H_2}
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
+			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -80,15 +80,15 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-		\reifyH{h_1 \composeH h' \composeH \heapPart{\left(\localPart{w}\right)}}
+		\reifyH{\h{1} \composeH \h{}' \composeH \heapPart{\left(\localPart{w}\right)}}
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			(H_1, \seq{}, H_2) \in \AxiomsSeq \\
-			\land\;\repartitions{W_1}{W_2}{H_1}{H_2}\\
-			\land\; h_1 \composeH h' = \heapPart{l} \composeH \heapPart{s}\\
-			\land\; h_1 \in H_1
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
+			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
+			\land\; \h{1} \composeH \h{}' = \heapPart{l} \composeH \heapPart{s}\\
+			\land\; \h{1} \in \Hp{1}
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -102,15 +102,15 @@ By calculation.\\
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
 %		\reifyH{\heapPart{l} \composeH \heapPart{s} \composeH \heapPart{\left(\localPart{w}\right)}}
-		\reifyH{h_2 \composeH h' \composeH \heapPart{\left(\localPart{w}\right)}}
+		\reifyH{\h{2} \composeH \h{}' \composeH \heapPart{\left(\localPart{w}\right)}}
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			(H_1, \seq{}, H_2) \in \AxiomsSeq \\
-			\land\;\repartitions{W_1}{W_2}{H_1}{H_2}\\
-			\land\; h_1 \composeH h' = \heapPart{l} \composeH \heapPart{s}\\
-			\land\; h_1 \in H_1 \;\land\; h_2 \in H_2
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
+			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
+			\land\; \h{1} \composeH \h{}' = \heapPart{l} \composeH \heapPart{s}\\
+			\land\; \h{1} \in \Hp{1} \;\land\; \h{2} \in \Hp{2}
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -129,11 +129,11 @@ By calculation.\\
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			(H_1, \seq{}, H_2) \in \AxiomsSeq \\
-			\land\;\repartitions{W_1}{W_2}{H_1}{H_2}\\
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
+			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
 			\land\; w_2 \in W_2\\
-			\land\; \left(\;(l, s, \amod{}), w_2 \right) \in \guarantee
+			\land\; \left(\;(l, s, \amod{}, \amod{L}), w_2 \right) \in \guarantee
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -151,9 +151,9 @@ By calculation.\\
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}) \in W_1 \;\land\\ 
-			\land\;(l', s', \amod{}') \in W_2\\
-			\land\; \left(\;(l, s, \amod{}), (l', s', \amod{}') \right) \in \guarantee
+			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			\land\;(l', s', \amod{}', \amod{L}') \in W_2\\
+			\land\; \left(\;(l, s, \amod{}, \amod{L}), (l', s', \amod{}', \amod{L}') \right) \in \guarantee
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -177,7 +177,7 @@ as required.
 \end{lemma}
 %
 %
-\begin{lemma}[State hiding]
+\begin{lemma}[\forgetRule]
 %
 \[
 	\shared{P \sepish Q}{I} \implies \shared{P}{I}
@@ -224,7 +224,7 @@ as required.
 			\hspace*{-0.15cm}
 			\right) \in \intermediateSem[\lenv]{Q}\\
 			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
+			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
 			\extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{\ r}{\ \amod{}'}
 		\end{array}
@@ -271,7 +271,7 @@ as required.
 			\hspace*{-0.15cm}
 			\right) \in \intermediateSem[\lenv]{Q}\\
 			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
+			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
 			\extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\ \amod{}'}
 		\end{array}
@@ -312,7 +312,7 @@ as required.
 			\right) \in \intermediateSem[\lenv]{P}\\
 			
 			
-			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
+			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 			
 			\extendsAM{\amod{}, \amod{L}}{p}{\ r}{\ \amod{}'}
 		\end{array}
@@ -381,7 +381,7 @@ as required.
 %			
 %
 %			
-%			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
+%			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
 %			
 %			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
 %		\end{array}
@@ -420,7 +420,7 @@ as required.
 %			
 %
 %			
-%			\land\; r \in \LState \;\;\land\;\; \intermediateSemI{I_1} = \amod{}'\\
+%			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I_1} = \amod{}'\\
 %			
 %			\extendsAM{\amod{}}{p}{\ r}{\ \amod{}'}
 %		\end{array}
@@ -445,7 +445,7 @@ as required.
 %\end{lemma}
 %%
 %%
-\begin{lemma}[Merge]
+\begin{lemma}[\mergeRule]
 %
 \[
 	\shared{P}{I_1} * \shared{Q}{I_2} \;\implies\;\; \shared{P \sepish Q}{I_1 \cup I_2}
@@ -505,7 +505,7 @@ as required.
 %			\right) \in \sem[\lenv]{Q}\\
 %
 %			
-%			\land\; r, r' \in \LState \;\land\;
+%			\land\; r, r' \in \LStates \;\land\;
 %			s = p \composeL r = q \composeL r'\\
 %			
 %			\land\; \extendsAM{\amod{}}{p_0}{\ r}{\intermediateSemI{I_1}}
@@ -559,7 +559,7 @@ as required.
 			\hspace*{-0.15cm}
 			\right) \in \intermediateSem[\lenv]{Q} \\
 			
-			\land\; r \in \LState\\
+			\land\; r \in \LStates\\
 			
 			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\intermediateSemI{I_1}}\\
 			
@@ -610,7 +610,7 @@ as required.
 			\hspace*{-0.15cm}
 			\right) \in \intermediateSem[\lenv]{Q} \\
 			
-			\land\; r \in \LState \\
+			\land\; r \in \LStates \\
 			
 			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{r}{\intermediateSemI{I_1 \cup I_2}}
 		\end{array}
@@ -651,7 +651,7 @@ as required.
 			
 
 			
-			\land\; r \in \LState \\
+			\land\; r \in \LStates \\
 			\land\; \extendsAM{\amod{}, \amod{L}}{pq}{r}{\intermediateSemI{I_1 \cup I_2}}
 		\end{array}
 		\hspace*{-0.1cm}

@@ -52,11 +52,11 @@ where $m_1 \disjoint m_2$ denotes $(m_1, m_2) \in \disjoint$. We lift disjointne
 \noindent\textbf{Note: } When a separation algebra has the disjointness property, the definitions of disjointness ($\disjoint$) and separation ($\separate$) coincide.
 %
 %
-\begin{definition}[Separation Algebra Size]
-Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{size} function:
+\begin{definition}[Orthogonal]
+Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{orthogonal}:
 %
 \[
-\size{\blankArg}{\mathbb{M}} : \mathbb{M} \rightarrow \pset{\mathbb{M}}
+\size{.}{\mathbb{M}} : \mathbb{M} \rightarrow \pset{\mathbb{M}}
 \]
 %
 is defined as:
@@ -79,7 +79,13 @@ Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathb
 is defined as:
 %
 \[
-	m_1 \meet{\mathbb{M}} m_2 \eqdef \left\{ m \;|\; \exsts{m', m'', m_3} m_1 = m \compose{\mathbb{M}} m' \;\land\; m_2 = m \compose{\mathbb{M}} m'' \;\land\; m \compose{\mathbb{M}} m' \compose{\mathbb{M}} m'' = m_3 \right\}
+	m_1 \meet{\mathbb{M}} m_2 \eqdef 
+	\left\{ m \mid 
+					\begin{array}{l @{\hspace{3pt}} l}
+						\exsts{m', m'', m_3} & m_1 = m \compose{\mathbb{M}} m' \land m_2 = m \compose{\mathbb{M}} m'' \land\\
+						&m \compose{\mathbb{M}} m' \compose{\mathbb{M}} m'' = m_3 					
+					\end{array}
+					\right\}
 \]
 %
 The \emph{maximal overlap} is defined as:
@@ -88,6 +94,7 @@ The \emph{maximal overlap} is defined as:
 	m_1 \maxMeet{\mathbb{M}} m_2 = m \iffdef m \in (m_1 \meet{\mathbb{M}} m_2) \;\land\; \for{m' \in (m_1 \meet{\mathbb{M}} m_2)} m' \leq m
 \]
 %
+When such an element exists, it is defined uniquely by cancellativity of separation algebras.
 \end{definition}
 %
 %
@@ -124,7 +131,7 @@ Let $\left(\Caps, \composeCap, \unitCap\right)$ be any separation algebra repres
 %
 %
 \begin{parameter}[Heap Separation Algebra]
-Let $(\Heaps, \composeH, \unitH)$ be any separation algebra representing heaps ranged over by $\h{}, \h{1}, \cdots, \h{n}$. Assume a set of heap assertions $\HAssertions$ ranged over by $\heapAss{}, \heapAss{1}, \cdots, \heapAss{n}$ and an associated semantics function:
+Let $(\Heaps, \composeH, \unitH)$ be any separation algebra representing states ranged over by $\h{}, \h{1}, \cdots, \h{n}$. Assume a set of state assertions $\HAssertions$ ranged over by $\heapAss{}, \heapAss{1}, \cdots, \heapAss{n}$ and an associated semantics function:
 %
 \[
 	\semH[\blankArg]{.} : \HAssertions \rightarrow \LEnv \rightarrow \pset{\Heaps}
@@ -134,10 +141,10 @@ Let $(\Heaps, \composeH, \unitH)$ be any separation algebra representing heaps r
 %
 %
 \begin{definition}[Logical States]
-Given the separation algebra of heaps $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, a \emph{logical state} is a pair consisting of a heap and a capability:
+Given the separation algebra of states $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, a \emph{logical state} is a pair consisting of a heap and a capability:
 %
 \[
-	l, s \in \LState \eqdef \Heaps \times \Caps
+	l, s \in \LStates \eqdef \Heaps \times \Caps
 \]
 %
 We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Furthermore, given a logical state $l$, we write $\heapPart{l}$ and $\capPart{l}$ for the first and second projections, respectively.
@@ -145,10 +152,10 @@ We write $\unitL$ for the logical state $(\unitH, \unitCap)$. Furthermore, given
 %
 %
 \begin{definition}[Logical State Composition]
-Given the separation algebra of heaps $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, the \emph{composition of logical states}:
+Given the separation algebra of states $(\Heaps, \composeH, \unitH)$, and capabilities $\left(\Caps, \composeCap, \unitCap\right)$, the \emph{composition of logical states}:
 %
 \[
-	\composeL : \LState \times \LState \rightharpoonup \LState
+	\composeL : \LStates \times \LStates \rightharpoonup \LStates
 \]
 %
 is defined as:
@@ -164,7 +171,7 @@ is defined as:
 An \emph{action model} is a partial function associating capability resources with actions. An action is expressed as a relation between the original logical state and the new logical state reflecting the effects of the action:
 %
 \[
-	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LState \times \LState}
+	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
 \]
 %
 We write $\unitAM$ for an action model with empty domain.
@@ -175,7 +182,7 @@ We write $\unitAM$ for an action model with empty domain.
 A \emph{world} is a quadruple of a logical state (representing the local state), a second logical state (representing the shared state), a global action model and a local action model, subject to a well-formedness condition.
 %
 \[
-	w \in \Worlds \eqdef \left\{ (l, s, \amod{}, \amod{L}) \in \LState \times \LState \times \AMods \times \AMods \;|\; \wf{l, s, \amod{}, \amod{L}} \right\}
+	w \in \Worlds \eqdef \left\{ (l, s, \amod{}, \amod{L}) \in \LStates \times \LStates \times \AMods \times \AMods \;|\; \wf{l, s, \amod{}, \amod{L}} \right\}
 \]
 % 
 Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$, $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third and fourth projections, respectively.
@@ -203,7 +210,7 @@ is defined as:
 The \emph{collapse function on worlds}:
 %
 \[
-	\collapseW{.}: \Worlds \rightarrow \LState
+	\collapseW{.}: \Worlds \rightarrow \LStates
 \]
 %
 is defined as:
@@ -230,8 +237,8 @@ Assume a set of machine states $\MStates$, ranged over by $\ms{}, \ms{1}, \cdots
 \end{parameter}
 %
 %
-\begin{parameter}[Heap Reification]
-Assume a reification function from heaps to machine states:
+\begin{parameter}[State Reification]
+Assume a reification function from states to machine states:
 %
 \[
 	\reifyH{.}: \Heaps \rightarrow \pset{\MStates} 
@@ -241,7 +248,7 @@ Assume a reification function from heaps to machine states:
 %
 %
 \begin{definition}[Reification]
-Given the set of machine states $\MStates$ and the reification function of heaps, the \emph{reification of worlds}:
+Given the set of machine states $\MStates$ and the reification function of states, the \emph{reification of worlds}:
 %
 \[
 	\reifyW{.} : \Worlds \rightarrow \pset{\MStates}
