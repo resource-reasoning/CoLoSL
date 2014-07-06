@@ -351,10 +351,8 @@ variables, logical variables, and tokens, respectively.
 This syntax follows from standard separation logic with variables as
 resource~\cite{entcs06} (notice that expressions $E$ do not allow
 program variables), with the exception of shared-state assertions
-$\shared P I$, which states that a subjective view satisfying $P$ and
-undergoing interferences $I$ can be found in the global shared
-state. $\emp$ is true of the units of $\composeW$. The predicates are
-interpreted over the logic state of a world: $\li{x}|-> E$
+$\shared P I$. $\emp$ is true of the units of $\composeW$. Predicates
+are interpreted over the logic state of a world: $\li{x}|-> E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
 $E$ (resp.\ points to $E_2$); capability assertions $[K]$ describe the
@@ -367,7 +365,25 @@ disjoint sub-worlds, where the first two satisfy $P$ and the last two
 satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
 have their standard classical meaning. Interference assertions $I$
 describe actions enabled by a given capability, in the form of a pre
-and post-condition.
+and post-condition. A shared state assertion $\shared P I$ is true of
+$(l,g,\lmod,\gmod)$ when a subjective view $s$ satisfying $P$ and
+$g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
+undergoing interferences $I$ can be found in the global shared state
+and $\gmod$ \emph{agree} given the decomposition $s$, $r$ in the
+following sense:
+\begin{enumerate}
+\item
+  Every action in $I$ is reflected in $\lmod{}$.
+\item
+  Every action in $\lmod$ with visible effect on $s$ is reflected in
+  $I$.
+\item
+  Every action in $I$ that is enabled in $g$ is reflected is $\gmod$.
+\item
+  And the above is true after any number of action applications in
+  $I$ that affect $g$ and any number of action applications in
+  $\gmod$ that affect $r$ but not $s$.
+\end{enumerate}
 
 %% , and spatial predicates and connectives
 %% have been informally introduced in the previous section
@@ -406,11 +422,39 @@ respectively.
   denotes the semantics of interference assertions:
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  \ca{},\lenv &|=_K \token a
-  &\text{iff}& \ca{} = \{\token a\}\\
-  \ca{},\lenv &|=_K K_1 * K_2
-  &\text{iff}& \E{\ca{1},\ca{2}} \ca{} = \ca{1}\uplus\ca{2} /|\null\\
-  &&& \ca{1},\lenv|=_K K_1 /| \ca{2}|=_K K_2\\
+  (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
+  (l,g,\lmod,\gmod), \lenv &|= \shared P I &\text{iff}&
+  l = \unitH\text{ and }
+  \exsts{s,r}
+  g = s\composeL r
+  \text{ and}\\
+  &&&s, \lenv |=_{g,\lmod,\gmod} P\text{ and }
+  \extendsAM{\lmod, \gmod}{s}{r}{\semI[\lenv]{I}}
+\end{array}
+\]
+\[
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  s, \lenv &|=_{g,\lmod,\gmod} A &\text{iff}& s, \lenv \slsat A\\
+  s, \lenv &|=_{g,\lmod,\gmod} \shared P I &\text{iff}&
+  (s,g,\lmod,\gmod), \lenv |= \shared P I\\
+
+  u,\lenv &|=_\dagger P => Q
+  &\text{iff}& u,\lenv |=_\dagger P\text{ implies }u,\lenv |=_\dagger Q\\
+  u,\lenv &|=_\dagger \exsts x P
+  &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
+  u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
+  \exsts{u_1,u_2} u = u_1\gray u_2\text{ and}\\
+  &&& u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
+  u, \lenv &|=_\dagger P --* Q &\text{iff}&
+  \for{u'} u', \lenv |=_\dagger P \text{ and }
+  u \sharp u'\\
+  &&&\text{ implies }u\gray u', \lenv |=_\dagger Q\\
+  u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
+  \exsts{u',u_1,u_2} u = u'\gray u_1\gray u_2\text{ and}\\
+  &&&
+  u'\gray u_1, \lenv |=_\dagger P_1 \text{ and }
+  u'\gray u_2, \lenv |=_\dagger P_2\\
+
   l,\lenv &\slsat E_1 = E_2
   &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
   l, \lenv &\slsat \li{x}|->E
@@ -429,37 +473,12 @@ respectively.
   && \text{never}\\
   l, \lenv &\slsat \emp &\text{iff}&   l, \lenv \slsat \shared P I
   \text{ iff } l = \unitL\\
-  s, \lenv &|=_{g,\lmod,\gmod} A &\text{iff}& s, \lenv \slsat A\\
-  s, \lenv &|=_{g,\lmod,\gmod} \shared P I &\text{iff}&
-  (s,g,\lmod,\gmod), \lenv |= \shared P I\\
-  u,\lenv &|=_\dagger P => Q
-  &\text{iff}& u,\lenv |=_\dagger P\text{ implies }u,\lenv |=_\dagger Q\\
-  u,\lenv &|=_\dagger \exsts x P
-  &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
-  u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
-  \exsts{u_1,u_2} u = u_1\gray u_2\text{ and}\\
-  &&& u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
-  u, \lenv &|=_\dagger P --* Q &\text{iff}&
-  \for{u'} u', \lenv |=_\dagger P \text{ and }
-  u \sharp u'\\
-  &&&\text{ implies }u\gray u', \lenv |=_\dagger Q\\
-  u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
-  \exsts{u',u_1,u_2} u = u'\gray u_1\gray u_2\text{ and}\\
-  &&&
-  u'\gray u_1, \lenv |=_\dagger P_1 \text{ and }
-  u'\gray u_2, \lenv |=_\dagger P_2
-\end{array}
-\]
-\[
-\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
-  (l,g,\lmod,\gmod), \lenv &|= \shared P I &\text{iff}&
-  l = \unitH\text{ and }
-  \exsts{s,r}
-  g = s\composeL r
-  \text{ and}\\
-  &&&s, \lenv |=_{g,\lmod,\gmod} P\text{ and }
-  \extendsAM{\lmod, \gmod}{s}{r}{\semI[\lenv]{I}}
+
+  \ca{},\lenv &|=_K \token a
+  &\text{iff}& \ca{} = \{\token a\}\\
+  \ca{},\lenv &|=_K K_1 * K_2
+  &\text{iff}& \E{\ca{1},\ca{2}} \ca{} = \ca{1}\uplus\ca{2} /|\null\\
+  &&& \ca{1},\lenv|=_K K_1 /| \ca{2}|=_K K_2
 \end{array}
 \]
 \vspace{-1em}
@@ -666,8 +685,8 @@ following definition.
   A pair $(\lmod, \gmod)$ of action models is \emph{closed}
   under a subjective state $s$, context $r$, and action model
   $\lmod'$, written $\extendsAM{\lmod,
-    \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \gmod$
-  and $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'}$ for
+    \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$
+  and $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for
   all $n\in\Nats$, where $\downarrow_n$ is defined recursively as
   follows:
 \[
@@ -681,7 +700,7 @@ following definition.
   \quad\m{fst}(a)\leq s\composeL r => (s\composeL r,
   \m{fst}(a[s,r])\composeL \m{snd}(a[s,r]))\in \lmod(\ca{})
   /|\null\\
-  \V{\ca{}}\V{a\in \gmod(\ca{})}
+  \V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{enabled}(a,s\composeL r) =>\null\\
   \quad\m{present}(a,s\composeL r,\lmod'(\ca{}) |/\null\\
   \quad(\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
