@@ -69,32 +69,7 @@
 \maketitle
 
 \begin{abstract}
-A key difficulty in verifying shared-memory concurrent programs is
-reasoning compositionally about each thread in isolation, even though
-in reality the correctness of the whole system is the collaborative
-result of intricately intertwined actions of the threads.  Such
-compositionality is essential for verifying large concurrent systems
-and replicating a programmer's intuition about why their
-implementations are correct. For sequential programs, separation logic
-has demonstrated the importance of reasoning only about portions of
-the machine state (the resource) actually accessed by programs. For
-concurrent programs, existing techniques require global reasoning
-about shared resource, even though a thread might only access a small
-part of it.
-
-This paper introduces the program logic \colosl, in which threads are
-verified with respect to their \emph{subjective views}. Each
-subjective (personalised) view provides a thread-specific description
-of the shared state, comprising the partial shared resource necessary
-for the thread to run and a thread-specific interference relation
-describing how the thread and the environment can effect this partial
-shared resource. Subjective views may arbitrarily overlap with each
-other.  In particular, the interference relations expand and contract
-with relation to the partial shared resource, as long as the projected
-effect on the subjective view remains the same.  This flexibility
-provides truly compositional proofs for shared-memory concurrency,
-which we demonstrate on a range of examples including a concurrent
-computation of the spanning tree of a graph.
+....
 \end{abstract}
 
 
