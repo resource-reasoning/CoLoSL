@@ -214,9 +214,9 @@
 \newcommand{\meetL}{\meet{}}
 \newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{M}}}}
-\newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-\newcommand{\updateFP}[1]{\Delta {#1}}
+\newcommand{\heapPart}[1]{\m{fst}(#1)}
+\newcommand{\capPart}[1]{\m{snd}(#1)}
+\newcommand{\updateFP}[1]{\mathop{\Delta} #1}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
@@ -234,7 +234,9 @@
 
 %%%%Action Models
 \newcommand{\AMods}{\textsf{AMod}}
-\newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
+%\newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
+\newcommand{\lmod}{\mathscr{I}}
+\newcommand{\gmod}{\mathscr{G}}
 \newcommand{\composeAM}{\compose{=}}
 \newcommand{\unitAM}{\emptyset}
 
