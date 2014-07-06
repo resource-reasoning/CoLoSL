@@ -191,43 +191,46 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 \hrule\vspace*{5pt}
 \begin{mathpar}
 	\infer[\proofRule{Hide}]{
-		\left(I \cup \left\{ \capAss{}: P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right) \weakenI{R} 
+		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
 		I 	
 	}{
 		R \entails \fenceAss{} * \fenceAss{}' 
-		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}
+		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
 		&\exact{\fenceAss{}}
 %		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
-		& P \sepish (\fenceAss{} * \fenceAss{} ') \entails P * \fenceAss{}  * \fenceAss{}' 
+		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
+		& \precise{P}
+		& \precise{\fenceAss{}'}
 	}
 
 
 	\infer[\proofRule{False-L}]{	
-		\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
 		I 	
 	}{
 		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
 		&F \sepish P \entails \m{false}
 	}
 	
 	
 	\infer[\proofRule{False-R}]{	
-		\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
 		I 	
 	}{
 		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
 		&F \sepish Q \entails \m{false}
 	}
 
 
 	\infer[\proofRule{Expand/Contract}]{
-		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
 	}
 	{	
-	    R \entails \fenceAss{} 
-		& \fenceAss{} \fences I \cup \left\{ \capAss{}: P \swap Q\right\}
+		R \entails \fenceAss{} 
+		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
 		&\bigwedge\limits_{i \in J} \exact{R_i}
 		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
 	}
@@ -660,7 +663,7 @@ In both judgements, $\semimplies$ denotes the repartitioning of the state as des
 \end{definition}
 
 
-\subsection{Soundness}\label{subsec:soundness}
+\paragraph{Soundness}\label{subsec:soundness}
 In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
 
 
