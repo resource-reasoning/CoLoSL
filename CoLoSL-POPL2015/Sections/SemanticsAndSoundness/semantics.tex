@@ -64,7 +64,7 @@ accurate account of their effect. This is achieved through
 \emph{action shifting}, which allows the swapping of one global action
 model for another one that is equivalent. Here, being equivalent means
 that there is some fence that sees them as equivalent, in that actions
-from the new global acton model contains only actions with the same
+from the new global action model contains only actions with the same
 effect from the old one, and moreover any action from the old one that
 affects the subjective state has to remain in the new one. Since we
 are working at the level of a subjective view and not the whole shared
@@ -275,11 +275,11 @@ where * denotes the reflexive transitive closure and
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l , s, \gmod, \lmod),\\
+	     (l , g, \gmod, \lmod),\\
  	     \left(
 	     \begin{array}{@{} l @{}}
 	      l,
-	      s \composeL s',\\
+	      g \composeL g',\\
 	      \gmod', \lmod \cup \lmod_n
 	     \end{array}
  	    \right)
@@ -287,17 +287,17 @@ where * denotes the reflexive transitive closure and
  	  \right)
 	   &
  	  	\begin{array}{@{} l @{}}
-%	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
+%	 	  	g' = l' \composeL (\unitH, \ca{2})  \land\\
 	 	  	
-	 	  	\capPart{s'} \subseteq \dom{\lmod_n} \cup \dom{\lmod} \land \\
+	 	  	\capPart{g'} \subseteq \dom{\lmod_n} \cup \dom{\lmod} \land \\
 	 	  	
-			\extendsAM{\gmod', \lmod \cup \lmod_n}{s'}{s}{\lmod_n} \land \\
+			\extendsAM{\gmod', \lmod \cup \lmod_n}{g'}{g}{\lmod_n} \land \\
 			
 %			\for{l_1, r, \amod{1} \subseteq \lmod} \\
 %			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\gmod, \lmod}{l_1}{r}{\amod{1}}  \\
 %			\hspace*{0.1cm} \implies\extendsAM{\gmod', \lmod \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
 			
-			\expandsAM{\gmod'}{\lmod_n}{s'}{s}{\gmod}{\lmod}
+			\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}
 			
      	
    		\end{array}
@@ -311,19 +311,19 @@ where * denotes the reflexive transitive closure and
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   	\left(
 	   	\begin{array}{@{} l @{}}
-	     	(l, s, \gmod, \lmod),\\
-	     	(l, s', \gmod, \lmod)
+	     	(l, g, \gmod, \lmod),\\
+	     	(l, g', \gmod, \lmod)
 	   	\end{array}
 		\right)
 	  	&
 	  	\begin{array}{@{} l @{} }
 %		  	\left(
 %		  	\begin{array}{@{} l @{} }
-%		 		s = s' \lor\\
+%		 		g = g' \lor\\
 
 		 	  	\begin{array}{@{} l @{}}
-		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{s} \right) \disjoint \ca{} \land 
-		 	  		(s, s') \in \gmod(\ca{}) \\
+		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{g} \right) \disjoint \ca{} \land 
+		 	  		(g, g') \in \gmod(\ca{}) \\
 		 	  	
 		 	  	\end{array}	
 
@@ -340,8 +340,8 @@ where * denotes the reflexive transitive closure and
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l, s, \gmod, \lmod),
- 	     \left( l, s, \gmod, \lmod \cup \lmod_n  \right)
+	     (l, g, \gmod, \lmod),
+ 	     \left( l, g, \gmod, \lmod \cup \lmod_n  \right)
 	   \end{array}
  	  \right)
 	   &
@@ -350,7 +350,7 @@ where * denotes the reflexive transitive closure and
 %	 	  	\hspace*{0.5cm} \implies \extendsAM{\gmod, \lmod \cup \amod{0}}{l}{r}{\gmod'}
 %   		\end{array}
 
-		\expandsAM{\gmod}{\lmod_n}{\unitL}{s}{\gmod}{\lmod}
+		\expandsAM{\gmod}{\lmod_n}{\unitL}{g}{\gmod}{\lmod}
  	\end{array}
 	\right\}
 
@@ -361,7 +361,7 @@ where \emph{action model extension}, $\expandsAM{\gmod'}{\lmod_n}{s'}{s}{\gmod}{
 \end{definition}
 %
 %
-Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($s'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{s'}{s}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL s'}{\lmod_1}$. 
+Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
 
 Moreover, at any one point the environment may update the shared state by performing an action for which it has the sufficient capability ($\ca{}$). This is described by the \updateR\ relation. For this to be possible, the thread performing the action must have the $\ca{}$ capability in its own local state and thus the $\ca{}$ capability must be disjoint from both shared and local states of the current world. 
 
@@ -369,10 +369,10 @@ Finally, the environment may extend the local action model by shifting (rewritin
 %
 %
 \begin{definition}[Action Model Extension]\label{def:amodExtension}
-An action model $\gmod'$ \emph{extends}  ($s, \gmod, \lmod$) with $(\lmod_n, s')$, written $\expandsAM{\gmod'}{\lmod_n}{s'}{s}{\gmod}{\lmod}$, iff for all $\lmod_0 \subseteq \lmod$ and $l, r$ such that $l \composeL r = s$:
+An action model $\gmod'$ \emph{extends}  ($g, \gmod, \lmod$) with $(\lmod_n, g')$, written $\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}$, iff for all $\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
 %
 \[
-	\extendsAM{\gmod, \lmod}{l}{r}{\lmod_0} \implies \extendsAM{\gmod', \lmod \cup \lmod_n}{l}{r\composeL s'}{\lmod_0}
+	\extendsAM{\gmod, \lmod}{s}{r}{\lmod_0} \implies \extendsAM{\gmod', \lmod \cup \lmod_n}{s}{r\composeL g'}{\lmod_0}
 \]
 %
 \end{definition}
@@ -427,11 +427,11 @@ with
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l \composeL l', s, \gmod, \lmod),\\
+	     (l \composeL l', g, \gmod, \lmod),\\
  	     \left(
 	     \begin{array}{@{} l @{}}
 	      l \composeL (\unitH, \ca{1}),\\
-	      s \composeL s',\\
+	      g \composeL g',\\
 	      \gmod', \lmod \cup \lmod_n
 	     \end{array}
  	    \right)
@@ -439,19 +439,19 @@ with
  	  \right)
 	   &
  	  	\begin{array}{@{} l @{}}
-	 	  	s' = l' \composeL (\unitH, \ca{2})  \land\\
+	 	  	g' = l' \composeL (\unitH, \ca{2})  \land\\
 	 	  	
 	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_n} \land \\
 	 	  	
 	 	  	\ca{1} \composeCap \ca{2} \disjoint \dom{\lmod} \land \\
 	 	  	
-			\extendsAM{\gmod', \lmod \cup \lmod_n}{s'}{s}{\lmod_n} \land \\
+			\extendsAM{\gmod', \lmod \cup \lmod_n}{g'}{g}{\lmod_n} \land \\
 			
 %			\for{l_1, r_1, \amod{1} \subseteq \lmod} \\
 %			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\gmod, \lmod}{l_1}{r_1}{\amod{1}}  \\
 %			\hspace*{0.1cm} \implies\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r_1 \composeL s'}{\amod{1}}
 
-			\expandsAM{\gmod'}{\lmod_n}{s'}{s}{\gmod}{\lmod}
+			\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}
 			
      	
    		\end{array}
@@ -463,23 +463,23 @@ with
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   	\left(
 	   	\begin{array}{@{} l @{}}
-	     	(l, s, \gmod, \lmod),\\
-	     	(l', s', \gmod, \lmod)
+	     	(l, g, \gmod, \lmod),\\
+	     	(l', g', \gmod, \lmod)
 	   	\end{array}
 		\right)
 	  	&
 	  	\begin{array}{@{} l @{} }
-	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL s)} \land\\
+	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL g)} \land\\
 		  	\left(
 		  	\begin{array}{@{} l @{} }
-		 		s = s' \lor\\
+		 		g = g' \lor\\
 		 	  	\left(
 		 	  	\begin{array}{@{} l @{}}
 		 	  		\exsts{\ca{} \subseteq \capPart{l}}
-		 	  		(s, s') \in \gmod(\ca{}) \land\\
+		 	  		(g, g') \in \gmod(\ca{}) \land\\
 		 	  	
-		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} \subseteq 
-		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
+		 	  	\heapSize{\heapPart{\left(l \composeL g\right)}} \subseteq 
+		 	  	\heapSize{\heapPart{\left(l' \composeL g'\right)}}
 		 	  	\end{array}	
 		 	  	\right)
 		 	\end{array}
@@ -495,13 +495,13 @@ with
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   \left(
 	   \begin{array}{@{} l @{}}
-	     (l, s, \gmod, \lmod),
- 	     \left( l, s, \gmod, \lmod \cup \lmod_0  \right)
+	     (l, g, \gmod, \lmod),
+ 	     \left( l, g, \gmod, \lmod \cup \lmod_0  \right)
 	   \end{array}
  	  \right)
 	   &
 	   
-	   \expandsAM{\gmod}{\lmod_n}{\unitL}{s}{\gmod}{\lmod}
+	   \expandsAM{\gmod}{\lmod_n}{\unitL}{g}{\gmod}{\lmod}
 % 	  	\begin{array}{@{} l @{}}
 %	 	  	\for{l, r} \for{\gmod' \subseteq \lmod} \extendsAM{\gmod, \lmod}{l}{r}{\gmod'} \\
 %	 	  	\hspace*{0.5cm} \implies \extendsAM{\gmod, \lmod \cup \lmod_0}{l}{r}{\gmod'}
@@ -515,14 +515,14 @@ with
 \end{definition}
 %
 %
-The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\lmod_0$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_0}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\lmod}$). The last two conjunct are to enforce the closure of the new action models and can be justified as in the case of \extendR.
+The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\lmod_0$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_0}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\lmod}$). The last two conjuncts  enforce closure of the new action models and can be justified as in the case of \extendR.
 
-The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($s \not= s'$),  then the heap resources (the domain of the heap) may not grow ($\heapSize{\heapPart{(l \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $s$ to $s'$) without extending the heap resources, as illustrated in the following sequence.
+The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($g \not= g'$),  then the heap resources (the domain of the heap) may not grow ($\heapSize{\heapPart{(l \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $g$ to $g'$) without extending the heap resources, as illustrated in the following sequence.
 %
 \[
 \begin{array}{l}
-	(l, s, \gmod, \lmod) \rightarrow (l \composeL l'', s, \gmod, \lmod) \rightarrow (l', s', \gmod, \lmod)\\
-	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL s)}} \subseteq \heapSize{\heapPart{(l' \composeL s')}}
+	(l, g, \gmod, \lmod) \rightarrow (l \composeL l'', g, \gmod, \lmod) \rightarrow (l', g', \gmod, \lmod)\\
+	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}
 \end{array}
 \]
 %
@@ -533,31 +533,31 @@ Lastly, the current thread may extend the local action model by shifting some of
 %
 %
 \begin{definition}[Orthogonal]\label{def:orthogonal}
-The \emph{orthogonal} of a heap  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all heaps that are disjoint from it. That is, given a heap $m \in \Heaps$:
+The \emph{orthogonal} of a state  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all states that are disjoint from it. That is, given a state $\h{} \in \Heaps$:
 %
 \[
-	\heapSize{m} \eqdef \left\{ m' \mid m \disjoint m' \right\}
+	\heapSize{\h{}} \eqdef \left\{ \h{}' \mid \h{} \disjoint \h{}' \right\}
 \]
 %
 \end{definition}
 %
-Using the guarantee relation, we introduce the notion of \emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$ with respect to an update from $p$ to $q$, written $\repartitions{P}{Q}{p}{q}$. While the guarantee states how a thread can modify the shared state, extend it or shift the interference, repartitioning describes how the local and shared \emph{heaps} are updated in such a way that is compatible with the guarantee as well as the update from $p$ to $q$.
+Using the guarantee relation, we introduce the notion of \emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$ with respect to an update from $R_1$ to $R_2$, written $\repartitions{P}{Q}{R_1}{R_2}$. While the guarantee states how a thread can modify the shared state, extend it or shift the interference, repartitioning describes how the local and shared \emph{heaps} are updated in such a way that is compatible with the guarantee as well as the update from $R_1$ to $R_2$.
 %
 \begin{definition}[Repartitioning] \label{def:repartitioning}
-$\repartitions{P}{Q}{p}{q}$ holds iff for every $\lenv \in \LEnv$, and world $w_1$ where $w_1, \lenv |= P$, there exists a state $m_1 \in \Heaps$ where $(m_1, \emptyset), \lenv \slsat p$ and a residual state $m'$ such that 
+$\repartitions{P}{Q}{R_1}{R_2}$ holds iff for every $\lenv \in \LEnv$, and world $w_1$ where $w_1, \lenv |= P$, there exists a state $m_1 \in \Heaps$ where $(m_1, \emptyset), \lenv \slsat R_1$ and a residual state $m'$ such that 
 %
 \begin{itemize} 
 	\item $m_1 \composeH m' = \heapPart{\left(\collapseW{w_1}\right)}$; and
-	\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat q$, there exists a world $w_2$ where $w_2, \lenv |= Q$ such that:
+	\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$, there exists a world $w_2$ where $w_2, \lenv |= Q$ such that:
 	\begin{itemize}
 		\item $m_2 \composeH m' = \heapPart{\left(\collapseW{w_2}\right)}$; and
 		\item $(w_1, w_2) \in \guarantee$
 	\end{itemize}	  
 \end{itemize}
 %
-where $\collapseW{l, s, \gmod, \lmod} \eqdef l \composeL s$.
+where $\collapseW{l, g, \gmod, \lmod} \eqdef l \composeL s$.
 
-Note that when $p = q = \emp$, then the repartitioning has no side effect in that it preserves the concrete state and only allows the world to be repartitioned. We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $.
+Note that when $R_1 = R_2 = \emp$, then the repartitioning has no side effect in that it preserves the concrete state and only allows the world to be repartitioned. We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $.
 %\[
 %\begin{array}{@{} r l @{}}
 %	\repartitions{P}{Q}{p}{q} \iffdef 
@@ -580,58 +580,15 @@ Note that when $p = q = \emp$, then the repartitioning has no side effect in tha
 The semantic implications (\extendRule) and (\shiftRule) are valid.
 %
 \begin{proof}
-It suffices to show that the respective repartitioning ($\semimplies$) is allowed by the guarantee relation. In the case of (\extendRule) the transition is contained in the \extendG\ relation, while with (\shiftRule) the transition is allowed by \shiftG. The full proof is provided in~\cite{colosl-tr14}.
+In each case, it suffices to show that the respective repartitioning ($\semimplies$) is valid and allowed by the guarantee relation. In the case of (\extendRule) the transition is contained in the \extendG\ relation, while with (\shiftRule) the transition is allowed by \shiftG. The full proof is provided in~\cite{colosl-tr14}.
 \renewcommand{\qed}{}
 \end{proof}
 %
 \end{lemma}
 %
 %
-\subsection{Program logic}
-We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. Our view semigroup is the separation algebra of worlds as described in \defin\ref{def:worlds}. 
-The machine states and the reification of worlds are given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
-Generally, since \colosl\ is parametric in the separation algebra of heaps, the set of machine states and the reification function over heaps are also parameterised. Further details can be found in~\cite{colosl-tr14}.
-}. 
-The grammar of \colosl\ atomic commands is provided in \defin\ref{def:atomicCommands}; we show the soundness of \colosl\ atomic commands in the companion technical report~\cite{colosl-tr14}. 
-The axiomatisation of \colosl\ atomic commands are as per \defin\ref{def:proofRules}.
-%
-%
-\begin{definition}[Machine States]\label{def:machineStates}
-The set of \colosl\ \emph{Machine States} are $\MStates \eqdef \Heaps$.
-\end{definition}
-%
-%
-\begin{definition}[Reification]\label{def:reification}
-The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\MStates}$ is defined as:
-%
-\[
-	\reifyW{(l, l_s, \gmod, \lmod)} \eqdef \heapPart{(l \composeL l_s)}
-\]
-%
-\end{definition}
-%
-%
-\paragraph{Programming language}
- We use the programming language of the views framework \cite{views} instantiated with a set of atomic commands. \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of \colosl atomic commands.
-%
-\begin{definition}[Atomic commands]\label{def:atomicCommands}
-The \emph{atomic commands} of \colosl, $\atom{} \in \Atoms$, are defined by the following grammar
-%
-\begin{mathpar}
-	\atom{} ::= \atomic{\seq{}}
-	
-	\seq{} ::= \bc{} \mid \li{skip} \mid \seq{1};\seq{2} \mid \seq{1}+\seq{2} \mid \seq{}^{\text{*}}
-\end{mathpar}
-%
-where $\bc{} \in \Basics$ denotes a set of basic commands that can be instantiated with any set of sequential commands. In the examples of this paper, our basic commands are given by the following grammar.
-%
-\[
-\bc{} ::= \li{x}:= E \mid \li{assume}(E)
-\]
-%
-\end{definition}
 \paragraph{Proof rules}
-Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit assumption that the pre- and post-conditions of their judgements are stable. Most of the proof rules are standard as described in \cite{views} with the exception of the atomic and consequence rules. We proceed with the judgements of these rules.
+Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit assumption that the pre- and post-conditions of their judgements are stable. Most of the proof rules are standard with the exception of the atomic and consequence rules. We proceed with the judgements of these rules.
 %
 %
 \begin{definition}[Proof rules]\label{def:proofRules} The \emph{atomic} proof judgement, \proofRule{Atom}, is defined as follows where $\entails_{\textsf{SL}}$ denotes the standard sequential separation logic judgement.
@@ -641,8 +598,8 @@ Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit
 	\infer[\proofRule{Atom}]{
 		\entails \{P\} \atomic {C} \{Q\}
 	}{
-		\entails_{\textsf{SL}} \{p\}\ C\ \{q\} &
-		\repartitions{P}{Q}{p}{q}
+		\entails_{\textsf{SL}} \{R_1\}\ C\ \{R_2\} &
+		\repartitions{P}{Q}{R_1}{R_2}
 	}
 \]
 %
@@ -661,13 +618,95 @@ The \emph{rule of consequence}, \proofRule{Conseq}, is as given below.
 %
 In both judgements, $\semimplies$ denotes the repartitioning of the state as described in \defin\ref{def:repartitioning}.
 \end{definition}
-
-
-\paragraph{Soundness}\label{subsec:soundness}
-In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
-
-
-
+%
+%
+%\subsection{Program logic}
+%We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. Our view semigroup is the separation algebra of worlds as described in \defin\ref{def:worlds}. 
+%The machine states and the reification of worlds are given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
+%Generally, since \colosl\ is parametric in the separation algebra of heaps, the set of machine states and the reification function over heaps are also parameterised. Further details can be found in~\cite{colosl-tr14}.
+%}. 
+%The grammar of \colosl\ atomic commands is provided in \defin\ref{def:atomicCommands}; we show the soundness of \colosl\ atomic commands in the companion technical report~\cite{colosl-tr14}. 
+%The axiomatisation of \colosl\ atomic commands are as per \defin\ref{def:proofRules}.
+%%
+%%
+%\begin{definition}[Machine States]\label{def:machineStates}
+%The set of \colosl\ \emph{Machine States} are $\MStates \eqdef \Heaps$.
+%\end{definition}
+%%
+%%
+%%
+%%
+%\paragraph{Programming language}
+% We use the programming language of the views framework \cite{views} instantiated with a set of atomic commands. \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of \colosl atomic commands.
+%%
+%\begin{definition}[Atomic commands]\label{def:atomicCommands}
+%The \emph{atomic commands} of \colosl, $\atom{} \in \Atoms$, are defined by the following grammar
+%%
+%\begin{mathpar}
+%	\atom{} ::= \atomic{\seq{}}
+%	
+%	\seq{} ::= \bc{} \mid \li{skip} \mid \seq{1};\seq{2} \mid \seq{1}+\seq{2} \mid \seq{}^{\text{*}}
+%\end{mathpar}
+%%
+%where $\bc{} \in \Basics$ denotes a set of basic commands that can be instantiated with any set of sequential commands. In the examples of this paper, our basic commands are given by the following grammar.
+%%
+%\[
+%\bc{} ::= \li{x}:= E \mid \li{assume}(E)
+%\]
+%%
+%\end{definition}
+%
+%\paragraph{Soundness}\label{subsec:soundness}
+%In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
+%
+%
+\subsection{Soundness}
+In this section we show that the program logic of \colosl\ is sound. We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
+%
+\begin{definition}[Reification]\label{def:reification}
+The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}$ is defined as:
+%
+\[
+	\reifyW{(l, g, \gmod, \lmod)} \eqdef \heapPart{(l \composeL g)}
+\]
+%
+\end{definition}
+%
+We now formalise the notion of a \emph{valid} triple where $-,- \rightarrow^{\text{*}} -,-: (\textsf{Comm} \times \Heaps ) \times (\textsf{Comm} \times \Heaps)$ denotes the operational semantics relation. 
+%
+%
+\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\} C \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+%
+\[
+\begin{array}{l l}
+	\text{if} & w, \lenv |= P  \land \h{} \in \reifyW{w} \land C, \h{} \rightarrow^{\text{*}} \li{skip}, \h{}' \\
+	
+	\text{then} & \exsts{w'} w', \lenv |= Q \land \h{}' \in \reifyW{w'}
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Soundness]
+%
+The \colosl\ program logic is \emph{sound} iff\  $|-\!\{P\} C \{Q\} \implies |=\!\{P\} C \{Q\}$.
+%
+\end{definition}
+%
+%
+\begin{theorem}[Soundness]
+%
+The \colosl\ program logic is sound. 
+%
+\begin{proof}(Sketch)
+We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 
+\renewcommand{\qed}{}
+\end{proof}
+%
+\end{theorem}
+%
+%
 %\subsection{Axiomatisation of \colosl principles}
 
 %\paragraph{Action shifting}

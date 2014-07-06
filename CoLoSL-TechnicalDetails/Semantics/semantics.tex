@@ -1,6 +1,6 @@
 \section*{Assertions and their Semantics}
 \begin{definition}[Logical State Assertions]
-Given the set of heap assertions $\HAssertions$, and the set of capability assertions $\KAssertions$, the \emph{logical state assertions} are:
+Given the set of state assertions $\HAssertions$, and the set of capability assertions $\KAssertions$, the \emph{logical state assertions} are:
 %
 \[
 	p, q \in \LAssertions ::= \heapAss{} \;|\; \capAss{} \;|\; \emp \;|\;  p_1 * p_2
@@ -11,7 +11,7 @@ Given the set of heap assertions $\HAssertions$, and the set of capability asser
 Given a logical environment $\lenv \in \LEnv$, the semantic function of heap assertions $\semH[\blankArg]{.}$ and the semantic function of capability assertions $\semK[\blankArg]{.}$, the semantics of logical state assertions:
 %
 \[
-	\semL[\blankArg]{.} : \LAssertions \rightarrow \LEnv \rightarrow \pset{\LState}
+	\semL[\blankArg]{.} : \LAssertions \rightarrow \LEnv \rightarrow \pset{\LStates}
 \]
 %
 is defined as:
@@ -72,7 +72,7 @@ Given the set of logical state assertions $\LAssertions$, the assertions of \col
 The \emph{semantic of interference assertions}
 %
 \[
-	\intermediateSemI{.} : \IAssertions \rightharpoonup \left(\Caps \rightharpoonup  \LState \times \LState \right)
+	\intermediateSemI{.} : \IAssertions \rightharpoonup \left(\Caps \rightharpoonup  \LStates \times \LStates \right)
 \]
 %
 is given as
@@ -147,7 +147,7 @@ is defined as:
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
 	 \left( l, s, \amod{}, \amod{L} \right) &
-	 		l \in \semL{p} \;\land\; s \in \LState,\;\land\; \amod{}, \amod{L} \in \AMods 
+	 		l \in \semL{p} \;\land\; s \in \LStates,\;\land\; \amod{}, \amod{L} \in \AMods 
 	\end{array}
 	\hspace*{-0.1cm}
 	\right\}\\
@@ -158,7 +158,7 @@ is defined as:
 	\begin{array}{l | l}
 		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
 		\begin{array}{l}
-			r \in \LState \;\land\; (l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P} \\
+			r \in \LStates \;\land\; (l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P} \\
 %			\land\; \exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \fences \intermediateSemI{I} \\
 %			\land\; \amod{}' = \semI{I}{\fence{}} \;\land\; 
 	%		\exsts{\fence{}} \fence{} \fences \amod' \;\land\; l \in \fence{} \;\land\; \\
@@ -401,7 +401,7 @@ where
 %	\end{array}\\
 		
 	\amod{} \weakenI{F}  \amod{1} \iffdef \\
-	\hspace*{0.2cm}\for{\ca{}} \for{l \in F}  \for{f, r, p, q} (\for{s} s \leq p \land s \leq q \implies s = \unitL) \implies\\
+	\hspace*{0.2cm}\for{\ca{}} \for{l \in F}  \for{f, r, p, q, r'} (\for{s} s \leq p \land s \leq q \implies s = \unitL) \implies\\
 	\hspace*{0.2cm}
 	\begin{array}{l}
 		(p \composeL f, q \composeL f) \in \amod{1}(\ca{}) 
@@ -411,12 +411,15 @@ where
 		\hspace*{1cm} \land\\
 		
 		(p \composeL f, q \composeL f) \in \amod{}(\ca{})
-		\;\land\; p \composeL f \leq l \composeL r \implies \\
+		\;\land\; p \composeL f \composeL r' = l \composeL r \implies \\
 		\hspace*{0.4cm}
 		\begin{array}{l}
 			\exsts{f'} (p \composeL f', q \composeL f') \in \amod{1}(\ca{}) \;\land\; p \composeL f' \leq l \composeL r \\
 			\hspace*{2cm} \lor\\
-			\for{w \in \left( l \meetL p \right)} w \leq q
+			\for{w \in \left( l \meetL p \right)} w \leq q\\
+			\hspace*{2cm} \lor\\
+			q \composeL f' \composeL r' \text{ is undefined.}
+			
 		\end{array}
 
 	\end{array}\\\\
@@ -521,12 +524,12 @@ where
 	\repartitions{P}{Q}{\heapAss{1}}{\heapAss{2}} \iffdef 
 	& \for{\lenv} \repartitions{\sem[\lenv]{P}}{\sem[\lenv]{Q}}{\semH[\lenv]{\heapAss{1}}}{\semH[\lenv]{\heapAss{2}}}\\\\
 	
-	\repartitions{W_1}{W_2}{H_{1}}{H_{2}} \iffdef &
+	\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}} \iffdef &
 	\begin{array}{l}
-		\for{w_1 \in W_1} \exsts{h_1 \in H_1\ , h'}\\
-		\hspace*{0.5cm} h_1 \composeH h' = \heapPart{(\collapseW{w_1})} \;\land\\
-		\hspace*{0.5cm} \for{h_2 \in H_2} \exsts{w_2 \in W_2}\\
-		\hspace*{1cm} h_2 \composeH h' = \heapPart{(\collapseW{w_2})} \;\land\; (w_1, w_2) \in \guarantee
+		\for{w_1 \in W_1} \exsts{\h{1} \in \Hp{1}\ , \h{}'}\\
+		\hspace*{0.5cm} \h{1} \composeH \h{}' = \heapPart{(\collapseW{w_1})} \;\land\\
+		\hspace*{0.5cm} \for{\h{2} \in \Hp{2}} \exsts{w_2 \in W_2}\\
+		\hspace*{1cm} \h{2} \composeH \h{}' = \heapPart{(\collapseW{w_2})} \;\land\; (w_1, w_2) \in \guarantee
 	\end{array}
 \end{array}
 \]
@@ -543,7 +546,7 @@ where
 %	\for{\amod{L}, l, r} \amod{L} \in L \;\land\; l \composeL r = s \;\land\; \extendsAM{\amod{}, L}{l}{r}{\amod{L}} \implies\\
 %	& \hspace*{0.3cm} \extendsAM{\amod{}', L'}{l \composeL s'}{r}{\amod{L}}
 %	
-%%	\for{l_1,\cdots,l_n \in \LState}\for{\amod{1},\cdots,\amod{n} \in \AMods}\for{F_1, \cdots,F_n \in \pset{\LState}}\\
+%%	\for{l_1,\cdots,l_n \in \LStates}\for{\amod{1},\cdots,\amod{n} \in \AMods}\for{F_1, \cdots,F_n \in \pset{\LStates}}\\
 %%	
 %%	\hspace*{0.2cm} l_1 \composeL  \cdots \composeL l_n = s \;\land\; \for{\amod{i}, \amod{j} \in \left(\amod{1} \cup \cdots \cup \amod{n}\right)} \dom{\amod{i}} \disjoint \dom{\amod{j}}\\
 %%	
@@ -624,7 +627,7 @@ where
 		 	  	\exsts{\ca{} \leq \capPart{l}}\;\;
 		 	  	(s, s') \in \amod{}(\ca{}) \;\land\\
 		 	  	
-		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} = 
+		 	  	\heapSize{\heapPart{\left(l \composeL s\right)}} \subseteq 
 		 	  	\heapSize{\heapPart{\left(l' \composeL s'\right)}}
 		 	  \end{array}	
 		 	  \hspace*{-0.1cm}

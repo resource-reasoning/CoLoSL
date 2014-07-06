@@ -396,7 +396,7 @@
 \begin{array}{r l}
 	\inSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \inList{h}{v}\\
 	\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
-	\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  _\triangleleft L \land \lsg{h}{h}{-\infty:: L ++ \{\infty\} }{\nil}\\
+	\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{h}{-\infty:: L ++ \{\infty\} }{\li{null}}\\
 %	 \land v \in L \land \lockT{h}[\pi] * \lsg{h}{h}{-\infty:: L ++\{\infty\} }{\nil}\\
 %
 %	\outSet{h}{v} \eqdef & \exsts{\pi, L} \sorted{L} \land v \not\in L \land \lockT{h}[\pi] * \lsg{h}{h}{-\infty:: L ++ \{\infty\} }{\nil}
@@ -581,7 +581,7 @@
 		\left\{
 		\begin{array}{@{} l @{}}
 			\exsts{L, \pi} \sorted{-\infty :: L ++ \{+\infty\}} \land  \lockT{h}[\pi] * \valueT{h}{v} * \\
-			 \shared{\lockedNode{p}{-\infty}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L++\{\infty\}}{\nil}
+			 \shared{\lockedNode{p}{-\infty}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L++\{\infty\}}{\li{null}}
 		\end{array}	 
 		\right\}\\
 		
@@ -589,7 +589,7 @@
 		\left\{
 		\begin{array}{@{} l @{}}
 			\exsts{L_1, L_2, v_p, \pi} v_p < v \land \sorted{L_1 ++\{v_p\}  ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
-			\lsg{h}{h}{L_1}{p} * \shared{\lockedNode{p}{v_p}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L_2}{\nil}
+			\lsg{h}{h}{L_1}{p} * \shared{\lockedNode{p}{v_p}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L_2}{\li{null}}
 		\end{array}
 		\right\}\\
 		
@@ -600,7 +600,7 @@
 					\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land  \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
 					\lsg{h}{h}{L_1}{p} * 
 				 	\shared{\lockedNode{p}{v_p}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\ 
-				 	* \shared{\node{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\nil}
+				 	* \shared{\node{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\li{null}}
 				 	
 			 	\end{array}
 			 	\right\}\\
@@ -613,7 +613,7 @@
 			 		\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
 					\lsg{h}{h}{L_1}{p} * 
 			 		\shared{\lockedNode{p}{v_0}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\ 
-			 		* \shared{\lockedNode{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\nil}
+			 		* \shared{\lockedNode{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\li{null}}
 			 		* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
 			 	\end{array}
 			 	\right\}\\
@@ -628,7 +628,7 @@
 					\lsg{h}{h}{L_1}{p} 
 				 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
 				 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
-				 	* \lsg{h}{c}{L_2}{\nil}
+				 	* \lsg{h}{c}{L_2}{\li{null}}
 			 	
 			 	\end{array}
 			 	\right\}
@@ -643,7 +643,7 @@
 		\lsg{h}{h}{L_1}{p} 
 	 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
 	 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
-	 	* \lsg{h}{c}{v_c ::L_2}{\nil}
+	 	* \lsg{h}{c}{v_c ::L_2}{\li{null}}
  	
  	\end{array}
  	\right\}
@@ -669,7 +669,7 @@
 			\lsg{h}{h}{L_1}{p} 
 		 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
 		 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
-		 	* \lsg{h}{c}{v_c ::L_2}{\nil}
+		 	* \lsg{h}{c}{v_c ::L_2}{\li{null}}
 	 	
 	 	\end{array}
 	 	\right\}\\
@@ -691,7 +691,7 @@
 			 	
 			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
 			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
-			 	* \lsg{h}{d}{L_2}{\nil}
+			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
@@ -708,7 +708,7 @@
 			 	
 			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
 			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
-			 	* \lsg{h}{d}{L_2}{\nil}
+			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
@@ -724,7 +724,7 @@
 			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
 			 	
 			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
-			 	* \lsg{h}{d}{L_2}{\nil}
+			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
@@ -740,7 +740,7 @@
 			 	
 			 	* \lockedNode{c}{v}{d}
 			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
-			 	* \lsg{h}{d}{L_2}{\nil}
+			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
@@ -757,7 +757,7 @@
 			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{d}\\
 			 	
 			 	* \cell{c}{1, v, d}  
-			 	* \lsg{h}{d}{L_2}{\nil}
+			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\

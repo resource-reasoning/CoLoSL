@@ -4,7 +4,7 @@
 %
 \[
 \begin{array}{l}
-	\for{p, q, c, r \in \LState} \for{\amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
+	\for{p, q, c, r \in \LStates} \for{\amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
 	\hspace*{0.5cm} \extendsAMUpto{\amod{}, \amod{L}}{n}{p \composeL c}{q \composeL r}{\amod{1}} \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{n}{q \composeL c}{p \composeL r}{\amod{2}}
 	\implies\\
 	\hspace*{2cm} \extendsAMUpto{\amod{}, \amod{L}}{n}{p \composeL c \composeL q}{r}{\amod{1} \cup \amod{2}}
@@ -12,7 +12,7 @@
 \]
 %
 \begin{proof} By induction on number of steps $n$.\\
-\noindent Pick an arbitrary $p, a, q, b \in \LState, \amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods$.\\
+\noindent Pick an arbitrary $p, a, q, b \in \LStates, \amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods$.\\
 \noindent\textbf{Base case}\\
 \textbf{RTS. }\hspace*{0.5cm}$\extendsAMUpto{\amod{}, \amod{L}}{0}{p \composeL a}{r}{\amod{1} \cup \amod{2}}$\\
 This holds trivially by definition of $\extendsAMUpto{\amod{}, \amod{L}}{0}{p \composeL a}{r}{\amod{1} \cup \amod{2}}$\\
@@ -24,7 +24,7 @@ This holds trivially by definition of $\extendsAMUpto{\amod{}, \amod{L}}{0}{p \c
 \begin{equation}
 	\tag{I.H.}
 	\begin{array}{l}
-		\for{p, q, c, r \in \LState} \for{\amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
+		\for{p, q, c, r \in \LStates} \for{\amod{}, \amod{L}, \amod{1}, \amod{2} \in \AMods} \for{n \in \Nats}\\
 %		\hspace*{0.5cm} p \composeL c \in F_1 \;\land\; F_1 \fences \amod{1} \;\land\; c \composeL q \in F_2 \;\land\; F_2 \fences \amod{2} \;\land\; (F_1, \amod{1}) \agrees (F_2, \amod{2})\\
 		\hspace*{0.5cm} \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{p \composeL c}{q \composeL r}{\amod{1}} \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{q \composeL c}{p \composeL r}{\amod{2}}
 		\implies\\

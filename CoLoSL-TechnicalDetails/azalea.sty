@@ -1,8 +1,14 @@
+\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage{array}
 \usepackage{amsmath}
-\usepackage{amsfonts}
+%\usepackage{amsfonts}
+\usepackage[scaled=.9]{beramono}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{caption}
+\DeclareCaptionType{copyrightbox}
 \usepackage{subcaption}\captionsetup{compatibility=false}
 \usepackage{xspace}
 \usepackage{xparse}
@@ -12,13 +18,78 @@
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{stmaryrd}
+%\usepackage{mathrsfs} % for \powerset
+\usepackage[mathscr]{euscript} % for \powerset
 \usepackage[fleqn]{mathtools}
+\usepackage{empheq} % for boxes
 \usepackage{proof}
-\usepackage{MnSymbol}
-%\usepackage{tikz}
+%\usepackage{MnSymbol}
+\usepackage{listings}
+%\usepackage{alltt}
+\usepackage{tikz}
+\usepackage{fancybox}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
+\usepackage{relsize}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{mathpartir}
+\usepackage{at}
+
+\input mathlig
+
+\usepackage{seplog}
+\usepackage{url}
+\usepackage[colorlinks,%
+  pdftitle={CoLoSL: Concurrent Local Subjective Logic},
+  pdfauthor={Azalea Raad, Philippa Gardner, and Jules Villard}]{hyperref}
+\hypersetup{linkcolor=black,citecolor=black,filecolor=black,urlcolor=black}
+
+
+\usetikzlibrary{shapes}
+
+\newcommand{\comment}{\color{blue!80!black}}
+
+\lstset{%
+  language=C,
+  morecomment=[n][{\comment}]{/*}{*/},
+  morecomment=[l][{\comment}]{//},
+  morecomment=[n][{\ghost}]{[}{]},
+  sensitive=true,
+  mathescape=true,
+  showlines=true,
+  basicstyle=\smaller\tt,
+  keywordstyle=\bf,
+  numbers=none,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  boxpos=t,
+}
+
+\newcommand{\azaleacomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Azalea's comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+\newcommand{\pgcomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Philippa's comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+\newcommand{\julescomment}[1]{
+\begin{center}
+\fbox{\begin{minipage}{.9\columnwidth}
+{\bf Jules' comment:} {\it #1}
+\end{minipage}}
+\end{center}}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
 
 \theoremstyle{definition}
@@ -35,21 +106,34 @@
 
 \newtheorem{proposition}{Proposition}
 
+\theoremstyle{definition}
 \newtheorem{example}{Example}
 
 \newcommand{\blankArg}{(.)}
-\newcommand{\emp}{\textsf{emp}}
+\newcommand{\emp}{\ensuremath{\mathsf{emp}}\xspace}
 
-\newcommand{\colosl}{\text{CoLoSL}}
-\newcommand{\missref}{???}
+\newcommand{\colosl}{\text{CoLoSL}\xspace}
+\newcommand{\fig}{Fig.~}
+\newcommand{\param}{Parameter}
+\newcommand{\defin}{Def.~}
+\newcommand{\ex}{Example}
+
+\newcommand{\powerset}{\mathscr{P}}
+
+\newcolumntype{L}{@{}>{\null}l<{\null}@{}}
+\newcolumntype{R}{@{}>{\null}r<{\null}@{}}
 
 %%%%%%%%%%%%%%%%%%%%%%%% General Macros %%%%%%%%%%%%%%%%%%%%%%%%
-%
-\definecolor{darkgreen}{rgb}{0, 0.55, 0}
+
+\newcommand{\m}[1]{\mathit{#1}}
+\newcommand{\p}[1]{\mathsf{#1}}
+\newcommand{\set}[1]{\mathsf{#1}}
+
+\definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
 %\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
-\newcommand{\eqdef}{\triangleq}
-\newcommand{\iffdef}{\stackrel{\mathrm{def}}{\iff}}
+\newcommand{\eqdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{=}}}
+\newcommand{\iffdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{\iff}}}
 
 \newcommand{\Nats}{\mathbb{N}}
 \newcommand{\NatsPlus}{\Nats^{+}}
@@ -57,28 +141,45 @@
 \newcommand{\dom}[1]{\textsf{dom}\left( #1 \right)}
 \newcommand{\codom}[1]{\textsf{co-dom}\left( #1 \right)}
 
-\newcommand{\for}[1]{\forall\; #1.\; }
-\newcommand{\exsts}[1]{\exists\; #1.\;}
+\newcommand{\for}[1]{\forall #1.\,}
+\newcommand{\exsts}[1]{\exists #1.\,}
+\let\V\for
+\let\E\exsts
 
 \newcommand{\cell}[2]{#1 \mapsto #2}
 \newcommand{\pset}[1]{\powerset\left(#1 \right)}
 
 \newcommand{\todo}{\textbf{TO DO }}
-\newcommand{\note}[1]{\noindent\framebox{\parbox{\textwidth}{\textbf{Note: }#1}}}
 \newcommand{\defstyle}[1]{\emph{#1}}
-%
+
+% inline code
+\makeatletter
+\newlength{\@mli}
+\newcommand{\mli}[1]{%
+  \settowidth{\@mli}{\lstinline/#1/}
+  \hspace{-.5ex}\begin{minipage}[t]{\@mli}\lstinline/#1/\end{minipage}}
+\makeatother
+\newcommand{\li}[1]{\ifmmode\mbox{\mli{#1}}\else\mbox{\lstinline/#1/}\fi}
+\newcommand{\tx}[1]{\text{#1}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% MODEL %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\disjoint}{\sharp}
-\newcommand{\separate}{\text{\textreferencemark}}
-\newcommand{\fence}[1]{\ensuremath{F_{#1}}}
-\newcommand{\fences}{\ensuremath{\rhd}}
-\newcommand{\strictfences}{\ensuremath{\unrhd}}
+\newcommand{\separate}{\bot}
+%\newcommand{\separate}{\text{\textreferencemark}}
+
+\newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
+\newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
+\newcommand{\fences}{\mathrel{\rhd}}
+
+
+\newcommand{\strictfences}{\mathrel{\RHD}}
 \newcommand{\compose}[1]{\ensuremath{\bullet_{#1}}}
 \newcommand{\meet}[1]{\sqcap_{#1}}
-\newcommand{\maxMeet}[1]{\sqcap_{#1}^{\textsf{max}}}
+%\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
+\newcommand{\maxMeet}[1]{\meet{#1}^{\textsf{m}}}
 \newcommand{\unit}[1]{\ensuremath{\mathbf{0}_{#1}}}
-\newcommand{\size}[2]{\left\lvert #1\right\rvert_{#2}}
+\newcommand{\size}[2]{\left( #1\right)_{#2}^{\bot}}
 
 %%%%Capabilities
 \newcommand{\Caps}{\ensuremath{\mathbb{K}}}
@@ -91,10 +192,12 @@
 \newcommand{\capSize}[1]{\size{#1}{\Caps}}
 
 %%%%Heaps
-\newcommand{\Heaps}{\ensuremath{\mathbb{H}}}
-\newcommand{\h}[1]{\ensuremath{h_{#1}}}
-\newcommand{\heapAss}[1]{\ensuremath{\mathcal{H}_{#1}}}
-\newcommand{\composeH}{\ensuremath{\compose{\Heaps}}}
+\newcommand{\Heaps}{\ensuremath{\mathbb{M}}\xspace}
+%\newcommand{\Stacks}{\ensuremath{\mathbb{S}}\xspace}
+\newcommand{\h}[1]{\ensuremath{m_{#1}}}
+\newcommand{\Hp}[1]{M_{#1}}
+\newcommand{\heapAss}[1]{\ensuremath{\mathcal{M}_{#1}}}
+\newcommand{\composeH}{\compose{\Heaps}}
 \newcommand{\meetH}{\meet{\Heaps}}
 \newcommand{\maxMeetH}{\maxMeet{\Heaps}}
 \newcommand{\unitH}{\unit{\Heaps}}
@@ -106,38 +209,41 @@
 \newcommand{\ms}[1]{\sigma_{#1}}
 
 %%%%Logical States
-\newcommand{\LState}{\textsf{LState}}
-\newcommand{\composeL}{\compose{\textsf{L}}}
+\newcommand{\LStates}{\textsf{LState}}
+\newcommand{\composeL}{\circ}
+\newcommand{\compatL}{\mathrel{\sharp}}
 \newcommand{\composeS}{\compose{=}}
-\newcommand{\meetL}{\meet{\textsf{L}}}
-\newcommand{\maxMeetL}{\maxMeet{\textsf{L}}}
+\newcommand{\meetL}{\meet{}}
+\newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{H}}}}
+\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{M}}}}
 \newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
-
+\newcommand{\updateFP}[1]{\Delta {#1}}
 
 %%%%Worlds
 \newcommand{\Worlds}{\textsf{World}}
-\newcommand{\composeW}{\compose{\textsf{W}}}
+\newcommand{\composeW}{\bullet}
 \newcommand{\unitW}{\unit{\textsf{W}}}
-\newcommand{\localPart}[1]{#1_{\textsf{L}}}
-\newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
-\newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
-\newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
-\newcommand{\collapseW}[1]{\downarrow\left(#1\right)}
+ \newcommand{\localPart}[1]{#1_{\textsf{L}}}
+ \newcommand{\sharedPart}[1]{#1_{\textsf{S}}}
+ \newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
+ \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
+\newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
 \newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
+
+\newcommand{\gray}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
 
 %%%%Action Models
 \newcommand{\AMods}{\textsf{AMod}}
 \newcommand{\amod}[1]{\ensuremath{\varsigma}_{#1}}
 \newcommand{\composeAM}{\compose{=}}
-\newcommand{\unitAM}{\unit{\textsf{A}}}
+\newcommand{\unitAM}{\emptyset}
 
 
 \newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
 \newcommand{\extendsAMUpto}[5]{\left(#1\right) \!\downarrow_{#2} \left(#3, #4, #5\right)}
-\newcommand{\expandsAM}[5]{\left(#1\right) \!\uparrow \left(#2, #3, #4, #5\right)}
+\newcommand{\expandsAM}[6]{#1 \!\uparrow^{\left(#2, #3\right)} \left(#4, #5, #6\right)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
 %\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
 %\newcommand{\backwardClosure}[1]{#1^{\leftarrow}}
@@ -145,24 +251,26 @@
 %\newcommand{\expandAM}[2]{#1\!\!\uparrow_{\left(#2\right)}}
 %
 
+\newcommand{\slsat}{\mathrel{\vDash_{\mathsf{SL}}}}
+
 %%%%%%%%%%%%%%%%%%%%%%%% Programming Language%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\newcommand{\skipC}{\texttt{skip}}
+\newcommand{\skipC}{\li{skip}}
 \newcommand{\opSem}[3]{\ensuremath{\left[\!\left| #1 \right |\! \right]_{#3}\left( #2 \right)}}
 \newcommand{\Axioms}[1]{\ensuremath{\textsf{Axiom}_{#1}}}
 
 \newcommand{\Basics}{\textsf{Basic}}
-\newcommand{\bc}[1]{\ensuremath{\mathbb{BC}_{#1}}}
+\newcommand{\bc}[1]{\ensuremath{\mathbb{B}_{#1}}}
 \newcommand{\AxiomsB}{\Axioms{\textsf{B}}}
 \newcommand{\opSemB}[2]{\opSem{#1}{#2}{\textsf{B}}}
 
 \newcommand{\Seqs}{\textsf{Seqs}}
-\newcommand{\seq}[1]{\ensuremath{\mathbb{SC}_{#1}}}
+\newcommand{\seq}[1]{\ensuremath{\mathbb{S}_{#1}}}
 \newcommand{\AxiomsSeq}{\Axioms{\textsf{S}}}
 \newcommand{\opSemSeq}[2]{\opSem{#1}{#2}{\textsf{S}}}
 
 \newcommand{\Atoms}{\textsf{Atom}}
-\newcommand{\atom}[1]{\ensuremath{a_{#1}}}
+\newcommand{\atom}[1]{\ensuremath{\mathbb{A}_{#1}}}
 \newcommand{\AxiomsA}{\Axioms{\textsf{A}}}
 \newcommand{\opSemA}[2]{\opSem{#1}{#2}{\textsf{A}}}
 
@@ -170,41 +278,69 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% Assertions %%%%%%%%%%%%%%%%%%%%%%%%
-%
-\newcommand{\Assertions}{\textsf{Assn}}
-\newcommand{\LAssertions}{\textsf{LAssn}}
-\newcommand{\KAssertions}{\textsf{KAssn}}
-\newcommand{\HAssertions}{\textsf{HAssn}}
-\newcommand{\IAssertions}{\textsf{IAssn}}
-\newcommand{\PEnv}{\textsf{PEnv}}
-\newcommand{\LEnv}{\textsf{LEnv}}
-\newcommand{\penv}{\ensuremath{\Delta}}
-\newcommand{\lenv}{\ensuremath{\Gamma}}
-\newcommand{\sepish}{\cup \hspace*{-7pt} \text{\tiny *} \hspace*{4pt}}
+
+\newcommand{\Assertions}{\textsf{Assn}\xspace}
+\newcommand{\LAssertions}{\textsf{LAssn}\xspace}
+\newcommand{\KAssertions}{\textsf{KAssn}\xspace}
+\newcommand{\HAssertions}{\textsf{MAssn}\xspace}
+\newcommand{\IAssertions}{\textsf{IAssn}\xspace}
+\newcommand{\PEnv}{\textsf{PEnv}\xspace}
+\newcommand{\LEnv}{\textsf{LEnv}\xspace}
+\newcommand{\penv}{\ensuremath{\Delta}\xspace}
+\newcommand{\lenv}{\ensuremath{\iota}\xspace}
+\newcommand{\sepish}{\ocon}
+\newcommand{\intersect}{%
+  \mathbin{\mbox{$\mathrlap{\cap}\hspace*{.09em}
+      \raisebox{.01em}[0ex][0ex]{$\scon$}$\hspace*{.07em}}}}
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
-\newcommand{\shared}[2]{\boxed{#1}_{\; #2}}
-\newcommand{\swap}{\leadsto}
-\newcommand{\interAss}[4]{\ensuremath{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
-\newcommand{\condInterAss}[6]{\ensuremath{\lambda #1. #2: \left\{ \exsts{#3} #4, #5 \swap #6 \right\} }}
+\addtolength{\fboxsep}{-1.5pt}
+%\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
+\newcommand{\shared}[2]{{\ovalbox{$#1\vphantom{Qq}$}}_{\; {#2}}}
+\newcommand{\swap}{\mathrel{\leadsto}}
+\newcommand{\ewand}{\septraction}
+\newcommand{\interAss}[4]{#1: \exsts{#2} #3 \swap #4\xspace}
+\newcommand{\multiInterAss}[5]{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 
 \newcommand{\strengthenAction}[2]{\left\lceil #1 \right\rceil^{#2}}
 \newcommand{\weakenAction}[2]{\left\lfloor #1 \right\rfloor_{#2}}
 \newcommand{\shiftAction}[2]{\left\lvert #1\right\rvert^{#2}}
 \newcommand{\shiftInterference}[2]{\left\lvert #1\right\rvert^{#2}}
-%
+
+\newcommand{\token}[1]{\ensuremath{\mathsf{#1}}\xspace}
+
+\newcommand{\hoare}[3]{\vdash\,\{#1\}\;#2\;\{#3\}}
+%% Inference rules
+\newcommand{\infrulestyle}[1]{\textsc{#1}}
+\newcommand{\SideCondition}[1]{\RightLabel{\scriptsize{#1}}}
+\renewcommand{\TirName}[1]{#1}
+\renewcommand{\RefTirName}[1]{#1}
+%\newcommand{\infrulelabel}[1]{\mbox{\normalfont\small\textsc{#1}}}
+\newcommand{\infrule}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},right=\mathrlap{\text{#5}}]
+                        {#3}{#4}}}
+\newcommand{\infruleR}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},right=\text{#5}]
+                        {#3}{#4}}}
+\newcommand{\infruleL}[5][]{{\inferrule*[#1,lab=\infrulestyle{#2},left=\mathllap{\text{#5}}]
+                        {#3}{#4}}}
+\newcommand{\infruleBC}[4]{\infrule{#1}{#2}{#3\\\\\rule{0pt}{3ex}
+                          {}^\dagger#4}{${}^\dagger$}}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%% Semantics %%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newcommand{\wf}[1]{\ensuremath{\textsf{wf}\left( #1 \right)}}
-%\newcommand{\precise}[1]{\ensuremath{\textsf{precise} \left( #1 \right)}}
+\newcommand{\precise}[1]{\ensuremath{\textsf{precise} \left( #1 \right)}}
 \newcommand{\exact}[1]{\ensuremath{\textsf{exact} \left( #1 \right)}}
-\newcommand{\semH}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{H}}
-\newcommand{\semK}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{K}}
-\newcommand{\semL}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}^{\textsf{L}}}
-\newcommand{\semI}[2]{\left[ \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right]^{#2}}
-\newcommand{\intermediateSemI}[1]{\ensuremath{\left( \hspace*{-2pt}\left| #1 \right| \hspace*{-2pt} \right)}}
-\newcommand{\intermediateSem}[2][\lenv]{\left( \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right)_{#1}}
-\newcommand{\sem}[2][\lenv]{\left[ \hspace*{-2pt}\left| #2 \right| \hspace*{-2pt} \right]_{#1}}
+\newcommand{\semH}[2][\lenv]{\llparenthesis {#2} \rrparenthesis_{#1}^{M}}
+\newcommand{\semK}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}^{K}}
+\newcommand{\semL}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}^{\textsf{L}}}
+\newcommand{\semI}[2][\lenv]{\left\langle \hspace*{-1.9pt}\left| #2 \right| \hspace*{-1.9pt} \right\rangle_{#1}}
+\newcommand{\intermediateSemI}[1]{\ensuremath{\llparenthesis #1 \rrparenthesis}}
+\newcommand{\intermediateSem}[2][\lenv]{\llparenthesis #2 \rrparenthesis_{#1}}
+\newcommand{\sem}[2][\lenv]{\llbracket #2 \rrbracket_{#1}}
+\newcommand{\sentails}{\Vvdash}
+\newcommand{\entails}{\vdash}
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Soundness %%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -221,6 +357,8 @@
 \newcommand{\repartitions}[4]{\ensuremath{#1\semimplies^{\left\{#3\right\}\left\{#4\right\}}#2}}
 %\newcommand{\viewshift}[1]{\sqsubseteq^{#1}}
 \newcommand{\weakenI}[1]{\sqsubseteq^{#1}}
+\newcommand{\weakenIb}[1]{\sqsubseteq_{#1}}
+\newcommand{\containI}{\mathrel{\copyright}}
 %\newcommand{\entangleI}[1]{\bowtie^{#1}}
 \newcommand{\agrees}{\bowtie}
 \newcommand{\respects}{\ltimes}
@@ -230,24 +368,88 @@
 \newcommand{\extendAM}[2]{\left\lceil #1 \right\rceil^{#2}}
 \newcommand{\semimplies}{\ensuremath{\Rrightarrow}}
 %
-%%%%%%%%%%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Programming Language %%%%%%%%%%%%%%%
 %
 \newcommand{\atomic}[1]{\ensuremath{\left\langle #1 \right\rangle}}
 
+\AtBeginDocument{
+  %% ligatures
+  % to be safe, use only characters from the following list:
+  % ` " ' ~ ! ? @ * ( ) [ ] < > - + = | : ; . , / 0 1 2 3 4 5 6 7 8 9
+  % each lig must be defined after all ligs it prefixes
+  \mathlig{<==>}{\mathrel{\Longleftrightarrow}} % equivalence
+  \mathlig{--->}{\mathrel{\longrightarrow}} % transitions
+  \mathlig{===>}{\Rrightarrow}
+  % 3 chars
+  %\mathlig{::=}{\mathrel{\Coloneqq}}
+  \mathlig{-->}{\mathrel{\rightarrow}} % set function space
+  \mathlig{<->}{\mathrel{\leftrightarrow}}
+  \mathlig{-|}{\dashv}
+  \mathlig{--`}{\mathrel{\rightharpoonup}} % partial function
+  \mathlig{===}{\mathrel{\equiv}} % syntactic equality
+  \mathlig{=/=}{\mathrel{\not\equiv}} % not syntactic equality
+  \mathlig{|/-}{\nvdash} % not entailment
+  \mathlig{|/=}{\nvDash} % not forces
+  \mathlig{<=>}{\mathrel{\Leftrightarrow}} % equivalence of expressions
+  \mathlig{==>}{\mathrel{\Rightarrow}} % meta implication
+  \mathlig{|||}{\mathrel{|}} % grammar
+  \mathlig{-|-}{\mathrel{\mathrlap{\dashv} \hspace{5pt} \vdash}} % entails
+  % 2 chars
+%  \mathlig{==}{\mathrel{\stackrel{\smash{\scriptscriptstyle\mathrm{def}}}{=}}}
+ \mathlig{==}{\eqdef}
+  \mathlig{/|}{\mathbin{\wedge}} % additive conjunction
+  \mathlig{|/}{\mathbin{\vee}} % additive disjunction
+  \mathlig{/=}{\mathrel{\neq}} % non-equality expression
+  \mathlig{<=}{\mathord{\leq}} % less than or equal expression
+  \mathlig{=>}{\mathrel{\Rightarrow}} % implication
+  \mathlig{|-}{\mathrel{\vdash}} % entails
+  \mathlig{|=}{\vDash} % models
+  \mathlig{|>}{\vartriangleright}
+  \mathlig{<|}{\vartriangleleft}
+  \mathlig{[|}{\llbracket} % open double bracket
+  \mathlig{|]}{\rrbracket} % close double bracket
+  \mathlig{->}{\mathord{\rightarrow}} % field dereference
+  \mathlig{<-}{\mathord{\leftarrow}} % assignement
+  \mathlig{||}{\mathbin{\parallel}}
+  \mathlig{<<}{\langle}
+  \mathlig{>>}{\rangle}
+  % 1 char  WARNING: change standard spacing
+}
+%
+%%%%%%%%%%%%%%% Examples %%%%%%%%%%%%%%%
+%
+\newcommand{\graph}[2]{\textsf{graph}\left(#1, #2\right)}
+\newcommand{\tree}[2]{\textsf{tree}\left(#1, #2\right)}
+\newcommand{\markT}[2]{\token{a}_{\textsf{m}}\left(#1, #2\right)}
+\newcommand{\rootEdge}{\mathcal{R}}
+\newcommand{\G}[2]{\textsf{G}\left(#1, #2\right)}
+\newcommand{\g}[2]{\textsf{g}\left(#1, #2\right)}
+\newcommand{\tr}[2]{\textsf{t}\left(#1, #2\right)}
+\newcommand{\unmarked}[3]{\textsf{U}\left(#1, #2, #3\right)}
+\newcommand{\marked}[1]{\textsf{M}\left(#1\right)}
+\newcommand{\tmarked}[2]{\textsf{tm}\left(#1, #2\right)}
+\newcommand{\tnil}[2]{\textsf{tnil}\left(#1, #2\right)}
+\newcommand{\command}[1]{\li{#1}}
+\newcommand{\var}[1]{\li{#1}}
 
 %%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
 
-
-\DeclareDocumentCommand{\ghostCell}{ m O{} O{-}}{#1 \stackrel{#2}{\rightarrow} #3}
+\DeclareDocumentCommand{\setCap}{m O{} O{-}}{#1 \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.#2 \stackrel{#3}{\rightarrow} #4}
+\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4}
 \DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
 
+\newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
+\newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
+
+\newcommand{\capChangeT}[1]{\textsc{LChange}(#1)}
+\newcommand{\capGapT}[3]{\textsc{LGap}(#1, #2, #3)}
+
 \DeclareDocumentCommand{\lockC}{m O{} O{-}}{\left[#1.\textsf{L} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\unlockC}{m O{} O{-}}{\left[#1.\textsf{U} \stackrel{#2}{\rightarrow} #3\right]}
-\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.#2 \stackrel{#3}{\rightarrow} #4\right]}
+\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
 
@@ -257,22 +459,102 @@
 \newcommand{\inList}[2]{\sortedList{\in}{#1}{#2}}
 \newcommand{\outList}[2]{\sortedList{\not\in}{#1}{#2}}
 
+\newcommand{\sortedListCAP}[4]{\textsf{L}_{#1}\left(#2, #3, #4 \right)}
+\newcommand{\inListCAP}[3]{\sortedListCAP{\in}{#1}{#2}{#3}}
+\newcommand{\outListCAP}[3]{\sortedListCAP{\not\in}{#1}{#2}{#3}}
+
+
+\newcommand{\sorted}[1]{\textsf{sorted}\left(#1\right)}
+
 \newcommand{\inSet}[2]{\textsf{in}\left(#1, #2\right)}
 \newcommand{\outSet}[2]{\textsf{out}\left(#1, #2\right)}
 \newcommand{\ownSet}[2]{\textsf{own}\left\{#1, #2\right\}}
 
 \newcommand{\lsg}[4]{\textsf{lsg}\left(#1, #2, #3, #4\right)}
+\newcommand{\lsgCAP}[4]{\textsf{lsg}\left(#1, #2, #3, #4\right)}
 
 \newcommand{\node}[3]{\textsf{node}\left(#1, #2, #3\right)}
+\newcommand{\lockedNode}[3]{\textsf{L}\left(#1, #2, #3\right)}
+\newcommand{\unlockedNode}[3]{\textsf{U}\left(#1, #2, #3\right)}
 \newcommand{\link}[2]{\textsf{link}\left(#1, #2 \right)}
 \newcommand{\val}[3]{\textsf{val}\left(#1, #2, #3 \right)}
 
+\newcommand{\nodeCAP}[3]{\textsf{node}\left(#1, #2, #3\right)}
+\newcommand{\linkCAP}[2]{\textsf{link}\left(#1, #2 \right)}
+\newcommand{\valCAP}[2]{\textsf{val}\left(#1, #2 \right)}
+\newcommand{\gapsCAP}[2]{\textsf{gaps}\left(#1, #2\right)}
+\newcommand{\myGapsCAP}[2]{\textsf{mygaps}\left(#1, #2\right)}
 
-\newcommand{\lockedNode}[3]{\textsf{L}\left(#1, #2, #3\right)}
-\newcommand{\unlockedNode}[3]{\textsf{U}\left(#1, #2, #3\right)}
 
-\newcommand{\nil}{\texttt{null}}
-\newcommand{\command}[1]{\texttt{#1}}
-\newcommand{\sorted}[1]{\textsf{sorted}\left(#1\right)}
+\newcommand{\proofRule}[1]{\textsc{#1}}
+\newcommand{\forgetRule}{\proofRule{Forget}}
+\newcommand{\mergeRule}{\proofRule{Merge}}
+\newcommand{\shiftRule}{\proofRule{Shift}}
+\newcommand{\extendRule}{\proofRule{Extend}}
+\newcommand{\copyRule}{\proofRule{Copy}}
 
-\newcommand{\V}[1]{\texttt{#1}}
+\newcommand{\iterStar}{\scalebox{1.5}{$\oast$}}
+
+\definecolor{grey}{rgb}{0.8, 0.8, 0.8}
+\newcommand{\shade}[1]{\colorbox{grey}{$#1$}}
+
+% floats
+\floatstyle{plain}
+\newfloat{figure}{tp}{los}
+\floatname{figure}{Figure}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.3}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.9}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+
+%% greek letters
+%% @a = alpha, @b = beta, etc.
+\newcommand{\asgreekstyle}{\mathrm} % overridde when greek letters are italic
+\newatcommand a {\ensuremath{\alpha}\xspace}
+\newatcommand b {\ensuremath{\beta}\xspace}
+\newatcommand c {\ensuremath{\xi}\xspace}
+\newatcommand C {\ensuremath{\Xi}\xspace}
+\newatcommand d {\ensuremath{\delta}\xspace}
+\newatcommand D {\ensuremath{\Delta}\xspace}
+\newatcommand e {\text{\normalfont\textvisiblespace}}
+\newatcommand E {\ensuremath{\epsilon}\xspace}
+\newatcommand f {\ensuremath{\phi}\xspace}
+\newatcommand F {\ensuremath{\Phi}\xspace}
+\newatcommand g {\ensuremath{\gamma}\xspace}
+\newatcommand G {\ensuremath{\Gamma}\xspace}
+\newatcommand h {\ensuremath{\varrho}\xspace}
+\renewatcommand i {\ensuremath{\iota}\xspace} % conflicts with something
+\newatcommand j {\ensuremath{\varsigma}\xspace}
+\newatcommand k {\ensuremath{\kappa}\xspace}
+\newatcommand l {\ensuremath{\lambda}\xspace}
+\newatcommand L {\ensuremath{\Lambda}\xspace}
+\newatcommand m {\ensuremath{\mu}\xspace}
+\newatcommand n {\ensuremath{\eta}\xspace}
+\newatcommand N {\ensuremath{\Eta}\xspace}
+\newatcommand o {\ensuremath{\theta}\xspace}
+\newatcommand O {\ensuremath{\Theta}\xspace}
+\newatcommand p {\ensuremath{\pi}\xspace}
+\newatcommand P {\ensuremath{\Pi}\xspace}
+\newatcommand q {\ensuremath{\epsilon}\xspace}
+\newatcommand Q {\ensuremath{\Phi}\xspace} % duplicate
+\newatcommand r {\ensuremath{\rho}\xspace}
+\newatcommand R {\ensuremath{\Rho}\xspace}
+\newatcommand s {\ensuremath{\sigma}\xspace}
+\newatcommand S {\ensuremath{\Sigma}\xspace}
+\newatcommand t {\ensuremath{\tau}\xspace}
+\newatcommand u {\ensuremath{\upsilon}\xspace}
+\newatcommand U {\ensuremath{\Upsilon}\xspace}
+\newatcommand v {\ensuremath{\nu}\xspace}
+\newatcommand w {\ensuremath{\omega}\xspace}
+\newatcommand W {\ensuremath{\Omega}\xspace}
+\newatcommand x {\ensuremath{\chi}\xspace}
+\newatcommand y {\ensuremath{\psi}\xspace}
+\newatcommand Y {\ensuremath{\Psi}\xspace}
+\newatcommand z {\ensuremath{\zeta}\xspace}
+
