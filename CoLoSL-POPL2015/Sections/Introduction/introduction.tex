@@ -155,11 +155,10 @@ In combination with the usual law of parallel composition of
 separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
 distribute the shared state between several threads:
 \[
-\infrule{Parallel}
-        {\hoare{P_1}{\mathbb{P}_1}{Q_1}\\
-          \hoare{P_2}{\mathbb{P}_2}{Q_2}}
+\infer[\parRule]
         {\hoare{P_1 * P_2}{\mathbb{P}_1 || \mathbb{P}_2}{Q_1 * Q_2}}
-        {}
+        {\hoare{P_1}{\mathbb{P}_1}{Q_1} &
+          \hoare{P_2}{\mathbb{P}_2}{Q_2}}
 \]
 
 

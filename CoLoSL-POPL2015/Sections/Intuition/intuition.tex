@@ -150,7 +150,7 @@ consequence of an action
 
 
 Using the disjoint concurrency rule and the 
-copy/merge principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
+\copyRule/\mergeRule\ principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
 \[
 \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
 \]
@@ -166,8 +166,8 @@ Fundamentally, for large systems, the burden of carrying the whole
 shared state around to analyse all threads, even those that use only a
 small fraction of it, can lead to intractable proofs.
 
-As a first try at simplifying the precondition, consider the following implication using the forget
-and shift principles given in the introduction:
+As a first try at simplifying the precondition, consider the following implication using the \forgetRule\
+and \shiftRule\ principles given in the introduction:
 %
 \[
 \begin{array}{c l}
@@ -180,7 +180,7 @@ and shift principles given in the introduction:
 The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the cell referenced by \li{z}. The cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
 action $\token a_{\li z}$ does not affect the resources described by the
 assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions
-from $I$, the resulting subjective view remains unaffected by $\token a_{\li z}$. Using the shift principle, we
+from $I$, the resulting subjective view remains unaffected by $\token a_{\li z}$. Using the \shiftRule principle, we
 can therefore forget the $\token{a}_{\li z}$ action. 
 Finally, as is normal when reasoning about concurrency, we weaken so
 that, whatever the environment can do to the state, the assertion
@@ -225,19 +225,19 @@ conditions, is not changed by the actions in $I$. This ammended action  gives fu
 the subjective view changes as \li{x} is being updated.
 Let  $I_{\li y}' $ be  $I_{\li y}$ with $\token a_{\li x}$ rewritten as above.
 As we justify in \S~\ref{sec:logic}, we can 
-use  the shift principle with  shift judgement 
+use  the \shiftRule\ principle with the following judgement judgement 
 $
 I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
 $
 to replace $I_{\li y}$ by $I'_{\li y}$. 
 
-Using \eqref{eq:forget},  it is now safe to lose the \li{z} cell to
+Using \forgetRule,  it is now safe to lose the \li{z} cell to
 obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$,  as 
 the new $\token a_{\li x}$ action in $I'_{\li y}$ retains enough information about how
 \li{x}, \li{y} and \li{z} are related.
 Since action $\token a_{\li z}$ only affects the \li{z} cell, which has been
 forgotten, leaving  the cells \li{x} and \li{y} unaltered, we can again use the
-shift principle to change  the interface
+\shiftRule\ principle to change  the interface
 relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interface relation
 is now as simple as it can get, whilst retaining enough information
 about the 
@@ -302,14 +302,14 @@ with respect to $I_{\li y}$. The atomic section allows safe
 manipulation of the contents of the subjective region.
  The final postcondition of $\mathbb{P}_{\li y}$ follows from the
 invariant and the boolean expression of the while. We join up the
-postconditions of the threads using the merge principle. Since $|/$
+postconditions of the threads using the \mergeRule\ principle. Since $|/$
 distributes over $**$, the subjective view simplifies to $
 \shared{\li{x}|->10 * \li{y}|->10 * \li{z}|->10}{I_{\li x}\cup I_{\li y}\cup I_{\li z}} $.
 Finally, we have 
 \[
 I_{\li x}\cup I_{\li y}\cup I_{\li z}\weakenIb{\li{x}|->10 * \li{y}|->10 * \li{z}|->10} I
 \]
-so, by the shift principle, we get the postcondition of $\mathbb{INC}$. 
+so, by the \shiftRule\ principle, we get the postcondition of $\mathbb{INC}$. 
 
 
 \paragraph{Comparison with other formalisms}
@@ -375,14 +375,14 @@ doesn’t violate their subjective views.
 %% 		\end{array}			
 %% 	\right.
 %% \]
-%% Note that in doing so we have neither restricted nor relaxed the action of $\token a_{\li z}$ in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \textsc{(Shift)} rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
+%% Note that in doing so we have neither restricted nor relaxed the action of $\token a_{\li z}$ in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \shiftRule\ rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
 %% \[
 %% 	\text{if}\hspace*{0.25cm} \fence{} \fences (P, I) 
 %% 	\hspace*{0.25cm}\text{and}\hspace*{0.25cm} I \weakenI{\fence{}} I'
 %% 	\hspace*{0.25cm}\text{then}\hspace*{0.25cm}
 %% 	\shared{P}{I} ===> \shared{P}{I'} \hspace*{0.5cm} \shiftRule
 %% \]
-%% Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \textsc{Forget} rule to forget variable \li{y} and obtain $\shared{a_{\li x}}{I'}$.
+%% Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \forgetRule\ rule to forget variable \li{y} and obtain $\shared{a_{\li x}}{I'}$.
 %% %%
 %% %\[
 %% %	X' \eqdef \shared{\exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v} \lor \cell{\li{x}}{v+1} * \cell{\li{z}}{v}}{I'} 
