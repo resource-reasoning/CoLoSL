@@ -1,31 +1,34 @@
 \section{Informal development}\label{sec:intuition}
 
-We illustrate all four new reasoning principles of \colosl by
+We illustrate our \colosl  reasoning principles  by
 sketching a proof of a variation of Dijkstra's token ring mutual
 exclusion algorithm~\cite{dijkstra74}.  Consider the program
 $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
-contructs for concurrency, namely atomic sections $\atomic .$ and
-parallel composition $||$ between commands (which spawns the
-corresponding threads and waits until they all complete). After
+contructs for concurrency: atomic sections $\atomic \_$ which
+declare that code behaves atomically; and
+parallel composition $\_ ||\_ $  which spawns threads then waits until
+they complete. In our example, after
 initialisation of the variables to $0$, three threads are spawned to
 increment each variable in a lock-step fashion: $\mathbb{P}_{\li x}$
 is the first allowed to run its increment operation; then
 $\mathbb{P}_{\li y}$; and finally $\mathbb{P}_{\li z}$. This process
 repeats until $\li{x} = \li{y} = \li{z} = 10$.  This example code is
 interesting because the threads are intricately intertwined. With
-thread $\mathbb{P}_{\li y}$, the programmer knows that the resource
-directly affected by the thread involves the cells given by \li{x} and
-\li{y}. He knows the simple behaviour of the thread that it will
-increment the cell at \li{y} as long as it is less than \li{x}.
-However, he also knows a much more complex behaviour associated with
-the resource of the thread that, given the initial condition that all
-the cells have value $0$, then the thread can only increase \li{y} by
-$1$ if \li{x} is one more than \li{y} and the environment can only
+thread $\mathbb{P}_{\li y}$, the programmer knows that the variables
+\li{x} and
+\li{y} are 
+directly affected by the thread. He knows a simple behaviour of the thread that it will
+increment variable  \li{y} as long as its value is less than that of \li{x}.
+However, he also knows a much more complex behaviour  of the 
+thread that, given the initial condition that all
+the variables have value $0$, then the thread can only increase the
+value of \li{y} by
+$1$ if \li{x} is one more than \li{y},  and the environment can only
 increase \li{x} by one if \li{x} and \li{z} (and in fact \li{y}) have
 the same value. Finally, the programmer knows that the end result will
-be that the value of the cells given by \li{x}, \li{y} and \li{z} will
-be $10$. Unlike previous work, \colosl can simply specify this complex
+be that the value of all the variables will
+be $10$. \colosl can simply specify   this complex
 behaviour of the resource associated with thread $\mathbb{P}_{\li y}$.
 
 \begin{figure*}
@@ -117,25 +120,26 @@ x = 0; y = 0; z = 0;
 
 
 
-Consider the \colosl assertions associated with $\mathbb{INC}$.
+Now consider the \colosl assertions accompanying  $\mathbb{INC}$.
 After
 initialisation, line~3 of $\mathbb{INC}$  provides a standard
-assertion from separation logic stating that 
-the thread-local state consists of three  heap cells,  which are
-referred to by  variables \li{x},
-\li{y} and \li{z} and contain the value  $0$. This resource in the thread-local state is
-fully owned by  the thread. Using the extension principle, the thread is able to give up  this local
+assertion from separation logic~\cite{.} with variables as
+resource~\cite{.}. The assertion  declares  that the variable cells
+addressed by 
+\li{x},
+\li{y} and \li{z}  have the same value  $0$. This variable resource in the thread-local state is
+fully owned by  the thread. Using the \extendRule\ principle, the thread is able to give up  this local
 resource and transfer it  to the global shared state. For example,
 line~4 demonstrates the
 creation of a subjective view $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|->
   0}I$, where {part} of the underlying
-global shared state now contains the three heap cells and the 
+global shared state now contains the three variable  cells and the 
 interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action 
 \[
  \token a_{\li y}:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}
 \]
-can increment  the cell addressed by \li{y} under the condition that the
+can increment  the variable cell  \li{y} under the condition that the
 value of the  cell
 given by \li{x} is one more than that of \li{y}. 
 This update is only possible when the
@@ -145,26 +149,26 @@ example, the assertion in line~4 simply has all the capabilities $[\token
 a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the $I$-actions   in the local state; in general,
 capabilities can be buried inside boxes, only to emerge as a
 consequence of an action
-(see  TODO). 
+(see  TODO?????????). 
 
 
 
-Using the disjoint concurrency rule and the 
-\copyRule/\mergeRule\ principle for subjective views, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
+Using the 
+\copyRule\ principle for subjective views and the disjoint concurrency
+rule, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
 \[
 \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
 \]
 However, this precondition is more complicated than we
 need. Intuitively, the specification of each thread should only use
-the resource relevant to that thread, and need only consider actions
+the variable resource relevant to that thread, and need only consider actions
 that affect that resource.  In this example, the extraneous piece of
-state is the single variable \li{z}, which might seem an acceptable
+state is the variable cell  \li{z}. This additional resource  might seem an acceptable
 price to pay, but straightforward generalisations to $n$ participants
-yields extra state of $n-2$ variables, and their associated
+yields extra state of $n-2$ variable cells with  their associated
 interferences which are of no interest to the particular thread.
 Fundamentally, for large systems, the burden of carrying the whole
-shared state around to analyse all threads, even those that use only a
-small fraction of it, can lead to intractable proofs.
+shared state around to analyse all threads,  can lead to intractable proofs.
 
 As a first try at simplifying the precondition, consider the following implication using the \forgetRule\
 and \shiftRule\ principles given in the introduction:
@@ -177,10 +181,12 @@ and \shiftRule\ principles given in the introduction:
 \stackrel{(\proofRule{Weaken})}{=>}  &\shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]\\
 \end{array}
 \]
-The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the cell referenced by \li{z}. The cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
+The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus
+forget the variable assertion $\li{z} \mapsto 0$. The variable cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
 action $\token a_{\li z}$ does not affect the resources described by the
 assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions
-from $I$, the resulting subjective view remains unaffected by $\token a_{\li z}$. Using the \shiftRule principle, we
+from $I$, the resulting subjective view remains unaffected by $\token
+a_{\li z}$. Using the \shiftRule\  principle, we
 can therefore forget the $\token{a}_{\li z}$ action. 
 Finally, as is normal when reasoning about concurrency, we weaken so
 that, whatever the environment can do to the state, the assertion
