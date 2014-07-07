@@ -136,8 +136,7 @@ We write $\unitAM$ for an action model with empty domain.
 
 
 \paragraph{The effect of actions} As mentioned in the beginning of the
-section, we require that actions in the local and global action models
-are \emph{confined} to the global shared state.  Let us now introduce
+section, we require that the effect of actions in the local and global action models are \emph{confined} to the global shared state.  Let us now introduce
 the necessary machinery to describe how actions in $\lmod$ and $\gmod$
 act on the shared state $g$, which will allow us to define our
 confinement condition, and then the set of well-formed worlds.
@@ -168,20 +167,20 @@ the set notation.\footnote{In the general case, separation algebras
   may lack the \emph{disjointness} property, in which case
   intersection between two states may yield more than one state. Thus,
   our general definition introduces \emph{maximal intersections} to
-  restore unicity. Since our logical states satisfy disjointness,
+  restore unicity. Since in this paper our logical states satisfy disjointness,
   intersection is enough for our exposition.}
 
 An action $a = (p, q)$ is typically of the form $(p'\composeL c,
 q'\composeL c)$, \textit{i.e.} part of the state $c$ required for
 the action is \emph{passive} and acts as a mere \emph{catalyst} for
 the action: it has to be present for the action to take effect, but is
-left unchanged by the action. The \emph{active} of the action is then
+left unchanged by the action. The \emph{active} part of the action is then
 the pair $(p',q')$, which should be maximal in the sense that no
 further, non-empty catalyst can be found in $(p',q')$.
 
 \begin{definition}[Active part of an action]
   Given a pair of logical states $(p, q)$, its \emph{active part}
-  $\updateFP{p,q}$ is defined as the pair $(p', q')$ such that:
+  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
   \[
   \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
   c'\leq q' => c' = \unitL
@@ -249,7 +248,7 @@ corresponding actions. We write $\m{rg}(f)$ to denote the \emph{range}
 \begin{definition}[Locally-fenced action model]
   An action model $\lmod \in \AMods$ is \emph{locally fenced} by
   $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$,
-  if, for all $l \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
+  iff, for all $l \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
 \[
 \begin{array}{L}
   l\containI a /|
@@ -268,19 +267,19 @@ corresponding actions. We write $\m{rg}(f)$ to denote the \emph{range}
 
 A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$
 are compatible, the capabilities found in $l\composeL g$ exist in
-the action models, actions in the global action model correspond to
-actions in $\gmod$, and $\gmod$ is contained by $g$.
+the action models, actions in the global action model $\gmod$, correspond to
+actions in $\lmod$, and $\gmod$ is contained by $g$.
 
 \begin{definition}[Well-formedness]
   A 4-tuple $(l, g, \lmod, \gmod)$ is \emph{well-formed},
   written $\wf{(l, g, \lmod, \gmod)}$, if
   \[
   \begin{array}{L}
-    (\exsts{h,\ca{}}
-    l \composeL g = (h,\ca{}) \land \ca{}\subseteq \dom{\lmod})
+    (\exsts{\h{},\ca{}}
+    l \composeL g = (\h{},\ca{}) \land \ca{}\subseteq \dom{\lmod})
     /|\null\\
     (\V{\ca{}}\V{a\in\gmod(\ca{})}\E{a'\in\lmod(\ca{})}
-    \updateFP{a} = \updateFP{a'}) /| l\containI \gmod
+    \updateFP{a} = \updateFP{a'}) /| g \containI \gmod
   \end{array}
   \]
 \end{definition}
@@ -322,7 +321,7 @@ the form $(\unitL,g,\lmod,\gmod)$.
 
 Our assertions extend standard separation logic with \emph{subjective
   views}, as introduced in the previous section. \colosl is parametric
-with respect to the heap and capability assertions and can be
+with respect to the machine states and capability assertions and can be
 instantiated with any assertion language over states $\Heaps$ and
 capabilities $\Caps$. Here, we instantiate these languages for our
 particular instantiation with respect to our model. We assume infinite
@@ -354,7 +353,7 @@ program variables), with the exception of shared-state assertions
 $\shared P I$, which states that a subjective view satisfying $P$ and
 undergoing interferences $I$ can be found in the global shared
 state. $\emp$ is true of the units of $\composeW$. The predicates are
-interpreted over the logic state of a world: $\li{x}|-> E$
+interpreted over the local state of a world: $\li{x}|-> E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
 $E$ (resp.\ points to $E_2$); capability assertions $[K]$ describe the
