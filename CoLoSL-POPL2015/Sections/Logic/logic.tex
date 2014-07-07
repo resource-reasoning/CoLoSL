@@ -31,16 +31,17 @@ current shared state, and is subject to interferences as described by
 the action models.
 
 An action model is a partial function from \emph{capabilities} to sets
-of \emph{actions}. An action is a pair $(p,q)$ of logical states
-where $p$ is the \emph{pre-state} of the action and $q$ its
-\emph{post-state}.  The \emph{local action model} $\lmod$
-corresponds directly to the (semantic interpretations of) interference
-relations $I$, as we have used in the example above. The \emph{global
-  action model} $\gmod$ extrapolates the effect of the actions in
-$\lmod$ to the global shared state $g$. Although worlds do not put
-further constraints on the relationship between $\lmod$ and $\gmod$,
-they will be linked more tightly in the semantics of assertions (see
-\S\ref{sec:assertions}).
+of \emph{actions}. An action is a pair $(p,q)$ of logical states where
+$p$ is the \emph{pre-state} of the action and $q$ its
+\emph{post-state}.  The \emph{local action model} $\lmod$ corresponds
+directly to the (semantic interpretations of) interference relations
+$I$, as we have used in the example above. The \emph{global action
+  model} $\gmod$ extrapolates the effect of the actions in $\lmod$ to
+the global shared state $g$. Although worlds do not put further
+constraints on the relationship between $\lmod$ and $\gmod$, they will
+be linked more tightly in the semantics of assertions (in fact,
+$\gmod$ records only those actions that matter for the current
+subjective view, as will be formalised in \S\ref{sec:assertions}).
 
 As $g$ represents the global shared state, we will also require that
 actions in $\lmod$ are \emph{confined} to $g$ (which we write $g
@@ -531,61 +532,141 @@ context $r$. This will be formalised just after this lemma.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{Action model closure}
-\label{subsec:amodClosure}
+Let us now turn to the definition of action model closure, as
+informally introduced at the beginning of this section. First, we need
+to revisit the effect of actions to take into account the splitting of
+the global shared state into a subjective state and a context.
 
+\begin{definition}[Action application (cont.)]
+  The application of action $a$ on the subjective state $s$ together
+  with the context $r$, written $a[s,r]$, is defined
+  provided that there are $s'$ and $r'$ such that
+  \[
+  \begin{array}{L}
+  \m{fst}(a)\meetL (s\composeL r) /= \emptyset /|
+  \E{p_s,p_r}
+  s = p_s \composeL s' /|
+  r = p_r \composeL r' /|\null\\
+  \quad
+  \m{fst}(\updateFP{a}) = p_s\composeL p_r /|
+  \m{snd}(\updateFP{a})\composeL s'\composeL r'\text{ is defined}\\
+  \end{array}
+  \]
+  When that is the case, we write $a[s,r]$ for
+  $(\m{snd}(\updateFP{a})\composeL s',r')$.
+\end{definition}
 
-It is typically composed of the subjective view $s$ of the thread
-(\textit{e.g.}  variables \li x and \li y for $\mathbb{P}_{\li y}$)
-together with a disjoint \emph{context} representing parts of the
-shared state not currently visible to that thread (variable \li z).
+In our informal description, we have mentioned that some actions must
+be reflected in some action models. Here is the formal definition.
 
-from the interference relation of the subjective view of the
-\emph{current} thread, extrapolated to act on the whole shared
-state. In particular, actions in the global model always have a local
-counterpart, but the converse does not hold in general: the global
-action model may discard actions that are never possible, or that do
-not influence the subjective view of the thread. The global action
-model allows us to combine the knowledge of different subjective
-views, as well as to know which sets of worlds are stable under
-interferences from other threads; in particular, the rely and
-guarantee relations will be computed from actions in the global action
-model. The local action model ensures that different threads agree on
-the set of all possible actions (but whether an action is actually
-relevant to a given world is given by the global action model).
+\begin{definition}
+  An action $a$ is \emph{reflected} in a set of actions $A$ from a state
+  $l$, written $\m{reflected}(a,l,A)$, if
+  \[
+  \V r \m{fst}(a)\leq l\composeL r =>
+  \E{a'\in A} \updateFP{a'} = \updateFP{a} /| \m{fst}(a')\leq
+  l\composeL r
+  \]
+\end{definition}
+
+\begin{definition}[Action model closure]
+  A pair $(\lmod, \gmod)$ of action models is \emph{closed}
+  under a subjective state $s$, context $r$, and action model
+  $\lmod'$, written $\extendsAM{\lmod,
+    \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$
+  and $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for
+  all $n\in\Nats$, where $\downarrow_n$ is defined recursively as
+  follows:
+\[
+\begin{array}{L}
+  \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'} \iffdef
+  \m{true}\\
+  \extendsAMUpto{\lmod, \gmod}{n+1}{s}{r}{\lmod'} \iffdef\\
+  \V{\ca{}}\V{a\in \lmod'(\ca{})}
+  \m{enabled}(a,s\composeL r) =>\null\\
+  \quad\extendsAMUpto{\lmod, \gmod}{n}{\m{fst}(a[s,r])}{\m{snd}(a[s,r])}{\lmod'} \land\null\\
+  \quad\m{fst}(a)\leq s\composeL r => (s\composeL r,
+  \m{fst}(a[s,r])\composeL \m{snd}(a[s,r]))\in \lmod(\ca{})
+  /|\null\\
+  \V{\ca{}}\V{a\in \lmod(\ca{})}
+  \m{enabled}(a,s\composeL r) =>\null\\
+  \quad\m{reflected}(a,s\composeL r,\lmod'(\ca{}) |/\null\\
+  \quad(\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
+  \extendsAMUpto{\lmod, \gmod}{n}{s}{\m{snd}(a[s,r])}{\lmod'})
+  %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
+  %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
+  %% \land \updateFP{p, q} = (p', q')
+  %% \land p \leq  l \composeL r \composeL t \land\null\\
+  %% \hspace*{0.2cm}p' = p_l \composeL p_r 
+  %% \land p' \maxMeetL l = p_l 
+  %% \land l = p_l \composeL l' 
+  %% \land r = p_r \composeL r' =>\\
+  %% \hspace*{0.4cm} \extendsAMUpto{\lmod, \gmod}{n}{q' \composeL l'}{r'}{\lmod'} \land\null\\
+  %% \hspace*{0.4cm}t = \unitL => 
+  %% \left(
+  %% \begin{array}{l}
+  %%   (p' \composeL l' \composeL r', q' \composeL l' \composeL r') \in \lmod(\ca{})\\
+  %%   \lor\; q' \composeL l' \composeL r' \text{ is undefined} 
+  %% \end{array}
+  %% \right)\\
+  %% \hspace*{2cm} \land\\
+  %% \hspace*{0.1cm}\for{\ca{}, p, q, p', q', l', r'} \\
+  %% \hspace*{0.2cm} (p, q) \in \gmod(\ca{})
+  %% \land \updateFP{p, q} = (p', q')
+  %% \land p \composeL l' = l \composeL r \composeL r' =>\\
+  %% \hspace*{0.4cm}\exsts{f, c'} (p' \composeL f, q' \composeL f) \in \lmod'(\ca{}) \land p' \composeL f \composeL c' =  l \composeL r \composeL r' \;\;\lor\\
+  %% \hspace*{0.4cm}q \composeL l' \text{ is undefined} \;\;\lor\\
+  %% \hspace*{0.4cm}p' \maxMeetL l = \unitL \land \exsts{r''} q \composeL l' = l \composeL r' \composeL r'' \land \extendsAMUpto{\lmod, \gmod}{n}{l}{r''}{\lmod'}
+\end{array}
+\]
+\end{definition}
+
+in particular, the rely and guarantee relations will be
+computed from actions in the global action model. The local action
+model ensures that different threads agree on the set of all possible
+actions (but whether an action is actually relevant to a given world
+is given by the global action model).
 %% In doing so, it is allowed to forget about actions that are
 %% equivalent, or that do not affect the subjective state. This leads to
 %% a rather subtle notion of \emph{action closure} which is only needed
 %% when defining the semantics of formulas (see \S TODO).
 
+\julescomment{TODO: update description.}
 
-As expressed in the definition of the composition $\composeW$ between
-worlds, different threads may have different subjective views, but
-must agree on the overall shared state $g = s \composeW r$.  The
-need for two action models in each world, a global one $\lmod$ and a
-local one $\gmod$, arises from this decomposition of the shared
-state between the subjective view and the context. The local action
-model corresponds to actions as seen by the subjective view $s$, while
-the global action model describes the effect of these actions on the
-whole shared state $g$. Crucially, given a shared state assertion
-$\shared P I$, $\gmod$ must contain all actions specified by
-$I$, while $\lmod$ is allowed to be any set of actions which have
-the same effect on the subjective state. In particular, it may be the
-case that some actions are irrelevant to the subjective view and thus
-omitted from the global action model. We must nonetheless record
-\emph{all} actions in the local action model to ensure consistency in
-the event that some thread has extended the shared state (using
-\eqref{eq:extend}). More precisely, we will require that $(\lmod,
-\gmod)$ be \emph{closed} with respect to $I$ and the
-decomposition $s$, $r$.
+The above states that the $(\lmod, \gmod)$ pair is closed under $(s, r, \lmod')$ if the closure relation holds for any number of steps $n \in \Nats$ where 1) $s$ denotes the subjective view of the shared state, 2) $r$ denotes the context, 3) $s \composeL r$ captures the entire shared state  and 4) a step corresponds to the occurrence of an action as prescribed in either the current action model $\lmod'$ or $\gmod$. The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff:
+\begin{enumerate}
+	\item Given a capability $\ca{}$, its action $(p, q) \in \lmod'(\ca{})$ and its update footprint $(p', q')$, if the action precondition $p$ is satisfiable through an arbitrary extension of the shared region ($t$), then after one step the closure relation holds for the resultant subjective state $q' \composeL s'$ and context $r'$ where $s'$ and $r'$ capture the residue subjective and context states, respectively; that is parts of the states unchanged by the action. Moreover, if the action requires no extension ($t = \unitL$) and thus the action precondition is satisfied by the current shared state $s \composeL r$, then the action should be included in the global action model $\lmod$ unless the resultant state $q' \composeL s' \composeL r'$ is undefined.
+	
+	\item Given a capability $\ca{}$, its action $(p, q) \in \gmod$ and its update footprint $(p', q')$, if the action precondition is satisfiable by the current shared state then \emph{either} 1) a similar action is visible to $\lmod'$, \emph{or} 2) the resultant state is undefined and thus the action can never take place, \emph{or} 3) the subjective state remains unchanged by the action $(p' \maxMeetL s = \unitL )$ and after one step the closure relation holds for the subjective state $s$ and the resultant context $r'$.
+\end{enumerate}
+Intuitively, the closure relation ensures that given the current subjective state $s$ and context $r$, all possible actions of $\lmod'$ are reflected in the global action model $\lmod$ \emph{and} for all actions that are possible and are yet unbeknownst to $\lmod'$, the subjective view $s$ remains unaffected.
 
-Interference assertions are interpreted into localised action models
-from which global action models are then calculated over the entire
-shared state. When computing the effect of a local action $(p,q)$ over
-all possible shared states, a naïve approach to would be to simply
-``frame on'' arbitrary pieces of state $r$ to yield $(p\composeL r,
-q\composeL r)$.  However, the situation is more complex than this,
-since the global semantics of local actions depends on the current
-subjective view. To see why, consider the following example.
+As illustrated above, the global behaviour $\lmod$ relies on the division between the subjective state $s$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\gmod$ without knowledge of the division between the subjective state and the context. 
+
+\begin{lemma}\label{lem:semprinciples}
+  The logical implications \eqref{eq:forget}, \eqref{eq:split}, and \eqref{eq:merge} are \emph{valid}.
+\end{lemma}
+\begin{proof}
+The case of \eqref{eq:split} is straightforward from the semantics of assertions.
+For \eqref{eq:forget}, it suffices to show that the global and local action model pair is closed under the smaller subjective view while for \eqref{eq:merge} we need to show that the action model pair is closed under the combined subjective view. The full proof is provided in~\cite{colosl-tr14}.
+\end{proof}
+
+
+\julescomment{now the explanatory examples}
+
+Actions in the global model always have a local counterpart, but the
+converse does not hold in general: the global action model may discard
+actions that are never possible, or that do not influence the
+subjective view of the thread. The global action model allows us to
+combine the knowledge of different subjective views, as shown  in the
+following example.
+
+When extrapolating the effect of a local action $(p,q)$ over global
+shared states, a naïve approach to would be to simply ``frame on''
+arbitrary pieces of state $r$ to yield $(p\composeL r, q\composeL r)$.
+However, the situation is more complex than this, since the global
+semantics of local actions depends on the current subjective view. To
+see why, consider the following example.
 
 \begin{example}[]\label{ex:closure}
   Let $P \eqdef \shared{\cell{y}{2} \lor \cell{z}{3}}{I} *
@@ -623,142 +704,8 @@ subjective view. To see why, consider the following example.
 \end{example}
 
 The solution is to take the subjective view of the shared state into
-account when extrapolating the global effects of local actions. Thus,
-we revisit our definition of action application to account for the
-fact that actions act on both a subjective state and a context.
-
-\begin{definition}[Action application (cont.)]
-  The application of action $a$ on the subjective state $s$ together
-  with the context $r$, written $a[s,r]$, is defined
-  provided that there are $s'$ and $r'$ such that
-  \[
-  \begin{array}{L}
-  \m{fst}(a)\meetL (s\composeL r) /= \emptyset /|
-  \E{p_s,p_r}
-  s = p_s \composeL s' /|
-  r = p_r \composeL r' /|\null\\
-  \quad
-  \m{fst}(\updateFP{a}) = p_s\composeL p_r /|
-  \m{snd}(\updateFP{a})\composeL s'\composeL r'\text{ is defined}\\
-  \end{array}
-  \]
-  When that is the case, we write $a[s,r]$ for
-  $(\m{snd}(\updateFP{a})\composeL s',r')$.
-\end{definition}
-
-Actions in the interpretation of the interference relation associated
-with a subjective view should account for all the enabled and visible
-actions present in the local action model. This is captured by the
-following definition.
-
-\begin{definition}
-  An action $a$ is \emph{present} in a set of actions $A$ from a state
-  $l$, written $\m{present}(a,l,A)$, if
-  \[
-  \V r \m{fst}(a)\leq l\composeL r =>
-  \E{a'\in A} \updateFP{a'} = \updateFP{a} /| \m{fst}(a')\leq
-  l\composeL r
-  \]
-\end{definition}
-
-
-
-%%  More precisely, given $\shared{P}{I}$, the contents of the shared
-%% state are of the form $l \composeL r$ where $l$ denotes a
-%% subjective view as captured by $P$ while $r$ represents the context
-%% or parts of the shared state not visible by the subjective view. In
-%% order to remedy the problem illustrated in \ex~\ref{ex:closure},
-%% when calculating the global behaviour of actions, rather than
-%% extending their localised behaviour with arbitrary frames, we
-%% relate them to the current subjective view $l$ and the context
-%% $r$. This is captured by the \emph{closure} relation as defined
-%% below.
-
-
-%\begin{example}[]\label{ex:closure}
-%Let $\tau_1$ and $\tau_2$ denote two distinct threads with $P \eqdef \token{X} * \cell{w}{4} * \shared{\cell{x}{1} * \cell{y}{2} \;\lor\; \cell{x}{1} * \cell{z}{3}}{I}$ and $Q \eqdef \cell{y}{2} * \shared{\cell{x}{1} * \cell{z}{3}}{I}$ as their subjective views of the shared state respectively with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{1} * \cell{w}{4}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then an action in possession of the $\cell{w}{4}$ resource can claim the $\cell{y}{2}$ resource in exchange for $\cell{w}{4}$. Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$ and $\lmod$ denote the global interpretation of $I$. A naive attempt at calculating $\lmod$ would be to define it such that $\lmod(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{1} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$
-%Since $\tau_2$ holds the $\cell{y}{2}$ resource locally, Suppose that at this point the current thread extends the shared state with 
-%\end{example}
-
-
-\begin{definition}[Action model closure]
-  A pair $(\lmod, \gmod)$ of action models is \emph{closed}
-  under a subjective state $s$, context $r$, and action model
-  $\lmod'$, written $\extendsAM{\lmod,
-    \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$
-  and $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for
-  all $n\in\Nats$, where $\downarrow_n$ is defined recursively as
-  follows:
-\[
-\begin{array}{L}
-  \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'} \iffdef
-  \m{true}\\
-  \extendsAMUpto{\lmod, \gmod}{n+1}{s}{r}{\lmod'} \iffdef\\
-  \V{\ca{}}\V{a\in \lmod'(\ca{})}
-  \m{enabled}(a,s\composeL r) =>\null\\
-  \quad\extendsAMUpto{\lmod, \gmod}{n}{\m{fst}(a[s,r])}{\m{snd}(a[s,r])}{\lmod'} \land\null\\
-  \quad\m{fst}(a)\leq s\composeL r => (s\composeL r,
-  \m{fst}(a[s,r])\composeL \m{snd}(a[s,r]))\in \lmod(\ca{})
-  /|\null\\
-  \V{\ca{}}\V{a\in \lmod(\ca{})}
-  \m{enabled}(a,s\composeL r) =>\null\\
-  \quad\m{present}(a,s\composeL r,\lmod'(\ca{}) |/\null\\
-  \quad(\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
-  \extendsAMUpto{\lmod, \gmod}{n}{s}{\m{snd}(a[s,r])}{\lmod'})
-  %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
-  %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
-  %% \land \updateFP{p, q} = (p', q')
-  %% \land p \leq  l \composeL r \composeL t \land\null\\
-  %% \hspace*{0.2cm}p' = p_l \composeL p_r 
-  %% \land p' \maxMeetL l = p_l 
-  %% \land l = p_l \composeL l' 
-  %% \land r = p_r \composeL r' =>\\
-  %% \hspace*{0.4cm} \extendsAMUpto{\lmod, \gmod}{n}{q' \composeL l'}{r'}{\lmod'} \land\null\\
-  %% \hspace*{0.4cm}t = \unitL => 
-  %% \left(
-  %% \begin{array}{l}
-  %%   (p' \composeL l' \composeL r', q' \composeL l' \composeL r') \in \lmod(\ca{})\\
-  %%   \lor\; q' \composeL l' \composeL r' \text{ is undefined} 
-  %% \end{array}
-  %% \right)\\
-  %% \hspace*{2cm} \land\\
-  %% \hspace*{0.1cm}\for{\ca{}, p, q, p', q', l', r'} \\
-  %% \hspace*{0.2cm} (p, q) \in \gmod(\ca{})
-  %% \land \updateFP{p, q} = (p', q')
-  %% \land p \composeL l' = l \composeL r \composeL r' =>\\
-  %% \hspace*{0.4cm}\exsts{f, c'} (p' \composeL f, q' \composeL f) \in \lmod'(\ca{}) \land p' \composeL f \composeL c' =  l \composeL r \composeL r' \;\;\lor\\
-  %% \hspace*{0.4cm}q \composeL l' \text{ is undefined} \;\;\lor\\
-  %% \hspace*{0.4cm}p' \maxMeetL l = \unitL \land \exsts{r''} q \composeL l' = l \composeL r' \composeL r'' \land \extendsAMUpto{\lmod, \gmod}{n}{l}{r''}{\lmod'}
-\end{array}
-\]
-\end{definition}
-
-\julescomment{TODO: update description, add diagrams.}
-
-The above states that the $(\lmod, \gmod)$ pair is closed under $(s, r, \lmod')$ if the closure relation holds for any number of steps $n \in \Nats$ where 1) $s$ denotes the subjective view of the shared state, 2) $r$ denotes the context, 3) $s \composeL r$ captures the entire shared state  and 4) a step corresponds to the occurrence of an action as prescribed in either the current action model $\lmod'$ or $\gmod$. The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff:
-\begin{enumerate}
-	\item Given a capability $\ca{}$, its action $(p, q) \in \lmod'(\ca{})$ and its update footprint $(p', q')$, if the action precondition $p$ is satisfiable through an arbitrary extension of the shared region ($t$), then after one step the closure relation holds for the resultant subjective state $q' \composeL s'$ and context $r'$ where $s'$ and $r'$ capture the residue subjective and context states, respectively; that is parts of the states unchanged by the action. Moreover, if the action requires no extension ($t = \unitL$) and thus the action precondition is satisfied by the current shared state $s \composeL r$, then the action should be included in the global action model $\lmod$ unless the resultant state $q' \composeL s' \composeL r'$ is undefined.
-	
-	\item Given a capability $\ca{}$, its action $(p, q) \in \gmod$ and its update footprint $(p', q')$, if the action precondition is satisfiable by the current shared state then \emph{either} 1) a similar action is visible to $\lmod'$, \emph{or} 2) the resultant state is undefined and thus the action can never take place, \emph{or} 3) the subjective state remains unchanged by the action $(p' \maxMeetL s = \unitL )$ and after one step the closure relation holds for the subjective state $s$ and the resultant context $r'$.
-\end{enumerate}
-Intuitively, the closure relation ensures that given the current subjective state $s$ and context $r$, all possible actions of $\lmod'$ are reflected in the global action model $\lmod$ \emph{and} for all actions that are possible and are yet unbeknownst to $\lmod'$, the subjective view $s$ remains unaffected.
-
-As illustrated above, the global behaviour $\lmod$ relies on the division between the subjective state $s$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\gmod$ without knowledge of the division between the subjective state and the context. 
-
-
-
-\begin{lemma}\label{lem:semprinciples}
-The logic implications \eqref{eq:forget}, \eqref{eq:split}, and \eqref{eq:merge} are \emph{valid}.
-%
-\begin{proof}
-The case of \eqref{eq:split} is straightforward from the semantics of assertions.
-For \eqref{eq:forget}, it suffices to show that the global and local action model pair is closed under the smaller subjective view while for \eqref{eq:merge} we need to show that the action model pair is closed under the combined subjective view. The full proof is provided in~\cite{colosl-tr14}.
-\renewcommand{\qed}{}
-%
-\end{proof}
-%
-\end{lemma}
-
+account when extrapolating the global effects of local actions, as we
+have done in our definition of action model closure.
 
 
 \paragraph{On the need for local and global action models}
@@ -783,3 +730,21 @@ assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
   \fenceAss{} \strictfences I &\iffdef \for{s,\lenv,\ca{}}
   \{ l \mid l, \lenv \slsat F \} \strictfences \semI[\lenv]{I}(\ca{})
 \end{align*}
+
+
+%%  More precisely, given $\shared{P}{I}$, the contents of the shared
+%% state are of the form $l \composeL r$ where $l$ denotes a
+%% subjective view as captured by $P$ while $r$ represents the context
+%% or parts of the shared state not visible by the subjective view. In
+%% order to remedy the problem illustrated in \ex~\ref{ex:closure},
+%% when calculating the global behaviour of actions, rather than
+%% extending their localised behaviour with arbitrary frames, we
+%% relate them to the current subjective view $l$ and the context
+%% $r$. This is captured by the \emph{closure} relation as defined
+%% below.
+
+
+%\begin{example}[]\label{ex:closure}
+%Let $\tau_1$ and $\tau_2$ denote two distinct threads with $P \eqdef \token{X} * \cell{w}{4} * \shared{\cell{x}{1} * \cell{y}{2} \;\lor\; \cell{x}{1} * \cell{z}{3}}{I}$ and $Q \eqdef \cell{y}{2} * \shared{\cell{x}{1} * \cell{z}{3}}{I}$ as their subjective views of the shared state respectively with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{1} * \cell{w}{4}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then an action in possession of the $\cell{w}{4}$ resource can claim the $\cell{y}{2}$ resource in exchange for $\cell{w}{4}$. Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$ and $\lmod$ denote the global interpretation of $I$. A naive attempt at calculating $\lmod$ would be to define it such that $\lmod(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{1} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$
+%Since $\tau_2$ holds the $\cell{y}{2}$ resource locally, Suppose that at this point the current thread extends the shared state with 
+%\end{example}
