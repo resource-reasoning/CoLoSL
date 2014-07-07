@@ -215,8 +215,10 @@
 \newcommand{\meetL}{\meet{}}
 \newcommand{\maxMeetL}{\maxMeet{}}
 \newcommand{\unitL}{\unit{\textsf{L}}}
-\newcommand{\heapPart}[1]{\m{fst}(#1)}
-\newcommand{\capPart}[1]{\m{snd}(#1)}
+%\newcommand{\heapPart}[1]{\m{fst}(#1)}
+%\newcommand{\capPart}[1]{\m{snd}(#1)}
+\newcommand{\heapPart}[1]{\ensuremath{#1_{\textsf{M}}}}
+\newcommand{\capPart}[1]{\ensuremath{#1_{\textsf{K}}}}
 \newcommand{\updateFP}[1]{\mathop{\Delta} #1}
 
 %%%%Worlds
@@ -347,15 +349,15 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Soundness %%%%%%%%%%%%%%%%%%%%%%%%
 %
-\newcommand{\guarantee}{\ensuremath{G}}
-\newcommand{\extendG}{\ensuremath{G^{\textsf{e}}}}
-\newcommand{\shiftG}{\ensuremath{G^{\textsf{s}}}}
-\newcommand{\updateG}{\ensuremath{G^{\textsf{u}}}}
+\newcommand{\guarantee}{\ensuremath{G}\xspace}
+\newcommand{\extendG}{\ensuremath{G^{\textsf{e}}}\xspace}
+\newcommand{\shiftG}{\ensuremath{G^{\textsf{s}}}\xspace}
+\newcommand{\updateG}{\ensuremath{G^{\textsf{u}}}\xspace}
 
-\newcommand{\rely}{\ensuremath{R}}
-\newcommand{\extendR}{\ensuremath{R^{\textsf{e}}}}
-\newcommand{\shiftR}{\ensuremath{R^{\textsf{s}}}}
-\newcommand{\updateR}{\ensuremath{R^{\textsf{u}}}}
+\newcommand{\rely}{\ensuremath{R}\xspace}
+\newcommand{\extendR}{\ensuremath{R^{\textsf{e}}}\xspace}
+\newcommand{\shiftR}{\ensuremath{R^{\textsf{s}}}\xspace}
+\newcommand{\updateR}{\ensuremath{R^{\textsf{u}}}\xspace}
 
 \newcommand{\repartitions}[4]{\ensuremath{#1\semimplies^{\left\{#3\right\}\left\{#4\right\}}#2}}
 %\newcommand{\viewshift}[1]{\sqsubseteq^{#1}}

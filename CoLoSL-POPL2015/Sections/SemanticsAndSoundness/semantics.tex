@@ -1,135 +1,132 @@
-\section{\colosl rules}
-\todo Section title must change.
-\todo introductory paragraph to summarise this section?
-%
-\subsection{Rely, Guarantee, Stability}
-%
-%
-\paragraph{Stability}
-An assertion is \emph{stable} if and only if it cannot be falsified by the interference from other threads in the environment. That is, for all possible updates that the environment can do, the assertion must remain true. To capture the interference of the environment, we define the Rely relation.
-%
-%
-\begin{definition}[Rely] The \emph{Rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is
-%
+\section{\colosl program logic}
+
+This section introduces the core concepts behind our program logic. We
+start by defining what the rely and guarantee conditions of each
+thread is in terms of their action models. This allows us to define
+\emph{stability} against rely conditions, \emph{repartitioning},
+which logically represent a thread's atomic actions (and have to be in
+the guarantee condition), and \emph{semantic implication}. Equipped
+with these notions, we can justify the \eqref{eq:shift} and
+\eqref{eq:extend} principles. We conclude this section with a sketch
+of the soundness of \colosl.
+
+\subsection{Proof system}
+
+\paragraph{Rely}
+The Rely relation represent potential interferences from the
+environment. Although the rely will be different for every program
+(and indeed, every thread), it is always defined in the same way,
+which we break down into three separate kinds of possible
+interferences as follows. In the remainder of this section, given a
+logical state $l = ((@s,h),\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for
+$\m{fst}(l)$ and $\m{snd}(l)$, respectively.
+
+The first relation, $\extendR$, extends the shared state $g$ with new
+state $g'$, along with new interference $\lmod'$ on $g'$. We introduce
+the following notation to describe extensions that respect all
+previous subjective views of a world (and may change the global action
+model in the process provided it preserves action closure with respect
+to both the old and the new local action models):
+\begin{definition}[Action model extension]\label{def:amodExtension}
+An action model $\gmod'$ \emph{extends} ($g, \gmod, \lmod$) with
+$(\lmod', g')$, written
+$\expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}$, iff for all
+$\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
 \[
-	\rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
+\extendsAM{\gmod, \lmod}{s}{r}{\lmod_0} \implies \extendsAM{\gmod', \lmod \cup \lmod'}{s}{r\composeL g'}{\lmod_0}
 \]
-%
-where * denotes the reflexive transitive closure and 
-%
-\[
-\begin{array}{@{} r @{} l @{}}
-	\extendR \eqdef &
- 	\left\{
-	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-	   \left(
-	   \begin{array}{@{} l @{}}
-	     (l , g, \gmod, \lmod),\\
- 	     \left(
-	     \begin{array}{@{} l @{}}
-	      l,
-	      g \composeL g',\\
-	      \gmod', \lmod \cup \lmod_n
-	     \end{array}
- 	    \right)
-	   \end{array}
- 	  \right)
-	   &
- 	  	\begin{array}{@{} l @{}}
-%	 	  	g' = l' \composeL (\unitH, \ca{2})  \land\\
-	 	  	
-	 	  	\capPart{g'} \subseteq \dom{\lmod_n} \cup \dom{\lmod} \land \\
-	 	  	
-			\extendsAM{\gmod', \lmod \cup \lmod_n}{g'}{g}{\lmod_n} \land \\
-			
-%			\for{l_1, r, \amod{1} \subseteq \lmod} \\
-%			\hspace*{0.1cm} l_1 \composeL r = s \land \extendsAM{\gmod, \lmod}{l_1}{r}{\amod{1}}  \\
-%			\hspace*{0.1cm} \implies\extendsAM{\gmod', \lmod \cup \amod{0}}{l_1}{r \composeL s'}{\amod{1}}
-			
-			\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}
-			
-     	
-   		\end{array}
- 	\end{array}
-	\right\}\\
-	
-	
-	
-	\updateR \eqdef &
- 	\left\{
-	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-	   	\left(
-	   	\begin{array}{@{} l @{}}
-	     	(l, g, \gmod, \lmod),\\
-	     	(l, g', \gmod, \lmod)
-	   	\end{array}
-		\right)
-	  	&
-	  	\begin{array}{@{} l @{} }
-%		  	\left(
-%		  	\begin{array}{@{} l @{} }
-%		 		g = g' \lor\\
-
-		 	  	\begin{array}{@{} l @{}}
-		 	  		\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{g} \right) \disjoint \ca{} \land 
-		 	  		(g, g') \in \gmod(\ca{}) \\
-		 	  	
-		 	  	\end{array}	
-
-%		 	\end{array}
-%	   		\right)
-   		\end{array}
- 	\end{array}
-	\right\}\\
-	
-	
-	
-	\shiftR \eqdef & 
-	\left\{
-	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-	   \left(
-	   \begin{array}{@{} l @{}}
-	     (l, g, \gmod, \lmod),
- 	     \left( l, g, \gmod, \lmod \cup \lmod_n  \right)
-	   \end{array}
- 	  \right)
-	   &
-% 	  	\begin{array}{@{} l @{}}
-%	 	  	\for{l, r} \for{\gmod' \subseteq \lmod} \extendsAM{\gmod, \lmod}{l}{r}{\gmod'} \\
-%	 	  	\hspace*{0.5cm} \implies \extendsAM{\gmod, \lmod \cup \amod{0}}{l}{r}{\gmod'}
-%   		\end{array}
-
-		\expandsAM{\gmod}{\lmod_n}{\unitL}{g}{\gmod}{\lmod}
- 	\end{array}
-	\right\}
-
-\end{array}
-\]
-%
-where \emph{action model extension}, $\expandsAM{\gmod'}{\lmod_n}{s'}{s}{\gmod}{\lmod}$, denotes the extension of $(\gmod, \lmod)$ to $(\gmod', \lmod \cup \lmod_n)$ when the shared state is extended with $s'$ and is described in \defin\ref{def:amodExtension}.
 \end{definition}
-%
-%
-Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
-
-Moreover, at any one point the environment may update the shared state by performing an action for which it has the sufficient capability ($\ca{}$). This is described by the \updateR\ relation. For this to be possible, the thread performing the action must have the $\ca{}$ capability in its own local state and thus the $\ca{}$ capability must be disjoint from both shared and local states of the current world. 
-
-Finally, the environment may extend the local action model by shifting (rewriting) some of the existing behaviour. This is modelled by the \shiftR\ relation. This is only possible if for any subjective state $l$, context $r$ and action model $\gmod'$ under which the old action model pair was closed, the new action model pair is also closed: $\extendsAM{\gmod, \lmod \cup \lmod_0}{l}{r}{\gmod'}$. 
-%
-%
-\begin{definition}[Action Model Extension]\label{def:amodExtension}
-An action model $\gmod'$ \emph{extends}  ($g, \gmod, \lmod$) with $(\lmod_n, g')$, written $\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}$, iff for all $\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
-%
+Then the extension rely $\extendR$ is defined as
 \[
-	\extendsAM{\gmod, \lmod}{s}{r}{\lmod_0} \implies \extendsAM{\gmod', \lmod \cup \lmod_n}{s}{r\composeL g'}{\lmod_0}
+  \extendR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l , g, \gmod, \lmod),\\
+      \left(
+      \begin{array}{@{} l @{}}
+	l,
+	g \composeL g',\\
+	\gmod', \lmod \cup \lmod'
+      \end{array}
+      \right)
+    \end{array}
+    \right)
+    &
+    \begin{array}{@{} l @{}}
+      \capPart{g'} \subseteq \dom{\lmod'} \cup \dom{\lmod} \land \\
+      \extendsAM{\gmod', \lmod \cup \lmod'}{g'}{g}{\lmod'} \land \\
+      \expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}
+    \end{array}
+  \end{array}
+  \right\}
 \]
-%
+%% Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
+
+
+The second kind of interference is the \emph{update} of the global
+state according to actions in the global action model whose capability
+is ``owned by the environment'', \textit{i.e.}, nowhere to be found
+the current local and shared states.
+\[	
+  \updateR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l, g, \gmod, \lmod),\\
+      (l, g', \gmod, \lmod)
+    \end{array}
+    \right)
+    &
+    \begin{array}{@{} l @{} }
+      \begin{array}{@{} l @{}}
+	\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{g} \right) \disjoint \ca{} \land 
+	(g, g') \in \gmod(\ca{}) \\
+      \end{array}	
+    \end{array}
+  \end{array}
+  \right\}
+\]	
+%% Moreover, at any one point the environment may update the shared state by performing an action for which it has the sufficient capability ($\ca{}$). This is described by the \updateR\ relation. For this to be possible, the thread performing the action must have the $\ca{}$ capability in its own local state and thus the $\ca{}$ capability must be disjoint from both shared and local states of the current world. 
+
+The third and last kind of interference is the \emph{shifting} of the
+local interference relation to a new one that allows more action while
+preserving all current subjective views (as expressed by the global
+action model):
+\[
+  \shiftR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l, g, \gmod, \lmod),
+      \left( l, g, \gmod, \lmod \cup \lmod'  \right)
+    \end{array}
+    \right)
+    &
+    \expandsAM{\gmod}{\lmod'}{\unitL}{g}{\gmod}{\lmod}
+  \end{array}
+  \right\}
+\]
+%% Finally, the environment may extend the local action model by shifting (rewriting) some of the existing behaviour. This is modelled by the \shiftR\ relation. This is only possible if for any subjective state $l$, context $r$ and action model $\gmod'$ under which the old action model pair was closed, the new action model pair is also closed: $\extendsAM{\gmod, \lmod \cup \lmod_0}{l}{r}{\gmod'}$. 
+
+
+\begin{definition}[Rely]
+  The \emph{Rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is
+  \[
+  \rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
+  \]
+  where $(\cdot)^{\text{*}}$ denotes reflexive transitive closure.
 \end{definition}
-%
-%
-The rely $\rely$ enables us to define the stability of assertions with respect to the environment actions.
-%
-\begin{definition}[Stability] An assertion $P$ is stable ($\stable{P}$) iff for all $\lenv \in \LEnv$ and $w, w' \in \Worlds$, if $w, \lenv |= P$ and $(w, w') \in \rely$, then $w', \lenv |= P$.
+
+The Rely relation enables us to define the stability of assertions
+with respect to the environment actions.
+\begin{definition}[Stability]
+  An assertion $P$ is \emph{stable} ($\stable{P}$) if, for all $\lenv
+  \in \LEnv$ and $w, w' \in \Worlds$, if $w, \lenv |= P$ and $(w, w')
+  \in \rely$, then $w', \lenv |= P$.
 %\[	
 %\begin{array}{r @{} l}
 %	\stable{P} \iffdef &
@@ -139,75 +136,94 @@ The rely $\rely$ enables us to define the stability of assertions with respect t
 %\end{array}
 %\]
 \end{definition}
-%
+
+Proving that an assertion is stable is not always obvious, in
+particular when there are lots of actions to consider (all those in
+$\extendR$, $\updateR$, $\shiftR$); as it turns out, we only need to
+check stability against update actions in $\updateR$, as expressed by
+the following lemma.
+
 \begin{lemma}[Stability]
-An assertion $P$ is stable if it cannot be falsified by possible updates on the shared state from other threads:
-%
-\[
-\begin{array}{l}
-	\for{\lenv}\for{w, w'} 
-    w, \lenv |= P \land (w, w') \in \updateR \implies
-	 	w', \lenv |= P\\
+  If an assertion $P$ is stable with respect to actions in $\updateR$,
+  then it is stable.
+%% An assertion $P$ is stable if it cannot be falsified by possible updates on the shared state from other threads:
+%% %
+%% \[
+%% \begin{array}{l}
+%% 	\for{\lenv}\for{w, w'} 
+%%     w, \lenv |= P \land (w, w') \in \updateR \implies
+%% 	 	w', \lenv |= P\\
 	 
-	 \implies \stable{P}
-\end{array}	 
-\]
-%
+%% 	 \implies \stable{P}
+%% \end{array}	 
+%% \]
 \end{lemma}
-%
-That is, an assertion $P$ is always stable with respect to possible extensions of the shared state and action shifting. For an assertion to be stable it thus suffices to consider the interference on the shared state from other threads.
 
-We now define the Guarantee relation  that describes all possible updates the current thread can perform. Intuitively, the Guarantee relation is the dual of Rely.
-%
-\begin{definition}[Guarantee]
-The \emph{Guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
-%
+\paragraph{Guarantee}
+We now define the Guarantee relation that describes all possible
+updates the current thread can perform. In some sense, the Guarantee
+relation is the dual of Rely: the actions in the Guarantee of one
+thread are included in the Rely of concurrently running threads. Thus,
+it should come as no surprise that actions in the Guarantee can be
+categorised using three categories which resonate with those of the
+Rely. The \emph{extension} guarantee is similar to the extension rely
+except that new capabilities corresponding to the new shared region
+are materialised in the local and shared state, and a part of the
+local state is moved into the shared state:
 \[
-	\guarantee \eqdef  \left( \updateG \cup \extendG \cup \shiftG \right)^{\text{*}}
+\extendG \eqdef
+\left\{
+\begin{array}{L @{\hspace*{2pt}} | @{\hspace*{2pt}} R}
+  \left(
+  \begin{array}{@{} l @{}}
+    (l \composeL l', g, \gmod, \lmod),\\
+    \left(
+    \begin{array}{@{} l @{}}
+      l \composeL (\unitH, \ca{1}),\\
+      g \composeL g',\\
+      \gmod', \lmod \cup \lmod'
+    \end{array}
+    \right)
+  \end{array}
+  \right)
+  &
+  \begin{array}{L}
+    g' = l' \composeL (\unitH, \ca{2})  \land\\
+    \ca{1} \composeCap \ca{2} \subseteq \dom{\lmod'} \land \\
+    \ca{1} \composeCap \ca{2} \compatL \dom{\lmod} \land \\
+    \extendsAM{\gmod', \lmod \cup \lmod'}{g'}{g}{\lmod'} \land \\
+    \expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}
+  \end{array}
+\end{array}
+\right\}
 \]
-%
-with
-%
+%% The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\lmod_0$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_0}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \compatL \dom{\lmod}$). The last two conjuncts  enforce closure of the new action models and can be justified as in the case of \extendR.
+
+
+
+The \emph{update guarantee} $\updateG$ is more involved than its
+$\updateR$ counterpart, because updates in the guarantee may move
+resources from the local state into the shared state (similarly to
+extensions above) at the same time that it mutates them as prescribed
+by an enabled action. Intuitively, we want to enforce that resources
+are not created ``out of thin air'' in the process. This can be
+expressed as preserving the \emph{orthogonal} of the combination of
+the local and global states, \textit{i.e.}, the set of states
+compatible with that combination.
+
+\begin{definition}[Orthogonal]\label{def:orthogonal}
+The \emph{orthogonal} of a state  $\heapSize{.}: \Heaps \rightarrow
+\pset{\Heaps}$ is defined as the set of all states that are disjoint
+from it:
 \[
-\begin{array}{@{} r @{} l @{}}
+\heapSize{\h{}} \eqdef \left\{ \h{}' \mid \h{} \compatL \h{}' \right\}
+\]
+\end{definition}
 
-	\extendG \eqdef &
- 	\left\{
-	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-	   \left(
-	   \begin{array}{@{} l @{}}
-	     (l \composeL l', g, \gmod, \lmod),\\
- 	     \left(
-	     \begin{array}{@{} l @{}}
-	      l \composeL (\unitH, \ca{1}),\\
-	      g \composeL g',\\
-	      \gmod', \lmod \cup \lmod_n
-	     \end{array}
- 	    \right)
-	   \end{array}
- 	  \right)
-	   &
- 	  	\begin{array}{@{} l @{}}
-	 	  	g' = l' \composeL (\unitH, \ca{2})  \land\\
-	 	  	
-	 	  	\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_n} \land \\
-	 	  	
-	 	  	\ca{1} \composeCap \ca{2} \disjoint \dom{\lmod} \land \\
-	 	  	
-			\extendsAM{\gmod', \lmod \cup \lmod_n}{g'}{g}{\lmod_n} \land \\
-			
-%			\for{l_1, r_1, \amod{1} \subseteq \lmod} \\
-%			\hspace*{0.1cm} l_1 \composeL r_1 = s \land \extendsAM{\gmod, \lmod}{l_1}{r_1}{\amod{1}}  \\
-%			\hspace*{0.1cm} \implies\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r_1 \composeL s'}{\amod{1}}
-
-			\expandsAM{\gmod'}{\lmod_n}{g'}{g}{\gmod}{\lmod}
-			
-     	
-   		\end{array}
- 	\end{array}
-	\right\}\\
-	
-	\updateG \eqdef &
+Moreover, update actions are not allowed to introduce new
+capabilities, as this is the sole privilege of extension actions.
+\[
+	\updateG \eqdef
  	\left\{
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   	\left(
@@ -235,78 +251,100 @@ with
 	   		\right)
    		\end{array}
  	\end{array}
-	\right\}\\
-	
-	
-	
-	\shiftG \eqdef & 
-	\left\{
-	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
-	   \left(
-	   \begin{array}{@{} l @{}}
-	     (l, g, \gmod, \lmod),
- 	     \left( l, g, \gmod, \lmod \cup \lmod_0  \right)
-	   \end{array}
- 	  \right)
-	   &
-	   
-	   \expandsAM{\gmod}{\lmod_n}{\unitL}{g}{\gmod}{\lmod}
-% 	  	\begin{array}{@{} l @{}}
-%	 	  	\for{l, r} \for{\gmod' \subseteq \lmod} \extendsAM{\gmod, \lmod}{l}{r}{\gmod'} \\
-%	 	  	\hspace*{0.5cm} \implies \extendsAM{\gmod, \lmod \cup \lmod_0}{l}{r}{\gmod'}
-%   		\end{array}
- 	\end{array}
 	\right\}
-
-\end{array}
 \]
-%
-\end{definition}
-%
-%
-The current thread may at any point extend the shared state with some of its locally held resources $l'$ and in doing so introduce new interference to describe how the new resources may be mutated ($\lmod_0$) and generate  new capabilities ($\ca{1} \composeCap \ca{2} \subseteq \dom{\lmod_0}$) that facilitate the new interference. This is captured by the \extendG\ relation and is analogous to \extendR.  The generated capabilities must be fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\lmod}$). The last two conjuncts  enforce closure of the new action models and can be justified as in the case of \extendR.
+%% The current thread can update its local state arbitrarily and may
+%% update the shared state by performing an action for which it holds the
+%% necessary capability $\ca{}$ in its local state. This is described by
+%% the \updateG\ relation. For this to be possible, the total amount of
+%% capabilities held locally and in the shared state must not grow. That
+%% is, the current thread may not generate new capabilities arbitrarily
+%% since capabilities may only be generated upon extension of the shared
+%% state as captured in \extendG. Similarly, if the shared state is being
+%% updated ($g \not= g'$),  then the heap resources (the domain of the
+%% heap) may not grow ($\heapSize{\heapPart{(l \composeL g)}} \subseteq
+%% \heapSize{\heapPart{(l' \composeL g')}}$) where the $\heapSize{.}$
+%% function is as given in \defin\ref{def:orthogonal}. The intuition
+%% behind this constraint is to ensure that threads do not generate
+%% resources out of thin air in order to enable actions. Note that this
+%% does not stop a thread from local allocation/deallocation of
+%% resources. In the case of allocation, the desired effect can be
+%% achieved by first allocating the new resources locally (\textit{i.e.}
+%% extending the local state from $l$ to $l \composeL l''$), while
+%% leaving the shared state untouched; and then performing the relevant
+%% action on the shared state (\textit{i.e.} updating $g$ to $g'$)
+%% without extending the heap resources, as illustrated in the following
+%% sequence.
+%% \[
+%% \begin{array}{l}
+%% 	(l, g, \gmod, \lmod) \rightarrow (l \composeL l'', g, \gmod, \lmod) \rightarrow (l', g', \gmod, \lmod)\\
+%% 	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}
+%% \end{array}
+%% \]
+%% Deallocation of local resources can be achieved in a similar fashion.
+%That is, all previously compatible frames remain compatible. We
+%illustrate the need for this constraint in \ex
+%~\ref{ex:compatibleFrames}.
 
-The current thread can update its local state arbitrarily and may update the shared state by performing an action for which it holds the necessary capability $\ca{}$ in its local state. This is described by the \updateG\ relation. For this to be possible, the total amount of capabilities held locally and in the shared state must not grow. That is, the current thread may not generate new capabilities arbitrarily since capabilities may only be generated upon extension of the shared state as captured in \extendG. Similarly, if the shared state is being updated ($g \not= g'$),  then the heap resources (the domain of the heap) may not grow ($\heapSize{\heapPart{(l \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}$) where the $\heapSize{.}$ function is as given in \defin\ref{def:orthogonal}. The intuition behind this constraint is to ensure that threads do not generate resources out of thin air in order to enable actions. Note that this does not stop a thread from local allocation/deallocation of resources. In the case of allocation, the desired effect can be achieved by first allocating the new resources locally (\textit{i.e.} extending the local state from $l$ to $l \composeL l''$), while leaving the shared state untouched; and then performing the relevant action on the shared state (\textit{i.e.} updating $g$ to $g'$) without extending the heap resources, as illustrated in the following sequence.
-%
+Lastly, the current thread may extend the local action model by
+shifting some of the existing interference. This is modelled by the
+\shiftG relation which is analogous to \shiftR.
 \[
-\begin{array}{l}
-	(l, g, \gmod, \lmod) \rightarrow (l \composeL l'', g, \gmod, \lmod) \rightarrow (l', g', \gmod, \lmod)\\
-	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}
+\shiftG \eqdef
+\left\{
+\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+  \left(
+  \begin{array}{@{} l @{}}
+    (l, g, \gmod, \lmod),
+    \left( l, g, \gmod, \lmod \cup \lmod_0  \right)
+  \end{array}
+  \right)
+  &
+  \expandsAM{\gmod}{\lmod'}{\unitL}{g}{\gmod}{\lmod}
 \end{array}
+\right\}
 \]
-%
-Deallocation of local resources can be achieved in a similar fashion.
-%That is, all previously compatible frames remain compatible. We illustrate the need for this constraint in \ex ~\ref{ex:compatibleFrames}.
 
-Lastly, the current thread may extend the local action model by shifting some of the existing interference. This is modelled by the \shiftG\ relation and is analogous to \shiftR.
-%
-%
-\begin{definition}[Orthogonal]\label{def:orthogonal}
-The \emph{orthogonal} of a state  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all states that are disjoint from it. That is, given a state $\h{} \in \Heaps$:
-%
+\begin{definition}[Guarantee]
+The \emph{Guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
 \[
-	\heapSize{\h{}} \eqdef \left\{ \h{}' \mid \h{} \disjoint \h{}' \right\}
+\guarantee \eqdef  \left( \updateG \cup \extendG \cup \shiftG \right)^{\text{*}}
 \]
-%
 \end{definition}
-%
-Using the guarantee relation, we introduce the notion of \emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$ with respect to an update from $R_1$ to $R_2$, written $\repartitions{P}{Q}{R_1}{R_2}$. While the guarantee states how a thread can modify the shared state, extend it or shift the interference, repartitioning describes how the local and shared \emph{heaps} are updated in such a way that is compatible with the guarantee as well as the update from $R_1$ to $R_2$.
-%
+
+Using the guarantee relation, we introduce the notion of
+\emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$
+with respect to an update from $R_1$ to $R_2$, written
+$\repartitions{P}{Q}{R_1}{R_2}$, where $P$, $Q$, $R_1$, $R_2$ are
+assertions. Repartitioning takes a world satisfying $P$, merges its
+local and shared states together, and then updates a part of that
+combination that satisfies $R_1$ to one satisfying $R_2$. The new
+logical state is then split again into a local and shared part in such
+a way that the resulting action is in the Guarantee $\guarantee$.
+
 \begin{definition}[Repartitioning] \label{def:repartitioning}
-$\repartitions{P}{Q}{R_1}{R_2}$ holds iff for every $\lenv \in \LEnv$, and world $w_1$ where $w_1, \lenv |= P$, there exists a state $m_1 \in \Heaps$ where $(m_1, \emptyset), \lenv \slsat R_1$ and a residual state $m'$ such that 
-%
+  We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in
+  \LEnv$, and world $w_1 = (l_1,g_1,\lmod_1,\gmod_1)$ such that $w_1,
+  \lenv |= P$, there exists states $m_1,m' \in \Heaps$ such that
+  $(m_1, \emptyset), \lenv \slsat R_1$ and
 \begin{itemize} 
-	\item $m_1 \composeH m' = \heapPart{\left(\collapseW{w_1}\right)}$; and
-	\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$, there exists a world $w_2$ where $w_2, \lenv |= Q$ such that:
-	\begin{itemize}
-		\item $m_2 \composeH m' = \heapPart{\left(\collapseW{w_2}\right)}$; and
-		\item $(w_1, w_2) \in \guarantee$
-	\end{itemize}	  
+\item $m_1 \composeH m' = \heapPart{(l_1\composeL g_1)}$; and
+\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$,
+  there exists a world $w_2 = (l_2,g_2,\lmod_2,\gmod_2)$ such that
+  $w_2, \lenv |= Q$, and
+  \begin{itemize}
+  \item $m_2 \composeH m' = \heapPart{(l_2 \composeL g_2)}$; and
+  \item $(w_1, w_2) \in \guarantee$.
+  \end{itemize}
 \end{itemize}
-%
-where $\collapseW{l, g, \gmod, \lmod} \eqdef l \composeL s$.
+\end{definition}
 
-Note that when $R_1 = R_2 = \emp$, then the repartitioning has no side effect in that it preserves the concrete state and only allows the world to be repartitioned. We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $.
+We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in
+which case the repartitioning has no ``side effect'' and simply
+shuffles resources around between the local and shared state or
+modifies the action models. This is the case for \eqref{eq:shift} and
+\eqref{eq:extend}, whose proof will be given in the next section.
+
 %\[
 %\begin{array}{@{} r l @{}}
 %	\repartitions{P}{Q}{p}{q} \iffdef 
@@ -322,39 +360,35 @@ Note that when $R_1 = R_2 = \emp$, then the repartitioning has no side effect in
 %\end{array}
 %\]
 %%
-\end{definition}
 %
 %
-\begin{lemma}[]
-The semantic implications (\extendRule) and (\shiftRule) are valid.
-%
-\begin{proof}
-In each case, it suffices to show that the respective repartitioning ($\semimplies$) is valid and allowed by the guarantee relation. In the case of (\extendRule) the transition is contained in the \extendG\ relation, while with (\shiftRule) the transition is allowed by \shiftG. The full proof is provided in~\cite{colosl-tr14}.
-\renewcommand{\qed}{}
-\end{proof}
-%
-\end{lemma}
-%
-%
+
 \paragraph{Proof rules}
-Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit assumption that the pre- and post-conditions of their judgements are stable. Most of the proof rules are standard with the exception of the atomic and consequence rules. We proceed with the judgements of these rules.
-%
-%
-\begin{definition}[Proof rules]\label{def:proofRules} The \emph{atomic} proof judgement, \proofRule{Atom}, is defined as follows where $\entails_{\textsf{SL}}$ denotes the standard sequential separation logic judgement.
-%
-\[
-%\begin{array}{c}
+Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry
+an implicit assumption that the pre- and post-conditions of their
+judgements are stable. Most of the proof rules are standard and
+omitted for space reasons; they include the rules of concurrent
+separation logic~\cite{csl-tcs} (including the \proofRule{Parallel}
+rule mentioned in the introduction). We use two additional rules,
+similar to their CAP counterparts~\cite{cap-ecoop10}, which are as
+follows, where $\entails_{\textsf{SL}}$ denotes the standard
+sequential separation logic judgement:
+%% \begin{definition}[Proof rules]
+%%   \label{def:proofRules}
+%%   The \emph{atomic} proof judgement, \proofRule{Atom}, is defined as
+%%   follows where
+%% %
+\begin{mathpar}
 	\infer[\proofRule{Atom}]{
 		\entails \{P\} \atomic {C} \{Q\}
 	}{
 		\entails_{\textsf{SL}} \{R_1\}\ C\ \{R_2\} &
 		\repartitions{P}{Q}{R_1}{R_2}
 	}
-\]
-%
-The \emph{rule of consequence}, \proofRule{Conseq}, is as given below.
-%
-\[	
+%% \]
+%% The \emph{rule of consequence}, \proofRule{Conseq}, is as given below.
+%% \[	
+
 	\infer[\proofRule{Conseq}]{
 		\entails \{P\}\ C\ \{Q\}
 	}{
@@ -362,11 +396,9 @@ The \emph{rule of consequence}, \proofRule{Conseq}, is as given below.
 		\entails \{P'\}\ C\ \{Q'\} &
 		Q' \semimplies Q
 	}
-%\end{array}
-\]
-%
-In both judgements, $\semimplies$ denotes the repartitioning of the state as described in \defin\ref{def:repartitioning}.
-\end{definition}
+\end{mathpar}
+%% In both judgements, $\semimplies$ denotes the repartitioning of the state as described in \defin\ref{def:repartitioning}.
+%% \end{definition}
 %
 %
 %\subsection{Program logic}
@@ -407,59 +439,64 @@ In both judgements, $\semimplies$ denotes the repartitioning of the state as des
 %
 %\paragraph{Soundness}\label{subsec:soundness}
 %In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
-%
-%
-%
+
+
 \subsection{Interference manipulations}\label{subsec:extension}
-%The rest of the semantic development of this section concerns the
-%formalisation of the notions of well-formed states, action
-%shifting, and action model closure, which were informally introduced
-%above. Central to these definitions is the concept of fences.
-In this section we formalise the notions of action action model containment and action shifting, which were informally introduced in \S\ref{sec:logic}. Central to these definitions is the concept of fences.
 
-We lift the notion of fences and local fences to
-assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
-\IAssertions$:
-\begin{align*}
-  \fenceAss{} \fences I &\iffdef \for{\lenv,\ca{}}
-  \{ l \mid l, \lenv \slsat F \} \fences \semI[\lenv]{I}(\ca{})\\
-  \fenceAss{} \strictfences I &\iffdef \for{s,\lenv,\ca{}}
-  \{ l \mid l, \lenv \slsat F \} \strictfences \semI[\lenv]{I}(\ca{})
-\end{align*}
 
+In this section we formalise the requirements of the \eqref{eq:extend}
+and \eqref{eq:shift} semantic implications and show that they are
+valid.
 
 \paragraph{Shared state extension}
-Recall from \S\ref{subsec:extend} that one may always \emph{extend}
-the shared state using local resources from the current state of a
-thread. In doing so, one must specify the interference relation over
-newly shared resources. While in \colosl the new interferences may
-mention parts of the shared state beyond the newly added resources,
-they must not allow visible updates to those parts, so as not to
-invalidate other threads' views of existing resources. We thus impose
-a locality condition on the newly added behaviour to ensure sound
-extension of the shared state. This is informally illustrated in the
-following example.
-%
+When extending the shared state using currently owned local resources,
+one specifies a new interference assertion over these newly shared
+resources. While in \colosl the new interferences may mention parts of
+the shared state beyond the newly added resources (in particular
+existing shared state), they must not allow visible updates to those
+parts, so as not to invalidate other threads' views of existing
+resources. We thus impose a locality condition on the newly added
+behaviour to ensure sound extension of the shared state, similarly to
+the confinement constraint of local fences of
+\S\ref{def:actconf}. We first motivate this constraint with an example.
+
 \begin{example}\label{ex:badExtension}
-Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{b}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
-$
-	I' \eqdef 
-		\left(
-			\token{a}: 
-			\left\{
-			\begin{array}{@{}l@{}} 
-				\cell{x}{1} \swap \cell{x}{2}\\
-				\cell{y}{1} \swap \cell{y}{3}
-			\end{array}
-			\right\}
-		 \right)
-$.
-In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $[\token{a}]$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $[\token{b}]$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
+Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$
+denote the view of the current thread with $I \eqdef \left(\token{b}:
+\left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the
+current thread owns the location addressed by $x$, it can extend the
+shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} |/
+  \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where $ I' \eqdef
+\left( \token{a}: \cell{x}{1} \swap \cell{x}{2} \right) $.  In
+extending the shared state, the current thread also extended the
+interference allowed on the shared state by adding a new action
+associated with the newly generated capability resource $[\token{a}]$,
+as given in $I'$, which updates the value of location $x$. Since
+location $x$ was previously owned privately by the current thread and
+was hence not visible to other threads, this new action will not
+invalidate their view of the shared state, hence this extension is a
+valid one.
+
+\sloppy
+If, on the
+other hand, replacing $I'$ with
+$I''
+\eqdef \left( \token{a}:
+\left\{
+  \cell{y}{1} \swap \cell{y}{3}
+\right\}\right)$, where location $y$ can be mutated, in the situation above
+is not allowed.  Indeed, other threads may rely on the fact that the
+only updates allowed on location $y$ are done through the
+$[\token{b}]$ capability as specified in $I$, and would be spooked by
+this new possible behaviour that they were not aware of (as it is not
+in $I$).
 \end{example}
-%
-%
-In order to ensure sound extension of the shared state, we require that the newly introduced interferences are confined to the locally owned resources (\textit{cf.} \eqref{eq:extend}).
-%
+
+\fussy
+In order to ensure sound extension of the shared state, we require in
+\eqref{eq:extend} that the newly introduced interferences are confined
+to the locally owned resources.
+
 \begin{definition}
   A set of states $\mathcal P$ \emph{contains} an action model
   $\gmod$, written $\mathcal P \containI \gmod$, if
@@ -468,35 +505,68 @@ In order to ensure sound extension of the shared state, we require that the newl
   \]
 \end{definition}
 
-We lift the notion of containment to assertions as follows where given $P \in \Assertions$ and $I \in \IAssertions$:
-%
+The $P\containI I$ notation used in \eqref{eq:extend} is then a
+straightforwar lift of this definition to assertions $P \in
+\Assertions$ and interference assertions $I \in \IAssertions$:
 \[
-	P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
+P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
 \]
-%
+
+\begin{lemma}
+  The semantic implications \eqref{eq:extend} is valid.
+\end{lemma}
+\begin{proof}[Proof (sketch)]
+  It suffices to show that the repartitioning ($\semimplies$) is valid
+  and allowed by the guarantee relation. We can show that transitions
+  corresponding to applications of \eqref{eq:extend} are contained in
+  the \extendG relation.
+\end{proof}
 
 
 \paragraph{Action shifting}
-Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
-of those actions that do not affect the subjective view of the shared
-state, as well as rewriting the behaviour of actions to gain a more
-accurate account of their effect. This is achieved through
-\emph{action shifting}, which allows the swapping of one global action
-model for another one that is equivalent. Here, being equivalent means
-that there is some fence that sees them as equivalent, in that actions
-from the new global action model contains only actions with the same
-effect from the old one, and moreover any action from the old one that
-affects the subjective state has to remain in the new one. Since we
-are working at the level of a subjective view and not the whole shared
-state, we need to refine our notion of action application and fences.
+Notice that, according to our rely and guarantee conditions, the local
+action model may only grow with time. However, that is not to say that
+the same holds of interference relations in shared state assertions:
+as seen in \S\ref{sec:intuition}, they may forget about actions that
+are either redundant or not relevant to the current subjective
+view via \emph{shifting}. As for the action closure relation
+(Definition~\ref{def:actclos}), this needs to be the case not only
+from the current subjective view but also for any evolution of it
+according to potential actions, both from the thread and the
+environment. To capture this set of possible futures, we refine our
+notion of local fences (Definition~\ref{def:locfence}), which was
+defined in the context of the global shared state, to the case where
+we consider only a subjective state within the global shared state.
+For this, we need to also refine a second time our notion of action
+application to ignore the context of a subjective state, which as far
+as a subjective view is concerned could be anything.
+
+%% Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
+%% of those actions that do not affect the subjective view of the shared
+%% state, as well as rewriting the behaviour of actions to gain a more
+%% accurate account of their effect. This is achieved through
+%% \emph{action shifting}, which allows the swapping of one global action
+%% model for another one that is equivalent. Here, being equivalent means
+%% that there is some fence that sees them as equivalent, in that actions
+%% from the new global action model contains only actions with the same
+%% effect from the old one, and moreover any action from the old one that
+%% affects the subjective state has to remain in the new one. Since we
+%% are working at the level of a subjective view and not the whole shared
+%% state, we need to refine our notion of action application and fences.
 
 \begin{definition}[Subjective action application]
-  The \emph{subjective application} $a(l)$ of an action $a$ on a
-  logical state $l$ is defined as follows:
+  The \emph{subjective application} $a(s)$ of an action $a$ on a
+  logical state $s$ is defined as follows:
   \[
-  a(l) == a[l,l - (l\meetL \m{fst}(\updateFP{a}))]
+  a(s) == a[s,s - (s\meetL \m{fst}(\updateFP{a}))]
   \]
 \end{definition}
+
+Note that, in contrast with $a[l]$, only part of the active
+precondition $p' = \m{fst}(\updateFP{a})$ has to intersect with the
+subjective view $s$ for $a(s)$ to apply. Thus, we fabricate a context
+that will satisfy the rest of $p'$ to be able to reuse our $a[s,r]$
+definition.
 
 \begin{definition}[Fenced action model]
   An action model $\gmod \in \AMods$ is \emph{fenced} by $\fence{}
@@ -518,21 +588,36 @@ state, we need to refine our notion of action application and fences.
 \]
 \end{definition}
 
-Note that, in contrast with $a[l]$, only part of the active
-precondition has to intersect with the subjective view.
+In contrast with local fences, fences do not require that actions be
+confined inside the subjective state.  We lift the notion of fences to
+assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
+\IAssertions$:
+\begin{align*}
+  \fenceAss{} \fences I &\iffdef \for{\lenv,\ca{}}
+  \{ l \mid l, \lenv \slsat F \} \fences \semI[\lenv]{I}(\ca{})
+  %% \fenceAss{} \strictfences I &\iffdef \for{\lenv,\ca{}}
+  %% \{ l \mid l, \lenv \slsat F \} \strictfences \semI[\lenv]{I}(\ca{})
+\end{align*}
 
-In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
+
+For instance, a possible fence for the interference assertion
+$I_{\li{y}}$ of \fig\ref{fig:concurrentInc} is
 \[
-\fence{x} \eqdef\begin{array}[t]{L}
-\left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
-\cdots, 10\} \right\} \cup\\
-\left\{\cell{x}{v+1} * \cell{z}{v} \mid v
-\in \{0 ,\cdots, 9 \}\right\}
+\fence{\li{y}} \eqdef\begin{array}[t]{L}
+\left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+\ldots, 10\} \right\} \cup\\
+\left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+\ldots, 10\} \right\}
 \end{array}
+\]
+Or equivalently, expressed as an assertion:
+\[
+F_{\li{y}} \eqdef
+\bigvee_{v = 0}^{10} (x|-> v * y|->v) |/ (x|->v+1 * y|->v)
 \]
 
 \julescomment{Find better/more examples, perhaps of non-fencing as
-  well.}
+  well?}
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -572,11 +657,11 @@ In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
     \mathcal{P} \subseteq \fence{} \land \fence{} \fences \gmod
     \land
     \for{l\in \fence{}}\for{\ca{}}\\
-    \quad\for{a\in\gmod'(\ca{})}
-    \m{present}(a,l,\gmod(\ca{})) /|\null\\
-    \quad\for{a\in\gmod(\ca{})}
-    a(l)\text{ is defined} /|\m{visible}(a,l) =>
-    \m{present}(a,l,\gmod(\ca{}))
+    \ (\for{a\in\gmod'(\ca{})}
+    \m{reflected}(a,l,\gmod(\ca{}))) /|\null\\
+    \ \for{a\in\gmod(\ca{})}
+    a(l)\text{ is defined} {/|}\m{visible}(a,l) {=>}
+    \m{reflected}(a,l,\gmod(\ca{}))
     %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
     %% \left(\begin{array}{L}
     %%   (p, q) \in \gmod'(\ca{}) 
@@ -592,18 +677,34 @@ In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
   \end{array}
   \]
 \end{definition}
-%
-%
-\julescomment{TODO: update words.}
-%
-%
-Intuitively, there exists an invariant $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\gmod$ and 
-\begin{enumerate}
-	\item if an action in $\gmod'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\gmod$ whose precondition is also satisfiable by $l \composeL r$. 
-	\item if an action in $\gmod$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\gmod'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL p' = \{\unitL\}$ where $(p', q')$ denotes the update footprint of the action; \emph{or}  the resultant state ($q' \composeL l'$) is undefined.
-\end{enumerate} 
-%
-%
+
+The first conjunct expresses the fact that the new action model
+$\gmod'$ cannot invent new actions not present in $\gmod$, and the
+second one that $\gmod'$ has to include all the visible potential
+actions of $\gmod$. We lift $\weakenI{}$ to assertions as follows:
+\[
+I \weakenI{P} I' == \V{\lenv,\ca{}} \semI[\lenv]{I} \weakenI{\{s|||
+  s,\lenv\slsat P\}} \semI[\lenv]{I'}
+\]
+
+
+%% Intuitively, there exists an invariant $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\gmod$ and 
+%% \begin{enumerate}
+%% 	\item if an action in $\gmod'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\gmod$ whose precondition is also satisfiable by $l \composeL r$. 
+%% 	\item if an action in $\gmod$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\gmod'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL p' = \{\unitL\}$ where $(p', q')$ denotes the update footprint of the action; \emph{or}  the resultant state ($q' \composeL l'$) is undefined.
+%% \end{enumerate} 
+
+
+\begin{lemma}
+  The semantic implications \eqref{eq:shift} is valid.
+\end{lemma}
+\begin{proof}[Proof (sketch)]
+  It suffices to show that the repartitioning ($\semimplies$) is valid
+  and allowed by the guarantee relation. We can show that transitions
+  corresponding to applications of \eqref{eq:shift} are contained in
+  the \shiftG relation.
+\end{proof}
+
 %We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
 %%
 %%

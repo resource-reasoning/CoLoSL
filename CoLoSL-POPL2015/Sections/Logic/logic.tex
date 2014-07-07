@@ -198,6 +198,7 @@ the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$) or
 $([y:v,z:v],\emptyset),\emptyset)$ (for $I_{\li{y}}$).
 
 \begin{definition}[Action confinement]
+  \label{def:actconf}
   An action $a$ is \emph{confined} to a logical state $g$, written
   $g\containI a$, if
   \[
@@ -369,8 +370,8 @@ have their standard classical meaning. Interference assertions $I$
 describe actions enabled by a given capability, in the form of a pre
 and post-condition. A shared state assertion $\shared P I$ is true of
 $(l,g,\lmod,\gmod)$ when a subjective view $s$ satisfying $P$ and
-$g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
 undergoing interferences $I$ can be found in the global shared state
+$g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
 and $\gmod$ \emph{agree} given the decomposition $s$, $r$ in the
 following sense:
 \begin{enumerate}
@@ -583,6 +584,7 @@ write
 resources in the prestate of $a$.
 
 \begin{definition}[Action model closure]
+  \label{def:actclos}
   A pair $(\lmod, \gmod)$ of action models is \emph{closed} under a
   subjective state $s$, context $r$, and action model $\lmod'$,
   written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if
