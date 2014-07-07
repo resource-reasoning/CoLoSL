@@ -416,7 +416,18 @@ In both judgements, $\semimplies$ denotes the repartitioning of the state as des
 %shifting, and action model closure, which were informally introduced
 %above. Central to these definitions is the concept of fences.
 In this section we formalise the notions of action action model containment and action shifting, which were informally introduced in \S\ref{sec:logic}. Central to these definitions is the concept of fences.
-%
+
+We lift the notion of fences and local fences to
+assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
+\IAssertions$:
+\begin{align*}
+  \fenceAss{} \fences I &\iffdef \for{\lenv,\ca{}}
+  \{ l \mid l, \lenv \slsat F \} \fences \semI[\lenv]{I}(\ca{})\\
+  \fenceAss{} \strictfences I &\iffdef \for{s,\lenv,\ca{}}
+  \{ l \mid l, \lenv \slsat F \} \strictfences \semI[\lenv]{I}(\ca{})
+\end{align*}
+
+
 \paragraph{Shared state extension}
 Recall from \S\ref{subsec:extend} that one may always \emph{extend}
 the shared state using local resources from the current state of a
