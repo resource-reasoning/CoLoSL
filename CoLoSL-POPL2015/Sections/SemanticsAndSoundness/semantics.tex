@@ -593,73 +593,73 @@ Intuitively, there exists an invariant $\fence{}$ that contains the states in $\
 \end{enumerate} 
 %
 %
-We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
+%We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
+%%
+%%
+%\begin{figure*}
+%\hrule\vspace*{5pt}
+%\begin{mathpar}
+%	\infer[\proofRule{Hide}]{
+%		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} * \fenceAss{}' 
+%		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
+%		&\exact{\fenceAss{}}
+%%		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
+%		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
+%		& \precise{P}
+%		& \precise{\fenceAss{}'}
+%	}
 %
 %
-\begin{figure*}
-\hrule\vspace*{5pt}
-\begin{mathpar}
-	\infer[\proofRule{Hide}]{
-		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} * \fenceAss{}' 
-		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
-		&\exact{\fenceAss{}}
-%		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
-		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
-		& \precise{P}
-		& \precise{\fenceAss{}'}
-	}
-
-
-	\infer[\proofRule{False-L}]{	
-		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&F \sepish P \entails \m{false}
-	}
-	
-	
-	\infer[\proofRule{False-R}]{	
-		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&F \sepish Q \entails \m{false}
-	}
-
-
-	\infer[\proofRule{Expand/Contract}]{
-%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
-		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
-	}
-	{	
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&\bigwedge\limits_{i \in J} \exact{R_i}
-		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
-	}
-\end{mathpar}
-%\[
-%%\infer{
-%%	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
-%%	I 	
-%%}{
-%%	R \entails \fenceAss{} 
-%%	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
-%%	&\exact{\fenceAss{} \intersect Q}
-%%	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
-%%}\\\\
-%\]
-\hrule
-%\vspace*{5pt}
-\caption{Action shifting rules.}
-\label{fig:shiftRules}
-\end{figure*}
+%	\infer[\proofRule{False-L}]{	
+%		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&F \sepish P \entails \m{false}
+%	}
+%	
+%	
+%	\infer[\proofRule{False-R}]{	
+%		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&F \sepish Q \entails \m{false}
+%	}
+%
+%
+%	\infer[\proofRule{Expand/Contract}]{
+%%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+%		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
+%	}
+%	{	
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&\bigwedge\limits_{i \in J} \exact{R_i}
+%		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
+%	}
+%\end{mathpar}
+%%\[
+%%%\infer{
+%%%	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+%%%	I 	
+%%%}{
+%%%	R \entails \fenceAss{} 
+%%%	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+%%%	&\exact{\fenceAss{} \intersect Q}
+%%%	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
+%%%}\\\\
+%%\]
+%\hrule
+%%\vspace*{5pt}
+%\caption{Action shifting rules.}
+%\label{fig:shiftRules}
+%\end{figure*}
 
 
 %
