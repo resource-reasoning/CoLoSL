@@ -1,258 +1,7 @@
 \section{\colosl rules}
 \todo Section title must change.
 \todo introductory paragraph to summarise this section?
-\subsection{Interference manipulations}\label{subsec:extension}
-%The rest of the semantic development of this section concerns the
-%formalisation of the notions of well-formed states, action
-%shifting, and action model closure, which were informally introduced
-%above. Central to these definitions is the concept of fences.
-In this section we formalise the notions of action action model containment and action shifting, which were informally introduced in \S\ref{sec:logic}. Central to these definitions is the concept of fences.
 %
-\paragraph{Shared state extension}
-Recall from \S\ref{subsec:extend} that one may always \emph{extend}
-the shared state using local resources from the current state of a
-thread. In doing so, one must specify the interference relation over
-newly shared resources. While in \colosl the new interferences may
-mention parts of the shared state beyond the newly added resources,
-they must not allow visible updates to those parts, so as not to
-invalidate other threads' views of existing resources. We thus impose
-a locality condition on the newly added behaviour to ensure sound
-extension of the shared state. This is informally illustrated in the
-following example.
-%
-\begin{example}\label{ex:badExtension}
-Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{b}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
-$
-	I' \eqdef 
-		\left(
-			\token{a}: 
-			\left\{
-			\begin{array}{@{}l@{}} 
-				\cell{x}{1} \swap \cell{x}{2}\\
-				\cell{y}{1} \swap \cell{y}{3}
-			\end{array}
-			\right\}
-		 \right)
-$.
-In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $[\token{a}]$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $[\token{b}]$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
-\end{example}
-%
-%
-In order to ensure sound extension of the shared state, we require that the newly introduced interferences are confined to the locally owned resources (\textit{cf.} \eqref{eq:extend}).
-%
-\begin{definition}
-  A set of states $\mathcal P$ \emph{contains} an action model
-  $\gmod$, written $\mathcal P \containI \gmod$, if
-  \[
-  \E{\fence{}} \mathcal P\subseteq \fence{} /| \fence{} \strictfences \gmod
-  \]
-\end{definition}
-
-We lift the notion of containment to assertions as follows where given $P \in \Assertions$ and $I \in \IAssertions$:
-%
-\[
-	P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
-\]
-%
-
-
-\paragraph{Action shifting}
-Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
-of those actions that do not affect the subjective view of the shared
-state, as well as rewriting the behaviour of actions to gain a more
-accurate account of their effect. This is achieved through
-\emph{action shifting}, which allows the swapping of one global action
-model for another one that is equivalent. Here, being equivalent means
-that there is some fence that sees them as equivalent, in that actions
-from the new global action model contains only actions with the same
-effect from the old one, and moreover any action from the old one that
-affects the subjective state has to remain in the new one. Since we
-are working at the level of a subjective view and not the whole shared
-state, we need to refine our notion of action application and fences.
-
-\begin{definition}[Subjective action application]
-  The \emph{subjective application} $a(l)$ of an action $a$ on a
-  logical state $l$ is defined as follows:
-  \[
-  a(l) == a[l,l - (l\meetL \m{fst}(\updateFP{a}))]
-  \]
-\end{definition}
-
-\begin{definition}[Fenced action model]
-  An action model $\gmod \in \AMods$ is \emph{fenced} by $\fence{}
-  \in \pset{\LStates}$, written $\fence{} \fences \gmod$, if, for
-  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\gmod)$,
-\[
-\begin{array}{L}
-  a(l)\text{ is defined} /| \m{visible}(a,l) => a(l)\in\fence{}
-  %% (p, q) \in \gmod(\ca{}) /|
-  %% p \meetL l \not= \emptyset /|
-  %% \updateFP{p, q} = (p', q') \land\\
-  %% p' \maxMeetL l = p'' \land
-  %% p'' /= \unitL \land
-  %% l = p'' \composeL l' /|
-  %% q' \compatL l'
-  %% =>
-  %% q' \composeL l' \in \fence{}
-\end{array}
-\]
-\end{definition}
-
-Note that, in contrast with $a[l]$, only part of the active
-precondition has to intersect with the subjective view.
-
-In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
-\[
-\fence{x} \eqdef\begin{array}[t]{L}
-\left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
-\cdots, 10\} \right\} \cup\\
-\left\{\cell{x}{v+1} * \cell{z}{v} \mid v
-\in \{0 ,\cdots, 9 \}\right\}
-\end{array}
-\]
-
-\julescomment{Find better/more examples, perhaps of non-fencing as
-  well.}
-
-
-%%%%%%%%%%%%%%%%%%%%%
-%% \paragraph{Fences}
-%% A subjective state represents the instantaneous view of a thread at a
-%% particular instant. However, this view is subject to interferences by
-%% other threads, as well as by the thread's own actions, as specified by
-%% an action model. To reason on such states, it makes sense to consider
-%% all its potential future incarnations with respect to these
-%% modifications.  
-
-%% %  F |> s <==> \forall p, q, k, l, l', p',
-%% %    (p,q)\in s(k) /\ l o l' o p' is defined /\ l o l'\in F /\ l o p' = p /\ l\neq\emptyset
-%% %      => \exists f, l'', q'. l = l'' o f /\ q = f o q' /\
-%% %            (l''\neq\emptyset /\ q # l' => l' o q\in F)
-
-
-%% We are now ready to describe what effect an action $a$ can have on a
-%% \emph{subjective} state $l$: because the subjective state is not the
-%% whole shared state, the precondition of $a$ only needs to be
-%% \emph{compatible} with $l$. When that is the case, the action consumes
-%% the part of its active precondition that intersects with $l$ and plugs
-%% in its active postcondition instead, provided that the result is
-%% defined.
-
-
-
-
-
-\begin{definition}[Action shifting]
-  Given $\gmod, \gmod' \in \AMods$ and $\mathcal{P} \in
-  \pset{\LStates}$, $\gmod'$ is a \emph{shifting} of $\gmod$ with
-  respect to $\mathcal{P}$, written $\gmod \weakenI{\mathcal{P}}
-  \gmod'$, if there exists a fence $\fence{}$ such that
-  \[
-  \begin{array}{L}
-    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \gmod
-    \land
-    \for{l\in \fence{}}\for{\ca{}}\\
-    \quad\for{a\in\gmod'(\ca{})}
-    \m{present}(a,l,\gmod(\ca{})) /|\null\\
-    \quad\for{a\in\gmod(\ca{})}
-    a(l)\text{ is defined} /|\m{visible}(a,l) =>
-    \m{present}(a,l,\gmod(\ca{}))
-    %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
-    %% \left(\begin{array}{L}
-    %%   (p, q) \in \gmod'(\ca{}) 
-    %%   \land p \leq l \composeL r => \\
-    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in
-    %%   \gmod(\ca{}) \land p' \composeL f \leq l \composeL r
-    %% \end{array}\right) /|\\
-    %% \left(\begin{array}{L}
-    %% (p, q) \in \gmod(\ca{})
-    %%   \land p \composeL l' = l \composeL r /| q'\compatL l' /| l \meetL p' /= \{ \unitL \} => \\
-    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \gmod'(\ca{}) \land p' \composeL f \leq l \composeL r
-    %% \end{array}\right)
-  \end{array}
-  \]
-\end{definition}
-%
-%
-\julescomment{TODO: update words.}
-%
-%
-Intuitively, there exists an invariant $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\gmod$ and 
-\begin{enumerate}
-	\item if an action in $\gmod'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\gmod$ whose precondition is also satisfiable by $l \composeL r$. 
-	\item if an action in $\gmod$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\gmod'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL p' = \{\unitL\}$ where $(p', q')$ denotes the update footprint of the action; \emph{or}  the resultant state ($q' \composeL l'$) is undefined.
-\end{enumerate} 
-%
-%
-We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
-%
-%
-\begin{figure*}
-\hrule\vspace*{5pt}
-\begin{mathpar}
-	\infer[\proofRule{Hide}]{
-		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} * \fenceAss{}' 
-		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
-		&\exact{\fenceAss{}}
-%		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
-		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
-		& \precise{P}
-		& \precise{\fenceAss{}'}
-	}
-
-
-	\infer[\proofRule{False-L}]{	
-		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&F \sepish P \entails \m{false}
-	}
-	
-	
-	\infer[\proofRule{False-R}]{	
-		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
-		I 	
-	}{
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&F \sepish Q \entails \m{false}
-	}
-
-
-	\infer[\proofRule{Expand/Contract}]{
-%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
-		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
-	}
-	{	
-		R \entails \fenceAss{} 
-		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		&\bigwedge\limits_{i \in J} \exact{R_i}
-		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
-	}
-\end{mathpar}
-%\[
-%%\infer{
-%%	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
-%%	I 	
-%%}{
-%%	R \entails \fenceAss{} 
-%%	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
-%%	&\exact{\fenceAss{} \intersect Q}
-%%	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
-%%}\\\\
-%\]
-\hrule
-%\vspace*{5pt}
-\caption{Action shifting rules.}
-\label{fig:shiftRules}
-\end{figure*}
-
-
 \subsection{Rely, Guarantee, Stability}
 %
 %
@@ -660,8 +409,263 @@ In both judgements, $\semimplies$ denotes the repartitioning of the state as des
 %In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
 %
 %
+%
+\subsection{Interference manipulations}\label{subsec:extension}
+%The rest of the semantic development of this section concerns the
+%formalisation of the notions of well-formed states, action
+%shifting, and action model closure, which were informally introduced
+%above. Central to these definitions is the concept of fences.
+In this section we formalise the notions of action action model containment and action shifting, which were informally introduced in \S\ref{sec:logic}. Central to these definitions is the concept of fences.
+%
+\paragraph{Shared state extension}
+Recall from \S\ref{subsec:extend} that one may always \emph{extend}
+the shared state using local resources from the current state of a
+thread. In doing so, one must specify the interference relation over
+newly shared resources. While in \colosl the new interferences may
+mention parts of the shared state beyond the newly added resources,
+they must not allow visible updates to those parts, so as not to
+invalidate other threads' views of existing resources. We thus impose
+a locality condition on the newly added behaviour to ensure sound
+extension of the shared state. This is informally illustrated in the
+following example.
+%
+\begin{example}\label{ex:badExtension}
+Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{b}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} \!\lor\! \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where 
+$
+	I' \eqdef 
+		\left(
+			\token{a}: 
+			\left\{
+			\begin{array}{@{}l@{}} 
+				\cell{x}{1} \swap \cell{x}{2}\\
+				\cell{y}{1} \swap \cell{y}{3}
+			\end{array}
+			\right\}
+		 \right)
+$.
+In extending the shared state, the current thread also extended the interference allowed on the shared state by adding two new actions associated with the newly generated capability resource $[\token{a}]$ as given in $I'$. The first action specifies how the value of location $x$ can be updated. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state. On the other hand, the second action introduces a new way in which the value of location $y$ can be mutated. To other threads the only updates allowed on location $y$ are done through the $[\token{b}]$ capability as specified in $I$ and thus this new behaviour is unbeknownst to them. As such, this action violates the view of other threads and does not agree with the existing interference.
+\end{example}
+%
+%
+In order to ensure sound extension of the shared state, we require that the newly introduced interferences are confined to the locally owned resources (\textit{cf.} \eqref{eq:extend}).
+%
+\begin{definition}
+  A set of states $\mathcal P$ \emph{contains} an action model
+  $\gmod$, written $\mathcal P \containI \gmod$, if
+  \[
+  \E{\fence{}} \mathcal P\subseteq \fence{} /| \fence{} \strictfences \gmod
+  \]
+\end{definition}
+
+We lift the notion of containment to assertions as follows where given $P \in \Assertions$ and $I \in \IAssertions$:
+%
+\[
+	P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
+\]
+%
+
+
+\paragraph{Action shifting}
+Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
+of those actions that do not affect the subjective view of the shared
+state, as well as rewriting the behaviour of actions to gain a more
+accurate account of their effect. This is achieved through
+\emph{action shifting}, which allows the swapping of one global action
+model for another one that is equivalent. Here, being equivalent means
+that there is some fence that sees them as equivalent, in that actions
+from the new global action model contains only actions with the same
+effect from the old one, and moreover any action from the old one that
+affects the subjective state has to remain in the new one. Since we
+are working at the level of a subjective view and not the whole shared
+state, we need to refine our notion of action application and fences.
+
+\begin{definition}[Subjective action application]
+  The \emph{subjective application} $a(l)$ of an action $a$ on a
+  logical state $l$ is defined as follows:
+  \[
+  a(l) == a[l,l - (l\meetL \m{fst}(\updateFP{a}))]
+  \]
+\end{definition}
+
+\begin{definition}[Fenced action model]
+  An action model $\gmod \in \AMods$ is \emph{fenced} by $\fence{}
+  \in \pset{\LStates}$, written $\fence{} \fences \gmod$, if, for
+  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\gmod)$,
+\[
+\begin{array}{L}
+  a(l)\text{ is defined} /| \m{visible}(a,l) => a(l)\in\fence{}
+  %% (p, q) \in \gmod(\ca{}) /|
+  %% p \meetL l \not= \emptyset /|
+  %% \updateFP{p, q} = (p', q') \land\\
+  %% p' \maxMeetL l = p'' \land
+  %% p'' /= \unitL \land
+  %% l = p'' \composeL l' /|
+  %% q' \compatL l'
+  %% =>
+  %% q' \composeL l' \in \fence{}
+\end{array}
+\]
+\end{definition}
+
+Note that, in contrast with $a[l]$, only part of the active
+precondition has to intersect with the subjective view.
+
+In the example of \fig\ref{fig:concurrentInc}, $I_x$ is fenced by
+\[
+\fence{x} \eqdef\begin{array}[t]{L}
+\left\{\cell{x}{v} * \cell{z}{v} \mid v \in \{0,
+\cdots, 10\} \right\} \cup\\
+\left\{\cell{x}{v+1} * \cell{z}{v} \mid v
+\in \{0 ,\cdots, 9 \}\right\}
+\end{array}
+\]
+
+\julescomment{Find better/more examples, perhaps of non-fencing as
+  well.}
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%% \paragraph{Fences}
+%% A subjective state represents the instantaneous view of a thread at a
+%% particular instant. However, this view is subject to interferences by
+%% other threads, as well as by the thread's own actions, as specified by
+%% an action model. To reason on such states, it makes sense to consider
+%% all its potential future incarnations with respect to these
+%% modifications.  
+
+%% %  F |> s <==> \forall p, q, k, l, l', p',
+%% %    (p,q)\in s(k) /\ l o l' o p' is defined /\ l o l'\in F /\ l o p' = p /\ l\neq\emptyset
+%% %      => \exists f, l'', q'. l = l'' o f /\ q = f o q' /\
+%% %            (l''\neq\emptyset /\ q # l' => l' o q\in F)
+
+
+%% We are now ready to describe what effect an action $a$ can have on a
+%% \emph{subjective} state $l$: because the subjective state is not the
+%% whole shared state, the precondition of $a$ only needs to be
+%% \emph{compatible} with $l$. When that is the case, the action consumes
+%% the part of its active precondition that intersects with $l$ and plugs
+%% in its active postcondition instead, provided that the result is
+%% defined.
+
+
+
+
+
+\begin{definition}[Action shifting]
+  Given $\gmod, \gmod' \in \AMods$ and $\mathcal{P} \in
+  \pset{\LStates}$, $\gmod'$ is a \emph{shifting} of $\gmod$ with
+  respect to $\mathcal{P}$, written $\gmod \weakenI{\mathcal{P}}
+  \gmod'$, if there exists a fence $\fence{}$ such that
+  \[
+  \begin{array}{L}
+    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \gmod
+    \land
+    \for{l\in \fence{}}\for{\ca{}}\\
+    \quad\for{a\in\gmod'(\ca{})}
+    \m{present}(a,l,\gmod(\ca{})) /|\null\\
+    \quad\for{a\in\gmod(\ca{})}
+    a(l)\text{ is defined} /|\m{visible}(a,l) =>
+    \m{present}(a,l,\gmod(\ca{}))
+    %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
+    %% \left(\begin{array}{L}
+    %%   (p, q) \in \gmod'(\ca{}) 
+    %%   \land p \leq l \composeL r => \\
+    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in
+    %%   \gmod(\ca{}) \land p' \composeL f \leq l \composeL r
+    %% \end{array}\right) /|\\
+    %% \left(\begin{array}{L}
+    %% (p, q) \in \gmod(\ca{})
+    %%   \land p \composeL l' = l \composeL r /| q'\compatL l' /| l \meetL p' /= \{ \unitL \} => \\
+    %%   \hspace*{0.4cm}\exsts{f} (p' \composeL f, q' \composeL f) \in \gmod'(\ca{}) \land p' \composeL f \leq l \composeL r
+    %% \end{array}\right)
+  \end{array}
+  \]
+\end{definition}
+%
+%
+\julescomment{TODO: update words.}
+%
+%
+Intuitively, there exists an invariant $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\gmod$ and 
+\begin{enumerate}
+	\item if an action in $\gmod'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\gmod$ whose precondition is also satisfiable by $l \composeL r$. 
+	\item if an action in $\gmod$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\gmod'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL p' = \{\unitL\}$ where $(p', q')$ denotes the update footprint of the action; \emph{or}  the resultant state ($q' \composeL l'$) is undefined.
+\end{enumerate} 
+%
+%
+We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
+%
+%
+\begin{figure*}
+\hrule\vspace*{5pt}
+\begin{mathpar}
+	\infer[\proofRule{Hide}]{
+		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
+		I 	
+	}{
+		R \entails \fenceAss{} * \fenceAss{}' 
+		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
+		&\exact{\fenceAss{}}
+%		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
+		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
+		& \precise{P}
+		& \precise{\fenceAss{}'}
+	}
+
+
+	\infer[\proofRule{False-L}]{	
+		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+		I 	
+	}{
+		R \entails \fenceAss{} 
+		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+		&F \sepish P \entails \m{false}
+	}
+	
+	
+	\infer[\proofRule{False-R}]{	
+		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+		I 	
+	}{
+		R \entails \fenceAss{} 
+		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+		&F \sepish Q \entails \m{false}
+	}
+
+
+	\infer[\proofRule{Expand/Contract}]{
+%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
+	}
+	{	
+		R \entails \fenceAss{} 
+		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+		&\bigwedge\limits_{i \in J} \exact{R_i}
+		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
+	}
+\end{mathpar}
+%\[
+%%\infer{
+%%	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+%%	I 	
+%%}{
+%%	R \entails \fenceAss{} 
+%%	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+%%	&\exact{\fenceAss{} \intersect Q}
+%%	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
+%%}\\\\
+%\]
+\hrule
+%\vspace*{5pt}
+\caption{Action shifting rules.}
+\label{fig:shiftRules}
+\end{figure*}
+
+
+%
 \subsection{Soundness}
-In this section we show that the program logic of \colosl\ is sound. We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
+In this section we show that the program logic of \colosl\ is sound. We proceed with the definition of a \emph{valid} triple that relates the proof rules (Hoare triples) to the operational semantics of \colosl. In what follows, we write $C, m \rightarrow^{\text{*}} C', m'$ to denote the operational semantics relation where $C, C' \in \textsf{Comm}$ and $m, m' \in \Heaps$. We define a reification function that relates a \colosl\ world $w \in \Worlds$, to concrete states in \Heaps.
+%We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
 %
 \begin{definition}[Reification]\label{def:reification}
 The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}$ is defined as:
@@ -671,8 +675,6 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 \]
 %
 \end{definition}
-%
-We now formalise the notion of a \emph{valid} triple where $-,- \rightarrow^{\text{*}} -,-: (\textsf{Comm} \times \Heaps ) \times (\textsf{Comm} \times \Heaps)$ denotes the operational semantics relation. 
 %
 %
 \begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\} C \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
@@ -688,16 +690,11 @@ We now formalise the notion of a \emph{valid} triple where $-,- \rightarrow^{\te
 \end{definition}
 %
 %
-\begin{definition}[Soundness]
-%
-The \colosl\ program logic is \emph{sound} iff\  $|-\!\{P\} C \{Q\} \implies |=\!\{P\} C \{Q\}$.
-%
-\end{definition}
 %
 %
 \begin{theorem}[Soundness]
 %
-The \colosl\ program logic is sound. 
+The \colosl\ program logic is sound. That is, if $|-\!\{P\} C \{Q\}$ then $|=\!\{P\} C \{Q\}$.
 %
 \begin{proof}(Sketch)
 We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 
