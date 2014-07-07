@@ -25,7 +25,8 @@ $1$ if \li{x} is one more than \li{y} and the environment can only
 increase \li{x} by one if \li{x} and \li{z} (and in fact \li{y}) have
 the same value. Finally, the programmer knows that the end result will
 be that the value of the cells given by \li{x}, \li{y} and \li{z} will
-be $10$.
+be $10$. Unlike previous work, \colosl can simply specify this complex
+behaviour of the resource associated with thread $\mathbb{P}_{\li y}$.
 
 \begin{figure*}
 \centering
@@ -113,10 +114,6 @@ x = 0; y = 0; z = 0;
 \end{figure*}
 
 
-\colosl
-can quite simply specify this complex behaviour of the
-resource associated with thread
-$\mathbb{P}_{\li y}$. 
 \colosl assertions comprise  standard assertions from the
 separation-logic literature~\cite{rey02,ramification},
 plus {\em subjective views} and {\em capabilities}. \colosl
