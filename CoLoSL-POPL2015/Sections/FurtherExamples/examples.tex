@@ -8,7 +8,7 @@ For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible span
 	\centering
 	\begin{tabular}{|c |}
 		\hline
-			\includegraphics[scale=0.27]{Sections/FurtherExamples/Images/graphWithRootEdge.pdf} \\
+			\includegraphics[scale=0.27]{Sections/FurtherExamples/Images/graph.pdf} \\
 		\hline
 	\end{tabular}
 \caption{A graph.}
@@ -255,7 +255,6 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 %
 \subsection{Set Module}
 \label{sec:set}
-\azaleacomment{Mention nestedness at some point.}
 We now look at the specification of a concurrent set module implemented as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in \cite{cap-ecoop10}. A typical set module provides three functionalities: \li{contains(v)}, \li{add(v)} and \li{remove(v)}.
 %The $\inSet{\var{h}}{\var{v}} $ predicate asserts that the set at \var{h} contains value \var{v}. Dually, $\outSet{\var{h}}{\var{v}}$ asserts that the set does not contain \var{v}. 
 As the name suggests, the \li{contains(v)} function checks whether value \var{v} is contained in the set; the \li{add(v)} and \command{remove(v)} functions add/remove value \var{v} to/from the list, respectively.
@@ -290,7 +289,7 @@ Finally, node $x$ is unlocked; its updated next pointer is returned to the share
 \includegraphics[scale=0.215]{Sections/FurtherExamples/Images/add3.pdf}
 %
 
-We can reason about the \li{remove} operation in a similar fashion. Note that the dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. Moreover, using the four principles of \mergeRule, \forgetRule, \shiftRule and \copyRule, we can grow and shrink our subjective views as needed. Lastly, since \colosl\ is parametric in the separation algebra of capabilities, we instantiate it with a heap-like separation algebra that is \emph{stateful} and allows for a more concise specification. That is, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$, we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address as demonstrated above. The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}.
+We can reason about the \li{remove} operation in a similar fashion. Note that the dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. Moreover, using the four principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed. Lastly, since \colosl\ is parametric in the separation algebra of capabilities, we instantiate it with a heap-like separation algebra that is \emph{stateful} and allows for a more concise specification. That is, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$, we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address as demonstrated above. The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}.
 %in that it limits the modifications on node $x$ with respect to its successor $y$. For instance, in order to remove the node at address $y$, a thread proceeds by first acquiring the locks on both $x$ and $y$ nodes. It then claims $x$'s next pointer and redirects it to $z$. In order to ensure that the thread indeed redirects $x$ to $z$ and not any arbitrary address, the we track the current successor of $x$ with $\nextC{x}{y}$ and consequently, in our reasoning, when the thread attempts to unlock $x$, its new successor is compared against the old one $y$ and only when  t of $y$  nodes at $x$ and $y$ when node $x$ is locked and the its next pointer has been temporarily claimed by the locking thread, 
 
 
