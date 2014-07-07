@@ -39,18 +39,18 @@ $I$, as we have used in the example above. The \emph{global action
   model} $\gmod$ extrapolates the effect of the actions in $\lmod$ to
 the global shared state $g$. Although worlds do not put further
 constraints on the relationship between $\lmod$ and $\gmod$, they will
-be linked more tightly in the semantics of assertions (in fact,
-$\gmod$ records only those actions that matter for the current
-subjective view, as will be formalised in \S\ref{sec:assertions}).
+be linked more tightly in the semantics of assertions.
+% (in fact, $\gmod$ records only those actions that matter for the current
+%subjective view, as will be formalised in \S\ref{sec:assertions}).
 
 As $g$ represents the global shared state, we will also require that
 actions in $\lmod$ are \emph{confined} to $g$ (which we write $g
-\containI \lmod$, \textit{i.e.} the part of state they mutate is
+\containI \lmod$, \textit{i.e.} the part of state they \emph{mutate} is
 always fully contained in $g$. Thus, these actions cannot affect new
 pieces of global state $g'$ disjoint from $g$. This is essential to
 enable extensions of the shared state. We will similarly require that
 new actions in any extension are confined to that extension in the
-same sense.
+same sense. Note that this does not prohibit \emph{referring} to existing parts of the shared state in the new actions; rather, it only safeguards against mutation of the already shared resources through new actions. 
 
 Finally, the composition of two worlds will be defined whenever their
 local states are disjoint and they agree on all other three
@@ -137,8 +137,7 @@ We write $\unitAM$ for an action model with empty domain.
 
 
 \paragraph{The effect of actions} As mentioned in the beginning of the
-section, we require that actions in the local and global action models
-are \emph{confined} to the global shared state.  Let us now introduce
+section, we require that the effect of actions in the local and global action models are \emph{confined} to the global shared state.  Let us now introduce
 the necessary machinery to describe how actions in $\lmod$ and $\gmod$
 act on the shared state $g$, which will allow us to define our
 confinement condition, and then the set of well-formed worlds.
@@ -169,20 +168,20 @@ the set notation.\footnote{In the general case, separation algebras
   may lack the \emph{disjointness} property, in which case
   intersection between two states may yield more than one state. Thus,
   our general definition introduces \emph{maximal intersections} to
-  restore unicity. Since our logical states satisfy disjointness,
+  restore unicity. Since in this paper our logical states satisfy disjointness,
   intersection is enough for our exposition.}
 
 An action $a = (p, q)$ is typically of the form $(p'\composeL c,
 q'\composeL c)$, \textit{i.e.} part of the state $c$ required for
 the action is \emph{passive} and acts as a mere \emph{catalyst} for
 the action: it has to be present for the action to take effect, but is
-left unchanged by the action. The \emph{active} of the action is then
+left unchanged by the action. The \emph{active} part of the action is then
 the pair $(p',q')$, which should be maximal in the sense that no
 further, non-empty catalyst can be found in $(p',q')$.
 
 \begin{definition}[Active part of an action]
   Given a pair of logical states $(p, q)$, its \emph{active part}
-  $\updateFP{p,q}$ is defined as the pair $(p', q')$ such that:
+  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
   \[
   \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
   c'\leq q' => c' = \unitL
@@ -252,7 +251,7 @@ corresponding actions. We write $\m{rg}(f)$ to denote the \emph{range}
 \begin{definition}[Locally-fenced action model]
   An action model $\lmod \in \AMods$ is \emph{locally fenced} by
   $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$,
-  if, for all $l \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
+  iff, for all $l \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
 \[
 \begin{array}{L}
   l\containI a /|
@@ -271,19 +270,19 @@ corresponding actions. We write $\m{rg}(f)$ to denote the \emph{range}
 
 A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$
 are compatible, the capabilities found in $l\composeL g$ exist in
-the action models, actions in the global action model correspond to
-actions in $\gmod$, and $\gmod$ is contained by $g$.
+the action models, actions in the global action model $\gmod$, correspond to
+actions in $\lmod$, and $\gmod$ is contained by $g$.
 
 \begin{definition}[Well-formedness]
   A 4-tuple $(l, g, \lmod, \gmod)$ is \emph{well-formed},
   written $\wf{(l, g, \lmod, \gmod)}$, if
   \[
   \begin{array}{L}
-    (\exsts{h,\ca{}}
-    l \composeL g = (h,\ca{}) \land \ca{}\subseteq \dom{\lmod})
+    (\exsts{\h{},\ca{}}
+    l \composeL g = (\h{},\ca{}) \land \ca{}\subseteq \dom{\lmod})
     /|\null\\
     (\V{\ca{}}\V{a\in\gmod(\ca{})}\E{a'\in\lmod(\ca{})}
-    \updateFP{a} = \updateFP{a'}) /| l\containI \gmod
+    \updateFP{a} = \updateFP{a'}) /| g \containI \gmod
   \end{array}
   \]
 \end{definition}
@@ -325,7 +324,7 @@ the form $(\unitL,g,\lmod,\gmod)$.
 
 Our assertions extend standard separation logic with \emph{subjective
   views}, as introduced in the previous section. \colosl is parametric
-with respect to the heap and capability assertions and can be
+with respect to the machine states and capability assertions and can be
 instantiated with any assertion language over states $\Heaps$ and
 capabilities $\Caps$. Here, we instantiate these languages for our
 particular instantiation with respect to our model. We assume infinite
@@ -369,7 +368,7 @@ satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
 have their standard classical meaning. Interference assertions $I$
 describe actions enabled by a given capability, in the form of a pre
 and post-condition. A shared state assertion $\shared P I$ is true of
-$(l,g,\lmod,\gmod)$ when a subjective view $s$ satisfying $P$ and
+$(l,g,\lmod,\gmod)$ when $l = \unitL$, a subjective view $s$ satisfying $P$ and
 undergoing interferences $I$ can be found in the global shared state
 $g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
 and $\gmod$ \emph{agree} given the decomposition $s$, $r$ in the
@@ -600,7 +599,7 @@ resources in the prestate of $a$.
   \V{a\in \lmod'(\ca{})}\\
   (\m{potential}(a,s\composeL r) =>
   \extendsAMUptob{\lmod,
-    \gmod}{n}{a[s\composeL r]}{\lmod'}) \land\hfill \textit{(4.)}\\
+    \gmod}{n}{a[s, r]}{\lmod'}) \land\hfill \textit{(4.)}\\
   \quad\m{enabled}(a,s\composeL r)
   => (s\composeL r,
   a[s\composeL r])\in \gmod(\ca{}))
@@ -609,7 +608,7 @@ resources in the prestate of $a$.
   \m{potential}(a,s\composeL r) =>\null\\
   \ \m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/\null\hfill \textit{(2.)}\\
   \ (\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
-  \extendsAMUptob{\lmod, \gmod}{n}{a[s\composeL r]}{\lmod'})\quad \textit{(4.)}
+  \extendsAMUptob{\lmod, \gmod}{n}{a[s, r]}{\lmod'})\quad \textit{(4.)}
   %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
   %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
   %% \land \updateFP{p, q} = (p', q')
@@ -652,7 +651,7 @@ steps on $g = s\composeL r$:
 This makes our assertions robust with respect to future extensions of
 the shared state, where potentially enabled actions may be become
 enabled using additional catalyst that is not immediately
-present. Second, $\gmod$ only has to records actions from $\lmod'$
+present. Second, $\gmod$ only has to record actions from $\lmod'$
 that are enabled in any $g$ resulting from these steps, hence
 immediately possible. Finally, $\lmod'$ (and thus interference
 assertions) needs not reflect actions that have no visible effect on
@@ -708,10 +707,10 @@ action model.
   \shared{x|->1}{I} * \shared{y|->0}{\emptyset}
   \]
   Assertion $\shared{(x|->0 * y|-> 0) |/ x|->1}{I}$ is true of states
-  $(\unitL,g,\lmod,\gmod)$ where $g$ satisfies $x|->0 * y|-> 0$, in
+  $(\unitL,g,\lmod,\gmod)$ where parts of $g$ satisfies $x|->0 * y|-> 0$, in
   which case $\gmod$ has to include the action associated with $\token
   a$ in $I$ according to our closure condition, and of states
-  $(\unitL,g',\lmod',\gmod')$ where $g'$ satisfies $x|->1$, in which
+  $(\unitL,g',\lmod',\gmod')$ where parts of $g'$ satisfies $x|->1$, in which
   case $\gmod'$ need not contain the action. The second conjunct
   $\shared{y|->0}{\emptyset}$ does not allow the action to appear in
   the global action models, because it potentially affects $y|->0$ yet
