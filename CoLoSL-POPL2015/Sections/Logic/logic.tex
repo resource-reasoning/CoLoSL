@@ -39,18 +39,18 @@ $I$, as we have used in the example above. The \emph{global action
   model} $\gmod$ extrapolates the effect of the actions in $\lmod$ to
 the global shared state $g$. Although worlds do not put further
 constraints on the relationship between $\lmod$ and $\gmod$, they will
-be linked more tightly in the semantics of assertions (in fact,
-$\gmod$ records only those actions that matter for the current
-subjective view, as will be formalised in \S\ref{sec:assertions}).
+be linked more tightly in the semantics of assertions.
+% (in fact, $\gmod$ records only those actions that matter for the current
+%subjective view, as will be formalised in \S\ref{sec:assertions}).
 
 As $g$ represents the global shared state, we will also require that
 actions in $\lmod$ are \emph{confined} to $g$ (which we write $g
-\containI \lmod$, \textit{i.e.} the part of state they mutate is
+\containI \lmod$, \textit{i.e.} the part of state they \emph{mutate} is
 always fully contained in $g$. Thus, these actions cannot affect new
 pieces of global state $g'$ disjoint from $g$. This is essential to
 enable extensions of the shared state. We will similarly require that
 new actions in any extension are confined to that extension in the
-same sense.
+same sense. Note that this does not prohibit \emph{referring} to existing parts of the shared state in the new actions; rather, it only safeguards against mutation of the already shared resources through new actions. 
 
 Finally, the composition of two worlds will be defined whenever their
 local states are disjoint and they agree on all other three
@@ -367,7 +367,7 @@ satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
 have their standard classical meaning. Interference assertions $I$
 describe actions enabled by a given capability, in the form of a pre
 and post-condition. A shared state assertion $\shared P I$ is true of
-$(l,g,\lmod,\gmod)$ when a subjective view $s$ satisfying $P$ and
+$(l,g,\lmod,\gmod)$ when $l = \unitL$, a subjective view $s$ satisfying $P$ and
 $g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
 undergoing interferences $I$ can be found in the global shared state
 and $\gmod$ \emph{agree} given the decomposition $s$, $r$ in the
@@ -597,7 +597,7 @@ resources in the prestate of $a$.
   \V{a\in \lmod'(\ca{})}\\
   (\m{potential}(a,s\composeL r) =>
   \extendsAMUptob{\lmod,
-    \gmod}{n}{a[s\composeL r]}{\lmod'}) \land\hfill \textit{(4.)}\\
+    \gmod}{n}{a[s, r]}{\lmod'}) \land\hfill \textit{(4.)}\\
   \quad\m{enabled}(a,s\composeL r)
   => (s\composeL r,
   a[s\composeL r])\in \gmod(\ca{}))
@@ -606,7 +606,7 @@ resources in the prestate of $a$.
   \m{potential}(a,s\composeL r) =>\null\\
   \ \m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/\null\hfill \textit{(2.)}\\
   \ (\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
-  \extendsAMUptob{\lmod, \gmod}{n}{a[s\composeL r]}{\lmod'})\quad \textit{(4.)}
+  \extendsAMUptob{\lmod, \gmod}{n}{a[s, r]}{\lmod'})\quad \textit{(4.)}
   %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
   %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
   %% \land \updateFP{p, q} = (p', q')
@@ -649,7 +649,7 @@ steps on $g = s\composeL r$:
 This makes our assertions robust with respect to future extensions of
 the shared state, where potentially enabled actions may be become
 enabled using additional catalyst that is not immediately
-present. Second, $\gmod$ only has to records actions from $\lmod'$
+present. Second, $\gmod$ only has to record actions from $\lmod'$
 that are enabled in any $g$ resulting from these steps, hence
 immediately possible. Finally, $\lmod'$ (and thus interference
 assertions) needs not reflect actions that have no visible effect on
@@ -705,10 +705,10 @@ action model.
   \shared{x|->1}{I} * \shared{y|->0}{\emptyset}
   \]
   Assertion $\shared{(x|->0 * y|-> 0) |/ x|->1}{I}$ is true of states
-  $(\unitL,g,\lmod,\gmod)$ where $g$ satisfies $x|->0 * y|-> 0$, in
+  $(\unitL,g,\lmod,\gmod)$ where parts of $g$ satisfies $x|->0 * y|-> 0$, in
   which case $\gmod$ has to include the action associated with $\token
   a$ in $I$ according to our closure condition, and of states
-  $(\unitL,g',\lmod',\gmod')$ where $g'$ satisfies $x|->1$, in which
+  $(\unitL,g',\lmod',\gmod')$ where parts of $g'$ satisfies $x|->1$, in which
   case $\gmod'$ need not contain the action. The second conjunct
   $\shared{y|->0}{\emptyset}$ does not allow the action to appear in
   the global action models, because it potentially affects $y|->0$ yet
