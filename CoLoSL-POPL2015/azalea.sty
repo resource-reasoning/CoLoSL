@@ -32,6 +32,7 @@
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
 \usepackage{relsize}
+\usepackage{wrapfig}
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{mathpartir}
@@ -441,6 +442,9 @@
 \DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4}
 \DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+%\DeclareDocumentCommand{\valueT}{m m}{#1.\uppercase{\textsf{#2}}}
+%\DeclareDocumentCommand{\modT}{m}{#1.\textsf{M}}
+%\DeclareDocumentCommand{\nextT}{m m}{#1.\textsf{N} \rightarrow #2}
 
 \newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
 \newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
@@ -453,6 +457,9 @@
 \DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\valueC}{m m}{\left[#1.\uppercase{\textsf{#2}} \right]}
+%\DeclareDocumentCommand{\modC}{m}{\left[#1.\textsf{M}\right]}
+%\DeclareDocumentCommand{\nextC}{m m}{\left[#1.\textsf{N} \rightarrow #2\right]}
 
 \newcommand{\isLock}[2]{\textsf{isLock}\left(#1, #2\right)}
 \newcommand{\locked}[1]{\textsf{locked}\left(#1 \right)}
