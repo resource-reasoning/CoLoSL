@@ -114,22 +114,6 @@ x = 0; y = 0; z = 0;
 \end{figure*}
 
 
-\colosl assertions comprise  standard assertions from the
-separation-logic literature~\cite{rey02,ramification},
-plus {\em subjective views} and {\em capabilities}. \colosl
-assertions are interpreted over a particular domain which includes:
-{thread-local} state exclusively visible to the thread; {\em one}
-global shared state accessible by all threads; and { interference
-actions}  describing how the global state can be updated. A subjective view  $\shared{P} I$ comprises assertion $P$ which
-gives {\em partial} information about the global
-shared state and interference relation $I$  which gives partial
-information about  how this
-part of the shared state may change by declaring actions of the form  $\token a :
-P' \swap Q$.  A capability assertion $[\token a]$ provides a thread with permission to 
-change that partial shared state using one of the actions associated
-with $\token a$ (in the example of this section, only one action is
-associated to each capability, but this need not be the case in \colosl).
-
 
 
 
