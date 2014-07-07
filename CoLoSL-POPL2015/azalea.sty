@@ -32,6 +32,7 @@
 %\usepackage{enumerate}
 %\usepackage{wrapfig}
 \usepackage{relsize}
+\usepackage{wrapfig}
 \usepackage{xcolor}
 \usepackage{microtype}
 \usepackage{mathpartir}
@@ -242,9 +243,10 @@
 \newcommand{\unitAM}{\emptyset}
 
 
-\newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
-\newcommand{\extendsAMUpto}[5]{\left(#1\right) \!\downarrow_{#2} \left(#3, #4, #5\right)}
-\newcommand{\expandsAM}[6]{#1 \!\uparrow^{\left(#2, #3\right)} \left(#4, #5, #6\right)}
+\newcommand{\extendsAM}[4]{(#1) \mathbin{\downarrow} ((#2, #3), #4)}
+\newcommand{\extendsAMUpto}[5]{(#1) \mathbin{\downarrow}_{#2} ((#3, #4), #5)}
+\newcommand{\extendsAMUptob}[4]{(#1) \mathbin{\downarrow}_{#2} (#3, #4)}
+\newcommand{\expandsAM}[6]{#1 \mathbin{\uparrow}^{\left(#2, #3\right)} (#4, #5, #6)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
 %\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
 %\newcommand{\backwardClosure}[1]{#1^{\leftarrow}}
@@ -441,6 +443,9 @@
 \DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4}
 \DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\rightarrow} #3}
 \DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+%\DeclareDocumentCommand{\valueT}{m m}{#1.\uppercase{\textsf{#2}}}
+%\DeclareDocumentCommand{\modT}{m}{#1.\textsf{M}}
+%\DeclareDocumentCommand{\nextT}{m m}{#1.\textsf{N} \rightarrow #2}
 
 \newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
 \newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
@@ -453,6 +458,9 @@
 \DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
 \DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\valueC}{m m}{\left[#1.\uppercase{\textsf{#2}} \right]}
+%\DeclareDocumentCommand{\modC}{m}{\left[#1.\textsf{M}\right]}
+%\DeclareDocumentCommand{\nextC}{m m}{\left[#1.\textsf{N} \rightarrow #2\right]}
 
 \newcommand{\isLock}[2]{\textsf{isLock}\left(#1, #2\right)}
 \newcommand{\locked}[1]{\textsf{locked}\left(#1 \right)}
@@ -559,3 +567,5 @@
 \newatcommand Y {\ensuremath{\Psi}\xspace}
 \newatcommand z {\ensuremath{\zeta}\xspace}
 
+
+\allowdisplaybreaks
