@@ -14,12 +14,12 @@ of the soundness of \colosl.
 \subsection{Proof System}
 
 \paragraph{Rely}
-The Rely relation represents potential interferences from the
+The rely relation represents potential interferences from the
 environment. Although the rely will be different for every program
 (and indeed, every thread), it is always defined in the same way,
-which we break down into three separate kinds of possible
-interferences as follows. In the remainder of this section, given a
-logical state $l = ((@s,h),\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for
+which we can break down into three kinds of possible interferences. In
+the remainder of this section, given a logical state $l =
+((@s,h),\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for
 $\m{fst}(l)$ and $\m{snd}(l)$, respectively.
 
 The first relation, $\extendR$, extends the shared state $g$ with new
@@ -63,7 +63,7 @@ Then the extension rely, $\extendR$, is defined as
   \end{array}
   \right\}
 \]
-%% Intuitively, the Rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
+%% Intuitively, the rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
 
 
 The second kind of interference is the \emph{update} of the global
@@ -115,14 +115,15 @@ action model):
 
 
 \begin{definition}[Rely]
-  The \emph{Rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is
+  The \emph{rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is
+  defined as follows, where $(\cdot)^{\text{*}}$ denotes reflexive
+  transitive closure:
   \[
   \rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
   \]
-  where $(\cdot)^{\text{*}}$ denotes the reflexive transitive closure.
 \end{definition}
 
-The Rely relation enables us to define the stability of assertions
+The rely relation enables us to define the stability of assertions
 with respect to the environment actions.
 \begin{definition}[Stability]
   An assertion $P$ is \emph{stable} ($\stable{P}$) if, for all $\lenv
@@ -161,13 +162,13 @@ the following lemma.
 \end{lemma}
 
 \paragraph{Guarantee}
-We now define the Guarantee relation that describes all possible
-updates the current thread can perform. In some sense, the Guarantee
-relation is the dual of Rely: the actions in the Guarantee of one
-thread are included in the Rely of concurrently running threads. Thus,
-it should come as no surprise that transitions in the Guarantee can be
+We now define the guarantee relation that describes all possible
+updates the current thread can perform. In some sense, the guarantee
+relation is the dual of rely: the actions in the guarantee of one
+thread are included in the rely of concurrently running threads. Thus,
+it should come as no surprise that transitions in the guarantee can be
 categorised using three categories which resonate with those of the
-Rely. The \emph{extension} guarantee is similar to the extension rely
+rely. The \emph{extension} guarantee is similar to the extension rely
 except that new capabilities corresponding to the new shared region
 are materialised in the local and shared state, and a part of the
 local state is moved into the shared state:
@@ -307,21 +308,19 @@ shifting some of the existing interference. This is modelled by the
 \]
 
 \begin{definition}[Guarantee]
-The \emph{Guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
+The \emph{guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
 \[
 \guarantee \eqdef  \left( \updateG \cup \extendG \cup \shiftG \right)^{\text{*}}
 \]
 \end{definition}
 
 Using the guarantee relation, we introduce the notion of
-\emph{repartitioning} a state that satisfies $P$ to one satisfying $Q$
-with respect to an update from $R_1$ to $R_2$, written
-$\repartitions{P}{Q}{R_1}{R_2}$, where $P$, $Q$, $R_1$, $R_2$ are
-assertions. Repartitioning takes a world satisfying $P$, merges its
-local and shared states together, and then updates a part of that
-combination that satisfies $R_1$ to one satisfying $R_2$. The new
-logical state is then split again into a local and shared part in such
-a way that the resulting transition is in the Guarantee $\guarantee$.
+\emph{repartitioning} $\repartitions{P}{Q}{R_1}{R_2}$. This relation
+holds whenever, from any world satisfying $P$, if whenever parts of
+the composition of its local and shared states that satisfies $R_1$ is
+exchanged for one satisfying $R_2$, it is possible to split the
+resulting logical state into a local and shared part again, in such a
+way that the resulting transition is in $\guarantee$.
 
 \begin{definition}[Repartitioning] \label{def:repartitioning}
   We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in
@@ -332,11 +331,9 @@ a way that the resulting transition is in the Guarantee $\guarantee$.
 \item $m_1 \composeH m' = \heapPart{(l_1\composeL g_1)}$; and
 \item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$,
   there exists a world $w_2 = (l_2,g_2,\lmod_2,\gmod_2)$ such that
-  $w_2, \lenv |= Q$, and
-  \begin{itemize}
-  \item $m_2 \composeH m' = \heapPart{(l_2 \composeL g_2)}$; and
-  \item $(w_1, w_2) \in \guarantee$.
-  \end{itemize}
+  $w_2, \lenv |= Q$,
+  $m_2 \composeH m' = \heapPart{(l_2 \composeL g_2)}$, and
+  $(w_1, w_2) \in \guarantee$.
 \end{itemize}
 \end{definition}
 
@@ -489,7 +486,7 @@ $I''
 is not allowed.  Indeed, other threads may rely on the fact that the
 only updates allowed on location $y$ are done through the
 $[\token{b}]$ capability as specified in $I$, and would be spooked by
-this new possible behaviour that they were not aware of (as it is not
+this new possible behaviour they were not aware of (as it is not
 in $I$).
 \end{example}
 
