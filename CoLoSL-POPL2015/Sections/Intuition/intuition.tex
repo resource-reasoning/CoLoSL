@@ -178,7 +178,7 @@ and \shiftRule\ principles given in the introduction:
  & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
 \stackrel{(\forgetRule)}{=>}  &\shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
  \stackrel{(\shiftRule)}{\semimplies}  &\shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\li z}} *[\token a_{\li y}]\\
-\stackrel{(\proofRule{Weaken})}{=>}  &\shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]\\
+\stackrel{(\stabilise)}{=>}  &\shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]\\
 \end{array}
 \]
 The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus
@@ -206,7 +206,7 @@ It is however possible to give a  stronger specification, as follows:
  \stackrel{(\forgetRule)}{=>} & \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
  
 \stackrel{(\shiftRule)}{\semimplies} &  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
-\stackrel{(\proofRule{Weaken})}{=>} &
+\stackrel{(\stabilise)}{=>} &
     \shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
         \cell{\li{y}}{0} \lor\\ \cell{\li{x}}{1} *
         \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]
