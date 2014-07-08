@@ -227,10 +227,6 @@ subjective views since this is achieved by the \forgetRule principle.
 
 
 
-\pgcomment{Azalea, make sure you highlight 
-' The main novelty of this rule is the fact
-that new actions may refer to existing shared state, as we will see in
-our examples.' in the set example ins ection 5.} 
 
 
 
@@ -240,10 +236,11 @@ our examples.' in the set example ins ection 5.}
 With these reasoning principles, we are able to expand and contract
 subjective views  to provide just the resource required by a thread.
 In essence, we provide  frame-like reasoning for  subjective  views. 
-The interaction between  these principles is
-subtle. We are able to forget resource of the subjective assertion $P$
- whilst at the same time adapting the interference relation $I$  to
-capture global constraints associated with that lost resource. In 
+%% The interaction between  these principles is
+%% subtle. We are able to forget resource of the subjective assertion $P$
+%%  whilst at the same time adapting the interference relation $I$  to
+%% capture global constraints associated with that lost resource.
+In 
 \S\ref{sec:intuition}, we 
 demonstrate this using 
 a variant of the famous  token ring mutual exclusion algorithm [? ],
@@ -256,22 +253,19 @@ as retaining global knowledge about the overall thread behaviour. It
 is a good  introductory example, as it uses all the highlighted \colosl
 reasoning principles in a fundamental way. 
 
-\pgcomment{In next para, I wasn't quite sure what to say so I just did
-  adaquate `blah'.}
-
-In \S\ref{sec:sectionthree}, we interpret \colosl assertions
+In \S\ref{sec:logic}, we interpret \colosl assertions
  over a particular domain which includes: thread-local
 state exclusively visible to the thread; {\em one} global shared state
 accessible by all thread (in contrast with the CAP approach); and {\em
   action models} describing how the global state can be updated.  In
-\S\ref{sec:sectionfour}, we define the rely and guarantee conditions
+\S\ref{sec:semantics}, we define the rely and guarantee conditions
 of each thread is in terms of their action models, and provide a
 sketch of soundness. In particular, the
 reasoning principles highlighted above are simple semantic
 consequences of our generic model of program states.  The full
 technical details can
 be found 
-in the accompanying technical report~\cite{.}.
+in the accompanying technical report~\cite{colosl-tr14}.
 
 
 

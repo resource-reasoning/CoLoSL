@@ -43,10 +43,10 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-		\reifyW{\left(l \composeL \localPart{w}, s, \amod{}, \amod{L} \right)}
+		\reifyW{\left(l \composeL \localPart{w}, g, \lmod, \gmod \right)}
 		&
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
 			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
 			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}
 		\end{array}			
@@ -61,11 +61,11 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-		\reifyH{\heapPart{l} \composeH \heapPart{s} \composeH \heapPart{\left(\localPart{w}\right)}}
+		\reifyH{\heapPart{l} \composeH \heapPart{g} \composeH \heapPart{\left(\localPart{w}\right)}}
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
 			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
 			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}
 		\end{array}			
@@ -84,7 +84,7 @@ By calculation.\\
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
 			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
 			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
 			\land\; \h{1} \composeH \h{}' = \heapPart{l} \composeH \heapPart{s}\\
@@ -101,15 +101,15 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-%		\reifyH{\heapPart{l} \composeH \heapPart{s} \composeH \heapPart{\left(\localPart{w}\right)}}
+%		\reifyH{\heapPart{l} \composeH \heapPart{g} \composeH \heapPart{\left(\localPart{w}\right)}}
 		\reifyH{\h{2} \composeH \h{}' \composeH \heapPart{\left(\localPart{w}\right)}}
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
 			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
 			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
-			\land\; \h{1} \composeH \h{}' = \heapPart{l} \composeH \heapPart{s}\\
+			\land\; \h{1} \composeH \h{}' = \heapPart{l} \composeH \heapPart{g}\\
 			\land\; \h{1} \in \Hp{1} \;\land\; \h{2} \in \Hp{2}
 		\end{array}			
 		\hspace*{-0.15cm}
@@ -129,11 +129,11 @@ By calculation.\\
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
 			(\Hp{1}, \seq{}, \Hp{2}) \in \AxiomsSeq \\
 			\land\;\repartitions{W_1}{W_2}{\Hp{1}}{\Hp{2}}\\
 			\land\; w_2 \in W_2\\
-			\land\; \left(\;(l, s, \amod{}, \amod{L}), w_2 \right) \in \guarantee
+			\land\; \left(\;(l, g, \lmod{}, \gmod), w_2 \right) \in \guarantee
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -147,13 +147,13 @@ By calculation.\\
 	\left\{
 	\hspace*{-0.15cm}
 	\begin{array}{l | l}
-		\reifyW{\left(l' \composeL \localPart{w}, s', \amod{}' \right)}
+		\reifyW{\left(l' \composeL \localPart{w}, g', \lmod', \gmod' \right)}
 		&
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-			(l, s, \amod{}, \amod{L}) \in W_1 \;\land\\ 
-			\land\;(l', s', \amod{}', \amod{L}') \in W_2\\
-			\land\; \left(\;(l, s, \amod{}, \amod{L}), (l', s', \amod{}', \amod{L}') \right) \in \guarantee
+			(l, g, \lmod, \gmod) \in W_1 \;\land\\ 
+			\land\;(l', g', \lmod', \gmod') \in W_2\\
+			\land\; \left(\;(l, g, \lmod, \amod{L}), (l', g', \lmod', \gmod') \right) \in \guarantee
 		\end{array}			
 		\hspace*{-0.15cm}
 	\end{array}
@@ -183,12 +183,12 @@ as required.
 	\shared{P \sepish Q}{I} \implies \shared{P}{I}
 \]
 %
-\textbf{RTS.} $\for{\lenv} \sem[\lenv]{\shared{P \sepish Q}{I}} \subseteq  \sem[\lenv]{\shared{P}{I}}$
+\textbf{RTS.} $\for{\lenv\in \LEnv} \left\{w \mid w, \lenv |= \shared{P \sepish Q}{I}\right\} \subseteq \left\{w \mid w, \lenv |= \shared{P}{I} \right\}$
 %
 \begin{proof}
 \[
 \begin{array}{r l}
-	\sem[\lenv]{\shared{P \sepish Q}{I}} &
+	\left\{w \mid w, \lenv |= \shared{P \sepish Q}{I}\right\} &
 	= \left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
@@ -197,36 +197,20 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL c \composeL q \composeL r)\\
-		, \amod{}, \amod{L}
+		, \lmod, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(p \composeL c, 
-			(p \composeL c \composeL q \composeL r)
-			, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P}\\
+
+			(p \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} P \\
+			\land (q \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} Q \\
 			
-			\land\; \left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(q \composeL c, 
-			(p \composeL c \composeL q \composeL r)
-			, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{Q}\\
+			\land r \in \LStates \\
 			
-			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
-			
-			\extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{\ r}{\ \amod{}'}
+			\land \extendsAM{\lmod, \gmod}{p \composeL c \composeL q}{r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -244,36 +228,19 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL c \composeL q \composeL r)\\
-		, \amod{}, \amod{L}
+		, \lmod{}, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(p \composeL c, 
-			(p \composeL c \composeL q \composeL r)
-			, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P}\\
+			(p \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} P \\
+			\land (q \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} Q \\
 			
-			\land\; \left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(q \composeL c, 
-			(p \composeL c \composeL q \composeL r)
-			, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{Q}\\
+			\land r \in \LStates \;\;\land\\
 			
-			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
-			
-			\extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\ \amod{}'}
+			\land \extendsAM{\lmod{}, \gmod}{p \composeL c}{\ q \composeL r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -285,7 +252,7 @@ as required.
 	
 	
 	
-	& =
+	& \subseteq
 	\left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
@@ -294,27 +261,17 @@ as required.
 		\begin{array}{l}
 		(\unitL, \\
 		(p \composeL r)\\
-		, \amod{}, \amod{L}
+		, \lmod{}, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-			(p, 
-			(p \composeL r)
-			, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P}\\
-			
-			
-			\land\; r \in \LStates \;\;\land\;\; \intermediateSemI{I} = \amod{}'\\
-			
-			\extendsAM{\amod{}, \amod{L}}{p}{\ r}{\ \amod{}'}
+
+			p, \lenv |=_{(p \composeL r), \lmod, \gmod} P \\
+			\land r \in \LStates 
+			\land \extendsAM{\lmod{}, \gmod}{p}{\ r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -322,7 +279,7 @@ as required.
 	\right\} \\
 	
 	
-	& = \sem[\lenv]{\shared{P}{I}}
+	& = \left\{ w \mid w, \lenv |= \shared{P}{I}\right\}
 \end{array}
 \]
 %
@@ -454,77 +411,17 @@ as required.
 \textbf{RTS.} 
 \[
 \begin{array}{l l}
-	\for{\lenv} &
-%		\fence{1} \fences \left(\intermediateSemI{I_1}, \sem[\lenv]{P}\right) \;\land\; 
-%		\fence{2} \fences \left(\intermediateSemI{I_2}, \sem[\lenv]{Q}\right) \;\land\\
-%		&
-%		\left(\fence{1}, \intermediateSemI{I_1}\right) \agrees \left(\fence{2}, \intermediateSemI{I_2}\right) \\
-%		& \hspace*{1cm} \implies\\
-	  \sem[\lenv]{\shared{P}{I_1}} * \sem[\lenv]{\shared{Q}{I_2}} \subseteq  \sem[\lenv]{\shared{P \sepish Q}{I_1 \cup I_2}}
+	\for{\lenv\in \LEnv} \left\{ w \mid w, \lenv |= \shared{P}{I_1} * \shared{Q}{I_2} \right\} \subseteq \left\{ w \mid w, \lenv |= \shared{P \sepish Q}{I_1 \cup I_2}\right\}
 \end{array}
 \]
 %
 \begin{proof}
 \[
 \begin{array}{r l}
-	\sem[\lenv]{\shared{P}{I_1} * \shared{Q}{I_2}} &
-%	= \left\{
-%	\hspace*{-0.2cm}
-%	\begin{array}{l | l}
-%		\left(
-%		\hspace*{-0.15cm}
-%		\begin{array}{l}
-%		\unitL,
-%		s
-%		, \amod{}, \amod{L}
-%		\end{array}
-%		\hspace*{-0.15cm}
-%		\right)
-%		&
-%		\hspace*{-0.1cm}
-%		\begin{array}{l}
-%			\left(
-%			\hspace*{-0.15cm}
-%			\begin{array}{l}
-%				p_0, 
-%				(p_0 \composeL r)
-%				, \amod{}
-%			\end{array}
-%			\hspace*{-0.15cm}
-%			\right) \in \sem[\lenv]{P}\\
-%			
-%			\land\; 
-%			\left(
-%			\hspace*{-0.15cm}
-%			\begin{array}{l}
-%				q_0, 
-%				(q_0 \composeL r')
-%				, \amod{}
-%			\end{array}
-%			\hspace*{-0.15cm}
-%			\right) \in \sem[\lenv]{Q}\\
-%
-%			
-%			\land\; r, r' \in \LStates \;\land\;
-%			s = p \composeL r = q \composeL r'\\
-%			
-%			\land\; \extendsAM{\amod{}}{p_0}{\ r}{\intermediateSemI{I_1}}
-%			\;\land\; \extendsAM{\amod{}}{q_0}{\ r'}{\intermediateSemI{I_2}}\\
-%			
-%			\land\; p_0 \in F_1 \;\land\; q_0 \in F_2			
-%			\;\land\; F_1 \fences \intermediateSemI{I_1}\\
-%			
-%			\land\; F_2 \fences \intermediateSemI{I_2}
-%			\;\land\; \left(F_1, \intermediateSemI{I_1}\right) \agrees \left(F_2, \intermediateSemI{I_2} \right)
-%		\end{array}
-%		\hspace*{-0.1cm}
-%	\end{array}
-%	\hspace*{-0.2cm}
-%	\right\} \\
-%	
-%	
-%	&
-	= \left\{
+	& \left\{ w \mid w, \lenv |= \shared{P}{I_1} * \shared{Q}{I_2} \right\}\\
+	
+	= &
+	\left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
 		\left(
@@ -532,38 +429,23 @@ as required.
 		\begin{array}{l}
 		\unitL,
 		p \composeL c \composeL q \composeL r
-		, \amod{}, \amod{L}
+		, \lmod{}, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				p \composeL c, 
-				(p \composeL c \composeL q\composeL r)
-				, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P} \\
+
 			
-			\land\;\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				q \composeL c, 
-				(p \composeL c \composeL q \composeL r)
-				, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{Q} \\
+			(p \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} P \\
+			\land (q \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} Q \\
 			
-			\land\; r \in \LStates\\
+			\land r \in \LStates\\
 			
-			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c}{\ q \composeL r}{\intermediateSemI{I_1}}\\
+			\land \extendsAM{\lmod{}, \gmod}{p \composeL c}{\ q \composeL r}{\semI[\lenv]{I_1}}\\
 			
-			\land\; \extendsAM{\amod{}, \amod{L}}{c \composeL q}{\ p \composeL r}{\intermediateSemI{I_2}}
+			\land \extendsAM{\lmod{}, \gmod}{c \composeL q}{\ p \composeL r}{\semI[\lenv]{I_2}}
 
 		\end{array}
 		\hspace*{-0.1cm}
@@ -574,8 +456,8 @@ as required.
 	
 	
 	
-	\text{By Lemma \ref{lem:amodMerge}} & 
-	\subseteq \left\{
+	\text{By Lemma \ref{lem:amodMerge}} \subseteq & 
+	 \left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
 		\left(
@@ -583,36 +465,19 @@ as required.
 		\begin{array}{l}
 		\unitL,
 		p \composeL c \composeL q \composeL r
-		, \amod{}, \amod{L}
+		, \lmod{}, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				p \composeL c, 
-				(p \composeL c \composeL q\composeL r)
-				, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P} \\
+			(p \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} P \\
+			\land (q \composeL c), \lenv |=_{(p \composeL c \composeL q \composeL r), \lmod, \gmod} Q \\
 			
-			\land\;\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				c \composeL q, 
-				(p \composeL c \composeL q \composeL r)
-				, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{Q} \\
+			\land r \in \LStates \\
 			
-			\land\; r \in \LStates \\
-			
-			\land\; \extendsAM{\amod{}, \amod{L}}{p \composeL c \composeL q}{r}{\intermediateSemI{I_1 \cup I_2}}
+			\land  \extendsAM{\lmod{}, \gmod}{p \composeL c \composeL q}{r}{\semI[\lenv]{I_1 \cup I_2}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -623,8 +488,8 @@ as required.
 	
 	
 	
-	& 
-	\subseteq \left\{
+	\subseteq & 
+	\left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
 		\left(
@@ -632,27 +497,27 @@ as required.
 		\begin{array}{l}
 		\unitL,
 		pq \composeL r
-		, \amod{}, \amod{L}
+		, \lmod{}, \gmod
 		\end{array}
 		\hspace*{-0.15cm}
 		\right)
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\left(
-			\hspace*{-0.15cm}
-			\begin{array}{l}
-				pq, 
-				(pq \composeL r)
-				, \amod{}, \amod{L}
-			\end{array}
-			\hspace*{-0.15cm}
-			\right) \in \intermediateSem[\lenv]{P \sepish Q} \\
+%			\left(
+%			\hspace*{-0.15cm}
+%			\begin{array}{l}
+%				pq, 
+%				(pq \composeL r)
+%				, \lmod{}, \gmod
+%			\end{array}
+%			\hspace*{-0.15cm}
+%			\right), \lenv |= P \sepish Q \\
 			
-
+			pq, \lenv |=_{pq \composeL r), \lmod, \gmod} P \sepish Q \\
 			
-			\land\; r \in \LStates \\
-			\land\; \extendsAM{\amod{}, \amod{L}}{pq}{r}{\intermediateSemI{I_1 \cup I_2}}
+			\land r \in \LStates \\
+			\land \extendsAM{\lmod{}, \gmod}{pq}{r}{\semI[\lenv]{I_1 \cup I_2}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -662,7 +527,7 @@ as required.
 	
 
 	
-	& = \sem[\lenv]{\shared{P \sepish Q}{I_1 \cup I_2}}
+	= & \left\{ w \mid w, \lenv |= \shared{P \sepish Q}{I_1 \cup I_2}\right\}
 \end{array}
 \]
 %
@@ -671,5 +536,146 @@ as required.
 \end{lemma}
 %
 %
+\begin{lemma}[Shift]
+%
+\[
+	\shared{P}{I} \land I \weakenI{P} I' \semimplies \shared{P}{I'}
+\]
+%
+\noindent\textbf{RTS.} for all $\lenv \in \LEnv$ and $w_1 \in \Worlds$, 
+\[
+\begin{array}{l l}
+	\text{if} & w_1, \lenv |= \shared{P}{I} \land \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\} } \semI[\lenv]{I'}\\
+	\text{then} & \exsts{w_2} \heapPart{(\collapseW{w_1})} = \heapPart{(\collapseW{w_2})} \land (w_1, w_2) \in \guarantee
+\end{array}
+\]
+%
+\begin{proof}
+Pick an arbitrary $w_1 = (l, g, \lmod, \gmod)$ such that 
+%
+\begin{align}
+	& w_1, \lenv |= \shared{P}{I}  \label{shift:ass1}\\
+	& \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\} } \semI[\lenv]{I'} \label{shift:ass2}
+\end{align}
+%
+and let $w_2 = (l, g, \lmod \cup \semI[\lenv]{I'}, \gmod)$. Then by definition of $\collapseW{.}$ we have 
+%
+\begin{equation}
+	\heapPart{(\collapseW{w_1})} = \heapPart{(\collapseW{w_2})} \label{shift:goal1}
+\end{equation}
+%
+On the other hand from Lemma \ref{lem:amodHiding} and \ref{shift:ass2} we have: 
+%	
+\begin{equation}
+	\for{s, r, \lmod'} s \composeL = g \land \extendsAM{\lmod, \gmod}{s}{r}{\lmod'} \implies \extendsAM{\lmod \cup \lmod_{0}, \gmod}{s}{r}{\lmod'}  \label{shift:ass3}
+\end{equation}
+%
+From \ref{shift:ass3} and the definitions of $w_1$ and $w_2$ we have: 
+%
+\begin{equation}
+	(w_1, w_2) \in \shiftG \nonumber
+\end{equation}
+%
+and consequently
+%
+\begin{equation}
+	(w_1, w_2) \in \guarantee \nonumber
+\end{equation}
+%
+as required.
+
+\end{proof}
+\end{lemma}
+%
+%
+%
+\begin{lemma}[] \label{lem:extension}
+%
+\[
+		P \containI I  \Rrightarrow \exsts{\capAss{1}, \capAss{2}} \;\; \capAss{1} * \shared{P * \capAss{2}}{I}
+\]
+%
+\begin{proof}
+\textbf{RTS. }
+%
+\[
+\begin{array}{l}
+	\for{\lenv} \for{w_1} w_1, \lenv |=  P \implies\\
+	\hspace{0.2cm} \exsts{w_2} w_2, \lenv |= \exsts{\capAss{1}} \;\; \capAss{1} * \shared{P * \capAss{2}}{I} \land \\
+	\hspace*{0.4cm} (w_1, w_2) \in \guarantee \;\land\; \heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)}
+\end{array}
+\]
+%
+Pick an arbitrary $\lenv$, $w_1 = (l, g, \lmod{}, \gmod)$ such that $w, \lenv |= P$ and set $K$ such that:
+\begin{align}
+%	K = 
+%	\semK[\lenv]{\left( \bigvee\limits_{\lambda \vec{x}. \capAss{}: a \in \dom{I}} \capAss{}\right) \;\lor\; \capAss{1} }
+%	\;\land\; K \disjoint \dom{\amod{L}} \label{LE:Ass1}
+	K = 
+	\semK[\lenv]{\capAss{1} \lor \capAss{2}}
+	\;\land\; K \disjoint \dom{\amod{L}} \label{LE:Ass1}
+\end{align}	 
+%
+Since $\wf{w_1}$, we know 
+\begin{align}
+	\exsts{\fence{L}} g \in \fence{L} \;\land\; \fence{L} \strictfences \amod{L} \label{LE:Ass2}
+\end{align} 
+%Pick arbitrary $l_1, \cdots, l_n \in \LStates$, $\amod{1} , \cdots, \amod{n} \in \AMods$, $F_1, \cdots, F_n \in \pset{\LStates}$ such that 
+%%
+%\begin{align}
+%\begin{array}{l}
+%	l_1 \composeL \cdots \composeL l_n = s \\
+%	\for{\amod{i}, \amod{j} \in \left(\amod{1} \cup \cdots \cup \amod{n}\right)} \dom{\amod{i}} \disjoint \dom{\amod{j}}\\
+%	\dom{\amod{}} = \dom{\amod{1}} \cup \cdots \cup \dom{\amod{n}}\\
+%	\for{i \in 1, \cdots, n} l_i \in F_i \;\land\; F_i \strictfences \amod{i}\;\land\;\\
+%	\hspace*{1cm}\extendsAM{\amod{}}{l_i}{l_1 \composeL \cdots \composeL l_{i-1} \composeL l_{i+1} \composeL \cdots \composeL l_n}{\amod{i}} \label{LE:Ass2}
+%\end{array}
+%\end{align}
+%%
+On the other hand, from the premise of the lemma we know 
+%
+\begin{align}
+	\exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \strictfences \semI[\lenv]{I} \label{LE:Ass3}
+\end{align}
+%(\ref{LE:Ass})
+Since $\wf{w_1}$, we know $l \composeL g \text{ is defined}$ and thus from (\ref{LE:Ass1})-(\ref{LE:Ass3}) and lemma \ref{lem:amodWitness} we know:
+%
+\begin{align}
+\begin{array}{l}
+	\exsts{\gmod', \fence{}'} l \composeL g \in \fence{}' \;\land\; \fence{}' \strictfences \lmod \cup \semI[\lenv]{I} \;\land\; \extendsAM{\lmod \cup \semI[\lenv]{I}, \gmod'}{l}{g}{\semI[\lenv]{I}} \;\land\\
+	\hspace*{1.3cm}\for{s', r'} \for{\lmod_{1} \subseteq \lmod} s' \composeL r' = g \;\land\; \extendsAM{\lmod{}, \gmod}{s'}{r'}{\lmod_{1}} \implies\\
+	\hspace*{1.8cm}\extendsAM{\lmod \cup \semI[\lenv]{I}, \gmod'}{s'}{r' \composeL l}{\lmod_{1}} 
+\end{array}\label{LE:Ass4}
+\end{align}
+%
+%Pick $\amod{}'$ such that (\ref{LE:Ass4}) is satisfied. Then from (\ref{LE:Ass2}) and (\ref{LE:Ass4}) we know
+%%
+%\begin{align}
+%	\expandsAM{\amod{}'}{s}{l}{\amod{}} \;\land\; \extendsAM{\amod{}'}{l}{s}{\intermediateSemI{I}} \label{LE:Ass5}
+%\end{align}
+%%
+Pick $\gmod'$ such that (\ref{LE:Ass4}) is satisfied. Pick $\ca{1} \in \semK[\lenv]{\capAss{1}}$, $\ca{2} \in \semK[\lenv]{\capAss{2}}$ and $w_2 = ( (\unitH, \ca{1}), l \composeL g \composeL (\unitH, \ca{2}), \lmod\cup \intermediateSemI{I}, \gmod' )$. Then from (\ref{LE:Ass1}) and (\ref{LE:Ass4}) we know
+%
+\begin{align}
+	(w_1, w_2) \in \guarantee \label{LE:Ass6}
+\end{align}
+%
+On the other hand, from the definition of $\collapseW{.}$ we know:
+%(\ref{LE:Ass})
+\begin{align}
+	\heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)} \label{LE:Ass7}
+\end{align}
+%
+Finally since $w_2, \lenv |= \capAss{1} * \shared{P * \capAss{2}}{I}$, from (\ref{LE:Ass6}) and (\ref{LE:Ass7}) we have
+%
+\begin{align}
+	(w_1, w_2) \in \guarantee \;\land\; \heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)}
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+
 \input{Soundness/auxiliaryLemmas.tex}
 

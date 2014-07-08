@@ -1,5 +1,11 @@
 \section*{General Definitions}
 %
+\azaleacomment{
+	We have not brought some of our notation up to date. The most up to date version of this document is available at:
+	\begin{center}
+		\url{www.doc.ic.ac.uk/~azalea/popl2015/CoLoSL-TR.pdf}
+	\end{center}
+}
 \begin{definition}[Separation]
 Given a separation algebra $\left(\mathbb{M}, \compose{\mathbb{M}}, \unit{\mathbb{M}} \right)$, the \emph{separation} relation over elements of $\mathbb{M}$:
 %
@@ -171,7 +177,7 @@ is defined as:
 An \emph{action model} is a partial function associating capability resources with actions. An action is expressed as a relation between the original logical state and the new logical state reflecting the effects of the action:
 %
 \[
-	\amod{} \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
+	\lmod, \gmod \in \AMods \eqdef \Caps \rightharpoonup \pset{\LStates \times \LStates}
 \]
 %
 We write $\unitAM$ for an action model with empty domain.
@@ -179,10 +185,10 @@ We write $\unitAM$ for an action model with empty domain.
 %
 %
 \begin{definition}[Worlds]
-A \emph{world} is a quadruple of a logical state (representing the local state), a second logical state (representing the shared state), a global action model and a local action model, subject to a well-formedness condition.
+A \emph{world} is a quadruple of a logical state (representing the local state), a second logical state (representing the shared state), a local action model and a global action model, subject to a well-formedness condition (Definition \ref{def:wellformedness}).
 %
 \[
-	w \in \Worlds \eqdef \left\{ (l, s, \amod{}, \amod{L}) \in \LStates \times \LStates \times \AMods \times \AMods \;|\; \wf{l, s, \amod{}, \amod{L}} \right\}
+	w \in \Worlds \eqdef \left\{ (l, g, \lmod{}, \gmod) \in \LStates \times \LStates \times \AMods \times \AMods \;|\; \wf{l, s, \lmod, \gmod} \right\}
 \]
 % 
 Given a world $w$, we write $\localPart{w}$, $\sharedPart{w}$, $\amodelPart{w}$ and $\amodelPartL{w}$ for the first, second, third and fourth projections, respectively.
@@ -216,7 +222,7 @@ The \emph{collapse function on worlds}:
 is defined as:
 %
 \[
-	\collapseW{l, s, \amod{}, \amod{L}} \eqdef l \composeL s
+	\collapseW{l, g, \gmod, \lmod} \eqdef l \composeL g
 \]
 %
 \end{definition}
@@ -225,7 +231,7 @@ is defined as:
 %\begin{definition}[Well-formedness]
 %%
 %\[
-%	\wf{l, s, \amod{}, \amod{L}} \iffdef \exsts{r} \collapseW{l, s, \amod{}} = r \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}\;\land\; \contains{\dom{\amod{}}}{\capPart{r}}
+%	\wf{l, s, \gmod, \lmod} \iffdef \exsts{r} \collapseW{l, s, \gmod} = r \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \lmod\;\land\; \contains{\dom{\gmod}}{\capPart{r}}
 %\]
 %%
 %
@@ -262,3 +268,114 @@ is defined as:
 %
 \end{definition}
 %
+%
+\begin{definition}[Action model closure]
+A pair $(\lmod, \gmod)$ of action models is closed under a subjective state $s$, $r$, and action
+model $\lmod'$, written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$ if $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'}$ for all $n \in \Nats$, where $\downarrow_{n}$ is defined recursively as follows:
+%
+\[
+\begin{array}{l}
+	\extendsAMUpto{\lmod, \gmod}{0}{s}{r}{\lmod'} \iffdef \lmod' \subseteq \lmod\\
+	
+	\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'} \iffdef \\ 
+
+	\hspace*{0.2cm}\for{\ca{}, c, d, t, l_3, l_4}\for{(l_1 \composeL f, l_2 \composeL f) \in \gmod'(\ca{})} \\
+	\hspace*{0.4cm}\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL\right) \;\land\; l_1 \composeL f \leq  s \composeL r \composeL t \\
+	\hspace*{0.4cm} \land\; l_1 = l_3 \composeL l_4 \;\land\; l_1 \maxMeetL s = l_3 \;\land\; s = l_3 \composeL c \;\land\; r = l_4 \composeL d \implies\\
+	\hspace*{1cm} \extendsAMUpto{\lmod, \gmod}{(n-1)}{l_2 \composeL c}{d}{\lmod'}\\
+	\hspace*{1cm}\land\; t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \gmod(\ca{}) \lor l_2 \composeL c \composeL d \text{ is undefined} \\
+	
+		\hspace*{2cm} \land\\
+	
+
+  \hspace*{0.2cm}\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \lmod(\ca{})} \for{c, d} \\
+  \hspace*{0.4cm} l_1 \composeL f \composeL c = s \composeL r \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
+  \hspace*{0.6cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \gmod'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  s \composeL r \composeL d\\
+	
+
+		\hspace*{0.6cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
+		\hspace*{0.6cm}\lor\; l_1 \maxMeetL s = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = s \composeL r' \composeL d \;\land\; \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{r'}{\lmod'}
+
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Fenced action models] A fence $\fence{} \in \pset{\LStates}$, \emph{fences} action model $\lmod \in \AMods$, written, $\fence{} \fences \lmod$, iff 
+%
+\[ 
+\begin{array}{l}
+%	\fence{} \strictfences \amod{} \iffdef
+% 		& \fence{} \fences \amod{} \;\land\; \local{\amod{}}{\fence{}}\\
+ 		
+	\for{\ca{}} \for {(l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{})} (\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL ) \\
+  \hspace*{0.2cm} \for{l \in \fence{}} (l_1 \composeL f) \meetL l \not= \emptyset \implies \\
+  \hspace*{0.5cm} \for{c} \for{l_3 > \unitL} l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c\implies\\
+  \hspace*{1cm} l_2 \composeL c \in \fence{}	 
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Locally-fenced action models]
+A fence $\fence{} \in \pset{\LStates}$, \emph{locally fences} action model $\lmod \in \AMods$, written, $\fence{} \strictfences \lmod$, iff 
+%
+\[ 
+\begin{array}{l}
+	\fence{} \fences \amod{} \land \\
+	\for{\ca{}} \for{l \in \fence{}} \for{l_1, l_2, f}\\
+	\hspace*{0.5cm} (\for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL) \;\land\; (l_1 \composeL f, l_2 \composeL f) \in \amod{}(\ca{})  \implies \\
+	 \hspace*{0.7cm} \left(l_1 \leq l \;\land\; \for{r} l_1 \leq l \composeL r \implies l_1 \maxMeetL r = \unitL\right) \;\;\lor\;\; l_1 \composeL f \meetL l = \emptyset
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Action model shifting]An action model $\lmod'$  shifts $\lmod$ with respect to a set of states $\mathcal{P}$, written $\lmod \weakenI{\mathcal{P}} \lmod'$, iff there exists $\fence{} \in \pset{\LStates}$ such that $\mathcal{P} \subseteq \fence{}$ and $\fence{} \fences \lmod$ and 
+%
+\[
+\begin{array}{l}
+	\hspace*{0.2cm}\for{\ca{}} \for{l \in \fence{}}  \for{f, r, p, q, r'} (\for{t} t \leq p \land t \leq q \implies t = \unitL) \implies\\
+	\hspace*{0.2cm}
+	\begin{array}{l}
+		(p \composeL f, q \composeL f) \in \lmod'(\ca{}) 
+		\;\land\; p \composeL f \leq l \composeL r \implies \\
+		\hspace*{0.4cm}\exsts{f'} (p \composeL f', q \composeL f') \in \lmod(\ca{}) \;\land\; p \composeL f' \leq l \composeL r \\
+
+		\hspace*{1cm} \land\\
+		
+		(p \composeL f, q \composeL f) \in \lmod(\ca{})
+		\;\land\; p \composeL f \composeL r' = l \composeL r \implies \\
+		\hspace*{0.4cm}
+		\begin{array}{l}
+			\exsts{f'} (p \composeL f', q \composeL f') \in \lmod'(\ca{}) \;\land\; p \composeL f' \leq l \composeL r \\
+			\hspace*{2cm} \lor\\
+			\for{t \in \left( l \meetL p \right)} t \leq q\\
+			\hspace*{2cm} \lor\\
+			q \composeL f' \composeL r' \text{ is undefined.}
+			
+		\end{array}
+
+	\end{array}
+	
+	
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Well-formed states]\label{def:wellformedness}
+A world $w = (l, g, \lmod, \gmod)$ is \emph{well-formed} iff
+\[
+\begin{array}{l}
+	\exsts{r} \collapseW{w} = r  \land \contains{\lmod}{\capPart{r}} \land \exsts{\fence{}} g \in \fence{} \land \fence{} \strictfences \lmod\land\\
+	\for{\ca{}, f, l_1, l_2} (l_1 \composeL f, l_2 \composeL f) \in \gmod(\ca{}) \land (\for{t} t \leq l_1 \land t \leq l_2 \implies t = \unitL) \implies\\
+	\hspace{0.2cm}  \exsts{f'} (l_1 \composeL f', l_2 \composeL f') \in \lmod(\ca{}) 
+\end{array}
+\]
+%
+\end{definition}

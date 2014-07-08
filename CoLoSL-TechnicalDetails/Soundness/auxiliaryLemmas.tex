@@ -292,7 +292,7 @@ as required.
 \end{lemma}
 %
 %
-\begin{lemma}[] \label{lem:amodHiding} \todo Update
+\begin{lemma}[] \label{lem:amodHiding}
 %
 \[
 \begin{array}{l}
@@ -570,105 +570,19 @@ as required.
 \end{lemma}
 %
 %
-\begin{lemma}[]
-%
-\[
-		\fence{} \fences I \;\land\; I \weakenI{\fence{}} I_1 \implies \fence{} \fences I_1
-\]
-%
-\begin{proof}
-\todo
-\end{proof}
-\end{lemma}
-%
-%
+%\begin{lemma}[]
+%%
+%\[
+%		\fence{} \fences I \;\land\; I \weakenI{\fence{}} I_1 \implies \fence{} \fences I_1
+%\]
+%%
+%\begin{proof}
+%\todo
+%\end{proof}
+%\end{lemma}
+%%
+%%
 \input{Soundness/amodMerge.tex}
-\begin{lemma}[] \label{lem:extension}
-%
-\[
-		P \containI I  \Rrightarrow \exsts{\capAss{1}, \capAss{2}} \;\; \capAss{1} * \shared{P * \capAss{2}}{I}
-\]
-%
-\begin{proof}
-\textbf{RTS. }
-%
-\[
-\begin{array}{l}
-	\for{\lenv} \for{w_1 \in \sem[\lenv]{P}} \exsts{w_2 \in \sem[\lenv]{\exsts{\capAss{1}} \;\; \capAss{1} * \shared{P * \capAss{2}}{I}}}\\
-	\hspace*{1cm} (w_1, w_2) \in \guarantee \;\land\; \heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)}
-\end{array}
-\]
-%
-Pick an arbitrary $\lenv$, $w_1 = (l, s, \amod{}, \amod{L}) \in \sem[\lenv]{P}$ and set $K$ such that:
-\begin{align}
-%	K = 
-%	\semK[\lenv]{\left( \bigvee\limits_{\lambda \vec{x}. \capAss{}: a \in \dom{I}} \capAss{}\right) \;\lor\; \capAss{1} }
-%	\;\land\; K \disjoint \dom{\amod{L}} \label{LE:Ass1}
-	K = 
-	\semK[\lenv]{\capAss{1} \lor \capAss{2}}
-	\;\land\; K \disjoint \dom{\amod{L}} \label{LE:Ass1}
-\end{align}	 
-%
-Since $(l, s, \amod{}, \amod{L}) \in \sem[\lenv]{P}$, we know 
-\begin{align}
-	\exsts{\fence{L}} s \in \fence{L} \;\land\; \fence{L} \strictfences \amod{L} \label{LE:Ass2}
-\end{align} 
-%Pick arbitrary $l_1, \cdots, l_n \in \LStates$, $\amod{1} , \cdots, \amod{n} \in \AMods$, $F_1, \cdots, F_n \in \pset{\LStates}$ such that 
-%%
-%\begin{align}
-%\begin{array}{l}
-%	l_1 \composeL \cdots \composeL l_n = s \\
-%	\for{\amod{i}, \amod{j} \in \left(\amod{1} \cup \cdots \cup \amod{n}\right)} \dom{\amod{i}} \disjoint \dom{\amod{j}}\\
-%	\dom{\amod{}} = \dom{\amod{1}} \cup \cdots \cup \dom{\amod{n}}\\
-%	\for{i \in 1, \cdots, n} l_i \in F_i \;\land\; F_i \strictfences \amod{i}\;\land\;\\
-%	\hspace*{1cm}\extendsAM{\amod{}}{l_i}{l_1 \composeL \cdots \composeL l_{i-1} \composeL l_{i+1} \composeL \cdots \composeL l_n}{\amod{i}} \label{LE:Ass2}
-%\end{array}
-%\end{align}
-%%
-On the other hand, from the premise of the lemma we know 
-%
-\begin{align}
-	\exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \strictfences \semI[\lenv]{I} \label{LE:Ass3}
-\end{align}
-%(\ref{LE:Ass})
-Since $\wf{l, s, \amod{}, \amod{L}}$, we know $l \composeL s \text{ is defined}$ and thus from (\ref{LE:Ass1})-(\ref{LE:Ass3}) and lemma \ref{lem:amodWitness} we know:
-%
-\begin{align}
-\begin{array}{l}
-	\exsts{\amod{}', \fence{}'} l \composeL s \in \fence{}' \;\land\; \fence{}' \strictfences \amod{L} \cup \semI[\lenv]{I} \;\land\; \extendsAM{\amod{}', \amod{L} \cup \semI[\lenv]{I}}{l}{s}{\semI[\lenv]{I}} \;\land\\
-	\hspace*{1.3cm}\for{l', r'} \for{\amod{1} \subseteq \amod{L}} l' \composeL r' = s \;\land\; \extendsAM{\amod{}, \amod{L}}{l'}{r'}{\amod{1}} \implies\\
-	\hspace*{1.8cm}\extendsAM{\amod{}', \amod{L} \cup \semI[\lenv]{I}}{l'}{r' \composeL l}{\amod{1}} 
-\end{array}\label{LE:Ass4}
-\end{align}
-%
-%Pick $\amod{}'$ such that (\ref{LE:Ass4}) is satisfied. Then from (\ref{LE:Ass2}) and (\ref{LE:Ass4}) we know
-%%
-%\begin{align}
-%	\expandsAM{\amod{}'}{s}{l}{\amod{}} \;\land\; \extendsAM{\amod{}'}{l}{s}{\intermediateSemI{I}} \label{LE:Ass5}
-%\end{align}
-%%
-Pick $\amod{}'$ such that (\ref{LE:Ass4}) is satisfied. Pick $\ca{1} \in \semK[\lenv]{\capAss{1}}$, $\ca{2} \in \semK[\lenv]{\capAss{2}}$ and $w_2 = ( (\unitH, \ca{1}), l \composeL s \composeL (\unitH, \ca{2}), \amod{}', \amod{L} \cup \intermediateSemI{I} )$. Then from (\ref{LE:Ass1}) and (\ref{LE:Ass4}) we know
-%
-\begin{align}
-	(w_1, w_2) \in \guarantee \label{LE:Ass6}
-\end{align}
-%
-On the other hand, from the definition of $\collapseW{.}$ we know:
-%(\ref{LE:Ass})
-\begin{align}
-	\heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)} \label{LE:Ass7}
-\end{align}
-%
-Finally since $w_2 \in \sem[\lenv]{\capAss{1} * \shared{P * \capAss{2}}{I}}$, from (\ref{LE:Ass6}) and (\ref{LE:Ass7}) we have
-%
-\begin{align}
-	(w_1, w_2) \in \guarantee \;\land\; \heapPart{\left(\collapseW{w_1}\right)} = \heapPart{\left(\collapseW{w_2}\right)}
-\end{align}
-%
-as required.
-\end{proof}
-\end{lemma}
-%
 %
 \input{Soundness/amodConstruction.tex}
 %
