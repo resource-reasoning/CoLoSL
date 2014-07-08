@@ -17,8 +17,8 @@ need in this case, as it naturally deals with arbitrary overlapping
 views of the shared state, and allows one to tailor interferences to a
 given subjective view.
 
-Our example, presented in \fig{fig:conSpanningTree}, operates on a
-\emph{directed binary graph}, henceforth simply called a \emph{graph},
+Our example, presented in \fig\ref{fig:conSpanningTree}, operates on a
+\emph{directed binary graph} (henceforth simply \emph{graph}),
 \textit{i.e.} a directed graph where each node has at most two
 successors, called its left and right children. The program computes a
 in-place spanning tree of the graph, \textit{i.e.} a tree that covers
@@ -26,7 +26,7 @@ all nodes of the graphs from a given root, concurrently as follows:
 each time a new node is encountered, two new threads are created that
 each prune the edges of the left and right children recursively. A
 mark bit is associated to each node to keep track of which ones have
-already been visited. Crucially, each thread returns whether the root
+already been visited. Each thread returns whether the root
 of the subgraph it was operating on had already been visited; if so,
 the parent thread removes the link from its root node to the
 corresponding child. Intuitively, it is allowed to do so because,
@@ -82,7 +82,7 @@ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$.
 
 
 
-\begin{wrapfigure}{r}{0.3\columnwidth}
+\begin{wrapfigure}[8]{r}{0.3\columnwidth}
 	\centering
 	\begin{tabular}{|c |}
 		\hline
