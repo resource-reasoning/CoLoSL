@@ -3,9 +3,9 @@
 
 This section introduces the core concepts behind our program logic. We
 start by defining what the rely and guarantee conditions of each
-thread is in terms of their action models. This allows us to define
+thread are in terms of their action models. This allows us to define
 \emph{stability} against rely conditions, \emph{repartitioning},
-which logically represent a thread's atomic actions (and have to be in
+which logically represents a thread's atomic actions (and have to be in
 the guarantee condition), and \emph{semantic implication}. Equipped
 with these notions, we can justify the \eqref{eq:shift} and
 \eqref{eq:extend} principles. We conclude this section with a sketch
@@ -23,7 +23,7 @@ logical state $l = ((@s,h),\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for
 $\m{fst}(l)$ and $\m{snd}(l)$, respectively.
 
 The first relation, $\extendR$, extends the shared state $g$ with new
-state $g'$, along with new interference $\lmod'$ on $g'$. We introduce
+state $g'$, along with a new interference $\lmod'$ on $g'$. We introduce
 the following notation to describe extensions that respect all
 previous subjective views of a world (and may change the global action
 model in the process provided it preserves action closure with respect
@@ -454,12 +454,12 @@ When extending the shared state using currently owned local resources,
 one specifies a new interference assertion over these newly shared
 resources. While in \colosl the new interferences may mention parts of
 the shared state beyond the newly added resources (in particular
-existing shared state), they must not allow visible updates to those
+the existing shared state), they must not allow visible updates to those
 parts, so as not to invalidate other threads' views of existing
 resources. We thus impose a locality condition on the newly added
 behaviour to ensure sound extension of the shared state, similarly to
 the confinement constraint of local fences of
-\S\ref{def:actconf}. We first motivate this constraint with an example.
+\defin\ref{def:actconf}. We first motivate this constraint with an example.
 
 \begin{example}\label{ex:badExtension}
 Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$
@@ -480,12 +480,12 @@ valid one.
 
 \sloppy
 If, on the
-other hand, replacing $I'$ with
+other hand, $I'$ is replaced with
 $I''
 \eqdef \left( \token{a}:
 \left\{
   \cell{y}{1} \swap \cell{y}{3}
-\right\}\right)$, where location $y$ can be mutated, in the situation above
+\right\}\right)$, where location $y$ can be mutated, the situation above
 is not allowed.  Indeed, other threads may rely on the fact that the
 only updates allowed on location $y$ are done through the
 $[\token{b}]$ capability as specified in $I$, and would be spooked by
