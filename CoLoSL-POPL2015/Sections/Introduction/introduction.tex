@@ -27,7 +27,7 @@ been used to demonstrate the importance of reasoning about only the
 portions of the local machine state (the resource) actually accessed
 by programs. Recently, several techniques have been built on top of
 separation logic, such as those related to CAP
-reasoning~\cite{lotsofthem}, which have made substantial advances in
+reasoning~\cite{cap-ecoop10,icap,tada}, which have made substantial advances in
 fine-grained compositional reasoning about complex algorithms which
 access the global shared state.  However, the rigidity of existing
 techniques forces us to work with {\em static} global shared state,
@@ -35,9 +35,9 @@ such as a shared data structure for representing sets, even though a
 thread might only access just a small part of it.  This global state
 must be robust with respect to all possible interferences from the
 environment, {even on parts of the shared state not actually accessed
-  by the current thread}.  Intuitively, compositionality calls for
+  by the current thread}. Intuitively, compositionality calls for
 reasoning that only refers to the part of the global shared state actually
-accessed by each thread.  Exisiting reasoning techniques are too rigid
+accessed by each thread.  Existing reasoning techniques are too rigid
 to achieve this. 
 
 
@@ -51,7 +51,7 @@ the partial shared resource necessary
 for the thread to run and the  thread-specific interference 
 describing how the thread and the environment can effect this partial
 shared resource. Subjective views may arbitrarily overlap with each
-other, and subtlely expand and contract  to the natural resources and the 
+other, and subtly expand and contract to the natural resources and the 
 interference required by  the current thread. 
 This flexibility
 provides truly compositional reasoning  for shared-memory concurrency.
@@ -138,7 +138,7 @@ distribute the shared state between several threads:
         {\hoare{P_1}{\mathbb{P}_1}{Q_1} &
           \hoare{P_2}{\mathbb{P}_2}{Q_2}}
 \]
-The subjective views for the individual subthreads will be typically
+The subjective views for the individual threads will be typically
 too strong, describing resource that is not necessary being used by
 the thread. However, before  weakening the view, it will sometimes 
 be useful to strengthen some of the actions in the interference assertion
@@ -151,7 +151,7 @@ principle:
   \shared{P}{I} ===> \shared{P}{I'}
   \tag{\shiftRule}
 \end{align*}
-This principle states that an interference assersion $I$ can be
+This principle states that an interference assertion $I$ can be
 exchanged for any other interference assertion $I'$ that has the same projected
 effect on the subjective state $P$. When this is the case, we write $
 I \weakenIb{P} I'$ and say that the actions have been  \emph{shifted}. It can
@@ -181,8 +181,8 @@ a precondition that is too weak.
 
 
 These reasoning principles enable us to provide subjective views for
-the subthreads which are just right. 
-We can proceed to verify the subthreads, knowing that their
+the sub-threads which are just right. 
+We can proceed to verify the sub-threads, knowing that their
 subjective views describe personalised preconditions which only  
 describe the resource relevant to the individual threads. The
 resulting postconditions naturally describe
@@ -194,14 +194,14 @@ using the disjoint concurrency rule and the \mergeRule principle:
 \end{align*}
 The assertion $P ** Q$ 
 describes the overlapping of states arising from $P$ and $Q$, using
-the overlapping conjunction $**$~\cite{gareth,jules}. 
+the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
 The new
 interference relation is simply the union of previous
 interferences. Finally, we can use the \shiftRule principle to simplify the
 interference assertion now that we are back with a larger subjective view.
 
 The last principle to mention is how subjective views are created
-using the \extendRule principle, wehere $\vec a, \vec b$ range over
+using the \extendRule principle, where $\vec a, \vec b$ range over
 tokens:
 
 \begin{align}
@@ -225,14 +225,6 @@ our set example discussed below. Notice that we  do not require a corresponding 
 subjective views since this is achieved by the \forgetRule principle. 
 
 
-
-
-
-
-
-
-
-
 With these reasoning principles, we are able to expand and contract
 subjective views  to provide just the resource required by a thread.
 In essence, we provide  frame-like reasoning for  subjective  views. 
@@ -243,7 +235,7 @@ In essence, we provide  frame-like reasoning for  subjective  views.
 In 
 \S\ref{sec:intuition}, we 
 demonstrate this using 
-a variant of the famous  token ring mutual exclusion algorithm [? ],
+a variant of the famous  token ring mutual exclusion algorithm~\cite{dijkstra74},
 introduced by Dijkstra to illustrate distributed, global knowledge between
 threads. The point is that, as well as local knowledge
 about how the threads behave, the programmer also has global knowledge
@@ -281,6 +273,6 @@ algorithm.
 %example uses the \extendRule principle   to the create new actions which refer to existing
 %state in a fundamental way. 
 The flexibility of \colosl's subjective views  leads to a
-considerably simpler correctness proof   compared to that of CAP. 
+considerably simpler correctness proof compared to that of CAP. 
 
 

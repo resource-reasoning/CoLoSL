@@ -125,21 +125,16 @@ An action is simply a pair of logical states describing the pre- and
 post-states of the action, and an action model describes the set of
 actions enabled by each capability.
 
-\begin{definition}[Action]
-  An action $a\in\set{Action}$ is a pair of logical states:
-  \[
-  \set{Action} == \LStates \times \LStates
-  \]
+\begin{definition}[Action, action models]
+  The sets of \emph{actions} $\set{Action}$ and \emph{action models}
+  $\AMods$ are defined as follows:
+  \begin{align*}
+  \set{Action} &== \LStates \times \LStates&
+  \AMods &\eqdef \Caps \rightharpoonup \pset{\set{Action}}
+  \end{align*}
 \end{definition}
 
-\begin{definition}[Action models]
-An \emph{action model} is a partial function from capabilities to
-actions:
-\[
-\lmod \in \AMods \eqdef \Caps \rightharpoonup \pset{\set{Action}}
-\]
 We write $\unitAM$ for an action model with empty domain.
-\end{definition}
 
 
 \paragraph{The Effect of Actions} As mentioned in the beginning of the
@@ -325,26 +320,30 @@ Note that we also have that $g\containI \gmod$.
     \Worlds \eqdef \{w\in
     \LStates\times\LStates\times\AMods\times\AMods ||| \p{wf}(w)\}
   \end{mathpar}
-  The \emph{composition} $\composeW$ between worlds is defined as
-  \begin{align*}
-    &\qquad (l,g,\lmod,\gmod) \composeW
-    (l',g',\lmod',\gmod') \\
-    &\eqdef
-    \begin{cases}
-      (l\composeL l', g, \lmod, \gmod) &
-      \begin{array}[t]{L}
-        \text{if }
-        g = g' \text{, }
-        \lmod = \lmod' \text{, and } \gmod = \gmod'\\[-.7ex]
-        \text{and }\p{wf}((l\composeL l', g, \lmod, \gmod))
-      \end{array}\\
-      \textit{undefined}&\text{otherwise}
-    \end{cases}
-  \end{align*}
+  The \emph{composition} $w\composeW w'$ of two worlds $w =
+  (l,g,\lmod,\gmod)$ and $w' = (l',g',\lmod',\gmod')$ is defined as
+  $(l\composeL l', g, \lmod, \gmod)$ when $g = g'$, $\lmod = \lmod'$,
+  $\gmod = \gmod'$, and $\p{wf}((l\composeL l', g, \lmod, \gmod))$,
+  and is undefined otherwise.
+  %% \begin{align*}
+  %%   &\qquad (l,g,\lmod,\gmod) \composeW
+  %%   (l',g',\lmod',\gmod') \\
+  %%   &\eqdef
+  %%   \begin{cases}
+  %%     (l\composeL l', g, \lmod, \gmod) &
+  %%     \begin{array}[t]{L}
+  %%       \text{if }
+  %%       g = g' \text{, }
+  %%       \lmod = \lmod' \text{, and } \gmod = \gmod'\\[-.7ex]
+  %%       \text{and }\p{wf}((l\composeL l', g, \lmod, \gmod))
+  %%     \end{array}\\
+  %%     \textit{undefined}&\text{otherwise}
+  %%   \end{cases}
+  %% \end{align*}
 \end{definition}
 
 The set of worlds with composition $\composeW$ forms a separation
-algebra with multiple units, which are all the well-formed states of
+algebra with multiple units: all well-formed states of
 the form $(\unitL,g,\lmod,\gmod)$.
 
 
