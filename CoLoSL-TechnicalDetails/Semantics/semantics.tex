@@ -1,210 +1,210 @@
 \section*{Assertions and their Semantics}
-\begin{definition}[Logical State Assertions]
-Given the set of state assertions $\HAssertions$, and the set of capability assertions $\KAssertions$, the \emph{logical state assertions} are:
-%
-\[
-	p, q \in \LAssertions ::= \heapAss{} \;|\; \capAss{} \;|\; \emp \;|\;  p_1 * p_2
-\]
-%
-\end{definition}
-\begin{definition}[Semantics of Logical State Assertions]
-Given a logical environment $\lenv \in \LEnv$, the semantic function of heap assertions $\semH[\blankArg]{.}$ and the semantic function of capability assertions $\semK[\blankArg]{.}$, the semantics of logical state assertions:
-%
-\[
-	\semL[\blankArg]{.} : \LAssertions \rightarrow \LEnv \rightarrow \pset{\LStates}
-\]
-%
-is defined as:
-\[
-\begin{array}{r c l}
-	
-	\semL{\heapAss{}} & \eqdef & 
-	\left\{
-	\begin{array}{l | l}
-	 \left(h, \unitCap \right) &
-	 h \in \semH{\heapAss{}}
-	\end{array}
-	\right\}\\
-	
-	\semL{\capAss{}} & \eqdef & 
-	\left\{
-	\begin{array}{l | l}
-	 \left( \unitH, \ca{} \right) &
-	 \ca{} \in \semK{\capAss{}}
-	\end{array}
-	\right\}\\
-
-
-	\semL{\emp} & \eqdef & \{\unitL\}\\
-
-
-	\semL{p_1 * p_2} & \eqdef & 
-	\left\{ 
-	\begin{array}{l | l}
-		l_1 \composeL l_2 & 
-		\begin{array}{l}
-				 l_1 \in \semL{p_1} \;\land\;
-				 l_2 \in \semL{P_2}
-		\end{array}
-	\end{array} \right\}
-\end{array}
-\]
-%
-\end{definition}
+%\begin{definition}[Logical State Assertions]
+%Given the set of state assertions $\HAssertions$, and the set of capability assertions $\KAssertions$, the \emph{logical state assertions} are:
+%%
+%\[
+%	p, q \in \LAssertions ::= \heapAss{} \;|\; \capAss{} \;|\; \emp \;|\;  p_1 * p_2
+%\]
+%%
+%\end{definition}
+%\begin{definition}[Semantics of Logical State Assertions]
+%Given a logical environment $\lenv \in \LEnv$, the semantic function of heap assertions $\semH[\blankArg]{.}$ and the semantic function of capability assertions $\semK[\blankArg]{.}$, the semantics of logical state assertions:
+%%
+%\[
+%	\semL[\blankArg]{.} : \LAssertions \rightarrow \LEnv \rightarrow \pset{\LStates}
+%\]
+%%
+%is defined as:
+%\[
+%\begin{array}{r c l}
+%	
+%	\semL{\heapAss{}} & \eqdef & 
+%	\left\{
+%	\begin{array}{l | l}
+%	 \left(h, \unitCap \right) &
+%	 h \in \semH{\heapAss{}}
+%	\end{array}
+%	\right\}\\
+%	
+%	\semL{\capAss{}} & \eqdef & 
+%	\left\{
+%	\begin{array}{l | l}
+%	 \left( \unitH, \ca{} \right) &
+%	 \ca{} \in \semK{\capAss{}}
+%	\end{array}
+%	\right\}\\
 %
 %
-\begin{definition}[Assertions]
-Given the set of logical state assertions $\LAssertions$, the assertions of \colosl\ are:
-%
-\[
-\begin{array}{r l}
-	P, Q \in \Assertions ::= & p \;|\; \shared{P}{I} \;|\; P * Q \;|\; P -\!\!\!* Q \;|\; P \implies Q \;|\; false \;|\; \exsts{x} P\\
-	I \in \IAssertions ::= & 
-	\left(\interAss{\capAss{}}{\vec{y}}{P}{Q} \right)
-	\;|\; I_1 , I_2
-\end{array}
-\]
-%
-\end{definition}
+%	\semL{\emp} & \eqdef & \{\unitL\}\\
 %
 %
-\begin{definition}[Semantics of Interference Assertions]
-The \emph{semantic of interference assertions}
-%
-\[
-	\intermediateSemI{.} : \IAssertions \rightharpoonup \left(\Caps \rightharpoonup  \LStates \times \LStates \right)
-\]
-%
-is given as
-%
-\[
-\begin{array}{r l}
-	\for{\kappa} \intermediateSemI{I}(\ca{}) =
-	 	&
-%	 	\hspace*{0.2cm}
-	 	\left\{
-		\begin{array}{l | r}
-			
-			\hspace*{-0.2cm}(l_1, l_2)\hspace*{-0.1cm} & 
-			\hspace*{-0.2cm}
-			\begin{array}{l}
-				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I,\; \vec{v}}\\
-	
-				\hspace*{0.2cm}
-				\semK[]{\capAss{}} = \ca{} \; \land\\
-				
-				\hspace*{0.2cm}
-				(l_1, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \;\land\\
-				
-
-				
-				\hspace*{0.2cm}
-				(l_2, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
-				
-			\end{array}
-		\end{array}
-	\hspace*{-0.2cm}
-	\right\}\\\\
-	
-
-	
-\end{array}
-\]
-%
-\end{definition}
+%	\semL{p_1 * p_2} & \eqdef & 
+%	\left\{ 
+%	\begin{array}{l | l}
+%		l_1 \composeL l_2 & 
+%		\begin{array}{l}
+%				 l_1 \in \semL{p_1} \;\land\;
+%				 l_2 \in \semL{P_2}
+%		\end{array}
+%	\end{array} \right\}
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
+%\begin{definition}[Assertions]
+%Given the set of logical state assertions $\LAssertions$, the assertions of \colosl\ are:
+%%
+%\[
+%\begin{array}{r l}
+%	P, Q \in \Assertions ::= & p \;|\; \shared{P}{I} \;|\; P * Q \;|\; P -\!\!\!* Q \;|\; P \implies Q \;|\; false \;|\; \exsts{x} P\\
+%	I \in \IAssertions ::= & 
+%	\left(\interAss{\capAss{}}{\vec{y}}{P}{Q} \right)
+%	\;|\; I_1 , I_2
+%\end{array}
+%\]
+%%
+%\end{definition}
 %
 %
-\begin{definition}[Intermediate Assertion Semantics]
-Given a logical environment $\lenv \in \LEnv$, the intermediate semantics of assertions: 
+%\begin{definition}[Semantics of Interference Assertions]
+%The \emph{semantic of interference assertions}
+%%
+%\[
+%	\intermediateSemI{.} : \IAssertions \rightharpoonup \left(\Caps \rightharpoonup  \LStates \times \LStates \right)
+%\]
+%%
+%is given as
+%%
+%\[
+%\begin{array}{r l}
+%	\for{\kappa} \intermediateSemI{I}(\ca{}) =
+%	 	&
+%%	 	\hspace*{0.2cm}
+%	 	\left\{
+%		\begin{array}{l | r}
+%			
+%			\hspace*{-0.2cm}(l_1, l_2)\hspace*{-0.1cm} & 
+%			\hspace*{-0.2cm}
+%			\begin{array}{l}
+%				\exsts{\interAss{\capAss{}}{\vec{y}}{P}{Q} \in I,\; \vec{v}}\\
+%	
+%				\hspace*{0.2cm}
+%				\semK[]{\capAss{}} = \ca{} \; \land\\
+%				
+%				\hspace*{0.2cm}
+%				(l_1, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{P} \;\land\\
+%				
 %
-\[
-	\intermediateSem[\blankArg]{.}  :  \Assertions \times \LEnv \rightarrow \pset{\Worlds}\\
-\]
+%				
+%				\hspace*{0.2cm}
+%				(l_2, -, -, -) \in \intermediateSem[\text{[} \vec{y} \mapsto \vec{v} \text{]}]{Q} 
+%				
+%			\end{array}
+%		\end{array}
+%	\hspace*{-0.2cm}
+%	\right\}\\\\
+%	
 %
-is defined as: 
+%	
+%\end{array}
+%\]
+%%
+%\end{definition}
+%%
+%%
+%\begin{definition}[Intermediate Assertion Semantics]
+%Given a logical environment $\lenv \in \LEnv$, the intermediate semantics of assertions: 
+%%
+%\[
+%	\intermediateSem[\blankArg]{.}  :  \Assertions \times \LEnv \rightarrow \pset{\Worlds}\\
+%\]
+%%
+%is defined as: 
+%%
+%\[
+%\begin{array}{r c l}
+%	\intermediateSem{p} & \eqdef & 
+%	\left\{
+%	\hspace*{-0.15cm}
+%	\begin{array}{l | l}
+%	 \left( l, s, \amod{}, \amod{L} \right) &
+%	 		l \in \semL{p} \;\land\; s \in \LStates,\;\land\; \amod{}, \amod{L} \in \AMods 
+%	\end{array}
+%	\hspace*{-0.1cm}
+%	\right\}\\
+%	
+%	
+%	\intermediateSem{\shared{P}{I}} & \eqdef & 
+%	\left\{ 
+%	\begin{array}{l | l}
+%		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
+%		\begin{array}{l}
+%			r \in \LStates \;\land\; (l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P} \\
+%%			\land\; \exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \fences \intermediateSemI{I} \\
+%%			\land\; \amod{}' = \semI{I}{\fence{}} \;\land\; 
+%	%		\exsts{\fence{}} \fence{} \fences \amod' \;\land\; l \in \fence{} \;\land\; \\
+%	%		s \in \extendL{l} \;\land\; 
+%			\extendsAM{\amod{}, \amod{L}}{l}{r}{\intermediateSemI{I} }
+%	
+%		\end{array}
+%	\end{array} \right\}\\
+%	
+%	
+%	\intermediateSem{P_1 * P_2} & \eqdef & 
+%	\left\{ 
+%	\begin{array}{l | l}
+%		(l_1 \composeL l_2, s, \amod{}, \amod{L})& 
+%		\begin{array}{l}
+%				 (l_1, s, \amod{}, \amod{L}) \in \intermediateSem{P_1} \;\land\\
+%				 (l_2, s, \amod{}, \amod{L}) \in \intermediateSem{P_2} 
+%				 %(s_1, \amod_1) \agrees (s_2, \amod_2)
+%		\end{array}
+%	\end{array} 
+%	\right\}
+%\end{array}
+%\]
+%%
+%%
+%\end{definition}
+%%
+%%
+%\begin{definition}[Assertion Semantics]
+%%
+%\[
+%\begin{array}{r c l}
+%%\sem[-, -]{-} & : & \Assertions \times \PEnv \times \LEnv \rightarrow \pset{\World} \\
+%\sem[-]{-} & : & \Assertions \times \LEnv \rightarrow \pset{\Worlds} \\
 %
-\[
-\begin{array}{r c l}
-	\intermediateSem{p} & \eqdef & 
-	\left\{
-	\hspace*{-0.15cm}
-	\begin{array}{l | l}
-	 \left( l, s, \amod{}, \amod{L} \right) &
-	 		l \in \semL{p} \;\land\; s \in \LStates,\;\land\; \amod{}, \amod{L} \in \AMods 
-	\end{array}
-	\hspace*{-0.1cm}
-	\right\}\\
-	
-	
-	\intermediateSem{\shared{P}{I}} & \eqdef & 
-	\left\{ 
-	\begin{array}{l | l}
-		(\unitL, l \composeL r, \amod{}, \amod{L}) & 
-		\begin{array}{l}
-			r \in \LStates \;\land\; (l, l \composeL r, \amod{}, \amod{L}) \in \intermediateSem{P} \\
-%			\land\; \exsts{\fence{}} l \in \fence{} \;\land\; \fence{} \fences \intermediateSemI{I} \\
-%			\land\; \amod{}' = \semI{I}{\fence{}} \;\land\; 
-	%		\exsts{\fence{}} \fence{} \fences \amod' \;\land\; l \in \fence{} \;\land\; \\
-	%		s \in \extendL{l} \;\land\; 
-			\extendsAM{\amod{}, \amod{L}}{l}{r}{\intermediateSemI{I} }
-	
-		\end{array}
-	\end{array} \right\}\\
-	
-	
-	\intermediateSem{P_1 * P_2} & \eqdef & 
-	\left\{ 
-	\begin{array}{l | l}
-		(l_1 \composeL l_2, s, \amod{}, \amod{L})& 
-		\begin{array}{l}
-				 (l_1, s, \amod{}, \amod{L}) \in \intermediateSem{P_1} \;\land\\
-				 (l_2, s, \amod{}, \amod{L}) \in \intermediateSem{P_2} 
-				 %(s_1, \amod_1) \agrees (s_2, \amod_2)
-		\end{array}
-	\end{array} 
-	\right\}
-\end{array}
-\]
-%
-%
-\end{definition}
-%
-%
-\begin{definition}[Assertion Semantics]
-%
-\[
-\begin{array}{r c l}
-%\sem[-, -]{-} & : & \Assertions \times \PEnv \times \LEnv \rightarrow \pset{\World} \\
-\sem[-]{-} & : & \Assertions \times \LEnv \rightarrow \pset{\Worlds} \\
-
-\sem{P} & \eqdef & 
-\left\{
-\begin{array}{l | l}
- w &
- \begin{array}{l}
- 	 w \in \intermediateSem{P} \;\land\;
- 	 \wf{w}
- 	\end{array} 
-\end{array}
-\right\}\\
-\end{array}
-\]
-%
-where 
-%
-\[
-\begin{array}{l l}
-%	\wf{l, s, \amod{}, \amod{L}} \iffdef & \exsts{r} \collapseW{l, s, \amod{}, \amod{L}} = r  \;\land\; \contains{\amod{L}}{\capPart{r}} \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}\\
-	
-	\contains{S}{\ca{}} \iffdef & 
-	\begin{array}{l}
-		\exsts{K}\;\; \ca{} = \prod\limits_{\ca{i} \in K}^{\composeCap} \ca{i} \;\land\;
-		\for{\ca{i} \in K} \exsts{\ca{}' \in S} \ca{i} \leq \ca{}'
-	\end{array}
-\end{array}
-\]
-%
-\end{definition}
+%\sem{P} & \eqdef & 
+%\left\{
+%\begin{array}{l | l}
+% w &
+% \begin{array}{l}
+% 	 w \in \intermediateSem{P} \;\land\;
+% 	 \wf{w}
+% 	\end{array} 
+%\end{array}
+%\right\}\\
+%\end{array}
+%\]
+%%
+%where 
+%%
+%\[
+%\begin{array}{l l}
+%%	\wf{l, s, \amod{}, \amod{L}} \iffdef & \exsts{r} \collapseW{l, s, \amod{}, \amod{L}} = r  \;\land\; \contains{\amod{L}}{\capPart{r}} \;\land\; \exsts{\fence{}} s \in \fence{} \;\land\; \fence{} \strictfences \amod{L}\\
+%	
+%	\contains{S}{\ca{}} \iffdef & 
+%	\begin{array}{l}
+%		\exsts{K}\;\; \ca{} = \prod\limits_{\ca{i} \in K}^{\composeCap} \ca{i} \;\land\;
+%		\for{\ca{i} \in K} \exsts{\ca{}' \in S} \ca{i} \leq \ca{}'
+%	\end{array}
+%\end{array}
+%\]
+%%
+%\end{definition}
 %
 
 %
