@@ -1,6 +1,8 @@
 
 \subsection*{Related Work and Concluding Remarks}
 
+\pgcomment{First para good, can loose views, but good to mention views
+  somwwhere, maybe at end saying subjective views much better.} 
 
 Compositional reasoning about fine-grained concurrent algorithms is
 essential for verifying large concurrent systems.  Jones introduced
@@ -14,19 +16,23 @@ have looked at more complex and finer-grained algorithms,
 building on the combination of global and local  ideas arising from these papers:
 examples include RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
 deny-guarantee~\cite{dg}, and the CAP
-family~\cite{cap-ecoop10,icap,tada}, to name but a few. Some of this
-work has been clarified by the views framework~\cite{views}: assertions provide 
+family~\cite{cap-ecoop10,icap,tada}, to name but a few. In addition,
+the views framework~\cite{views} clarifies much of the basic assumptions associated
+with this work: assertions provide disjoint 
 \emph{views} of the concrete machine state for each thread, which
 other threads cannot invalidate. 
 
-\pgcomment{Azalea, please make the fence bit better.}
+\pgcomment{Azalea, I dont know what to say here.}
 
 
 
 Our primary inspiration has come from Local RG~\cite{lrg}.
 
+global RG reasoning
 
+disjoint *, non-overlapping views. 
 
+assertions with fences, some connection with our fences 
 
 
  where the
@@ -38,10 +44,7 @@ taken inspiration from them. our set example better.
 
 fences, global rely-guarantee conditions,  still non-overlapping, 
 
-
-
-views an inspiration for us. 
-
+\pgcomment{Next para on CAP good.} 
 
 Another  point of inspiration has come from CAP reasoning. 
 CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
@@ -55,17 +58,10 @@ the flexible $I$. Subjective views  lead to simpler proofs, as
 illustrated by the concurrent set example in
 \S{sec:five}. There are many interesting ideas present in the CAP
 literature: e.g. abstract states~\cite{carasel}; higher-order
-<<<<<<< HEAD
-reasoning~\cite{iCAP}; and abstract atomicity~\cite{tada}. All these
-ideas are interesting areas for future research. The combination of 
-overlapping subjective views with abstraction will be particularly
-interesting. 
-=======
 reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
-ideas require further investigation. Here,  our aim was to  introduce 
+ideas require further investigation. Here,  our aim was to simply  introduce 
 subjective views as a 
 fundamental new way of  underpinning of  such reasoning. 
->>>>>>> 4b9cfcfc082256b93172202f1a62c8743ba28fe9
 
 
 Our merging of overlapping subjective views relies on the
@@ -77,16 +73,12 @@ how \colosl is naturally able to verify an concurrent tree spanning
 algorithm where the 
 overlapping of shared subgraphs is key. 
 
+\pgcomment{Needs ending baout how fab it all is.} 
+
 \pgcomment{Local Rely Guarantee abbreviates to Local RG or LRG(yuk),
   not both!} 
 
 
-This impedes
-compositionality: to use a given program specification in another
-context, the current shared state has to match that of the existing
-specification, instead of merely containing it. 
-
-our boxes very different,  fences like LRG, 
 
 
 %Future work: because we are able to specify shared state and
