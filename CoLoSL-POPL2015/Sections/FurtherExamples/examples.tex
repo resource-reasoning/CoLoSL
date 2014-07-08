@@ -199,6 +199,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 \]
 %
 \hrule
+\vspace{-6pt}
 \caption{Global specification of the graph predicate.}
 \label{fig:globalCST}
 \end{figure}
@@ -221,6 +222,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 \end{array}
 \]
 \hrule
+\vspace{-6pt}
 \caption{Local specification of the graph predicate.}
 \label{fig:localCST}
 \end{figure}
@@ -272,7 +274,7 @@ making the whole predicate stable against actions of the program and
 the environment.
 
 We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from the global specification of \fig\ref{fig:globalCST}. 
-When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial. \\
+When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial.
 Let
 %
 \[
@@ -283,35 +285,26 @@ Let
 \end{array}	
 \]
 %
-Then we have: 
-%
-\[
-\begin{array}{l @{\hspace*{1cm}} c @{\hspace*{1cm}} l}
-	\G{x}{\gamma} \iff  P & \text{and} & \g{x}{\gamma} \iff Q
-\end{array}
-\]
-%
+Then we have $\G{x}{\gamma} \iff  P$ and $\g{x}{\gamma} \iff Q$.
+%% %
+%% \[
+%% \begin{array}{l @{\hspace*{1cm}} c @{\hspace*{1cm}} l}
+%% 	\G{x}{\gamma} \iff  P & \text{and} & \g{x}{\gamma} \iff Q
+%% \end{array}
+%% \]
+%% %
 It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 %
-\[
-\begin{array}{@{} l @{} c @{\hspace{3pt}} l @{}}
+\begin{align*}
 	\shared{P}{I_{\gamma}} &
-	\stackrel{(\textsc{Copy})}{\implies} &
+	\stackrel{(\textsc{Copy})}{\implies}
 	\underbrace{\shared{P}{I_{\gamma}} * \cdots * \shared{P}{I_{\gamma}}}_{|\gamma| \text{ times}}\\
-	
-	
-	
-	&\stackrel{(\textsc{Forget})}{\implies} &
+	&\stackrel{(\textsc{Forget})}{\implies}
 	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I_{\gamma}}  \right)\\
-	
-	
-	& \stackrel{(\textsc{Shift})}{\semimplies} &
+	& \stackrel{(\textsc{Shift})}{\semimplies}
 	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}  \right)\\
-	
-	&\iffdef & Q
-	
-\end{array}
-\]
+	&\iffdef Q
+\end{align*}
 %
 %%
 %\[
@@ -374,14 +367,12 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
        $\text{[}$x.r$\text{]}$:= null
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} * \\ \cell{\tx{res}}{1} * \cell{\tx{b1}}{-} * \cell{\tx{b2}}{-} *  \exsts{l, r}  \\ \exsts{l' \in \{l, \tx{null}\}} \left[ \markT{l}{x.l} \right] * \cell{x.l}{l'} * \tr{l'}{\gamma} *\\ \exsts{r' \in \{r, \tx{null}\}} \left[ \markT{r}{x.r} \right] * \cell{x.r}{r'} * \tr{r'}{\gamma} \end{array}\right\}$  
    //$\comment\left\{\begin{array}{l}  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \cell{\tx{res}}{1} *\cell{\tx{b1}}{-} * \cell{\tx{b2}}{-}\\ * \markT{x}{\rootEdge} *  \tr{x}{\gamma}  \\  \end{array}\right\}$         
-   $\}		$
-   //$\comment\left\{ \begin{array}{l @{}} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right]*  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor \left(\begin{array}{@{} l @{}}\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)} \\  * \g{l}{\gamma} * \g{r}{\gamma} \end{array}\right) \end{array} \right\}$ 
+   $\}$ //$\comment\left\{ \begin{array}{l @{}} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right]*  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor \left(\begin{array}{@{} l @{}}\cell{\tx{res}}{0} * \shared{\marked{x}}{I(x)} \\  * \g{l}{\gamma} * \g{r}{\gamma} \end{array}\right) \end{array} \right\}$ 
    //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} ) \end{array} \right\}$      
    return res
- $\}$
- //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \left[ \markT{x}{\rootEdge} \right] *  ((\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor \cell{\tx{b}}{0}) \end{array} \right\}$         
+ $\}$ //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \left[ \markT{x}{\rootEdge} \right] *  ((\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor \cell{\tx{b}}{0}) \end{array} \right\}$         
 \end{lstlisting}
-\hrule\vspace*{5pt}
+\hrule\vspace*{-6pt}
 \caption{Concurrent Spanning Tree Implementation}
 \label{fig:conSpanningTree}
 \end{figure}
