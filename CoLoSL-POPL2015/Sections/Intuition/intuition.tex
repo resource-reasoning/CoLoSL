@@ -348,13 +348,13 @@ an explicit \emph{unsharing} mechanism to claim shared
 resources and render them thread-local. Instead, this behaviour can
 be simply encoded as an additional action with the second behaviour
 described above.
-
-We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
-cannot ensure that proved programs do not leak memory. Indeed, one may
-at any point of a proof stash leaked resources into a new subjective
-view, then weaken the resulting assertion to remove that view from the
-current state, rendering the leak invisible as far as the proof system
-is concerned.
+%
+%We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
+%cannot ensure that proved programs do not leak memory. Indeed, one may
+%at any point of a proof stash leaked resources into a new subjective
+%view, then weaken the resulting assertion to remove that view from the
+%current state, rendering the leak invisible as far as the proof system
+%is concerned.
 
 %% This finishes the justification of all uses of \eqref{eq:shift} in the
 %% derivations of \S\ref{subsec:threads}, and thus the derivations
