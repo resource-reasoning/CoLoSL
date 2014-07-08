@@ -234,7 +234,7 @@ capabilities, as this is the sole privilege of extension actions.
 		\right)
 	  	&
 	  	\begin{array}{@{} l @{} }
-	  		\capPart{(l' \composeL s')}  \subseteq \capPart{(l \composeL g)} \land\\
+	  		\capPart{(l' \composeL s')}  = \capPart{(l \composeL g)} \land\\
 		  	\left(
 		  	\begin{array}{@{} l @{} }
 		 		g = g' \lor\\
@@ -814,11 +814,6 @@ We build the \colosl\ program logic on top of the views framework~\cite{views} a
 \end{proof}
 %
 \end{theorem}
-
-\julescomment{Our soundness theorem doesn't include leak-freedom!
-  That's a fundamental limitation of \colosl. Could be overcome by
-  keeping a handle on all resources, that is only lost upon disposal.}
-
 %
 %
 %\subsection{Axiomatisation of \colosl principles}
