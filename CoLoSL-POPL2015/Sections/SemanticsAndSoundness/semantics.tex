@@ -1,4 +1,6 @@
+\vspace{-.5ex}
 \section{\colosl Program Logic}
+\vspace{-.5ex}
 \label{sec:semantics}
 
 This section introduces the core concepts behind our program logic. We
@@ -11,7 +13,9 @@ with these notions, we can justify the \eqref{eq:shift} and
 \eqref{eq:extend} principles. We conclude this section with a sketch
 of the soundness of \colosl.
 
+\vspace{-.5ex}
 \subsection{Proof System}
+\vspace{-.5ex}
 
 \paragraph{Rely}
 The rely relation represents potential interferences from the
@@ -439,7 +443,9 @@ sequential separation logic judgement:
 %In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
 
 
+\vspace{-.5ex}
 \subsection{Interference Manipulations}\label{subsec:extension}
+\vspace{-.5ex}
 
 
 In this section we formalise the requirements of the \eqref{eq:extend}
@@ -773,7 +779,9 @@ I \weakenI{P} I' == \V{\lenv,\ca{}} \semI[\lenv]{I} \weakenI{\{s|||
 
 
 %
+\vspace{-.5ex}
 \subsection{Soundness}
+\vspace{-.5ex}
 In this section we show that the program logic of \colosl\ is sound. We proceed with the definition of a \emph{valid} triple that relates the proof rules (Hoare triples) to the operational semantics of \colosl. In what follows, we write $C, m \rightarrow^{\text{*}} C', m'$ to denote the operational semantics relation where $C, C' \in \textsf{Comm}$ and $m, m' \in \Heaps$. We define a reification function that relates a \colosl\ world $w \in \Worlds$, to concrete states in \Heaps.
 %We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
 %
