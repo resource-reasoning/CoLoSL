@@ -1,0 +1,87 @@
+\documentclass[10pt]{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{azalea}
+
+
+\begin{document}
+
+%\special{papersize=8.5in,11in}
+%\setlength{\pdfpageheight}{\paperheight}
+%\setlength{\pdfpagewidth}{\paperwidth}
+%
+%\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country} 
+%\copyrightyear{20yy} 
+%\copyrightdata{978-1-nnnn-nnnn-n/yy/mm} 
+%\doi{nnnnnnn.nnnnnnn}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{CoLoSL: Concurrent Local Subjective Logic}
+\subtitle{}
+
+ \authorinfo{Azalea Raad\and Jules Villard \and Philippa Gardner}
+            {Imperial College London}
+            {\{azalea, j.villard, pg\}@@imperial.ac.uk}
+%\authorinfo\null\null{\vspace{-5cm}\null}
+
+\maketitle
+
+
+\begin{abstract}
+A key difficulty in verifying shared-memory concurrent programs is
+reasoning compositionally about each thread in isolation. Existing
+verification techniques for fine-grained concurrency require 
+reasoning about static global shared resource, impeding compositionality.  This
+paper introduces the program logic \colosl, in which each thread is
+verified with respect to its flexible subjective view of the global
+shared state.
+This subjective view  just describes  that part of the global shared resource accessed by the
+thread. Subjective views may arbitrarily overlap with each other, and
+expand and contract depending on the resource required by the thread.
+This flexibility provides truly compositional proofs for shared-memory
+concurrency, which we demonstrate through a variant of the famous token ring mutual exclusion algorithm introduced by Dijkstra.
+\end{abstract}
+
+\input{introduction.tex}
+\input{intuition.tex}
+%
+%\input{Sections/Introduction/introduction.tex}
+%\input{Sections/Intuition/intuition.tex}
+%\input{Sections/Logic/logic.tex}
+%\input{Sections/SemanticsAndSoundness/semantics.tex}
+%\input{Sections/FurtherExamples/examples.tex}
+%\input{Sections/Conclusions/conclusions.tex}
+
+% POPL recommends abbrvnat bibliography style.
+%% \bibliographystyle{abbrvnat}
+
+%  \vspace{-1ex}
+%\begin{spacing}{0.7}
+\bibliographystyle{plain}
+\bibliography{biblio}
+%\vfill
+%\columnbreak 
+
+%\end{spacing}
+% The bibliography should be embedded for final submission.
+
+
+\end{document}
