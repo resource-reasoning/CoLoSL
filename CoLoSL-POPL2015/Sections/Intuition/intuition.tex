@@ -293,9 +293,8 @@ the action is added in its place. Diagrammatically, a subjective state
 \]
 This is a direct consequence of the fact that the subjective view
 describes the thread's partial knowledge about the shared state, while
-the environment can have both some of the knowledge that the thread
-has and some additional knowledge, as long as the view of the thread
-and the environment are compatible.  In this case, while the thread
+the environment may have both the knowledge that the thread
+has, as well as some additional knowledge. In this case, while the thread
 does not have the capability to do action $\token a_{\li x}$, the
 environment might.
 
@@ -330,7 +329,22 @@ Subjectivity also enables the analysis of
 portions of code without access to the whole program, and allows one
 to reuse the established specifications in any environment that
 doesn't violate their subjective views.
+%
+%
+\paragraph{\colosl Actions and Unsharing}
+As discussed above, given a subjective view $\shared P I$, the interference assertion $I$ contains actions of the form $Q \swap R$ that state how the shared resources described by $P$ may be manipulated. The actions of $I$ capture three patterns of behaviour: 
+\begin{enumerate}
+	\item Actions can \emph{modify} resources in which case the same resource appears on both sides of $\swap$ with different values reflecting the change. For instance, in \fig\ref{fig:concurrentInc}, the action of $\token{a}_{\tx{x}} \in I$ modifies the value of \li{x} from $v$ to $v+1$ for any $v$.
+	
+	\item Actions can \emph{remove} resources from the shared state and move them into the local state of the thread performing the action; the removed resources only appear on the left hand side of $\swap$.
+	
+	\item Actions can remove resources from the local state of the thread performing the action and \emph{add} them into the shared state; the added resources only appear on the right hand side of $\swap$.
+\end{enumerate}   
+%
+%
+We demonstrate the latter two behaviours through our example in \S\ref{subsec:CSTExample}. These three behaviours are not mutually exclusive and an action may exhibit any combination of them. 
 
+Unlike~\cite{cap-ecoop10} and as with~\cite{icap}, we do not provide an explicit \emph{unsharing} mechanism in order to claim shared resources and render them thread-private. Instead, this behaviour can be simply encoded as an additional action with the second behaviour described above. 
 
 %% This finishes the justification of all uses of \eqref{eq:shift} in the
 %% derivations of \S\ref{subsec:threads}, and thus the derivations
