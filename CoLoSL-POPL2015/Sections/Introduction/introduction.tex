@@ -19,44 +19,48 @@ isolation, even though in reality the correctness of the whole system
 is the collaborative result of intricately intertwined actions of the
 threads.  Such compositional reasoning is essential for verifying
 large concurrent systems and for replicating a programmer's intuition
-about why their implementations are correct. For sequential programs,
-separation logic has demonstrated the importance of reasoning about
-only the portions of the local machine state (the resource) actually
-accessed by programs. For concurrent programs, several
-techniques, such as those related to CAP reasoning~\cite{lotsofthem},  have recently been introduced to provide
-fine-grained compositional reasoning about global shared resource.
-However, they require
-reasoning about static  global shared resource even though a thread might
-only access a small part of it. Such  reasoning does  not scale.
+about why their implementations are correct. 
 
-\pgcomment{Next para in flux.} 
-While
-compositionality calls for specifications that talk only about the
-part of the state actually accessed by each thread (the thread's
-\emph{subjective view} of the state), the rigidity of existing
-frameworks forces us to adopt global specifications. Moreover, the
-reasoning has to be robust against interferences from the environment
-\emph{even on parts of the shared state not actually accessed by the
-  current thread}. Finally, while in some examples one will know what
-the entire global shared state is, this will not always be the case
-(\textit{e.g.}, when proving code from a library, independently of any
-client). For shared-memory reasoning to naturally apply to incomplete
-code and scale to large programs, better techniques are needed.
+Separation logic reasoning~\cite{seppaperand concurrent sep logic} has
+been used to demonstrate the importance of reasoning about only the
+portions of the local machine state (the resource) actually accessed
+by programs. Recently, several techniques have been built on top of
+separation logic, such as those related to CAP
+reasoning~\cite{lotsofthem}, which have made substantial advances in
+fine-grained compositional reasoning about complex algorithms which
+access the global shared state.  However, the rigidity of existing
+techniques forces us to work with {\em static} global shared state,
+such as a shared data structure for representing sets, even though a
+thread might only access just a small part of it.  This global state
+must be robust with respect to all possible interferences from the
+environment, {even on parts of the shared state not actually accessed
+  by the current thread}.  Intuitively, compositionality calls for
+reasoning that only refers to the part of the global shared state actually
+accessed by each thread.  Exisiting reasoning techniques are too rigid
+to achieve this. 
+
+\pgcomment{Next comment is important, but it does not fit wonderfully
+  here. Maybe in conclusions?} 
+
+ Finally, while in some examples we know have complete knowledge of the
+global shared state, this is not necessarily the case  when proving code from a library.
 
 
-However, the specifications are brittle and unnatural.
 
-This paper introduces the program logic \colosl, in which threads are
-verified with respect to their \emph{subjective views}. Each
-subjective (personalised) view provides a thread-specific description
-of the shared state, comprising the partial shared resource necessary
-for the thread to run and a thread-specific interference relation
+This paper introduces the program logic \colosl, where  threads access one
+global shared state and are verified with respect to their
+\emph{subjective views} of this state. Each
+subjective (personalised) view  is an assertion which provides a thread-specific description
+of part of the shared state. It describes 
+the partial shared resource necessary
+for the thread to run and the  thread-specific interference 
 describing how the thread and the environment can effect this partial
 shared resource. Subjective views may arbitrarily overlap with each
-other.  In particular, the interference relations expand and contract
-with relation to the partial shared resource, as long as the projected
-effect on the subjective view remains the same.  This flexibility
-provides truly compositional proofs for shared-memory concurrency
+other, and subtlely expand and contract  to the natural resources and the 
+interference required by  the current thread. 
+This flexibility
+provides truly compositional reasoning  for shared-memory concurrency.
+
 
 %This paper presents the program logic \colosl, which achieves
 %compositional reasoning for concurrent programs by enabling
@@ -107,46 +111,25 @@ provides truly compositional proofs for shared-memory concurrency
 %  subjective views} and {\em capabilities}. 
 
 A subjective view
-$\shared{P} I$ comprises a subjective assertion $P$ which gives {\em partial}
+$\shared{P} I$ comprises an  assertion $P$ which gives {\em partial}
 information about the global shared state and interference assertion
 $I$ which describes how this partial shared state may be changed by
 the thread or the environment. The interference assertion $I$ declares
 actions of the form $\token a : P' \swap Q$, with capability assertion
 $[\token a]$ providing a thread with permission to use this action
-$\token a$. Subjective views provide a window into the global shared
-state, which can expand or contract depending on the resource required
-by the thread.  They are very different from the 
-boxed assertions of e.g. CAP reasoning which declare static global 
-data structures which cannot adapt to the resources required by a
-thread. 
+$\token a$. Subjective views expand or contract depending on the resource required
+by the thread, which has subtle consequences for the logical
+reasoning. In particular, it is possible to strengthen actions in $I$
+to record  some global information known to the subjective view.
+Then, the view can be weakened to just 
+the resources and possibly strengthened
+actions appropriate to  the thread. The strengthened actions retain  some
+global information despite the weakened view. 
+
 
 We introduce several novel reasoning principles which allow us to expand and
-contract subjective views. 
-
-
-\pgcomment{Not changed this bit yet. Some more done after principles.} 
-
-First, subjective views only capture fractions of the global shared
-state relevant to the program at hand, and we can always zoom in
-further on the subjective state:
-\begin{align*}
-  \label{eq:forget}
-  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
-\end{align*}
-This allows one to reuse specifications written from a subjective view
-of the state in contexts where we know more about the share state.
-
-Second, the $*$ connective of separation logic combines
-subjective views by \emph{overlapping} them ($P ** Q$ denotes those
-states that result from overlapping a state satisfying $P$ with one
-satisfying $Q$):
-\begin{align*}
-  \label{eq:merge}
-  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
-\end{align*}
-Doing so also combines the interference relations. Pleasingly, the new
-interference relation is simply the union of previous interferences.
-Similarly, the subjective view can always be duplicated:
+contract subjective views. Subjective views can always be duplicated
+using the \copyRule  principle:
 \begin{align*}
   \label{eq:split}
   \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
@@ -160,12 +143,12 @@ distribute the shared state between several threads:
         {\hoare{P_1}{\mathbb{P}_1}{Q_1} &
           \hoare{P_2}{\mathbb{P}_2}{Q_2}}
 \]
-
-
-Third, a set of actions $I$ can be exchanged for any other $I'$ that
-has the same projected effect on the subjective state $P$; when that
-is the case, we write $ I \weakenIb{P} I'$ and say that the actions
-are \emph{shifted}:
+The subjective views for the individual subthreads will be typically
+too strong, describing resource that is not necessary being used by
+the thread. However, before  weakening the view, it will sometimes 
+be useful to strengthen some of the actions in the interference assertion
+to preserve global knowledge. We achieve this using the \shiftRule 
+principle:
 \begin{align*}
   \label{eq:shift}
   I \weakenIb{P} I'
@@ -173,99 +156,157 @@ are \emph{shifted}:
   \shared{P}{I} ===> \shared{P}{I'}
   \tag{\shiftRule}
 \end{align*}
-This feature is in contrast with most existing formalisms, where the
-interference relation is fixed for the proof of the whole program. The
-semantic relation $\weakenIb{}$ is partially axiomitised so as to
-reduce shifting proofs to simple logical entailments. While
-incomplete, we found this axiomatisation to be enough for our
-examples.
+This principle states that an interference assersion $I$ can be
+exchanged for any other interference assertion $I'$ that has the same projected
+effect on the subjective state $P$. When this is the case, we write $
+I \weakenIb{P} I'$ and say that the actions have been  \emph{shifted}. It can
+be used to strengthen actions given by the combined global knowledge
+arising form the combination of $I$ and $P$. It can also be used to forget actions
+which are not relevant to $P$. This \shiftRule 
+principle describes a flexible  behaviour of interference  which is 
+in marked  contrast with most existing formalisms, where 
+interference is fixed throughout the verification of the whole
+program.
 
-Finally, private resources can be incorporated into the shared state
-together with new actions:
+
+Now, with a possibly strengthened interference assertion, we are able 
+to use the 
+ FORGET principle to zoom  on the resource required by the current thread:
+\begin{align*}
+  \label{eq:forget}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
+\end{align*}
+We  can again use the \shiftRule  principle to, this time, forget some of
+the actions not now relevant to the subjective view. Finally, as usual, we must
+{\em stabalise} the assertion of the subjective view,  so that the view is
+robust with respect to interferences from the environment. If the
+knowledge given by the 
+combination of the assertion $P$ and the interference assertion $I$ is too weak, then this stabilisation results in
+a precondition that is too weak. 
+
+
+These reasoning principles enable us to provide subjective views for
+the subthreads which are just right. 
+We can proceed to verify the subthreads, knowing that their
+subjective views describe personalised preconditions which only  
+describe the resource relevant to the individual threads. The
+resulting postconditions naturally describe
+overlapping parts of the shared state, which are then joined together
+using the disjoint concurrency rule and the \mergeRule principle:
+\begin{align*}
+  \label{eq:merge}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
+\end{align*}
+The assertion $P ** Q$ 
+describes the overlapping of states arising from $P$ and $Q$, using the sepish
+connective introduced in~\cite{gareth,jules}. 
+The new
+interference relation is simply the union of previous
+interferences. Finally, we can use the \shiftRule principle to simplify the
+interference assertion now that we are back with a larger subjective view.
+
+\pgcomment{In section 3, we should introduce the sepish conenctive
+  carefully, people are likely not to know it.} 
+
+
+The last principle to mention is how subjective views are
+created
+using the \extendRule  principle: 
+
 \begin{align}
   \label{eq:extend}
   P \containI I
   &\text{ implies }
   P ===>
-  \exsts{\capAss{1}, \capAss{2}} \capAss{1} * \shared{P *
-    \capAss{2}}{I}
+  \exsts{\vec{\token{a}}, \vec{\token{b}}}[\vec{\token{a}}] * \shared{P *
+   [\vec{\token{b}}]}{I}
   \tag{\extendRule}
 \end{align}
-The side condition $P \containI I$ ensures that the mutations
-performed by actions in $I$ are confined to $P$. The existential
+\pgcomment{Jules, please fix this notation  for as and bs. I think
+  this vec notation is quite good, but we shoud probably define box of
+  vec 
+  somewhere or do something different using iterative star or
+  something.} 
+%
+The side condition $P \containI I$ ensures that the actions associated
+with interference assertion $I$ are confined to $P$. The existential
 quantification of capabilities is to ensure the \emph{freshness} of
-the generated capabilities. The main novelty of this rule is the fact
-that new actions may refer to existing shared state. As we will see in
-our example of concurrent set operations, this enable flexible and
-powerful reasoning.
+the generated capabilities. 
+The main novelty of this rule is the fact
+that new actions may refer to existing shared state, as we shall see  in
+our set example discussed below. Notice that we  do not require a corresponding principle for destroying
+subjective views since this is achieved by the FORGET principle. 
 
 
-\pgcomment{I think we should also add weakening, as we can talk about
-stabilisation.}
 
 
-\pgcomment{Now some more changes}
+\pgcomment{Azalea, make sure you highlight 
+' The main novelty of this rule is the fact
+that new actions may refer to existing shared state, as we will see in
+our examples.' in the set example ins ection 5.} 
+
+
+
+
+
 
 With these reasoning principles, we are able to expand and contract
-subjective views  to provide just the resource required by a thread,
-to provide essentially frame-like reasoning for the subjective assertions and
-interference relations. The interaction between  these principles is
+subjective views  to provide just the resource required by a thread.
+In essence, we provide  frame-like reasoning for  subjective  views. 
+The interaction between  these principles is
 subtle. We are able to forget resource of the subjective assertion $P$
  whilst at the same time adapting the interference relation $I$  to
-capture constraints associated with that lost resource. We shall
-demosntrate this using our first introductory example, 
-in 
-\S\ref{sec:intuition}, we  motivate \colosl reasoning using 
-a variant of the  token ring mutual exclusion algorithm [? ],
+capture global constraints associated with that lost resource. In 
+\S\ref{sec:intuition}, we 
+demonstrate this using 
+a variant of the famous  token ring mutual exclusion algorithm [? ],
 introduced by Dijkstra to illustrate distributed, global knowledge between
 threads. The point is that, as well as local knowledge
 about how the threads behave, the programmer also has global knowledge
 about how the threads constrain each other. Our reasoning captures the
 spirit of reasoning locally about individual threads at the same time
 as retaining global knowledge about the overall thread behaviour. It
-is a good  introductory example, as it uses all five \colosl
-principles in a fundamental way. 
- 
+is a good  introductory example, as it uses all the highlighted \colosl
+reasoning principles in a fundamental way. 
+
+\pgcomment{In next para, I wasn't quite sure what to say so I just did
+  adaquate `blah'.}
+
+In \S\ref{sec:sectionthree}, we interpret \colosl assertions
+ over a particular domain which includes: thread-local
+state exclusively visible to the thread; {\em one} global shared state
+accessible by all thread (in contrast with the CAP approach); and {\em
+  action models} describing how the global state can be updated.  In
+\S\ref{sec:sectionfour}, we define the rely and guarantee conditions
+of each thread is in terms of their action models, and provide a
+sketch of soundness. In particular, the
+reasoning principles highlighted above are simple semantic
+consequences of our generic model of program states.  The full
+technical details can
+be found 
+in the accompanying technical report~\cite{.}.
 
 
-We show soundness, it was really hard, involves very subtle stuff. 
-\colosl
-assertions are interpreted over a particular domain which includes:
-{thread-local} state exclusively visible to the thread; {\em one}
-global shared state accessible by all threads; and { interference
-actions}  describing how the global state can be updated.
-Our soundness result is parametric in the underlying
-  programming language and separation algebra of states. The four
-  principles above are simple semantic consequences of our generic
-  model of program states.
 
 In \S\ref{sec:examples}, we 
 study two further, more challenging examples. We verify an concurrent algorithm for
-computing the spanning tree of a graph, illustrating how our reasoning
-works on naturally shared data structures. Our  \colosl reasoning for
-the concurrent algorithm 
-is simpler than the proof of a sequential tree spanning algorithm
-by Villard and ....~\cite{??}  because ......... We also study a concurrent set module
-implemented using a hand-over-hand list-locking algorithm,
-demonstrating that our proof of correctness of the implementation is
-considerably simpler than reasoning using CAP. CAP reasoning requires
-a static global box assertion for representing the shared set
-structure, and uses capability assertions (the tokens) 
-to move the appropriate resource to the local state to be
-updated. We do not play such token games. Instead, the subjective
-view can be updated in-place. 
-
+computing the spanning tree of a graph. This algorithm uses threads
+spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping
+subjective views of \colosl are just what we need. 
+We also verify a concurrent set module
+implemented using a hand-over-hand list-locking
+algorithm. 
+%Interestingly, this
+%example uses the \extendRule principle   to the create new actions which refer to existing
+%state in a fundamental way. 
+The flexibility of \colosl's subjective views  leads to a
+considerably simpler correctness proof   compared to that of CAP. 
 
 \julescomment{Our soundness theorem doesn't include leak-freedom!
   That's a fundamental limitation of \colosl. Could be overcome by
   keeping a handle on all resources, that is only lost upon
-  disposal. (comment repeated in soundness section)}
-
-
-
-
-
-
+  disposal. (comment repeated in soundness section). PG: ok to ignore
+  this for now.}
 
 
 \paragraph{Related work}
