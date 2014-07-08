@@ -71,15 +71,15 @@ A key difficulty in verifying shared-memory concurrent programs is
 reasoning compositionally about each thread in isolation. Existing
 verification techniques for fine-grained concurrency require 
 reasoning about static global shared resource, impeding compositionality.  This
-paper introduces the program logic CoLoSL, in which each thread is
+paper introduces the program logic \colosl, in which each thread is
 verified with respect to its flexible subjective view of the global
 shared state.
 This subjective view  just describes  that part of the global shared resource accessed by the
 thread. Subjective views may arbitrarily overlap with each other, and
-expand and contract depending on the resource rquired by the thread.
+expand and contract depending on the resource required by the thread.
 This flexibility provides truly compositional proofs for shared-memory
 concurrency, which we demonstrate on a range of examples including a
-concurrent computation of the spanning tree of a graph.
+concurrent computation of a spanning tree of a graph.
 \end{abstract}
 
 
