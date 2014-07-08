@@ -176,7 +176,9 @@ capabilities associated with node $n$ ($\markT{n}{-}$). Note that the
 anonymous quantification $-$ is yet another notational shorthand and
 can be substituted for the following more verbose definition.
 %
+\vspace{-1ex}
 \[
+\vspace{-1ex}
 I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
   p.r, \rootEdge\}}\!\!\! \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
 \]
@@ -233,6 +235,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 %
 The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
 %
+\vspace{-1ex}
 \[
 \begin{array}{@{} c @{} }
 	\color{blue}{
@@ -281,6 +284,7 @@ We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from th
 When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial.
 Let
 %
+\vspace{-1ex}
 \[
 \begin{array}{l l}
 	P \eqdef & \iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n}) \; \right)\\

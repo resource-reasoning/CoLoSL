@@ -42,6 +42,7 @@ $\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
 \]
 \end{definition}
 Then the extension rely, $\extendR$, is defined as
+\vspace{-1ex}
 \[
   \extendR \eqdef
   \left\{
@@ -74,6 +75,7 @@ The second kind of interference is the \emph{update} of the global
 state according to actions in the global action model whose capability
 is ``owned by the environment'', \textit{i.e.}, nowhere to be found
 in the current local and shared states.
+\vspace{-1ex}
 \[	
   \updateR \eqdef
   \left\{
@@ -100,6 +102,7 @@ The third and last kind of interference is the \emph{shifting} of the
 local interference relation to a new one that allows more action while
 preserving all current subjective views (as expressed by the global
 action model):
+\vspace{-1ex}
 \[
   \shiftR \eqdef
   \left\{
@@ -122,7 +125,9 @@ action model):
   The \emph{rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is
   defined as follows, where $(\cdot)^{\text{*}}$ denotes reflexive
   transitive closure:
+\vspace{-1ex}
   \[
+\vspace{-1ex}
   \rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
   \]
 \end{definition}
@@ -176,6 +181,7 @@ rely. The \emph{extension} guarantee is similar to the extension rely
 except that new capabilities corresponding to the new shared region
 are materialised in the local and shared state, and a part of the
 local state is moved into the shared state:
+\vspace{-1ex}
 \[
 \extendG \eqdef
 \left\{
@@ -221,13 +227,16 @@ compatible with that combination.
 The \emph{orthogonal} of a state  $\heapSize{.}: \Heaps \rightarrow
 \pset{\Heaps}$ is defined as the set of all states that are disjoint
 from it:
+\vspace{-1ex}
 \[
+\vspace{-1ex}
 \heapSize{\h{}} \eqdef \left\{ \h{}' \mid \h{} \compatL \h{}' \right\}
 \]
 \end{definition}
 
 Moreover, update actions are not allowed to introduce new
 capabilities, as this is the sole privilege of extension actions.
+\vspace{-1ex}
 \[
 	\updateG \eqdef
  	\left\{
