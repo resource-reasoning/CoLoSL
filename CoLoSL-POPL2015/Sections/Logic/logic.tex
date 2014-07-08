@@ -224,7 +224,7 @@ the set notation.\footnote{In the general case, separation algebras
   restore unicity. Since in this paper our logical states satisfy disjointness,
   intersection is enough for our exposition.}
 
-\begin{definition}[Action application]
+\begin{definition}[Action application]\label{def:actionApplication}
   The \emph{application} $a[g]$ of an action $a$ on a logical state
   $g$ is defined provided that there is $l$ such that
   \[
@@ -380,7 +380,7 @@ respectively.
 \end{definition}
 
 This syntax follows from standard separation logic with variables as
-resource~\cite{entcs06} (notice that expressions $E$ do not allow
+resource~\cite{variablesAsResource} (notice that expressions $E$ do not allow
 program variables), with the exception of subjective views $\shared P
 I$. $\emp$ is true of the units of $\composeW$. Predicates are
 interpreted over a world's local state: $\li{x}|-> E$
@@ -420,7 +420,7 @@ decomposition $s$, $r$, in the following sense:
 \end{enumerate}
 These conditions will be captured by the \emph{action model closure}
 relation $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ given by the
-upcoming Definition~\ref{def:actclos} (where $\semI{I}$ is the
+upcoming \defin~\ref{def:actclos} (where $\semI{I}$ is the
 interpretation of $I$).
 
 %% , and spatial predicates and connectives
@@ -460,7 +460,7 @@ respectively.
   assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$
   denotes the semantics of interference assertions and
   $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ will be given in
-  Definition~\ref{def:actclos}:
+  \defin~\ref{def:actclos}:
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
@@ -601,7 +601,7 @@ the global shared state into a subjective state $s$ and a context $r$.
   $(\m{snd}(\updateFP{a})\composeL s',r')$.
 \end{definition}
 
-We observe that this new definition and Definition~\ref{def:actapp}
+We observe that this new definition and \defin~\ref{def:actionApplication}
 are linked in the following way: $\m{fst}(a[s,r]) \composeL
 \m{snd}(a[s,r]) = a[s\composeL r]$.  In our informal description, we
 have mentioned that some actions must be reflected in some action
