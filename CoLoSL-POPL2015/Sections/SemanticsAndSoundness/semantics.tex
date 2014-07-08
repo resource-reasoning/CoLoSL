@@ -1,4 +1,4 @@
-\section{\colosl program logic}
+\section{\colosl Program Logic}
 
 This section introduces the core concepts behind our program logic. We
 start by defining what the rely and guarantee conditions of each
@@ -10,7 +10,7 @@ with these notions, we can justify the \eqref{eq:shift} and
 \eqref{eq:extend} principles. We conclude this section with a sketch
 of the soundness of \colosl.
 
-\subsection{Proof system}
+\subsection{Proof System}
 
 \paragraph{Rely}
 The Rely relation represents potential interferences from the
@@ -363,7 +363,7 @@ modifies the action models. This is the case for (\shiftRule) and
 %
 %
 
-\paragraph{Proof rules}
+\paragraph{Proof Rules}
 Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry
 an implicit assumption that the pre- and post-conditions of their
 judgements are stable. Most of the proof rules are standard and
@@ -441,14 +441,14 @@ sequential separation logic judgement:
 %In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
 
 
-\subsection{Interference manipulations}\label{subsec:extension}
+\subsection{Interference Manipulations}\label{subsec:extension}
 
 
 In this section we formalise the requirements of the \eqref{eq:extend}
 and \eqref{eq:shift} semantic implications and show that they are
 valid.
 
-\paragraph{Shared state extension}
+\paragraph{Shared State Extension}
 When extending the shared state using currently owned local resources,
 one specifies a new interference assertion over these newly shared
 resources. While in \colosl the new interferences may mention parts of
@@ -523,7 +523,7 @@ P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\
 \end{proof}
 
 
-\paragraph{Action shifting}
+\paragraph{Action Shifting}
 Notice that, according to our rely and guarantee conditions, the local
 action model may only grow with time. However, that is not to say that
 the same holds of interference relations in shared state assertions:
