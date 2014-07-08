@@ -181,13 +181,13 @@ and \shiftRule\ principles given in the introduction:
 \end{array}
 \]
 The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus
-forget the variable assertion $\li{z} \mapsto 0$. The variable cell addressed by \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
+forget the variable assertion $\li{z} \mapsto 0$. The variable cell \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the
 action $\token a_{\li z}$ does not affect the resources described by the
 assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions
 from $I$, the resulting subjective view remains unaffected by $\token
 a_{\li z}$. Using the \shiftRule\  principle, we
 can therefore forget the $\token{a}_{\li z}$ action. 
-Finally, as is normal when reasoning about concurrency, we weaken so
+Finally, as is normal when reasoning about concurrency, we stabalise  so
 that, whatever the environment can do to the state, the assertion
 inside the box still holds (the assertion is \emph{stable}). However, we have   lost information about
 \li{z}. Intuitively, we know that the value of \li{y} depends on the value
@@ -231,7 +231,7 @@ I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
 $
 to replace $I_{\li y}$ by $I'_{\li y}$. 
 
-Using \forgetRule,  it is now safe to lose the \li{z} cell to
+Using \forgetRule,  it is now safe to lose the \li{z} assertion  to
 obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$,  as 
 the new $\token a_{\li x}$ action in $I'_{\li y}$ retains enough information about how
 \li{x}, \li{y} and \li{z} are related.
@@ -312,16 +312,18 @@ so, by the \shiftRule\ principle, we get the postcondition of $\mathbb{INC}$.
 
 
 %\paragraph{Comparison with other formalisms}
-This concludes our \colosl proof of $\mathbb{INC}$. Using subjective
-views and manipulating the interference assertions in key places
-enables the specification and verification of each thread to be
-confined to just the resources they need, a feat that is not possible
+This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and
+contraction  of  subjective
+views, with in particular  our shifting of the interference assertions
+in key places, 
+enables us to confine the specification and verification of each
+thread to just the resources they need. This  is not possible
 using previous work.
 
 \paragraph{\colosl reasoning}
-We complete our semi-formal overview with features of \colosl not
+We complete our semi-formal overview with a brief desription of features of \colosl not
 showcased by the proof above. First, we note that an action $P\swap Q$
-may in general performs three actions: (1)
+may in general performs three types of action: (1)
 %% \begin{enumerate}
 %% \item
   \emph{modify} resources: $P$ and $Q$ contain the same amount of
