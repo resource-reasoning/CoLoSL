@@ -1,6 +1,53 @@
 \section{Further Examples}\label{sec:examples}
-\todo introductory paragraph about data structures with sharing.\\
+
 \subsection{Concurrent Spanning Tree}\label{subsec:CSTExample}
+
+Programs manipulated abitrary graphs present the following significant
+challenge for compositional verification: because of deep sharing
+between different components of a graph, changes to one subgraph may
+affect other subgraphs which may point into it. This makes it hard to
+reason about updates to each subgraph in isolation. In a concurrent
+setting, this difficulty compounds with the fact that threads working
+on different parts of the graph may affect each other in ways that are
+difficult to reason about locally to each subgraph. Central to those
+issues is the fact that different subgraphs present \emph{unspecified
+  sharing} and may overlap in arbitrary ways. We now demonstrate on a
+concurrent spanning tree example that \colosl may be just the tool you
+need in this case, as it naturally deals with arbitrary overlapping
+views of the shared state, and allows one to tailor interferences to a
+given subjective view.
+
+Our example, presented in \fig{fig:conSpanningTree}, operates on a
+\emph{directed binary graph}, henceforth simply called a \emph{graph},
+\textit{i.e.} a directed graph where each node has at most two
+successors, called its left and right children. The program computes a
+in-place spanning tree of the graph, \textit{i.e.} a tree that covers
+all nodes of the graphs from a given root, concurrently as follows:
+each time a new node is encountered, two new threads are created that
+each prune the edges of the left and right children recursively. A
+mark bit is associated to each node to keep track of which ones have
+already been visited. Crucially, each thread returns whether the root
+of the subgraph it was operating on had already been visited; if so,
+the parent thread removes the link from its root node to the
+corresponding child. Intuitively, it is allowed to do so because,
+since the child was marked by another thread, the child has to be
+already reachable via some other path in the graph.
+
+%% marking the vertices to keep track of those already visited; the
+%% return value b records the outcome of marking with \li{b}$=1$ when the
+%% top node $x$ is unmarked (not visited yet) and \li{b}$=0$
+%% otherwise. Assuming that the root vertex $x$ is unmarked initially,
+%% the algorithm continues by first marking $x$ and subsequently spanning
+%% the left and right subgraphs concurrently. When the top node of the
+%% left subgraph is already marked (\li{!b1}), the edge from $x$ into it
+%% is replaced by a null pointer. This corresponds to the case where the
+%% node has already been visited by another thread and is thus reachable
+%% from the root; \emph{mutatis mutandis} for the right subgraph.
+
+Following Hobor and Villard~\cite{ramification}, we find it natural to
+express graphs in memory by an inductive predicate that makes heavy
+use of the overlapping conjunction.
+
 Let $\gamma = (V, E)$ denote a directed connected binary (DCB) graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
 For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible spanning tree where the dashed lines indicate those edges that have been removed from the graph after spanning it.
 
@@ -82,7 +129,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \end{figure}
 %
 %
-\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by recursively marking the vertices to keep track of those already visited; the return value b records the outcome of marking with \li{b}$=1$ when the top node $x$ is unmarked (not visited yet) and \li{b}$=0$ otherwise. Assuming that the root vertex $x$ is unmarked initially, the algorithm continues by first marking $x$ and subsequently spanning the left and right subgraphs concurrently. When the top node of the left subgraph is already marked (\li{!b1}), the edge from $x$ into it is replaced by a null pointer. This corresponds to the case where the node has already been visited by another thread and is thus reachable from the root; \emph{mutatis mutandis} for the right subgraph.
+\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by 
 %
 \begin{figure}
 %

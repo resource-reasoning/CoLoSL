@@ -18,10 +18,11 @@ programs is to be able to reason compositionally about each thread in
 isolation, even though in reality the correctness of the whole system
 is the collaborative result of intricately intertwined actions of the
 threads.  Such compositional reasoning is essential for verifying
-large concurrent systems and for replicating a programmer's intuition
-about why their implementations are correct. 
+large concurrent systems, library code and more generally incomplete
+programs, and for replicating a programmer's intuition about why their
+implementations are correct.
 
-Separation logic reasoning~\cite{seppaperand concurrent sep logic} has
+Separation logic reasoning~\cite{seplog,csl-tcs} has
 been used to demonstrate the importance of reasoning about only the
 portions of the local machine state (the resource) actually accessed
 by programs. Recently, several techniques have been built on top of
@@ -38,12 +39,6 @@ environment, {even on parts of the shared state not actually accessed
 reasoning that only refers to the part of the global shared state actually
 accessed by each thread.  Exisiting reasoning techniques are too rigid
 to achieve this. 
-
-\pgcomment{Next comment is important, but it does not fit wonderfully
-  here. Maybe in conclusions?} 
-
- Finally, while in some examples we know have complete knowledge of the
-global shared state, this is not necessarily the case  when proving code from a library.
 
 
 
