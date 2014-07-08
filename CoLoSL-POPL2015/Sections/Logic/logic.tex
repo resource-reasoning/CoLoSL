@@ -372,7 +372,9 @@ respectively.
     E_1 |-> E_2 \mid [\token a] \\
     P, Q  &::= 
     A \mid P \Rightarrow Q \mid \exsts{x} P \mid
-     P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
+    P * Q
+    %\mid P --* Q 
+     \mid P \sepish Q% \mid P \intersect Q
      \mid \shared{P}{I} \\
     I &::= \emptyset ||| \interAss{K}{\vec{y}}{P}{Q}, I
   \end{align*}
@@ -484,10 +486,10 @@ respectively.
   u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
   \exsts{u_1,u_2} u = u_1\gray u_2\text{ and}\\
   &&& u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
-  u, \lenv &|=_\dagger P --* Q &\text{iff}&
-  \for{u'} u', \lenv |=_\dagger P \text{ and }
-  u \sharp u'\\
-  &&&\text{ implies }u\gray u', \lenv |=_\dagger Q\\
+  %% u, \lenv &|=_\dagger P --* Q &\text{iff}&
+  %% \for{u'} u', \lenv |=_\dagger P \text{ and }
+  %% u \sharp u'\\
+  %% &&&\text{ implies }u\gray u', \lenv |=_\dagger Q\\
   u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
   \exsts{u',u_1,u_2} u = u'\gray u_1\gray u_2\text{ and}\\
   &&&
