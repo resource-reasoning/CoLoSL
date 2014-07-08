@@ -789,7 +789,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 \end{definition}
 %
 %
-\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\} C \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\}\ C\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
 %
 \[
 \begin{array}{l l}
@@ -806,7 +806,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 %
 \begin{theorem}[Soundness]
 %
-The \colosl\ program logic is sound. That is, if $|-\!\{P\} C \{Q\}$ then $|=\!\{P\} C \{Q\}$.
+The \colosl\ program logic is sound. That is, if $|-\!\{P\}\ C\ \{Q\}$ then $|=\!\{P\}\ C\ \{Q\}$.
 %
 \begin{proof}(Sketch)
 We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 
