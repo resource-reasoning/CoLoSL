@@ -48,12 +48,15 @@ subgraphs is key.
 
 
 
-Finally, probably the work that is nearest in spirit to  \colosl is Local RG~\cite{lrg}. Here,  it is also
-possible to use assertions  to describe unnamed parts of the shared region, albeit only
-when the assertions cover disjoint parts of the shared state, and when
-the interference on each sub-region are also disjoint. Moreover, Local
-RG assertions are specified globally over the entire shared state, and
-cannot be dynamically rewritten, in contrast with
+Finally, probably the work that is nearest in spirit to  \colosl is
+Local RG~\cite{lrg}. This work provides {\em some}  flexibility in using
+assertions to describe the global shared state,
+ albeit only
+when the assertions describe disjoint parts of the shared state  and when
+the interference is  also disjoint. Moreover, Local
+RG assertions are specified globally over the entire shared state
+using rely/guarantee reasoning, and
+cannot be dynamically shifted, in contrast with
 \colosl. Nonetheless, both approaches share a similar goal of enabling
 more compositional reasoning about the shared state.
 
