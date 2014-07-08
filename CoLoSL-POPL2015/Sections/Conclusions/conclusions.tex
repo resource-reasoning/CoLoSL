@@ -7,21 +7,29 @@ essential for verifying large concurrent systems.  Jones introduced
 global rely-guarantee thinking in his PhD
 thesis~\cite{rg}, motivating the rely and guarantee relations given in
 \S{sec:????}. O'Hearn introduced local concurrent separation
-reasonng~\cite{csl-orig,csl-tcs}, giving the disjoint concurrency rule
-which underpins the reasoning presented here.  Since then, many people
+reasoning~\cite{csl-orig,csl-tcs}, giving the disjoint concurrency rule
+which underpins the reasoning presented here.  Since then, many
+researchers 
 have looked at more complex and finer-grained algorithms,
-building on the combination of ideas arising from these papers:
+building on the combination of global and local  ideas arising from these papers:
 examples include RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
 deny-guarantee~\cite{dg}, and the CAP
-family~\cite{cap-ecoop10,icap,tada}, to name but a few.
-
-\pgcomment{Azalea, please do a proper CAP box with r region name too.} 
+family~\cite{cap-ecoop10,icap,tada}, to name but a few. Some of this
+work has been clarified by the views framework~\cite{views}: assertions provide 
+\emph{views} of the concrete machine state for each thread, which
+other threads cannot invalidate. 
 
 \pgcomment{Azalea, please make the fence bit better.}
 
 
 
-Our primary inspiration has come from Local RG~\cite{lrg}, where the
+Our primary inspiration has come from Local RG~\cite{lrg}.
+
+
+
+
+
+ where the
 reasoning is based on the combination of global rely-guarantee reasoning with
 local separation logic based on one global shared state. 
 
@@ -38,8 +46,8 @@ views an inspiration for us.
 Another  point of inspiration has come from CAP reasoning. 
 CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
 where the assertion $P$ describes a fixed disjoint  part of the global shared
-state and the interference given by $I$ is also fixed. In contrast,
-\colosl uses flexible subjective views $\shared{P}{I}$, where
+state labelled by fixed region name  $r$, and the interference given by $I$ is also fixed. In contrast,
+\colosl uses flexible subjective views $\shared{P}{I}$ with no region name, where
 assertion $P$ now describes a flexible, overlapping part of the global
 shared state, and there is a subtle dynamic relationship between this
 $P$ and 
@@ -47,10 +55,17 @@ the flexible $I$. Subjective views  lead to simpler proofs, as
 illustrated by the concurrent set example in
 \S{sec:five}. There are many interesting ideas present in the CAP
 literature: e.g. abstract states~\cite{carasel}; higher-order
+<<<<<<< HEAD
+reasoning~\cite{iCAP}; and abstract atomicity~\cite{tada}. All these
+ideas are interesting areas for future research. The combination of 
+overlapping subjective views with abstraction will be particularly
+interesting. 
+=======
 reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
 ideas require further investigation. Here,  our aim was to  introduce 
 subjective views as a 
 fundamental new way of  underpinning of  such reasoning. 
+>>>>>>> 4b9cfcfc082256b93172202f1a62c8743ba28fe9
 
 
 Our merging of overlapping subjective views relies on the
@@ -62,16 +77,11 @@ how \colosl is naturally able to verify an concurrent tree spanning
 algorithm where the 
 overlapping of shared subgraphs is key. 
 
+\pgcomment{Local Rely Guarantee abbreviates to Local RG or LRG(yuk),
+  not both!} 
 
 
-
-The recent formalism of Views~\cite{views} pinpoints a common
-fundamental insight behind these program logics: assertions denote
-\emph{views} of the concrete machine state for each thread, which
-other threads cannot invalidate. Borrowing the vocabulary, existing
-formalisms (with the notable exception of Local Rely
-Guarantee~\cite{lrg}--henceforth LRG) require the view of all threads
-to map to the same portion of concrete state. This impedes
+This impedes
 compositionality: to use a given program specification in another
 context, the current shared state has to match that of the existing
 specification, instead of merely containing it. 
