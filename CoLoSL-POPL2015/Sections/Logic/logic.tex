@@ -366,9 +366,9 @@ respectively.
   the grammar below, where $\li x$ ranges over program variables, $x$
   over logical variables, and $\token a$ over tokens.
   \begin{align*}
-    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
+    E &::= x ||| \token a ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
     A &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
-    E_1 |-> E_2 \mid [\token a] \\
+    E_1 |-> E_2 \mid [E] \\
     P, Q  &::= 
     A \mid P \Rightarrow Q \mid \exsts{x} P \mid
     P * Q
@@ -456,7 +456,7 @@ $|=$, or either $\slsat$ or $|=_{l,\lmod,\gmod}$,
 respectively.
 
 \begin{definition}[Assertion semantics]
-  Given a logical environment $\lenv$, the semantics of \colosl
+  Given a logical environment $\lenv: \set{LVar} --> \set{Val}\uplus\set{Token}$, the semantics of \colosl
   assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$
   denotes the semantics of interference assertions and
   $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ will be given in
@@ -507,9 +507,9 @@ respectively.
   &\text{iff}&
   l =
   (\emptyset,[[|E_1|]_{\lenv}: [|E_2|]_{\lenv}],\unitCap)\\
-  l, \lenv &\slsat [\token a]
+  l, \lenv &\slsat [E]
   &\text{iff}&
-  l = (\emptyset,\unitH, \{\token a\})\\
+  l = (\emptyset,\unitH, \{[|E|]_{\lenv}\})\\
 %  &&\cdots\\
   l,\lenv &\slsat \m{false}
   && \text{never}\\
@@ -535,15 +535,15 @@ respectively.
   \end{align*}
 \end{definition}
 
-\julescomment{We don't actually use the below, do we? If not, probably
-  needs to be removed.}
-
 This satisfaction relation for subjective views in $\slsat$ is purely
-for convenience: this allows us to write predicates in interference
-assertions whose definition unpacks to a formula with subjective
-views. Alternatively, we could forbid boxes in assertions evaluated
-using $\slsat$ and explicitly unpack such predicates and erase their
-subjective views.
+for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to
+write predicates in interference assertions whose definition includes
+subjective views, as in the example of \S\ref{sec:set}. Since actions
+are not allowed to modify shared state from within another subjective
+view, the interpretation of such subjective views collapses to $\emp$.
+%% Alternatively, we could forbid boxes in assertions
+%% evaluated using $\slsat$ and explicitly unpack such predicates and
+%% erase their subjective views.
 
 %% The semantics of separation logic predicates and connectives is
 %% standard and depends only on the local state.  $\shared{P}{I}$ states

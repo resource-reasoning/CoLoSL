@@ -193,44 +193,36 @@ using the disjoint concurrency rule and the \mergeRule principle:
   \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
 \end{align*}
 The assertion $P ** Q$ 
-describes the overlapping of states arising from $P$ and $Q$, using the sepish
-connective introduced in~\cite{gareth,jules}. 
+describes the overlapping of states arising from $P$ and $Q$, using
+the overlapping conjunction $**$~\cite{gareth,jules}. 
 The new
 interference relation is simply the union of previous
 interferences. Finally, we can use the \shiftRule principle to simplify the
 interference assertion now that we are back with a larger subjective view.
 
-\pgcomment{In section 3, we should introduce the sepish conenctive
-  carefully, people are likely not to know it.} 
-
-
-The last principle to mention is how subjective views are
-created
-using the \extendRule  principle: 
+The last principle to mention is how subjective views are created
+using the \extendRule principle, wehere $\vec a, \vec b$ range over
+tokens:
 
 \begin{align}
   \label{eq:extend}
   P \containI I
   &\text{ implies }
   P ===>
-  \exsts{\vec{\token{a}}, \vec{\token{b}}}[\vec{\token{a}}] * \shared{P *
-   [\vec{\token{b}}]}{I}
+  \exsts{\vec{{a}}, \vec{{b}}}[{a}_1] {*} \cdots {*}
+        [ a_n] * \shared{P *
+   [{b}_1] {*} \cdots {*} [{b}_n]}{I}
   \tag{\extendRule}
 \end{align}
-\pgcomment{Jules, please fix this notation  for as and bs. I think
-  this vec notation is quite good, but we shoud probably define box of
-  vec 
-  somewhere or do something different using iterative star or
-  something.} 
 %
 The side condition $P \containI I$ ensures that the actions associated
 with interference assertion $I$ are confined to $P$. The existential
-quantification of capabilities is to ensure the \emph{freshness} of
+quantification of tokens is to ensure the \emph{freshness} of
 the generated capabilities. 
 The main novelty of this rule is the fact
 that new actions may refer to existing shared state, as we shall see  in
 our set example discussed below. Notice that we  do not require a corresponding principle for destroying
-subjective views since this is achieved by the FORGET principle. 
+subjective views since this is achieved by the \forgetRule principle. 
 
 
 
