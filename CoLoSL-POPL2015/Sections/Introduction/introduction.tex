@@ -138,12 +138,11 @@ distribute the shared state between several threads:
         {\hoare{P_1}{\mathbb{P}_1}{Q_1} &
           \hoare{P_2}{\mathbb{P}_2}{Q_2}}
 \]
-The subjective views for the individual threads will be typically
+The subjective views of each thread will be typically
 too strong, describing resource that is not necessary being used by
 the thread. However, before  weakening the view, it will sometimes 
 be useful to strengthen some of the actions in the interference assertion
-to preserve global knowledge. We achieve this using the \shiftRule 
-principle:
+to preserve global knowledge. We achieve this using the \shiftRule~principle:
 \begin{align*}
   \label{eq:shift}
   I \weakenIb{P} I'
@@ -166,14 +165,14 @@ program.
 
 Now, with a possibly strengthened interference assertion, we are able 
 to use the 
- FORGET principle to zoom  on the resource required by the current thread:
+ \forgetRule principle to zoom  on the resource required by the current thread:
 \begin{align*}
   \label{eq:forget}
   \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
 \end{align*}
 We  can again use the \shiftRule  principle to, this time, forget some of
 the actions not now relevant to the subjective view. Finally, as usual, we must
-{\em stabalise} the assertion of the subjective view,  so that the view is
+{\em stabilise} the assertion of the subjective view,  so that the view is
 robust with respect to interferences from the environment. If the
 knowledge given by the 
 combination of the assertion $P$ and the interference assertion $I$ is too weak, then this stabilisation results in
@@ -181,8 +180,8 @@ a precondition that is too weak.
 
 
 These reasoning principles enable us to provide subjective views for
-the sub-threads which are just right. 
-We can proceed to verify the sub-threads, knowing that their
+the threads which are just right. 
+We can proceed to verify the threads, knowing that their
 subjective views describe personalised preconditions which only  
 describe the resource relevant to the individual threads. The
 resulting postconditions naturally describe
@@ -261,14 +260,12 @@ in the accompanying technical report~\cite{colosl-tr14}.
 
 
 
-In \S\ref{sec:examples}, we 
-study two further, more challenging examples. We verify an concurrent algorithm for
-computing the spanning tree of a graph. This algorithm uses threads
-spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping
-subjective views of \colosl are just what we need. 
-We also verify a concurrent set module
-implemented using a hand-over-hand list-locking
-algorithm. 
+In \S\ref{sec:examples}, we study two further, more challenging
+examples. We verify a concurrent spanning tree algorithm for
+graphs. This algorithm uses threads spawned on arbitrary overlapping
+graphs. We demonstrate that the flexible, overlapping subjective views
+of \colosl are just what we need.  We also verify a concurrent set
+module implemented using a hand-over-hand list-locking algorithm.
 %Interestingly, this
 %example uses the \extendRule principle   to the create new actions which refer to existing
 %state in a fundamental way. 
