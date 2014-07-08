@@ -1,4 +1,5 @@
 \section{Introduction}
+\vspace{-.5ex}
 
 %% Jules: be more general than just program logics? Model-checking,
 %% etc.?
@@ -125,14 +126,18 @@ global information despite the weakened view.
 We introduce several novel reasoning principles which allow us to expand and
 contract subjective views. Subjective views can always be duplicated
 using the \copyRule\ principle:
+  \vspace{-.9ex}
 \begin{align*}
+  \vspace{-1ex}
   \label{eq:split}
   \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
 \end{align*}
 In combination with the usual law of parallel composition of
 separation logic~\cite{csl-tcs}, this yields a powerful mechanism to
 distribute the shared state between several threads:
+  \vspace{-.8ex}
 \[
+  \vspace{-1ex}
 \infer[\parRule]
         {\hoare{P_1 * P_2}{\mathbb{P}_1 || \mathbb{P}_2}{Q_1 * Q_2}}
         {\hoare{P_1}{\mathbb{P}_1}{Q_1} &
@@ -143,7 +148,9 @@ too strong, describing resource that is not necessarily being used by
 the thread. However, before  weakening the view, it will sometimes 
 be useful to strengthen some of the actions in the interference assertion
 to preserve global knowledge. We achieve this using the \shiftRule~principle:
+  \vspace{-1.7ex}
 \begin{align*}
+  \vspace{-1.9ex}
   \label{eq:shift}
   I \weakenIb{P} I'
   &\text{ implies }
@@ -165,7 +172,9 @@ program.
 Now, with a possibly strengthened interference assertion, we are able 
 to use the 
  \forgetRule\ principle to zoom  on the resource required by the current thread:
+  \vspace{-1ex}
 \begin{align*}
+  \vspace{-1ex}
   \label{eq:forget}
   \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
 \end{align*}
@@ -186,7 +195,9 @@ describe the resource relevant to the individual threads. The
 resulting postconditions naturally describe
 overlapping parts of the shared state, which are then joined together
 using the disjoint concurrency rule and the \mergeRule\ principle:
+  \vspace{-1ex}
 \begin{align*}
+  \vspace{-1ex}
   \label{eq:merge}
   \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
 \end{align*}
@@ -201,8 +212,9 @@ interference assertion now that we are back with a larger subjective view.
 The last principle to mention is how subjective views are created
 using the \extendRule principle, where $\vec a, \vec b$ range over
 capabilities:
-
+  \vspace{-1ex}
 \begin{align}
+  \vspace{-1ex}
   \label{eq:extend}
   P \containI I
   &\text{ implies }

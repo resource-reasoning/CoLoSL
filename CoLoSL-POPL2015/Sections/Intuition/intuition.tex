@@ -1,4 +1,6 @@
+\vspace{-.5ex}
 \section{Informal Development}\label{sec:intuition}
+\vspace{-.5ex}
 
 We illustrate our \colosl  reasoning principles  by
 sketching a proof of a variation of Dijkstra's token ring mutual
@@ -37,7 +39,7 @@ behaviour of the resource associated with thread $\mathbb{P}_{\li y}$.
   {$\mathbb{P}_{\li x}$:}& 
   {$\mathbb{P}_{\li y}$:}& 
   {$\mathbb{P}_{\li z}$:}&
-  $\mathbb{INC}$:\\[.5ex]
+  $\mathbb{INC}$:\\[-2ex]
 \begin{lstlisting}
 //$\comment\{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}} * [\token a_{\tx x}]\}$
 while(x != 10)
@@ -135,7 +137,9 @@ creation of a subjective view $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|->
   0}I$, where {part} of the underlying
 global shared state now contains the three variable  cells and the 
 interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action 
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
  \token a_{\li y}:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}
 \]
@@ -155,7 +159,9 @@ consequence of an action
 Using the 
 \copyRule\ principle for subjective views and the disjoint concurrency
 rule, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
 \]
 However, this precondition is more complicated than we
@@ -200,8 +206,8 @@ It is however possible to give a  stronger specification, as follows:
  & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
   \stackrel{(\shiftRule)}{\semimplies} \null& \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
  \stackrel{(\forgetRule)}{=>}\null& \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
- \stackrel{(\shiftRule)}{\semimplies}\null&  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
- \stackrel{(\stabilise)}{=>}\null&
+ \stackrel{(\shiftRule)}{\semimplies}\null&  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] 
+ \stackrel{(\stabilise)}{=>}\null
     \shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
         \cell{\li{y}}{0} \lor\\ \cell{\li{x}}{1} *
         \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]
@@ -212,7 +218,9 @@ Consider the action
 $\token a_{\li x}$ 
 of $I$ and the initial state with value $0$ in all the cells. This
 action can be replaced by:
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 \token a_{\li x} : \exsts{v} \; 
 \cell{\li{x}}{v} * \cell{\li{y}}{v} * \cell{\li{z}}{v}
 \swap
@@ -320,7 +328,7 @@ enables us to confine the specification and verification of each
 thread to just the resources they need. This  is not possible
 using previous work.
 
-\paragraph{\colosl reasoning}
+\paragraph{Further \colosl reasoning}
 We complete our semi-formal overview with a brief desription of features of \colosl not
 showcased by the proof above. First, we note that an action $P\swap Q$
 may in general performs three types of action: (1)
@@ -341,7 +349,7 @@ may in general performs three types of action: (1)
   \textit{e.g.} $Q = P * R$.
 %%\end{enumerate}   
 We demonstrate the latter two behaviours through our examples in
-\S\ref{subsec:CSTExample}. These three behaviours are not mutually
+\S\ref{sec:examples}. These three behaviours are not mutually
 exclusive and an action may exhibit any combination of them.  Unlike
 CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
 an explicit \emph{unsharing} mechanism to claim shared

@@ -1,10 +1,14 @@
+\vspace{-.5ex}
 \section{\colosl Worlds and Assertions}
+\vspace{-.5ex}
 \label{sec:logic}
 
 We formally introduce the assertions of \colosl and their models,
 starting with the latter.
 
+\vspace{-.5ex}
 \subsection{Worlds}
+\vspace{-.5ex}
 
 \paragraph{Overview}
 %% Incomplete, subjective view of the shared state forces us to revisit many
@@ -102,7 +106,9 @@ thread means that the environment can perform the action.\footnote{In
   \unitCap)$. The \emph{composition of logical states} $ \composeL :
   \LStates \times \LStates \rightharpoonup \LStates $ is defined as
   the disjoint union $\uplus$ of their individual components:
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   (@s, h,\ca{}) \composeL (@s', h', \ca{}') \eqdef
   (@s\uplus @s', h\composeH h', \ca{}\composeCap \ca{}')
   \]
@@ -127,10 +133,11 @@ actions enabled by each capability.
 
 \begin{definition}[Action, action models]
   The sets of \emph{actions} $\set{Action}$ and \emph{action models}
-  $\AMods$ are defined as follows:
+  $\AMods$ are defined as follows:  \vspace{-1ex}
   \begin{align*}
   \set{Action} &== \LStates \times \LStates&
   \AMods &\eqdef \Caps \rightharpoonup \pset{\set{Action}}
+  \vspace{-1ex}
   \end{align*}
 \end{definition}
 
@@ -171,7 +178,9 @@ further, non-empty catalyst can be found in $(p',q')$.
 \begin{definition}[Active part of an action]
   Given a pair of logical states $(p, q)$, its \emph{active part}
   $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
   c'\leq q' => c' = \unitL
   \]
@@ -196,7 +205,9 @@ $
 \meetL : \left(\LStates \times \LStates \right) \rightarrow \pset{\LStates}
 $
 is defined as:
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 l_1 \meetL l_2 \eqdef 
 \left\{ 
 l  \mid
@@ -222,7 +233,9 @@ the set notation.\footnote{In the general case, separation algebras
 \begin{definition}[Action application]\label{def:actionApplication}
   The \emph{application} $a[g]$ of an action $a$ on a logical state
   $g$ is defined provided that there is $l$ such that
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
     \m{fst}(a) \meetL g /=\emptyset /|
     g = \m{fst}(\updateFP{a}) \composeL l /|
     \m{snd}(\updateFP{a})\compatL l
@@ -236,7 +249,9 @@ the set notation.\footnote{In the general case, separation algebras
   \label{def:actconf}
   An action $a$ is \emph{confined} to a logical state $g$, written
   $g\containI a$, if
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   \m{fst}(a)\meetL g \neq\emptyset => \m{fst}(\updateFP{a})\leq g
   \]
 \end{definition}
@@ -257,7 +272,9 @@ the following notion of \emph{visible actions}.
 \begin{definition}[Visible actions]
   An action $a$ is called \emph{visible in $g$}, written
   $\m{visible}(a,g)$ when
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   \E{l} \m{fst}(\updateFP{a})\meetL g = l /| l/=\unitL
   \]
 \end{definition}
@@ -276,7 +293,9 @@ $f$.
   An action model $\lmod \in \AMods$ is \emph{locally fenced} by
   $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$,
   iff, for all $g \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 \begin{array}{L}
   g\containI a /|
   (\m{potential}(a,g) /| \m{visible}(a,g) => a[g]\in\fence{})
@@ -300,6 +319,7 @@ correspond to actions in $\lmod$, and $\gmod$ is confined to $g$.
 \begin{definition}[Well-formedness]
   A 4-tuple $(l, g, \lmod, \gmod)$ is \emph{well-formed},
   written $\wf{(l, g, \lmod, \gmod)}$, if
+  \vspace{-1ex}
   \[
   \begin{array}{L}
     (\exsts{\h{},\ca{}}
@@ -308,6 +328,7 @@ correspond to actions in $\lmod$, and $\gmod$ is confined to $g$.
     (\V{\ca{}}\V{a\in\gmod(\ca{})}\E{a'\in\lmod(\ca{})}
     \updateFP{a} = \updateFP{a'}) /| g \containI \lmod
   \end{array}
+  \vspace{-1ex}
   \]
 \end{definition}
 
@@ -347,7 +368,9 @@ algebra with multiple units: all well-formed states of
 the form $(\unitL,g,\lmod,\gmod)$.
 
 
+\vspace{-.5ex}
 \subsection{Assertions}\label{sec:assertions}
+\vspace{-.5ex}
 
 Our assertions extend standard assertions from separation logic with
 \emph{subjective views} and \emph{capability assertions}. \colosl is
@@ -460,6 +483,7 @@ respectively.
   denotes the semantics of interference assertions and
   $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ will be given in
   \defin~\ref{def:actclos}:
+  \vspace{-1ex}
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
