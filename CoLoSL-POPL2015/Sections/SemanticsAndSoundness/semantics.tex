@@ -601,23 +601,23 @@ assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
 
 
 For instance, a possible fence for the interference assertion
-$I_{\li{y}}$ of \fig\ref{fig:concurrentInc} is
-\[
-\fence{\li{y}} \eqdef\begin{array}[t]{L}
-\left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
-\ldots, 10\} \right\} \cup\\
-\left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
-\ldots, 10\} \right\}
-\end{array}
-\]
-Or equivalently, expressed as an assertion:
+$I_{\li{y}}$ of \fig\ref{fig:concurrentInc} is denoted by the assertion
 \[
 F_{\li{y}} \eqdef
 \bigvee_{v = 0}^{10} (x|-> v * y|->v) |/ (x|->v+1 * y|->v)
 \]
+%% \[
+%% \fence{\li{y}} \eqdef\begin{array}[t]{L}
+%% \left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\} \cup\\
+%% \left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\}
+%% \end{array}
+%% \]
 
-\julescomment{Find better/more examples, perhaps of non-fencing as
-  well?}
+%% TODO:
+%% \julescomment{Find better/more examples, perhaps of non-fencing as
+%%   well?}
 
 
 %%%%%%%%%%%%%%%%%%%%%

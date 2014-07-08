@@ -317,20 +317,14 @@ I_{\li x}\cup I_{\li y}\cup I_{\li z}\weakenIb{\li{x}|->10 * \li{y}|->10 * \li{z
 so, by the \shiftRule\ principle, we get the postcondition of $\mathbb{INC}$. 
 
 
-\paragraph{Comparison with other formalisms}
-Existing formalisms all require global views and global interferences
-to reason about $\mathbb{INC}$. TODO: blablabla, we're awesome.
+%\paragraph{Comparison with other formalisms}
+This concludes our \colosl proof of $\mathbb{INC}$. Using subjective
+views and the ability to manipulate interference assertions using
+semantic insights about the possible evolutions of the shared state
+gained at the time where we can see the whole shared state enables the
+specification and verification of each thread to be confined to just
+the resources they need, a feat not possible using previous work.
 
-\pgcomment{needs an ending. \colosl is brilliant, yeah.} 
-
-\pgcomment{might include somewhere here, needn't}
-
-Subjectivity also enables the analysis of
-portions of code without access to the whole program, and allows one
-to reuse the established specifications in any environment that
-doesn't violate their subjective views.
-%
-%
 \paragraph{\colosl Actions and Unsharing}
 As discussed above, given a subjective view $\shared P I$, the interference assertion $I$ contains actions of the form $Q \swap R$ that state how the shared resources described by $P$ may be manipulated. The actions of $I$ capture three patterns of behaviour: 
 \begin{enumerate}
