@@ -1,5 +1,83 @@
-\section{Conclusions}
+
+\subsection*{Related Work and Concluding Remarks}
+
+
+Compositional reasoning about fine-grained concurrent algorithms is
+essential for verifying large concurrent systems.  Jones introduced rely-guarantee thinking in his PhD
+thesis~\cite{rg}, motivating the rely and guarantee relations given in
+\S{sec:????}. O'Hearn introduced concurrent separation
+logic~\cite{csl-orig,csl-tcs}, giving the disjoint concurrency rule
+which underpins the reasoning presented here.  Since then, many people
+have looked at more complex and finer-grained algorithms,
+building on the combination of ideas arising from these papers:
+examples include RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
+deny-guarantee~\cite{dg}, and the CAP
+family~\cite{cap-ecoop10,icap,tada}, to name but a few.
+
+\pgcomment{Azalea, please do a proper CAP box.} 
+
+\pgcomment{Azalea, please make the fence bit better.}
+
+One point of inspiration has come from CAP reasoning. 
+CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
+where the assertion $P$ describes a fixed disjoint  part of the global shared
+state and the interference given by $I$ is also fixed. In contrast,
+\colosl uses flexible subjective views $\shared{P}{I}$, where
+assertion $P$ now describes a flexible, overlapping part of the global
+shared state, and there is a subtle dynamic relationship between this
+$P$ and 
+the flexible $I$. 
+
+
+
+ leading to
+much simpler proofs as illustrated by the concurrent set example in
+\S{sec:five}.More recently, there  has been much work on more abstract ways  of
+thinking about CAP~\cite{colosal, iCAP,TaDA}. 
+
+
+Our merging of overlapping subjective views relies on the
+sepish connective introduced in~\cite{reynolds,gareth,jules}. 
+In~\cite{jules}, they demonstrate how to reason about a sequential
+spanning tree algorithm using the sepish connective. Here, we
+demonstrate
+how \colosl is naturally able to verify an concurrent tree spanning
+algorithm where the underlying 
+overlapping shared graphs is key. 
+
+
+
+
+Our primary inspiration has, in fact, come from 
+
+taken inspiration from them. our set example better. 
+
+
+fences, global rely-guarantee conditions,  still non-overlapping, 
+
+
+
+views an inspiration for us. 
+
+
+The recent formalism of Views~\cite{views} pinpoints a common
+fundamental insight behind these program logics: assertions denote
+\emph{views} of the concrete machine state for each thread, which
+other threads cannot invalidate. Borrowing the vocabulary, existing
+formalisms (with the notable exception of Local Rely
+Guarantee~\cite{lrg}--henceforth LRG) require the view of all threads
+to map to the same portion of concrete state. This impedes
+compositionality: to use a given program specification in another
+context, the current shared state has to match that of the existing
+specification, instead of merely containing it. 
+
+our boxes very different,  fences like LRG, 
+
+\subsection*{Concluding Remarks}
 \label{sec:conclusion}
+
+now what to say about
+abstraction and TaDA. 
 
 Well, that was awesome.
 
