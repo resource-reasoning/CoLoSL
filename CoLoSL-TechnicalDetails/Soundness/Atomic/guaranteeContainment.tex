@@ -1,3 +1,48 @@
+%
+\begin{lemma}[] \label{lem:guaranteeContainment}
+%
+\[
+\begin{array}{l}
+	\for{w_1, w_2, w \in \Worlds} w_1 \composeW w_2 = w \implies\\
+	\hspace*{1cm}(l', s', \amod{}') \in \guarantee(w_1) \implies (\localPart{(w_2)}, s', \amod{}') \in \rely(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $w_1, w_2, w$ and $(l'_1, s', \amod{}')$ such that:
+%
+\begin{align}
+	w_1 \composeW w_2 = w \label{L13:Ass1}\\
+	(l'_1, s', \amod{}', \amod{L}') \in \guarantee(w_1) \label{L13:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \rely(w_2) \label{L13:Goal}
+\end{align}
+From (\ref{L13:Ass2}) and by definition of \guarantee\ we know:
+%
+\begin{align}
+	(l'_1, s', \amod{}', \amod{L}') \in \left(\updateG \cup \extendG \cup \shiftG \right)^{*}(w_2) \label{L13:Ass3}
+\end{align}
+%
+From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment}, \ref{lem:extendGContainment} and \ref{lem:shiftGContainment} we have:
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \left(\updateR \cup \extendR \cup \shiftR \right)^{*}(w_2) \nonumber
+\end{align}
+%
+and consequently 
+%
+\begin{align}
+	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \rely(w_2) \nonumber
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%
 \begin{lemma}[] \label{lem:updateGContainment}
 %
 \[
@@ -232,46 +277,3 @@ as required.
 %
 \end{lemma}
 %
-%
-\begin{lemma}[] \label{lem:guaranteeContainment}
-%
-\[
-\begin{array}{l}
-	\for{w_1, w_2, w \in \Worlds} w_1 \composeW w_2 = w \implies\\
-	\hspace*{1cm}(l', s', \amod{}') \in \guarantee(w_1) \implies (\localPart{(w_2)}, s', \amod{}') \in \rely(w_2)
-\end{array}
-\]
-%
-\begin{proof} Pick an arbitrary $w_1, w_2, w$ and $(l'_1, s', \amod{}')$ such that:
-%
-\begin{align}
-	w_1 \composeW w_2 = w \label{L13:Ass1}\\
-	(l'_1, s', \amod{}', \amod{L}') \in \guarantee(w_1) \label{L13:Ass2}
-\end{align}
-%
-\textbf{RTS.}
-%
-\begin{align}
-	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \rely(w_2) \label{L13:Goal}
-\end{align}
-From (\ref{L13:Ass2}) and by definition of \guarantee\ we know:
-%
-\begin{align}
-	(l'_1, s', \amod{}', \amod{L}') \in \left(\updateG \cup \extendG \cup \shiftG \right)^{*}(w_2) \label{L13:Ass3}
-\end{align}
-%
-From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment}, \ref{lem:extendGContainment} and \ref{lem:shiftGContainment} we have:
-%
-\begin{align}
-	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \left(\updateR \cup \extendR \cup \shiftR \right)^{*}(w_2) \nonumber
-\end{align}
-%
-and consequently 
-%
-\begin{align}
-	(\localPart{(w_2)}, s', \amod{}', \amod{L}') \in \rely(w_2) \nonumber
-\end{align}
-%
-as required.
-\end{proof}
-\end{lemma}

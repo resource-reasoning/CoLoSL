@@ -396,6 +396,7 @@
 \begin{array}{r l}
 	\inSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \inList{h}{v}\\
 	\outSet{h}{v} \eqdef & \exsts{\pi} \isLock{h}{\pi} * \valueC{h}{v} * \outList{h}{v}\\
+	\ownSet{h}{v} \eqdef & \inSet{h}{v} \lor \outSet{h}{v}\\
 	\sortedList{\triangleleft}{h}{v} \eqdef & \exsts{L} \sorted{L} \land v  \triangleleft L \land \lsg{h}{h}{-\infty:: L ++ \{\infty\} }{\li{null}}\\
 %	 \land v \in L \land \lockT{h}[\pi] * \lsg{h}{h}{-\infty:: L ++\{\infty\} }{\nil}\\
 %
@@ -425,11 +426,14 @@
 \[	
 \begin{array}{r l}
 	\node{a}{v}{b} \eqdef & \unlockedNode{a}{v}{b} \lor \lockedNode{a}{v}{b}\\ %\link{a}{b} * \val{a}{v}{b}\\
-	\lockedNode{a}{v}{b} \eqdef & \locked{a} * \val{a}{v}{b}\\
+	\lockedNode{a}{v}{b} \eqdef & \locked{a.lock} * \val{a}{v}{b}\\
 	\unlockedNode{a}{v}{b} \eqdef & \link{a}{b} * \val{a}{v}{b}\\
 	
-	\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b}{1} * \modC{a} \\
-	\val{a}{v}{b} \eqdef & \cell{a.value}{v} * \nextC{a}{b}
+	\link{a}{b} \eqdef & \cell{a.next}{b} * \isLock{b.lock}{1} * \modC{a} \\
+	\val{a}{v}{b} \eqdef & \cell{a.value}{v} * \nextC{a}{b}\\
+	
+	\isLock{a}{\pi} \eqdef & \lockC{a}[\pi] * \shared{\cell{a}{0} * \unlockC{a} \lor \cell{a}{0}}{L(a)}\\
+	\locked{a} \eqdef & \unlockC{a} * \shared{\cell{a}{1}}{L(a)}\\
 \end{array}
 \]\\
 %
@@ -439,7 +443,7 @@
 	\left\{
 	\begin{array}{r @ {\hspace*{2pt}}l}
 %		\text{//Locking}\hspace*{1.4cm}&\\
-		- : & \link{a}{b} \swap \locked{a}\\
+		- : & \link{a}{b} \swap \locked{a.lock}\\
 		
 		\modT{a} : & \exsts{v, b} \lockedNode{a}{v}{b} \swap \unlockedNode{a}{v}{b}\\
 		
@@ -466,6 +470,11 @@
 	  		\swap \lockedNode{a}{v_1}{b} * \val{b}{v}{c} *  \val{c}{v_2}{d}		
 		\end{array}
 		\right\}\\ 
+		
+		
+		
+		
+		
 
 %		
 %		\text{//Insertion of } v \hspace*{0.7cm}&\\
@@ -481,6 +490,17 @@
 %		\end{array}
 %		\right\}\\ 
 		
+	\end{array}
+	\right\}
+\]
+%
+\[
+	L(a) \eqdef 
+	\left\{
+	\begin{array}{r l}
+		\lockT{a}[-]&  \cell{a}{0} * \unlockC{a}  \swap \cell{a}{1}\\
+		\unlockT{a}[1]&  \cell{a}{1} \swap \cell{a}{0} * \unlockC{a} \\
+		\lockT{a}[1] * \unlockT{a}[1] &  \cell{a}{1} \swap \lockT{a}[1] * \unlockT{a}[1]
 	\end{array}
 	\right\}
 \]
@@ -572,62 +592,72 @@
 \[
 \begin{array}{l}
 	\left\{\ownSet{h}{v} \right\}\\
-	\command{locate(h, v) \{}\\
+	\command{locate(h, v) $\{$}\\
 	\begin{array}{l}
 		\command{p:= h}\\
-		\command{lock(p)}\\
+		\command{lock(p.lock)}\\
 		\command{c:= p.next}\\
 		
 		\left\{
 		\begin{array}{@{} l @{}}
-			\exsts{L, \pi} \sorted{-\infty :: L ++ \{+\infty\}} \land  \lockT{h}[\pi] * \valueT{h}{v} * \\
-			 \shared{\lockedNode{p}{-\infty}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L++\{\infty\}}{\li{null}}
+			\exsts{L, \pi} \sorted{-\infty :: L ++ \{+\infty\}} \land  \isLock{h}{\pi} * \valueT{h}{v} * \\
+			 \shared{\lockedNode{p}{-\infty}{c}}{I(p)} * \link{p}{c} * \lsg{h}{c}{L++\{\infty\}}{\li{null}}
 		\end{array}	 
 		\right\}\\
 		
 		
 		\left\{
 		\begin{array}{@{} l @{}}
-			\exsts{L_1, L_2, v_p, \pi} v_p < v \land \sorted{L_1 ++\{v_p\}  ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
-			\lsg{h}{h}{L_1}{p} * \shared{\lockedNode{p}{v_p}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c} * \lsg{h}{c}{L_2}{\li{null}}
+			\exsts{L_1, L_2, v_p, \pi} v_p < v \land \sorted{L_1 ++\{v_p\}  ++ L_2}  \land \isLock{h}{\pi}  * \valueT{h}{v} * \\
+			\lsg{h}{h}{L_1}{p} * \shared{\lockedNode{p}{v_p}{c}}{I(p)} * \link{p}{c} * \lsg{h}{c}{L_2}{\li{null}}
 		\end{array}
 		\right\}\\
 		
-		\command{while(c.value < v)\{}\\
+		\command{while(c.value $<$ v)\{}\\
 			\begin{array}{l}
 				\left\{
 				\begin{array}{@{} l @{}}
-					\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land  \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+					\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land  \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \isLock{h}{\pi}  * \valueT{h}{v} * \\
 					\lsg{h}{h}{L_1}{p} * 
-				 	\shared{\lockedNode{p}{v_p}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\ 
+				 	\shared{\lockedNode{p}{v_p}{c}}{I(p)} * \link{p}{c}\\ 
 				 	* \shared{\node{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\li{null}}
 				 	
 			 	\end{array}
 			 	\right\}\\
 			 	
 			 	
-			 	\command{lock(c)}\\
+			 	\command{lock(c.lock)}\\
 			 	
 			 	\left\{
 				\begin{array}{@{} l @{}}
-			 		\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+			 		\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \isLock{h}{\pi}  * \valueT{h}{v} * \\
 					\lsg{h}{h}{L_1}{p} * 
-			 		\shared{\lockedNode{p}{v_0}{c}}{I(p)} * \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\ 
-			 		* \shared{\lockedNode{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\li{null}}
-			 		* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+			 		\shared{\lockedNode{p}{v_0}{c}}{I(p)} * \link{p}{c} * \locked{c.lock} \\ 
+			 		* \shared{\node{c}{v_c}{d}}{I(c)} * \lsg{h}{d}{L_2}{\li{null}}
 			 	\end{array}
 			 	\right\}\\
 			 	
-			 	\command{unlock(p)}\\
+			 	
+			 	\left\{
+				\begin{array}{@{} l @{}}
+			 		\exsts{L_1, L_2, v_p, v_c, d, \pi} v_p < v_c < v \land \sorted{L_1 ++ \{v_p; v_c\} ++L_2}  \land \isLock{h}{\pi}  * \valueT{h}{v} * \\
+					\lsg{h}{h}{L_1}{p} * 
+			 		\shared{\lockedNode{p}{v_0}{c}}{I(p)} * \link{p}{c} \\ 
+			 		* \shared{\lockedNode{c}{v_c}{d}}{I(c)} * \link{c}{d} * \lsg{h}{d}{L_2}{\li{null}}
+			 	\end{array}
+			 	\right\}\\
+			 	
+			 	
+			 	\command{unlock(p.lock)}\\
 			 	\command{p:= c ;}\\
 			 	\command{c:= p.next ;}\\
 
 				\left\{
 			 	\begin{array}{@{} l @{}}
-				 	\exsts{L_1, L_2, v_p, c, \pi} v_p < v \land  \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+				 	\exsts{L_1, L_2, v_p, c, \pi} v_p < v \land  \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \isLock{h}{\pi} * \valueT{h}{v} * \\
 					\lsg{h}{h}{L_1}{p} 
 				 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
-				 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
+				 	* \link{p}{c}
 				 	* \lsg{h}{c}{L_2}{\li{null}}
 			 	
 			 	\end{array}
@@ -639,10 +669,10 @@
 	\}\\
 	\left\{
  	\begin{array}{@{} l @{}}
-	 	\exsts{L_1, L_2, v_p, c, \pi} v_p < v \leq v_c \land \sorted{L_1 ++ \{v_p\} ++  v_c::L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+	 	\exsts{L_1, L_2, v_p, c, \pi} v_p < v \leq v_c \land \sorted{L_1 ++ \{v_p\} ++  v_c::L_2}  \land \isLock{h}{\pi} * \valueT{h}{v} * \\
 		\lsg{h}{h}{L_1}{p} 
 	 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
-	 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
+	 	* \link{p}{c}
 	 	* \lsg{h}{c}{v_c ::L_2}{\li{null}}
  	
  	\end{array}
@@ -656,30 +686,30 @@
 \begin{array}{@{} l @{}}
 	\left\{ \ownSet{h}{v} \right \}\\
 	
-	\command{remove($h$, $v$)}\{\\
+	\command{remove(h, v)}\{\\
 	\begin{array}{l}
 		\left\{ \ownSet{h}{v} \right\}\\
 		
-		\command{($p$, $c$):= locate($h$, $v$); }\\
+		\command{(p, c):= locate(h, v); }\\
 		
 		\left\{
 	 	\begin{array}{@{} l @{}}
-		 	\exsts{L_1, L_2, v_p, \pi} v_p < v\leq v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+		 	\exsts{L_1, L_2, v_p, \pi} v_p < v\leq v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land \isLock{h}{\pi} * \valueT{h}{v} * \\
 		 	
 			\lsg{h}{h}{L_1}{p} 
 		 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
-		 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
+		 	* \link{p}{c}
 		 	* \lsg{h}{c}{v_c ::L_2}{\li{null}}
 	 	
 	 	\end{array}
 	 	\right\}\\
 	 	
-	 	\command{if ($c$.value == $v$) then\{ }\\
+	 	\command{if (c.value == v) then $\{$ }\\
 	 	\begin{array}{l}
 	 	
 	
 	 	
-		 	\command{lock($c$) ; }\\
+		 	\command{lock(c.lock) ; }\\
 		 	
 		 	
 		 	\left\{
@@ -687,27 +717,27 @@
 			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
 				\lsg{h}{h}{L_1}{p} 
 			 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
-			 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\
+			 	* \link{p}{c}\\
 			 	
 			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
-			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+			 	* \link{c}{d}
 			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
 		 	
-		 	\command{z:= $c$.next ;}\\
-		 	\command{$p$.next:= z ;}\\
+		 	\command{z:= c.next ;}\\
+		 	\command{$\text{[}$p.next$\text{]}$:= z ;}\\
 		 	
 		 	\left\{
 		 	\begin{array}{@{} l @{}}
 			 	\exsts{L_1, L_2, v_p, d} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
 				\lsg{h}{h}{L_1}{p} 
 			 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
-			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+			 	* \modC{p} * \cell{p.next}{d} * \isLock{c}{1}\\
 			 	
 			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
-			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+			 	* \modC{c} * \cell{c.next}{d} * \isLock{d}{1}
 			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
@@ -721,60 +751,84 @@
 			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
 				\lsg{h}{h}{L_1}{p} 
 			 	* \shared{\lockedNode{p}{v_p}{c} * \lockedNode{c}{v}{d}}{I(p) \cup I(c)} 
-			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+			 	* \modC{p} * \cell{p.next}{d} * \isLock{c}{1}\\
 			 	
-			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+			 	* \modC{c} * \cell{c.next}{d} * \isLock{d}{1}
 			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
 		 	
-		 	\text{//Use } \valueT{h}{v} * \unlockT{p} \text{ cpability.}\\
+		 	\text{//Use } \valueT{h}{v} * \modT{p} \text{ cpability.}\\
 		 	
 		 	\left\{
 		 	\begin{array}{@{} l @{}}
-			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \isLock{h}{\pi} * \valueT{h}{v} * \\
 				\lsg{h}{h}{L_1}{p} 
 			 	* \shared{\lockedNode{p}{v_p}{d}}{I(p) \cup I(c)} 
-			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+			 	* \modC{p} * \cell{p.next}{d} * \isLock{c}{1}\\
 			 	
 			 	* \lockedNode{c}{v}{d}
-			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+			 	* \modC{c} * \cell{c.next}{d} * \isLock{d}{1}
 			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
+		 	
 		 	
 		 	
 		 	\text{//\textsc{Shift} + \textsc{Con}} \\
 		 	
-		 	
 		 	\left\{
 		 	\begin{array}{@{} l @{}}
-			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \isLock{h.lock}{\pi} * \valueT{h}{v} * \\
 				\lsg{h}{h}{L_1}{p} 
-			 	* \shared{\lockedNode{p}{v_p}{d} }{I(p)} 
-			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{d}\\
+			 	* \shared{\lockedNode{p}{v_p}{d}}{I(p) \cup I(c)} 
+			 	* \modC{p} * \cell{p.next}{d} * \isLock{c}{1}\\
 			 	
-			 	* \cell{c}{1, v, d}  
+			 	* \cell{c}{v}{d} * \locked{c} 
+			 	* \modC{c} * \isLock{d}{1}
 			 	* \lsg{h}{d}{L_2}{\li{null}}
 		 	
 		 	\end{array}
 		 	\right\}\\
 		 	
 		 	
-		 	\command{unlock($p$) ;}\\
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \isLock{h}{\pi} * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{d} }{I(p)} 
+%			 	* \link{p}{d}\\
+%			 	
+%			 	* \cell{c}{v, d}  * \isLock{c.lock}{1} * \locked{c}
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+		 	
+		 	
+		 	\command{unlock(p) ;}\\
 		 	
 		 	
 		 	\left\{
 		 	\begin{array}{@{} l @{}}
 			 	\outSet{h}{v}
-				* \cell{c}{1, v, d}  
+				* \cell{c}{v, d} * \isLock{c}{1} * \locked{c}
 		 	
 		 	\end{array}
 		 	\right\}\\
 		 	
-		 	\command{dispose($c$, 3) ; }\\
+		 	
+		 	\left\{
+		 	\begin{array}{@{} l @{}}
+			 	\outSet{h}{v}
+				* \cell{c}{v, d, 1} 
+		 	
+		 	\end{array}
+		 	\right\}\\
+		 	
+		 	\command{dispose(c, 3) ; }\\
 		 	
 		 	
 		 	\left\{
@@ -796,3 +850,152 @@
 	
 \end{array}
 \]
+%
+%
+%\[
+%\begin{array}{@{} l @{}}
+%	\left\{ \ownSet{h}{v} \right \}\\
+%	
+%	\command{add($h$, $v$)}\{\\
+%	\begin{array}{l}
+%		\left\{ \ownSet{h}{v} \right\}\\
+%		
+%		\command{($p$, $c$):= locate($h$, $v$); }\\
+%		
+%		\left\{
+%	 	\begin{array}{@{} l @{}}
+%		 	\exsts{L_1, L_2, v_p, \pi} v_p < v\leq v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%		 	
+%			\lsg{h}{h}{L_1}{p} 
+%		 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
+%		 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}
+%		 	* \lsg{h}{c}{v_c ::L_2}{\li{null}}
+%	 	
+%	 	\end{array}
+%	 	\right\}\\
+%	 	
+%	 	\command{if ($c$.value != $v$) then $\{$ }\\
+%	 	\begin{array}{l}
+%	 		\left\{\emp\}\\
+%	 		\command{z:= alloc(3);}\\
+%	 		// \extendRule \text{ twice}\\
+%	 		\left\{\}
+%	 		\command{z.value:= $v$;}\\
+%	 		\command{$p$.next:= z;}\\
+%	 		
+%		 	
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
+%			 	* \unlockT{p} * \cell{p.next}{c} * \lockT{c}\\
+%			 	
+%			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
+%			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	\command{z:= $c$.next ;}\\
+%		 	\command{$p$.next:= z ;}\\
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{c}}{I(p)} 
+%			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+%			 	
+%			 	* \shared{\lockedNode{c}{v}{d}}{I(c)} 
+%			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	
+%		 	\text{//\textsc{Merge} } \\
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{c} * \lockedNode{c}{v}{d}}{I(p) \cup I(c)} 
+%			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+%			 	
+%			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	\text{//Use } \valueT{h}{v} * \unlockT{p} \text{ cpability.}\\
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{d}}{I(p) \cup I(c)} 
+%			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{c}\\
+%			 	
+%			 	* \lockedNode{c}{v}{d}
+%			 	* \unlockT{c} * \cell{c.next}{d} * \lockT{d}
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	
+%		 	\text{//\textsc{Shift} + \textsc{Con}} \\
+%		 	
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\exsts{L_1, L_2, v_p, d, \pi} \sorted{L_1 ++ \{v_p\} ++ L_2}  \land \lockT{h}[\pi] * \valueT{h}{v} * \\
+%				\lsg{h}{h}{L_1}{p} 
+%			 	* \shared{\lockedNode{p}{v_p}{d} }{I(p)} 
+%			 	* \unlockT{p} * \cell{p.next}{d} * \lockT{d}\\
+%			 	
+%			 	* \cell{c}{1, v, d}  
+%			 	* \lsg{h}{d}{L_2}{\li{null}}
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	
+%		 	\command{unlock($p$) ;}\\
+%		 	
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\outSet{h}{v}
+%				* \cell{c}{1, v, d}  
+%		 	
+%		 	\end{array}
+%		 	\right\}\\
+%		 	
+%		 	\command{dispose($c$, 3) ; }\\
+%		 	
+%		 	
+%		 	\left\{
+%		 	\begin{array}{@{} l @{}}
+%			 	\outSet{h}{v}
+%		 	\end{array}
+%		 	\right\}
+%		 	
+%		\end{array}\\
+%		
+%		\}\\
+%		
+%	\end{array}\\
+%	
+%	\}\\
+%	
+%	\left\{ \outSet{h}{v} \right\}
+%	
+%	
+%\end{array}
+%\]
