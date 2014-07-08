@@ -109,7 +109,7 @@ x = 0; y = 0; z = 0;
 \end{align*}
 \end{minipage}
 
-\vspace{5pt}\hrule\vspace{5pt}
+\vspace{3pt}\hrule\vspace{-6pt}
 \caption{The concurrent increment program together with a \colosl proof
   sketch. Lines starting with \lstinline{//} contain formulas that describe
   the local state and the subjective shared state at the relevant program point.}
@@ -197,21 +197,16 @@ stabilise in a general way as given, losing information about how the
 values of \li{x} and \li{y} are connected together through \li{z}.
 
 It is however possible to give a  stronger specification, as follows: 
-\[
-\begin{array}{c l}
+\begin{align*}
  & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
- 
-\stackrel{(\shiftRule)}{\semimplies} &  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
-
- \stackrel{(\forgetRule)}{=>} & \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
- 
-\stackrel{(\shiftRule)}{\semimplies} &  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
-\stackrel{(\stabilise)}{=>} &
+  \stackrel{(\shiftRule)}{\semimplies} \null& \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
+ \stackrel{(\forgetRule)}{=>}\null& \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
+ \stackrel{(\shiftRule)}{\semimplies}\null&  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
+ \stackrel{(\stabilise)}{=>}\null&
     \shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
         \cell{\li{y}}{0} \lor\\ \cell{\li{x}}{1} *
         \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]
-\end{array}
-\]
+\end{align*}
 This implication involves subtle interaction between the assertion and
 the interference relation of the subjective view. 
 Consider the action 
@@ -268,29 +263,29 @@ of the thread. Since another thread in the environment may own the $[\token{a_{\
 When that is the case, the piece of the
 state corresponding to the overlap between the state and the
 precondition of the action is removed, and the entire postcondition of
-the action is added in its place. Diagrammatically, a subjective state
-(represented by the circle) is affected as follows by an action $P\swap Q$:
-\[
-\begin{tikzpicture}[baseline]
-\draw[thick] (0,0) circle (.4cm);
-\draw[densely dotted] (0,0) rectangle (.4cm,.6cm);
-\end{tikzpicture}
-\quad\swap\quad
-\begin{tikzpicture}[baseline]
-\draw[thick] (0,0) circle (.4cm);
-\draw[thick,fill=white] (0,0) rectangle (.6cm,.4cm);
-\end{tikzpicture}
-\qquad
-\left(\text{where }
-\begin{tikzpicture}[baseline,yshift=-.25cm]
-\draw[thick] (0,0) rectangle (.4cm,.6cm);
-\draw[densely dotted] (.4cm,0) arc (0:90:.4cm);
-\end{tikzpicture}|= P
-\text{ and }
-\begin{tikzpicture}[baseline]
-\draw[thick,yshift=-.1cm] (0,0) rectangle (.6cm,.4cm);
-\end{tikzpicture}|= Q\right)
-\]
+the action is added in its place.%%  Diagrammatically, a subjective state
+%% (represented by the circle) is affected as follows by an action $P\swap Q$:
+%% \[
+%% \begin{tikzpicture}[baseline]
+%% \draw[thick] (0,0) circle (.4cm);
+%% \draw[densely dotted] (0,0) rectangle (.4cm,.6cm);
+%% \end{tikzpicture}
+%% \quad\swap\quad
+%% \begin{tikzpicture}[baseline]
+%% \draw[thick] (0,0) circle (.4cm);
+%% \draw[thick,fill=white] (0,0) rectangle (.6cm,.4cm);
+%% \end{tikzpicture}
+%% \qquad
+%% \left(\text{where }
+%% \begin{tikzpicture}[baseline,yshift=-.25cm]
+%% \draw[thick] (0,0) rectangle (.4cm,.6cm);
+%% \draw[densely dotted] (.4cm,0) arc (0:90:.4cm);
+%% \end{tikzpicture}|= P
+%% \text{ and }
+%% \begin{tikzpicture}[baseline]
+%% \draw[thick,yshift=-.1cm] (0,0) rectangle (.6cm,.4cm);
+%% \end{tikzpicture}|= Q\right)
+%% \]
 This is a direct consequence of the fact that the subjective view
 describes the thread's partial knowledge about the shared state, while
 the environment may have both the knowledge that the thread
