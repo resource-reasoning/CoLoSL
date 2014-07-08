@@ -1,4 +1,4 @@
-\section{\colosl worlds and assertions}
+\section{\colosl Worlds and Assertions}
 \label{sec:logic}
 
 We formally introduce the assertions of \colosl and their models,
@@ -47,7 +47,7 @@ As $g$ represents the global shared state, we will also require that
 actions in $\lmod$ and $\gmod$ are \emph{confined} to $g$.  We write
 $g \containI \lmod$ to denote that the part of state mutated by
 actions in $\lmod$ is always fully contained in $g$. As threads may
-uniterally decide to bring in part of their local states into the
+unilaterally decide to bring in part of their local states into the
 shared state at any point (by \extendRule), this ensures that
 existing actions cannot affect future extra pieces of shared state. We
 will similarly require that the new actions associated with newly
@@ -63,7 +63,7 @@ local states are disjoint and they agree on all other three
 components, hence have identical knowledge of the shared state and
 possible interferences.
 
-\paragraph{Worlds and actions}
+\paragraph{Worlds and Actions}
 We start by defining logical states, which are \colosl's notion of
 \emph{resource}, in the standard separation logic sense. Logical
 states have two components: one describes machine states; the other
@@ -142,7 +142,7 @@ We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 
 
-\paragraph{The effect of actions} As mentioned in the beginning of the
+\paragraph{The Effect of Actions} As mentioned in the beginning of the
 section, we require that the effect of actions in the local and global
 action models are \emph{confined} to the shared state. This means
 that, given an action $a = (p,q)$ and a shared state $g$, whenever the
@@ -191,7 +191,7 @@ the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$, and
 $([y:v,z:v],\emptyset,\emptyset)$ in $I_{\li{y}}$.
 
 
-The compatibility of an action prestate $p$ and the shared state $g$
+The compatibility of an action pre-state $p$ and the shared state $g$
 will be defined using the following notion of \emph{intersection} of
 logical states.
 
@@ -224,7 +224,7 @@ the set notation.\footnote{In the general case, separation algebras
   restore unicity. Since in this paper our logical states satisfy disjointness,
   intersection is enough for our exposition.}
 
-\begin{definition}[Action application]
+\begin{definition}[Action application]\label{def:actionApplication}
   The \emph{application} $a[g]$ of an action $a$ on a logical state
   $g$ is defined provided that there is $l$ such that
   \[
@@ -274,7 +274,7 @@ locally fenced action models to capture all possible states reachable
 from the current state via some number of action applications. A set
 of states $\fence{}$ \emph{fences} an action model if it is invariant
 under interferences perpetrated by the corresponding actions. We write
-$\m{rg}(f)$ to denote the \emph{range} (or codomain) of a function
+$\m{rg}(f)$ to denote the \emph{range} (or co-domain) of a function
 $f$.
 
 \begin{definition}[Locally-fenced action model]\label{def:localFence}
@@ -348,8 +348,7 @@ algebra with multiple units, which are all the well-formed states of
 the form $(\unitL,g,\lmod,\gmod)$.
 
 
-\subsection{Assertions}
-\label{sec:assertions}
+\subsection{Assertions}\label{sec:assertions}
 
 Our assertions extend standard assertions from separation logic with
 \emph{subjective views} and \emph{capability assertions}. \colosl is
@@ -376,12 +375,12 @@ respectively.
     %\mid P --* Q 
      \mid P \sepish Q% \mid P \intersect Q
      \mid \shared{P}{I} \\
-    I &::= \emptyset ||| \interAss{K}{\vec{y}}{P}{Q}, I
+    I &::= \emptyset ||| \{\interAss{K}{\vec{y}}{P}{Q}\} \cup I
   \end{align*}
 \end{definition}
 
 This syntax follows from standard separation logic with variables as
-resource~\cite{entcs06} (notice that expressions $E$ do not allow
+resource~\cite{variablesAsResource} (notice that expressions $E$ do not allow
 program variables), with the exception of subjective views $\shared P
 I$. $\emp$ is true of the units of $\composeW$. Predicates are
 interpreted over a world's local state: $\li{x}|-> E$
@@ -413,7 +412,7 @@ decomposition $s$, $r$, in the following sense:
   visible effect on $s$ is reflected in $I$;
 \item
   every action in $I$ that is potentially enabled in $g$ and whose
-  prestate is fully contained in $g$ is reflected is $\gmod$;
+  pre-state is fully contained in $g$ is reflected is $\gmod$;
 \item
   the above is true after any number of action applications in
   $I$ that affect $g$ and any number of action applications in
@@ -421,7 +420,7 @@ decomposition $s$, $r$, in the following sense:
 \end{enumerate}
 These conditions will be captured by the \emph{action model closure}
 relation $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ given by the
-upcoming Definition~\ref{def:actclos} (where $\semI{I}$ is the
+upcoming \defin~\ref{def:actclos} (where $\semI{I}$ is the
 interpretation of $I$).
 
 %% , and spatial predicates and connectives
@@ -443,7 +442,7 @@ nesting of subjective views.\footnote{This presentation with several
   interpreted over worlds that are not necessarily well-formed, and
   then cut down to well-formed ones. The CAP presentation strays from
   separation logic models in some respects; \textit{e.g.}, in CAP, $*$
-  is not the adjoint of $--*$, the ``magicwand'' connective of
+  is not the adjoint of $--*$, the ``magic wand'' connective of
   separation logic. Although we have omitted this connective from our
   presentation, its definition in \colosl would be standard and
   satisfy the adjunction with $*$.}
@@ -461,7 +460,7 @@ respectively.
   assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$
   denotes the semantics of interference assertions and
   $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ will be given in
-  Definition~\ref{def:actclos}:
+  \defin~\ref{def:actclos}:
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
@@ -543,7 +542,7 @@ This satisfaction relation for subjective views in $\slsat$ is purely
 for convenience: this allows us to write predicates in interference
 assertions whose definition unpacks to a formula with subjective
 views. Alternatively, we could forbid boxes in assertions evaluated
-using $\slsat$ and explicitely unpack such predicates and erase their
+using $\slsat$ and explicitly unpack such predicates and erase their
 subjective views.
 
 %% The semantics of separation logic predicates and connectives is
@@ -577,7 +576,7 @@ subjective views.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph{Action model closure}
+\paragraph{Action Model Closure}
 Let us now turn to the definition of action model closure, as
 informally introduced at the beginning of this section. First, we need
 to revisit the effect of actions to take into account the splitting of
@@ -602,7 +601,7 @@ the global shared state into a subjective state $s$ and a context $r$.
   $(\m{snd}(\updateFP{a})\composeL s',r')$.
 \end{definition}
 
-We observe that this new definition and Definition~\ref{def:actapp}
+We observe that this new definition and \defin~\ref{def:actionApplication}
 are linked in the following way: $\m{fst}(a[s,r]) \composeL
 \m{snd}(a[s,r]) = a[s\composeL r]$.  In our informal description, we
 have mentioned that some actions must be reflected in some action
@@ -625,7 +624,7 @@ which part of the definition implements them. We write
 \m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
 \]
 \textit{i.e.}\ $a$ can actually happen in $g$ since $g$ holds all the
-resources in the prestate of $a$.
+resources in the pre-state of $a$.
 
 \begin{definition}[Action model closure]
   \label{def:actclos}

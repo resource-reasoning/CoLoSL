@@ -1,6 +1,6 @@
 \section{Further Examples}\label{sec:examples}
 \todo introductory paragraph about data structures with sharing.\\
-\subsection{Concurrent Spanning Tree}
+\subsection{Concurrent Spanning Tree}\label{subsec:CSTExample}
 Let $\gamma = (V, E)$ denote a directed connected binary (DCB) graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
 For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible spanning tree where the dashed lines indicate those edges that have been removed from the graph after spanning it.
 
@@ -103,13 +103,13 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \label{fig:localCST}
 \end{figure}
 %
-The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\tx{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
 %
 \[
 \begin{array}{@{} c @{} }
 	\color{blue}{
 	\Big\{
-		\cell{\tx{n}}{n} * \cell{\tx{b}}{-} * 
+		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
 		\left[\markT{n}{e}\right] * 
 		\g{n}{\gamma}
 	\Big\} 
@@ -119,12 +119,12 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 %
 	\color{blue}{
 	\Big\{
-		\cell{\tx{n}}{n} *  
+		\cell{\li{n}}{n} *  
 		\left[\markT{n}{e}\right] * 
 		\left(
 %		\begin{array}{@{} l @{}}
-			\cell{\tx{b}}{1} * \tr{n}{\gamma} \lor
-			\cell{\tx{b}}{0} *  \tr{\li{null}}{\gamma}
+			\cell{\li{b}}{1} * \tr{n}{\gamma} \lor
+			\cell{\li{b}}{0} *  \tr{\li{null}}{\gamma}
 %		\end{array}
 		\right)
 	\Big\}
@@ -255,41 +255,62 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
 %
 \subsection{Set Module}
 \label{sec:set}
-We now look at the specification of a concurrent set module implemented as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in \cite{cap-ecoop10}. A typical set module provides three functionalities: \li{contains(v)}, \li{add(v)} and \li{remove(v)}.
+In this section we consider a concurrent set module and explore a pictorial specification. We first revisit the set specification of Concurrent Abstract Predicates (CAP) in~\cite{cap-ecoop10}; we then compare it against our specification in \colosl. We demonstrate that our \colosl\ reasoning considerably improves on CAP by producing a \emph{more concise} specification and allowing for \emph{more local} reasoning. 
+
+We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. Our set module provides three functionalities: \li{contains(v)}, \li{add(v)} and \li{remove(v)}.
 %The $\inSet{\var{h}}{\var{v}} $ predicate asserts that the set at \var{h} contains value \var{v}. Dually, $\outSet{\var{h}}{\var{v}}$ asserts that the set does not contain \var{v}. 
 As the name suggests, the \li{contains(v)} function checks whether value \var{v} is contained in the set; the \li{add(v)} and \command{remove(v)} functions add/remove value \var{v} to/from the list, respectively.
 %
-All three operations proceed by traversing the sorted list from the head address and locating the first node in the list holding a value $v'$ greater than or equal to $v$. The algorithm for locating such a node begins by locking the head node; it then moves down the list by hand-over-hand locking whereby first the node following the one currently held is locked and then the previously locked node is released. 
+All three operations proceed by traversing the sorted list from the head address and locating the first node in the list holding a value $v'$ greater than or equal to $v$. The algorithm for locating such a node begins by locking the head node; it then moves down the list by hand-over-hand locking whereby first the node following the one currently held is locked and subsequently the previously locked node is released. 
 %
 
-The following depicts a pictorial representation of the set predicate specified in ~\cite{cap-ecoop10} using Concurrent Abstract Predicates (CAP).\\
+The following diagram illustrates the set predicate in CAP.\\
 %
-\includegraphics[scale=0.24]{Sections/FurtherExamples/Images/capSet.pdf}\\
+\includegraphics[scale=0.232]{Sections/FurtherExamples/Images/capSet.pdf}\\
 %
-In this specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$ and the interference on the set is the combined interference associated with each node in the list. Since the capabilities associated with a region can only be allocated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{T}(x, y, v_{x})]$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v_{x}$. For instance, since the value $v_{x}$ may be contained in the set at address $x$ before address $y$, the region must include the $[\text{T}(x, y, v_{x})]$ capability to accommodate possible modifications of value $v_{x}$. This is captured by the infinite multiplicative star operator $\iterStar$. It uses an auxiliary mathematical set $S$ to track those nodes of the list that are currently locked and thus infer which \text{T} capabilities reside in the shared state and which ones have been removed. This results in an inevitably cluttered and a rather counter-intuitive specification since it seems unnatural to account for the capabilities pertaining to addresses not in the domain of the set. 
+%In this specification all elements of the set (represented as a singly-linked list) reside in a shared region labelled $s$ and the interference on the set is the combined interference associated with each node in the list. Since the capabilities associated with a region can only be allocated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{U}(x, y, v_{x})]$ associated with all addresses $x$, all possible successor addresses $y$ and all values $v_{x}$. For instance, since the value $v_{x}$ may be contained in the set at address $x$ before address $y$, the region must include the $[\text{U}(x, y, v_{x})]$ capability to accommodate possible modifications of value $v_{x}$. This is captured by the infinite multiplicative star operator $\iterStar$. It uses an auxiliary mathematical set $S$ to track those nodes of the list that are currently locked and thus infer which \text{U} capabilities reside in the shared state and which ones have been removed. This results in an inevitably cluttered and a rather counter-intuitive specification since it seems unnatural to account for the capabilities pertaining to addresses not in the domain of the set. 
+%
+%
+In this specification, the elements of the list are represented as a singly-linked list where the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. In the remainder of this section, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
 
-On the other hand, in \colosl\ we specify the set predicate as the *-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$, is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This capability is analogous to the $[\text{T}(x, y, v_{x})]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning.  
-%
-\begin{center}
-\includegraphics[scale=0.24]{Sections/FurtherExamples/Images/coloslSet.pdf}
-\end{center}
-%
-Since \colosl\ allows for \emph{dynamic} extension of the shared state, we do not need to account for capabilities associated with \emph{all} possible addresses and fresh capabilities are generated dynamically as needed. We demonstrate this by giving an outline of reasoning about the \li{add($v_w$)} method. 
+All nodes of the list reside in a single shared region labelled $s$ and the interference on the list is the combined interference associated with each constituent node. 
+Each node at a given address $x$, is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. For instance, since the value $v_{1}$ may be contained in the list at address $x$ before address $y$, there must exist an update capability $[\text{U}(x, y, v_1)]$ to accommodate possible modifications of value $v_{1}$ with respect to $x$ and $y$. In order to modify a node, a thread can acquire the lock associated with the node and subsequently claim the relevant update capability.
+% 
 
-Suppose, $v_x < v_w < v_y$, and thus a new node $w$ containing value $v_w$ is to be inserted after node $x$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $x$. It then locks node $x$ and claims its next pointer and moves it to its local state, as allowed by $I(x)$. Subsequently, the shared state is extended by the resources associated with the new node $w$ ($\cell{w}{v_w, y}$) and in doing so, the capabilities associated with $w$ ($\nextC{w}{y}$) are generated on the fly as depicted below.\\
+Since in CAP the capabilities associated with a region can only be generated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{U}(x, y, v)]$ associated with all addresses $x$ (including those not currently in the domain of the list), all addresses $y$ and all values $v$. At any one point, given $\node{x}{v}{y}$, the only update capability that can be claimed by a thread (through locking) is the one that reflects its current status, namely $[\text{U}(x, y, v)]$. As a result, an auxiliary mathematical set $S$ is used to track those nodes of the list that are currently locked and thus infer which $[\text{U}]$ capabilities have been claimed. The distribution of update capabilities is captured by the two assertions written as the \emph{infinite multiplicative star operator} $\iterStar$. The first part of the assertion states that given any node at address $x$ with successor $y$, if it is not locked, \textit{i.e.} $(x, y) \not\in S$, then \emph{all} of its update capabilities of the form $[\text{U}(x, y, v)]$ lie in the shared region for \emph{all} values $v$. On the other hand, if it is locked, \textit{i.e.} $(x, y) \in S$, then the update capabilities for \emph{all} values $v$ \emph{but one} ($w \not= v$) are in the shared region.
+
+This specification is unnecessarily complicated. It is rather counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, it is overly verbose to consider all combinations of values and successor addresses. Lastly, each thread is required to ``know'' of the resources associated with all nodes in the list and account for their associated interference. 
+
+%
+We proceed with the \colosl\ specification of the set module. Recall from \S\ref{sec:logic} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise specification.  
+
+We specify the set predicate as the *-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$, is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This capability is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning.
+
+%
+{\centering \includegraphics[scale=0.24]{Sections/FurtherExamples/Images/coloslSet.pdf}\\}
+%
+\noindent Since \colosl\ allows for \emph{dynamic} extension of the shared state, we do not need to account for capabilities associated with \emph{all} possible addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving an outline of reasoning about the \li{add(}$v'$\li{)} method. 
+
+Suppose $v_2 < v' < v_3$, and thus a new node $w$ containing value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks node $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is extended by the resources associated with the new node $w$ ($\cell{w}{v', z}$) and in doing so, the capabilities associated with $w$ ($\nextC{w}{z}$) are generated on the fly as depicted below.\\
 %
 \includegraphics[scale=0.215]{Sections/FurtherExamples/Images/add1.pdf}\\
 %
-At this point, since the locking thread holds the next pointer of $x$ in its local state, it modifies it to point to the new node $w$. It then unlocks $x$ and returns its next pointer to the shared state. However, the interference associated with node $x$ ($I(x)$) allows the node to be unlocked in three possible ways. Either its successor has not changed from $y$; \emph{or} it has been redirected to $y$'s successor (when $y$ is being deleted); \emph{or} it has been directed to a new node whose successor is $y$ (a new node is inserted between $x$ and $y$). When adding a new node after $x$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $y$. In our reasoning, using the (\mergeRule) rule we combine the subjective view of $x$ and $w$ as follows.\\
+At this point, since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. However, the interference assertion associated with node $y$ ($I(y)$) allows the node to be unlocked in three possible ways. Either its successor has not changed from its old value $z$ (tracked by $\nextC{y}{z}$); \emph{or} it has been redirected to $z$'s successor (when $z$ is being deleted); \emph{or} it has been directed to a new node whose successor is $z$ (a new node is inserted between $y$ and $z$). When adding a new node after $y$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this condition, we use the (\mergeRule) principle in our reasoning to combine the subjective views of $y$ and $w$ as follows.\\
 %
-\includegraphics[scale=0.22]{Sections/FurtherExamples/Images/add2.pdf}\\
+\includegraphics[scale=0.215]{Sections/FurtherExamples/Images/add2.pdf}\\
 %
-Finally, node $x$ is unlocked; its updated next pointer is returned to the shared state and its next capability is modified accordingly to reflect its new successor. Using the (\copyRule), (\forgetRule) and (\shiftRule) rules \textit{ad seriatim}, we can once again obtain the set predicate with the new node $w$ inserted. \\
+Finally, node $y$ is unlocked; its updated next pointer is returned to the shared state and its next capability is modified accordingly to reflect its new successor. Using the (\copyRule), (\forgetRule) and (\shiftRule) principles \textit{ad seriatim}, we can once again obtain the set predicate with the new node $w$ inserted. \\
 %
 \includegraphics[scale=0.215]{Sections/FurtherExamples/Images/add3.pdf}
 %
 
-We can reason about the \li{remove} operation in a similar fashion. Note that the dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. Moreover, using the four principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed. Lastly, since \colosl\ is parametric in the separation algebra of capabilities, we instantiate it with a heap-like separation algebra that is \emph{stateful} and allows for a more concise specification. That is, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$, we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address as demonstrated above. The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}.
+We can reason about the \li{remove} operation in a similar fashion. Note that the dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. 
+%
+Moreover, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$ (as with $[\text{U}(x, y, v)]$ in CAP), we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address as demonstrated above. 
+%
+Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
+%
+The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}.
 %in that it limits the modifications on node $x$ with respect to its successor $y$. For instance, in order to remove the node at address $y$, a thread proceeds by first acquiring the locks on both $x$ and $y$ nodes. It then claims $x$'s next pointer and redirects it to $z$. In order to ensure that the thread indeed redirects $x$ to $z$ and not any arbitrary address, the we track the current successor of $x$ with $\nextC{x}{y}$ and consequently, in our reasoning, when the thread attempts to unlock $x$, its new successor is compared against the old one $y$ and only when  t of $y$  nodes at $x$ and $y$ when node $x$ is locked and the its next pointer has been temporarily claimed by the locking thread, 
 
 
