@@ -1,8 +1,8 @@
 \section{\colosl worlds and assertions}
 \label{sec:logic}
 
-In this section, we formally introduce the assertion language of
-\colosl and their models. We start with the latter.
+We formally introduce the assertions of \colosl and their models,
+starting with the latter.
 
 \subsection{Worlds}
 
@@ -16,41 +16,47 @@ In this section, we formally introduce the assertion language of
 %% weasel out of some difficulties, but that actually makes the
 %% setting simpler in some respects, eg no token games, ability to
 %% manipulate the interference relations, etc.'').
-In this section, we gradually introduce the
-semantic model of \emph{worlds}, our representation of program
-states in the logic.
-
-A \emph{world} is a 4-tuple $(l,g,\lmod,\gmod)$ where $l$ and $g$
-are \emph{logical states} and $\lmod$ and $\gmod$ are \emph{action
+A \emph{world} is a 4-tuple $(l,g,\lmod,\gmod)$ where $l$ and $g$ are
+\emph{logical states} and $\lmod$ and $\gmod$ are \emph{action
   models}; let us explain the role of each component informally. The
-\emph{local (logical) state} $l$ represents the locally owned
-resources of a thread (\textit{e.g.} the capability $\{\token a_{\li
-  y}\}$ for $\mathbb{P}_{\li y}$ in the previous section). The
-\emph{shared (logical) state} $g$ represents the \emph{whole}
-current shared state, and is subject to interferences as described by
-the action models.
+\emph{local (logical) state}, or simply local state, $l$ represents
+the locally owned resources of a thread (\textit{e.g.} in
+\fig{fig:concurrentInc}, the capability $\{\token a_{\li y}\}$ for
+$\mathbb{P}_{\li y}$, and the variables \li{x}, \li{y}, \li{z} at the
+beginning of $\mathbb{P}$). The \emph{shared logical state}, or shared
+state, $g$ represents the \emph{whole} current shared state
+(\textit{e.g.} variables \li{x}, \li{y}, \li{z} in
+$\mathbb{P}_{\li{y}}$), and is subject to interferences as described
+by the action models (which represent, \textit{e.g.}, the various
+interference assertions $I$, $I_{\li{y}}$, \ldots).
 
 An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}. An action is a pair $(p,q)$ of logical states where
 $p$ is the \emph{pre-state} of the action and $q$ its
 \emph{post-state}.  The \emph{local action model} $\lmod$ corresponds
-directly to the (semantic interpretations of) interference relations
-$I$, as we have used in the example above. The \emph{global action
-  model} $\gmod$ extrapolates the effect of the actions in $\lmod$ to
-the global shared state $g$. Although worlds do not put further
-constraints on the relationship between $\lmod$ and $\gmod$, they will
-be linked more tightly in the semantics of assertions.
-% (in fact, $\gmod$ records only those actions that matter for the current
-%subjective view, as will be formalised in \S\ref{sec:assertions}).
+directly to the (semantic interpretation of) an interference relation
+$I$. The \emph{global action model} $\gmod$ extrapolates the effect of
+some of the actions in $\lmod$ to the global shared state
+$g$. Although worlds do not put further constraints on the
+relationship between $\lmod$ and $\gmod$, they will be linked more
+tightly in the semantics of assertions (\S\ref{sec:assertions}): as we
+shall see, $\gmod$ records at least those actions that matter for the
+current subjective view.
 
 As $g$ represents the global shared state, we will also require that
-actions in $\lmod$ are \emph{confined} to $g$ (which we write $g
-\containI \lmod$, \textit{i.e.} the part of state they \emph{mutate} is
-always fully contained in $g$. Thus, these actions cannot affect new
-pieces of global state $g'$ disjoint from $g$. This is essential to
-enable extensions of the shared state. We will similarly require that
-new actions in any extension are confined to that extension in the
-same sense. Note that this does not prohibit \emph{referring} to existing parts of the shared state in the new actions; rather, it only safeguards against mutation of the already shared resources through new actions. 
+actions in $\lmod$ and $\gmod$ are \emph{confined} to $g$.  We write
+$g \containI \lmod$ to denote that the part of state mutated by
+actions in $\lmod$ is always fully contained in $g$. As threads may
+uniterally decide to bring in part of their local states into the
+shared state at any point (by \eqref{eq:extend}), this ensures that
+existing actions cannot affect future extra pieces of shared state. We
+will similarly require that the new actions associated with newly
+shared state are confined to that extension in the same sense, hence
+extending the shared state cannot retroactively invalidate the views
+of other threads. As we shall see, confinement does not however
+prohibit \emph{referring} to existing parts of the shared state in the
+new actions; rather, it only safeguards against mutation of the
+already shared resources through new actions.
 
 Finally, the composition of two worlds will be defined whenever their
 local states are disjoint and they agree on all other three
@@ -58,24 +64,22 @@ components, hence have identical knowledge of the shared state and
 possible interferences.
 
 \paragraph{Worlds and actions}
-We start by defining logical states, which are \colosl's central
-concept of \emph{resources}, in the standard separation logic
-sense. Logical states have two components: one describes machine
-states; the other represents \emph{capabilities}. The latter are
-inspired by the same notion in deny-guarantee reasoning~\cite{dg}: a
-thread in possession of a given capability is allowed to perform the
-associated actions (as prescribed by the \emph{action model}
-components of each world, defined below), while any capability
-\emph{not} owned by a thread means that the environment can perform
-the action.\footnote{In general, capabilities could be fractionally
-  owned, in which case ownership of a \emph{fraction} of a capability
-  grants the right to perform the action to both the thread and the
-  environment, while a fully-owned capability \emph{denies} the right
-  to the environment to perform the associated action. For ease of
-  exposition, we only consider the case of fully-owned capabilities in
-  our formal development. See the long version for the general case.}
-Action models interpret interference assertions and assign actions to
-capabilities.
+We start by defining logical states, which are \colosl's notion of
+\emph{resource}, in the standard separation logic sense. Logical
+states have two components: one describes machine states; the other
+represents \emph{capabilities}. The latter are inspired by the
+capabilities in deny-guarantee reasoning~\cite{dg}: a thread in
+possession of a given capability is allowed to perform the associated
+actions (as prescribed by the \emph{action model} components of each
+world, defined below), while any capability \emph{not} owned by a
+thread means that the environment can perform the action.\footnote{In
+  general, capabilities could be fractionally owned, in which case
+  ownership of a \emph{fraction} of a capability grants the right to
+  perform the action to both the thread and the environment, while a
+  fully-owned capability \emph{denies} the right to the environment to
+  perform the associated action. For ease of exposition, we only
+  consider the case of fully-owned capabilities in our formal
+  development. See the technical report for the general case.}
 
 \begin{definition}[Logical states]
   A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
@@ -110,12 +114,14 @@ cancellative partial commutative monoids~\cite{asl}) satisfying a
 technical \emph{cross-split} condition~\cite{colosl-tr14}.
 
 In the following, we write $l_1\leq l_2$ when there exists $l$ such
-that $l\composeL l_1 = l_2$. When that is the case, we also write $l_2
-- l_1$ to denote the unique (by cancellativity) such $l$. When $l_1$
-and $l_2$ are compatible according to $\composeL$, we write
-$l_1\compatL l_2$.
+that $l\composeL l_1 = l_2$. We also write $l_2 - l_1$ to denote the
+unique (by cancellativity) such $l$. When $l_1$ and $l_2$ are
+compatible according to $\composeL$, we write $l_1\compatL l_2$. In
+the rest of this paper, we will use $l$ to denote either an arbitrary
+logical state or one that is to be understood as a local state, and
+$g$ for a (global) shared state.
 
-An action is simply a pair of logical states describing the pre and
+An action is simply a pair of logical states describing the pre- and
 post-states of the action, and an action model describes the set of
 actions enabled by each capability.
 
@@ -137,10 +143,57 @@ We write $\unitAM$ for an action model with empty domain.
 
 
 \paragraph{The effect of actions} As mentioned in the beginning of the
-section, we require that the effect of actions in the local and global action models are \emph{confined} to the global shared state.  Let us now introduce
-the necessary machinery to describe how actions in $\lmod$ and $\gmod$
-act on the shared state $g$, which will allow us to define our
-confinement condition, and then the set of well-formed worlds.
+section, we require that the effect of actions in the local and global
+action models are \emph{confined} to the shared state. This means
+that, given an action $a = (p,q)$ and a shared state $g$, whenever the
+precondition $p$ is \emph{compatible} with $g$ then the part of the
+state mutated by the state is contained in $g$. Compatibility of $p$
+and $g$ is interpreted \emph{loosely}: it merely means that $p$ and
+$g$ agree on the resource they have in common. In particular, $g$ need
+not contain $p$ entirely for $a$ to take effect. This relaxation is
+due to the fact that other threads may extend the shared state; in
+particular, the extension may provide the missing resources for $p$ to
+be contained in the shared state, thus allowing the extending thread
+to perform action $a$. Crucially, however, it is not the case that any
+part of $p$ is allowed to be missing from $g$. Rather, only parts of
+$p$ that are not mutated by $a$, \textit{i.e.}, which can also be
+found in $q$, can escape $g$'s grasp. Mutated parts must always be
+contained in $g$, so that extensions need not worry about existing
+actions interfering with new resources that were never shared
+beforehand. We start by characterising the active and passive parts of
+actions, then move on to define the effect of actions. This will
+enable us to define our confinement condition, and then the set of
+well-formed worlds.
+
+An action $a = (p, q)$ is typically of the form $(p'\composeL c,
+q'\composeL c)$, \textit{i.e.} part of the state $c$ required for
+the action is \emph{passive} and acts as a mere \emph{catalyst} for
+the action: it has to be present for the action to take effect, but is
+left unchanged by the action. The \emph{active} part of the action is then
+the pair $(p',q')$, which should be maximal in the sense that no
+further, non-empty catalyst can be found in $(p',q')$.
+
+\begin{definition}[Active part of an action]
+  Given a pair of logical states $(p, q)$, its \emph{active part}
+  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
+  \[
+  \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
+  c'\leq q' => c' = \unitL
+  \]
+\end{definition}
+
+For instance, the interpretations of the actions associated with token
+$\token a_{\li{x}}$ in the previous section all have the same active
+parts
+$([x:v],\emptyset,\emptyset),([x:v+1],\emptyset,\emptyset)$. Their
+catalysts are of the form $([z:v],\emptyset,\emptyset)$ in
+the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$, and
+$([y:v,z:v],\emptyset,\emptyset)$ in $I_{\li{y}}$.
+
+
+The compatibility of an action prestate $p$ and the shared state $g$
+will be defined using the following notion of \emph{intersection} of
+logical states.
 
 \begin{definition}[Intersection]
 The \emph{intersection} function over logical states 
@@ -171,30 +224,18 @@ the set notation.\footnote{In the general case, separation algebras
   restore unicity. Since in this paper our logical states satisfy disjointness,
   intersection is enough for our exposition.}
 
-An action $a = (p, q)$ is typically of the form $(p'\composeL c,
-q'\composeL c)$, \textit{i.e.} part of the state $c$ required for
-the action is \emph{passive} and acts as a mere \emph{catalyst} for
-the action: it has to be present for the action to take effect, but is
-left unchanged by the action. The \emph{active} part of the action is then
-the pair $(p',q')$, which should be maximal in the sense that no
-further, non-empty catalyst can be found in $(p',q')$.
-
-\begin{definition}[Active part of an action]
-  Given a pair of logical states $(p, q)$, its \emph{active part}
-  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
+\begin{definition}[Action application]
+  The \emph{application} $a[g]$ of an action $a$ on a logical state
+  $g$ is defined provided that there is $l$ such that
   \[
-  \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
-  c'\leq q' => c' = \unitL
+    \m{fst}(a) \meetL g /=\emptyset /|
+    g = \m{fst}(\updateFP{a}) \composeL l /|
+    \m{snd}(\updateFP{a})\compatL l
   \]
+  When that is the case, we write $a[g]$ for the (uniquely defined)
+  logical state $\m{snd}(\updateFP{a})\composeL l$. We write
+  $\m{potential}(a,g)$ to denote that $a[g]$ is defined.
 \end{definition}
-
-For instance, the interpretations of the actions associated with token
-$\token a_{\li{x}}$ in the previous section all have the same active
-parts
-$(([x:v],\emptyset),\emptyset),(([x:v+1],\emptyset),\emptyset)$. Their
-catalysts are either of the form $([z:v],\emptyset),\emptyset)$ (in
-the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$) or
-$([y:v,z:v],\emptyset),\emptyset)$ (for $I_{\li{y}}$).
 
 \begin{definition}[Action confinement]
   \label{def:actconf}
@@ -205,73 +246,61 @@ $([y:v,z:v],\emptyset),\emptyset)$ (for $I_{\li{y}}$).
   \]
 \end{definition}
 
-Note that only the \emph{active} precondition of $a$, \textit{i.e.}
-the part actually mutated by the action, has to be contained in $g$.
-The condition we will require on actions with respect to the global
-shared world $g$ is that all possible \emph{futures} of $g$ according
-to the action models contain the actions. We now define the effect of
-actions on the shared state, for which the same remark holds.
-
-\begin{definition}[Action application]
-  The \emph{application} $a[g]$ of an action $a$ on a logical state
-  $g$ is defined provided that there is $l$ such that
-  \[
-    \m{fst}(a) \meetL g /=\emptyset /|
-    g = \m{fst}(\updateFP{a}) \composeL l /|
-    \m{snd}(\updateFP{a})\compatL l
-  \]
-  When that is the case, we write $a[g]$ for
-  $\m{snd}(\updateFP{a})\composeL l'$. We write $\m{potential}(a,g)$ to
-  say that $a[g]$ is defined.
-\end{definition}
-
-Observe that $\m{potential}(a,g) => g\containI a$. In some cases, the
-active pre-state of $a$ might be empty. In that case, we find that we
-do not need to take the action into account when considering the
-effect of all actions on the shared state, even though it is
-potentially enabled. We thus introduce the following notion of
-\emph{visible actions}.
+Observe that $\m{potential}(a,g) => g\containI a$.  As discussed, only
+the \emph{active} precondition of $a$, \textit{i.e.}  the part
+actually mutated by the action, has to be contained in $g$.  The
+condition we will require on actions with respect to the global shared
+world $g$ is that the actions of the local action model $\lmod$ are
+confined in all possible \emph{futures} of $g$, \textit{i.e.} all the
+shared states that result from $g$ after any number of applications of
+actions in $\lmod$. For some of these actions, the active pre-state
+might be empty. In that case, we find that we do not need to take the
+action into account when considering the effect of all actions on the
+shared state, even though it is potentially enabled. We thus introduce
+the following notion of \emph{visible actions}.
 
 \begin{definition}[Visible actions]
-  An action $a$ is called \emph{visible in $l$}, written
-  $\m{visible}(a,l)$ when
+  An action $a$ is called \emph{visible in $g$}, written
+  $\m{visible}(a,g)$ when
   \[
-  \E{l'} \m{fst}(\updateFP{a})\meetL l = l' /| l'/=\unitL
+  \E{l} \m{fst}(\updateFP{a})\meetL g = l /| l/=\unitL
   \]
 \end{definition}
+
 
 We are now ready to define our confinement condition on actions.
 Inspired by the LRG logic~\cite{lrg}, we introduce the concept of
 locally fenced action models to capture all possible states reachable
-from the current state. A set of states $\fence{}$ \emph{fences} an
-action model if it is invariant under interferences perpetrated by the
-corresponding actions. We write $\m{rg}(f)$ to denote the \emph{range}
-(or codomain) of a function $f$.
+from the current state via some number of action applications. A set
+of states $\fence{}$ \emph{fences} an action model if it is invariant
+under interferences perpetrated by the corresponding actions. We write
+$\m{rg}(f)$ to denote the \emph{range} (or codomain) of a function
+$f$.
 
 \begin{definition}[Locally-fenced action model]
   An action model $\lmod \in \AMods$ is \emph{locally fenced} by
   $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$,
-  iff, for all $l \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
+  iff, for all $g \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
 \[
 \begin{array}{L}
-  l\containI a /|
-  (\m{potential}(a,l) /| \m{visible}(a,l) => a[l]\in\fence{})
+  g\containI a /|
+  (\m{potential}(a,g) /| \m{visible}(a,g) => a[g]\in\fence{})
 \end{array}
 \]
 \end{definition}
 
-\begin{definition}[Action model containment]
-  An action model $\lmod$ is \emph{contained} by a logical state
+\begin{definition}[Action model confinement]
+  An action model $\lmod$ is \emph{confined} to a logical state
   $l$, written $l\containI\lmod$, if there exists a fence $\fence{}$
   such that $l\in\fence{}$ and $\fence{}\strictfences{}\lmod$.
 \end{definition}
 
 
 
-A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$
-are compatible, the capabilities found in $l\composeL g$ exist in
-the action models, actions in the global action model $\gmod$, correspond to
-actions in $\lmod$, and $\gmod$ is contained by $g$.
+A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$ are
+compatible, the capabilities found in $l\composeL g$ exist in the
+local action model $\lmod$, actions in the global action model $\gmod$
+correspond to actions in $\lmod$, and $\gmod$ is confined to $g$.
 
 \begin{definition}[Well-formedness]
   A 4-tuple $(l, g, \lmod, \gmod)$ is \emph{well-formed},
@@ -282,12 +311,12 @@ actions in $\lmod$, and $\gmod$ is contained by $g$.
     l \composeL g = (\h{},\ca{}) \land \ca{}\subseteq \dom{\lmod})
     /|\null\\
     (\V{\ca{}}\V{a\in\gmod(\ca{})}\E{a'\in\lmod(\ca{})}
-    \updateFP{a} = \updateFP{a'}) /| g \containI \gmod
+    \updateFP{a} = \updateFP{a'}) /| g \containI \lmod
   \end{array}
   \]
 \end{definition}
 
-Note that we also have that $l\containI \lmod$.
+Note that we also have that $g\containI \gmod$.
 
 \begin{definition}[Worlds]
   \label{def:worlds}
@@ -654,7 +683,7 @@ enabled using additional catalyst that is not immediately
 present. Second, $\gmod$ only has to record actions from $\lmod'$
 that are enabled in any $g$ resulting from these steps, hence
 immediately possible. Finally, $\lmod'$ (and thus interference
-assertions) needs not reflect actions that have no visible effect on
+assertions) need not reflect actions that have no visible effect on
 the subjective state.
 
 %% in particular, the rely and guarantee relations will be
