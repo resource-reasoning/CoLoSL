@@ -444,7 +444,9 @@ nesting of subjective views.\footnote{This presentation with several
   then cut down to well-formed ones. The CAP presentation strays from
   separation logic models in some respects; \textit{e.g.}, in CAP, $*$
   is not the adjoint of $--*$, the ``magicwand'' connective of
-  separation logic, omitted in this presentation; here, it is.}
+  separation logic. Although we have omitted this connective from our
+  presentation, its definition in \colosl would be standard and
+  satisfy the adjunction with $*$.}
 
 Moreover, since logical connectives are interpreted uniformly in all
 cases, we write $|=_\dagger$ for either of the three satisfaction
@@ -737,6 +739,16 @@ need to have the same global action model to be compatible, which
 ensures closure under the combined subjective views. The full proof is
 provided in~\cite{colosl-tr14}.
 \end{proof}
+
+Moreover, the version of \forgetRule where predicates are conjoined
+using $**$ is also valid, as shown by the following derivation, valid
+for all $P$, $Q$, and $I$, which uses a property of $**$ and
+\weakenRule in the first step and \forgetRule in the second:
+\[
+\shared{P ** Q}{I} => 
+\shared{P * \m{true}}{I} => 
+\shared{P}{I}
+\]
 
 The following examples illustrate the need for both local and global
 action models in worlds.

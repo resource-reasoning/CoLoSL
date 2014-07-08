@@ -814,6 +814,11 @@ We build the \colosl\ program logic on top of the views framework~\cite{views} a
 \end{proof}
 %
 \end{theorem}
+
+\julescomment{Our soundness theorem doesn't include leak-freedom!
+  That's a fundamental limitation of \colosl. Could be overcome by
+  keeping a handle on all resources, that is only lost upon disposal.}
+
 %
 %
 %\subsection{Axiomatisation of \colosl principles}
