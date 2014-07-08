@@ -13,7 +13,7 @@ of the soundness of \colosl.
 \subsection{Proof system}
 
 \paragraph{Rely}
-The Rely relation represent potential interferences from the
+The Rely relation represents potential interferences from the
 environment. Although the rely will be different for every program
 (and indeed, every thread), it is always defined in the same way,
 which we break down into three separate kinds of possible
@@ -28,27 +28,27 @@ previous subjective views of a world (and may change the global action
 model in the process provided it preserves action closure with respect
 to both the old and the new local action models):
 \begin{definition}[Action model extension]\label{def:amodExtension}
-An action model $\gmod'$ \emph{extends} ($g, \gmod, \lmod$) with
-$(\lmod', g')$, written
-$\expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}$, iff for all
+An action model $\gmod'$ \emph{extends} ($g, \lmod, \gmod$) with
+$(g', \lmod')$, written
+$\expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}$, iff for all
 $\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
 \[
-\extendsAM{\gmod, \lmod}{s}{r}{\lmod_0} \implies \extendsAM{\gmod', \lmod \cup \lmod'}{s}{r\composeL g'}{\lmod_0}
+\extendsAM{\lmod, \gmod}{s}{r}{\lmod_0} \implies \extendsAM{\lmod \cup \lmod', \gmod'}{s}{r\composeL g'}{\lmod_0}
 \]
 \end{definition}
-Then the extension rely $\extendR$ is defined as
+Then the extension rely, $\extendR$, is defined as
 \[
   \extendR \eqdef
   \left\{
   \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
     \left(
     \begin{array}{@{} l @{}}
-      (l , g, \gmod, \lmod),\\
+      (l , g, \lmod, \gmod),\\
       \left(
       \begin{array}{@{} l @{}}
 	l,
 	g \composeL g',\\
-	\gmod', \lmod \cup \lmod'
+	\lmod \cup \lmod', \gmod'
       \end{array}
       \right)
     \end{array}
@@ -56,8 +56,8 @@ Then the extension rely $\extendR$ is defined as
     &
     \begin{array}{@{} l @{}}
       \capPart{g'} \subseteq \dom{\lmod'} \cup \dom{\lmod} \land \\
-      \extendsAM{\gmod', \lmod \cup \lmod'}{g'}{g}{\lmod'} \land \\
-      \expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}
+      \extendsAM{\lmod \cup \lmod', \gmod'}{g'}{g}{\lmod'} \land \\
+      \expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}
     \end{array}
   \end{array}
   \right\}
@@ -68,15 +68,15 @@ Then the extension rely $\extendR$ is defined as
 The second kind of interference is the \emph{update} of the global
 state according to actions in the global action model whose capability
 is ``owned by the environment'', \textit{i.e.}, nowhere to be found
-the current local and shared states.
+in the current local and shared states.
 \[	
   \updateR \eqdef
   \left\{
   \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
     \left(
     \begin{array}{@{} l @{}}
-      (l, g, \gmod, \lmod),\\
-      (l, g', \gmod, \lmod)
+      (l, g, \lmod, \gmod),\\
+      (l, g', \lmod, \gmod)
     \end{array}
     \right)
     &
@@ -101,12 +101,12 @@ action model):
   \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
     \left(
     \begin{array}{@{} l @{}}
-      (l, g, \gmod, \lmod),
-      \left( l, g, \gmod, \lmod \cup \lmod'  \right)
+      (l, g, \lmod, \gmod),
+      \left( l, g, \lmod \cup \lmod', \gmod \right)
     \end{array}
     \right)
     &
-    \expandsAM{\gmod}{\lmod'}{\unitL}{g}{\gmod}{\lmod}
+    \expandsAM{\gmod}{\unitL}{\lmod'}{g}{\lmod}{\gmod}
   \end{array}
   \right\}
 \]
@@ -118,7 +118,7 @@ action model):
   \[
   \rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
   \]
-  where $(\cdot)^{\text{*}}$ denotes reflexive transitive closure.
+  where $(\cdot)^{\text{*}}$ denotes the reflexive transitive closure.
 \end{definition}
 
 The Rely relation enables us to define the stability of assertions
@@ -164,7 +164,7 @@ We now define the Guarantee relation that describes all possible
 updates the current thread can perform. In some sense, the Guarantee
 relation is the dual of Rely: the actions in the Guarantee of one
 thread are included in the Rely of concurrently running threads. Thus,
-it should come as no surprise that actions in the Guarantee can be
+it should come as no surprise that transitions in the Guarantee can be
 categorised using three categories which resonate with those of the
 Rely. The \emph{extension} guarantee is similar to the extension rely
 except that new capabilities corresponding to the new shared region
@@ -176,12 +176,12 @@ local state is moved into the shared state:
 \begin{array}{L @{\hspace*{2pt}} | @{\hspace*{2pt}} R}
   \left(
   \begin{array}{@{} l @{}}
-    (l \composeL l', g, \gmod, \lmod),\\
+    (l \composeL l', g, \lmod, \gmod),\\
     \left(
     \begin{array}{@{} l @{}}
       l \composeL (\unitH, \ca{1}),\\
       g \composeL g',\\
-      \gmod', \lmod \cup \lmod'
+      \lmod \cup \lmod', \gmod'
     \end{array}
     \right)
   \end{array}
@@ -191,8 +191,8 @@ local state is moved into the shared state:
     g' = l' \composeL (\unitH, \ca{2})  \land\\
     \ca{1} \composeCap \ca{2} \subseteq \dom{\lmod'} \land \\
     \ca{1} \composeCap \ca{2} \compatL \dom{\lmod} \land \\
-    \extendsAM{\gmod', \lmod \cup \lmod'}{g'}{g}{\lmod'} \land \\
-    \expandsAM{\gmod'}{\lmod'}{g'}{g}{\gmod}{\lmod}
+    \extendsAM{\lmod \cup \lmod', \gmod'}{g'}{g}{\lmod'} \land \\
+    \expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}
   \end{array}
 \end{array}
 \right\}
@@ -228,8 +228,8 @@ capabilities, as this is the sole privilege of extension actions.
 	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
 	   	\left(
 	   	\begin{array}{@{} l @{}}
-	     	(l, g, \gmod, \lmod),\\
-	     	(l', g', \gmod, \lmod)
+	     	(l, g, \lmod, \gmod),\\
+	     	(l', g', \lmod, \gmod)
 	   	\end{array}
 		\right)
 	  	&
@@ -295,12 +295,12 @@ shifting some of the existing interference. This is modelled by the
 \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
   \left(
   \begin{array}{@{} l @{}}
-    (l, g, \gmod, \lmod),
-    \left( l, g, \gmod, \lmod \cup \lmod_0  \right)
+    (l, g, \lmod, \gmod),
+    \left( l, g, \lmod \cup \lmod_0, \gmod  \right)
   \end{array}
   \right)
   &
-  \expandsAM{\gmod}{\lmod'}{\unitL}{g}{\gmod}{\lmod}
+  \expandsAM{\gmod}{\unitL}{\lmod_0}{g}{\lmod}{\gmod}
 \end{array}
 \right\}
 \]
@@ -320,7 +320,7 @@ assertions. Repartitioning takes a world satisfying $P$, merges its
 local and shared states together, and then updates a part of that
 combination that satisfies $R_1$ to one satisfying $R_2$. The new
 logical state is then split again into a local and shared part in such
-a way that the resulting action is in the Guarantee $\guarantee$.
+a way that the resulting transition is in the Guarantee $\guarantee$.
 
 \begin{definition}[Repartitioning] \label{def:repartitioning}
   We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in
@@ -342,8 +342,8 @@ a way that the resulting action is in the Guarantee $\guarantee$.
 We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in
 which case the repartitioning has no ``side effect'' and simply
 shuffles resources around between the local and shared state or
-modifies the action models. This is the case for \eqref{eq:shift} and
-\eqref{eq:extend}, whose proof will be given in the next section.
+modifies the action models. This is the case for (\shiftRule) and
+(\extendRule), whose proof will be given in the next section.
 
 %\[
 %\begin{array}{@{} r l @{}}
@@ -506,14 +506,14 @@ to the locally owned resources.
 \end{definition}
 
 The $P\containI I$ notation used in \eqref{eq:extend} is then a
-straightforwar lift of this definition to assertions $P \in
+straightforward lift of this definition to assertions $P \in
 \Assertions$ and interference assertions $I \in \IAssertions$:
 \[
 P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
 \]
 
 \begin{lemma}
-  The semantic implications \eqref{eq:extend} is valid.
+  The semantic implication (\extendRule) is valid.
 \end{lemma}
 \begin{proof}[Proof (sketch)]
   It suffices to show that the repartitioning ($\semimplies$) is valid
@@ -529,12 +529,12 @@ action model may only grow with time. However, that is not to say that
 the same holds of interference relations in shared state assertions:
 as seen in \S\ref{sec:intuition}, they may forget about actions that
 are either redundant or not relevant to the current subjective
-view via \emph{shifting}. As for the action closure relation
+view via \emph{shifting}. As for the action model closure relation
 (Definition~\ref{def:actclos}), this needs to be the case not only
 from the current subjective view but also for any evolution of it
 according to potential actions, both from the thread and the
 environment. To capture this set of possible futures, we refine our
-notion of local fences (Definition~\ref{def:locfence}), which was
+notion of local fences (\defin~\ref{def:localFence}), which was
 defined in the context of the global shared state, to the case where
 we consider only a subjective state within the global shared state.
 For this, we need to also refine a second time our notion of action
@@ -558,7 +558,7 @@ as a subjective view is concerned could be anything.
   The \emph{subjective application} $a(s)$ of an action $a$ on a
   logical state $s$ is defined as follows:
   \[
-  a(s) == a[s,s - (s\meetL \m{fst}(\updateFP{a}))]
+  a(s) == \m{fst} \left( a[s, \m{fst}(\updateFP{a}) - (s\meetL \m{fst}(\updateFP{a}))] \right)
   \]
 \end{definition}
 
@@ -566,12 +566,12 @@ Note that, in contrast with $a[l]$, only part of the active
 precondition $p' = \m{fst}(\updateFP{a})$ has to intersect with the
 subjective view $s$ for $a(s)$ to apply. Thus, we fabricate a context
 that will satisfy the rest of $p'$ to be able to reuse our $a[s,r]$
-definition.
+definition (\defin\ref{def:actionApplicationPair}). We observe that $\m{snd} \left( a[s, \m{fst}(\updateFP{a}) - (s\meetL \m{fst}(\updateFP{a}))] \right) = \unitL$ always, since it is fabricated as the minimum context needed. 
 
 \begin{definition}[Fenced action model]
-  An action model $\gmod \in \AMods$ is \emph{fenced} by $\fence{}
-  \in \pset{\LStates}$, written $\fence{} \fences \gmod$, if, for
-  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\gmod)$,
+  An action model $\lmod \in \AMods$ is \emph{fenced} by $\fence{}
+  \in \pset{\LStates}$, written $\fence{} \fences \lmod$, if, for
+  all $l \in \fence{}$ and all $\ca{}\in\m{rg}(\lmod)$,
 \[
 \begin{array}{L}
   a(l)\text{ is defined} /| \m{visible}(a,l) => a(l)\in\fence{}
@@ -648,20 +648,20 @@ F_{\li{y}} \eqdef
 
 
 \begin{definition}[Action shifting]
-  Given $\gmod, \gmod' \in \AMods$ and $\mathcal{P} \in
-  \pset{\LStates}$, $\gmod'$ is a \emph{shifting} of $\gmod$ with
-  respect to $\mathcal{P}$, written $\gmod \weakenI{\mathcal{P}}
-  \gmod'$, if there exists a fence $\fence{}$ such that
+  Given $\lmod, \lmod' \in \AMods$ and $\mathcal{P} \in
+  \pset{\LStates}$, $\lmod'$ is a \emph{shifting} of $\lmod$ with
+  respect to $\mathcal{P}$, written $\lmod \weakenI{\mathcal{P}}
+  \lmod'$, if there exists a fence $\fence{}$ such that
   \[
   \begin{array}{L}
-    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \gmod
+    \mathcal{P} \subseteq \fence{} \land \fence{} \fences \lmod
     \land
     \for{l\in \fence{}}\for{\ca{}}\\
-    \ (\for{a\in\gmod'(\ca{})}
-    \m{reflected}(a,l,\gmod(\ca{}))) /|\null\\
-    \ \for{a\in\gmod(\ca{})}
+    \ (\for{a\in\lmod'(\ca{})}
+    \m{reflected}(a,l,\lmod(\ca{}))) /|\null\\
+    \ \for{a\in\lmod(\ca{})}
     a(l)\text{ is defined} {/|}\m{visible}(a,l) {=>}
-    \m{reflected}(a,l,\gmod(\ca{}))
+    \m{reflected}(a,l,\lmod(\ca{}))
     %% \for{\ca{}, l, p, q, p', q', l'} l \in F \land \updateFP{p, q} = (p', q') =>\\
     %% \left(\begin{array}{L}
     %%   (p, q) \in \gmod'(\ca{}) 
@@ -679,9 +679,9 @@ F_{\li{y}} \eqdef
 \end{definition}
 
 The first conjunct expresses the fact that the new action model
-$\gmod'$ cannot invent new actions not present in $\gmod$, and the
-second one that $\gmod'$ has to include all the visible potential
-actions of $\gmod$. We lift $\weakenI{}$ to assertions as follows:
+$\lmod'$ cannot introduce new actions not present in $\lmod$, and the
+second one that $\lmod'$ has to include all the visible potential
+actions of $\lmod$. We lift $\weakenI{}$ to assertions as follows:
 \[
 I \weakenI{P} I' == \V{\lenv,\ca{}} \semI[\lenv]{I} \weakenI{\{s|||
   s,\lenv\slsat P\}} \semI[\lenv]{I'}
@@ -700,7 +700,7 @@ I \weakenI{P} I' == \V{\lenv,\ca{}} \semI[\lenv]{I} \weakenI{\{s|||
 \end{lemma}
 \begin{proof}[Proof (sketch)]
   It suffices to show that the repartitioning ($\semimplies$) is valid
-  and allowed by the guarantee relation. We can show that transitions
+  and allowed by the guarantee relation. We can show that the transitions
   corresponding to applications of \eqref{eq:shift} are contained in
   the \shiftG relation.
 \end{proof}
