@@ -609,6 +609,7 @@ the global shared state into a subjective state $s$ and a context $r$.
   The application of action $a$ on the subjective state $s$ together
   with the context $r$, written $a[s,r]$, is defined
   provided that there exist $s'$ and $r'$ such that
+  \vspace{-1ex}
   \[
   \begin{array}{L}
   \m{fst}(a)\meetL (s\composeL r) /= \emptyset /|
@@ -633,6 +634,7 @@ models. Here is the formal definition.
 \begin{definition}
   An action $a$ is \emph{reflected} in a set of actions $A$ from a state
   $l$, written $\m{reflected}(a,l,A)$, if
+  \vspace{-1ex}
   \[
   \V r \m{fst}(a)\leq l\composeL r =>
   \E{a'\in A} \updateFP{a'} = \updateFP{a} /| \m{fst}(a')\leq
@@ -643,7 +645,9 @@ models. Here is the formal definition.
 Let us now give the formal definition of action model closure. For
 each condition mentioned at the beginning of this section, we annotate
 which part of the definition implements them. We write
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 \m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
 \]
 \textit{i.e.}\ $a$ can actually happen in $g$ since $g$ holds all the
@@ -656,6 +660,7 @@ resources in the pre-state of $a$.
   written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if
   $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for all
   $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
+  \vspace{-1ex}
 \[
 \begin{array}{L}
   \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
@@ -766,7 +771,9 @@ Moreover, the version of \forgetRule where predicates are conjoined
 using $**$ is also valid, as shown by the following derivation, valid
 for all $P$, $Q$, and $I$, which uses a property of $**$ and
 \weakenRule in the first step and \forgetRule in the second:
+  \vspace{-1ex}
 \[
+  \vspace{-1ex}
 \shared{P ** Q}{I} => 
 \shared{P * \m{true}}{I} => 
 \shared{P}{I}
@@ -781,7 +788,9 @@ action models in worlds.
   following entailment is valid, where $I \eqdef (\token{a}:
   \left\{\cell{x}{0} * \cell{y}{0} \swap \cell{x}{0} *
   \cell{y}{1}\right\})$:
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   \shared{(x|->0 * y|-> 0) |/ x|->1}{I} * \shared{y|->0}{\emptyset}
   |-
   \shared{x|->1}{I} * \shared{y|->0}{\emptyset}
@@ -880,7 +889,9 @@ action models in worlds.
   for a thread in possession of $\token{a}$ to perform the associated
   action. In particular, similarly to our previous example, the
   following entailment is valid:
+  \vspace{-1ex}
   \[
+  \vspace{-1ex}
   P' *  \shared{y|->0}{\emptyset} |- \m{false}
   \]
   Without local action models in our worlds, \textit{i.e.} from the
@@ -919,3 +930,8 @@ action models in worlds.
 %Let $\tau_1$ and $\tau_2$ denote two distinct threads with $P \eqdef \token{X} * \cell{w}{4} * \shared{\cell{x}{1} * \cell{y}{2} \;\lor\; \cell{x}{1} * \cell{z}{3}}{I}$ and $Q \eqdef \cell{y}{2} * \shared{\cell{x}{1} * \cell{z}{3}}{I}$ as their subjective views of the shared state respectively with $I \eqdef (\token{X}: \left\{\cell{x}{1} * \cell{y}{2} \swap \cell{x}{1} * \cell{w}{4}\right\})$. The action associated with $\token{X}$ states that if the shared state contains the resource $\cell{x}{1} * \cell{y}{2}$, then an action in possession of the $\cell{w}{4}$ resource can claim the $\cell{y}{2}$ resource in exchange for $\cell{w}{4}$. Given a logical environment $\lenv$, let $\ca{} \in \semK[\lenv]{\token{X}}$ and $\lmod$ denote the global interpretation of $I$. A naive attempt at calculating $\lmod$ would be to define it such that $\lmod(\ca{}) = \left\{(\cell{x}{1} \composeL \cell{y}{2} \composeL r, \cell{x}{1} \composeL \cell{w}{4} \composeL r ) \mid r \in \LStates \right\}$
 %Since $\tau_2$ holds the $\cell{y}{2}$ resource locally, Suppose that at this point the current thread extends the shared state with 
 %\end{example}
+
+Note that, while sometimes subtle, our semantic conditions are often
+easy to check in practice. Actions are usually \emph{small}
+and typically only concern a few cells at a time. Indeed, they are the
+by-product of atomic sections in program, which are also kept small.
