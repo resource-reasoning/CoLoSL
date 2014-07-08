@@ -139,9 +139,8 @@ interference relation $I$ declares  how  this  part of the  shared state can cha
  \token a_{\li y}:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}
 \]
-can increment  the variable cell  \li{y} under the condition that the
-value of the  cell
-given by \li{x} is one more than that of \li{y}. 
+can increment \li{y} under the condition that the
+value of \li{x} is one more than \li{y}. 
 This update is only possible when the
 local state of a thread has the { capability} $[\token a_{\li y}]$. For  this
 particular 
