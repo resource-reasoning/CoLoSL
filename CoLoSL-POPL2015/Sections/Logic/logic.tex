@@ -277,7 +277,7 @@ under interferences perpetrated by the corresponding actions. We write
 $\m{rg}(f)$ to denote the \emph{range} (or codomain) of a function
 $f$.
 
-\begin{definition}[Locally-fenced action model]
+\begin{definition}[Locally-fenced action model]\label{def:localFence}
   An action model $\lmod \in \AMods$ is \emph{locally fenced} by
   $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$,
   iff, for all $g \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
@@ -581,7 +581,7 @@ informally introduced at the beginning of this section. First, we need
 to revisit the effect of actions to take into account the splitting of
 the global shared state into a subjective state $s$ and a context $r$.
 
-\begin{definition}[Action application (cont.)]
+\begin{definition}[Action application (cont.)]\label{def:actionApplicationPair}
   The application of action $a$ on the subjective state $s$ together
   with the context $r$, written $a[s,r]$, is defined
   provided that there exist $s'$ and $r'$ such that
