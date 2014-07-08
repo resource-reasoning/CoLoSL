@@ -20,8 +20,37 @@ with this work: assertions provide disjoint
 \emph{views} of the concrete machine state for each thread, which
 other threads cannot invalidate. 
 
-A close cousin of \colosl is Local RG~\cite{lrg}, in which it is also
-possible to separate assertions inside the shared region, albeit only
+
+One point of inspiration has come from CAP reasoning. 
+CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
+where the assertion $P$ describes a fixed disjoint  part of the global shared
+state labelled by fixed region name  $r$, and the interference given by $I$ is also fixed. In contrast,
+\colosl uses overlapping  subjective views $\shared{P}{I}$ with no region name, where
+assertion $P$ now describes a flexible, overlapping part of the global
+shared state, and there is a subtle dynamic relationship between this
+$P$ and 
+the flexible $I$. Subjective views  lead to simpler proofs, as 
+illustrated by the concurrent set example in
+\S\ref{sec:examples}. There are many interesting ideas present in the CAP
+literature: e.g. abstract states~\cite{carasel}; higher-order
+reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
+ideas require further investigation. Here, our aim was to simply  introduce 
+subjective views as a 
+fundamental new way of  underpinning of  such reasoning. 
+
+
+
+Our merging of overlapping subjective views relies on the overlapping
+conjunction introduced in~\cite{rey-slnotes,js-popl12,ramification}.
+In~\cite{ramification}, a sequential spanning tree algorithm is
+verified using a this connective. \colosl is naturally able to verify
+a concurrent tree spanning algorithm where the overlapping of shared
+subgraphs is key.
+
+
+
+Finally, probably the work that is nearest in spirit to  \colosl is Local RG~\cite{lrg}. Here,  it is also
+possible to use assertions  to describe unnamed parts of the shared region, albeit only
 when the assertions cover disjoint parts of the shared state, and when
 the interference on each sub-region are also disjoint. Moreover, Local
 RG assertions are specified globally over the entire shared state, and
@@ -35,33 +64,6 @@ more compositional reasoning about the shared state.
 
 %% taken inspiration from them. our set example better. 
 
-
-Another  point of inspiration has come from CAP reasoning. 
-CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
-where the assertion $P$ describes a fixed disjoint  part of the global shared
-state labelled by fixed region name  $r$, and the interference given by $I$ is also fixed. In contrast,
-\colosl uses flexible subjective views $\shared{P}{I}$ with no region name, where
-assertion $P$ now describes a flexible, overlapping part of the global
-shared state, and there is a subtle dynamic relationship between this
-$P$ and 
-the flexible $I$. Subjective views  lead to simpler proofs, as 
-illustrated by the concurrent set example in
-\S{sec:five}. There are many interesting ideas present in the CAP
-literature: e.g. abstract states~\cite{carasel}; higher-order
-reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
-ideas require further investigation. Here,  our aim was to simply  introduce 
-subjective views as a 
-fundamental new way of  underpinning of  such reasoning. 
-
-
-Our merging of overlapping subjective views relies on the overlapping
-conjunction introduced in~\cite{rey-slnotes,js-popl12,ramification}.
-In~\cite{ramification}, a sequential spanning tree algorithm is
-verified using a this connective. \colosl is naturally able to verify
-a concurrent tree spanning algorithm where the overlapping of shared
-subgraphs is key.
-
-\pgcomment{Needs ending baout how fab it all is.} 
 
 
 
