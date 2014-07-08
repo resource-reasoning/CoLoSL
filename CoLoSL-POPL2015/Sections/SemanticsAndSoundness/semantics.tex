@@ -601,23 +601,23 @@ assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in
 
 
 For instance, a possible fence for the interference assertion
-$I_{\li{y}}$ of \fig\ref{fig:concurrentInc} is
-\[
-\fence{\li{y}} \eqdef\begin{array}[t]{L}
-\left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
-\ldots, 10\} \right\} \cup\\
-\left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
-\ldots, 10\} \right\}
-\end{array}
-\]
-Or equivalently, expressed as an assertion:
+$I_{\li{y}}$ of \fig\ref{fig:concurrentInc} is denoted by the assertion
 \[
 F_{\li{y}} \eqdef
 \bigvee_{v = 0}^{10} (x|-> v * y|->v) |/ (x|->v+1 * y|->v)
 \]
+%% \[
+%% \fence{\li{y}} \eqdef\begin{array}[t]{L}
+%% \left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\} \cup\\
+%% \left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\}
+%% \end{array}
+%% \]
 
-\julescomment{Find better/more examples, perhaps of non-fencing as
-  well?}
+%% TODO:
+%% \julescomment{Find better/more examples, perhaps of non-fencing as
+%%   well?}
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -789,7 +789,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 \end{definition}
 %
 %
-\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\} C \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\}\ C\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
 %
 \[
 \begin{array}{l l}
@@ -806,7 +806,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 %
 \begin{theorem}[Soundness]
 %
-The \colosl\ program logic is sound. That is, if $|-\!\{P\} C \{Q\}$ then $|=\!\{P\} C \{Q\}$.
+The \colosl\ program logic is sound. That is, if $|-\!\{P\}\ C\ \{Q\}$ then $|=\!\{P\}\ C\ \{Q\}$.
 %
 \begin{proof}(Sketch)
 We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 

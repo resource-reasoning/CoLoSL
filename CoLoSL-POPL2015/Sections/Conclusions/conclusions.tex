@@ -1,28 +1,104 @@
-\section{Conclusions}
-\label{sec:conclusion}
 
-Well, that was awesome.
+\subsection*{Related Work and Concluding Remarks}
 
-Future work: because we are able to specify shared state and
-interferences locally, there is hope that \colosl can be adapted to
-reason about distributed systems as well, as in our motivating example
-of \S\ref{sec:intuition}.
 
-\julescomment{This is a brain dump. Doesn't have to make it in the
-  submitted version.}
+Compositional reasoning about fine-grained concurrent algorithms is
+essential for verifying large concurrent systems.  Jones introduced
+global rely-guarantee thinking in his PhD
+thesis~\cite{rg}, motivating the rely and guarantee relations given in
+\S{sec:????}. O'Hearn introduced local concurrent separation
+reasonng~\cite{csl-orig,csl-tcs}, giving the disjoint concurrency rule
+which underpins the reasoning presented here.  Since then, many people
+have looked at more complex and finer-grained algorithms,
+building on the combination of ideas arising from these papers:
+examples include RGSep~\cite{viktor-marriage}, Local RG~\cite{lrg},
+deny-guarantee~\cite{dg}, and the CAP
+family~\cite{cap-ecoop10,icap,tada}, to name but a few.
 
-One of the new paradigms of \colosl is the ability to manipulate the
-interference relation, via \emph{shifting}. The focus of this paper
-has largely been on manipulations of the spatial components of
-subjective views, and the treatment of shifting has been left at the
-minimum we needed to cover our range of examples. This opens the way
-to more fine-grained reasoning about interferences. For instance, a
-process who never receives a capability could safely over-approximate
-the corresponding interference. Conversely, a process who never gives
-a capability away could safely under-approximate the corresponding
-interference relation. In \colosl, this is not yet allowed, as
-interferences can only be shifted to equivalent ones, the only
-exception being the ability to forget actions that have no visible
-effect on the current subjective state. One could imagine tracking
-which process is allowed to own which capability to be more flexible
-in this instance. (if that can be useful at all?)
+\pgcomment{Azalea, please do a proper CAP box with r region name too.} 
+
+\pgcomment{Azalea, please make the fence bit better.}
+
+
+
+Our primary inspiration has come from Local RG~\cite{lrg}, where the
+reasoning is based on the combination of global rely-guarantee reasoning with
+local separation logic based on one global shared state. 
+
+taken inspiration from them. our set example better. 
+
+
+fences, global rely-guarantee conditions,  still non-overlapping, 
+
+
+
+views an inspiration for us. 
+
+
+Another  point of inspiration has come from CAP reasoning. 
+CAP uses boxed assertions of the form $\capbox{P}{I}{r}$,
+where the assertion $P$ describes a fixed disjoint  part of the global shared
+state and the interference given by $I$ is also fixed. In contrast,
+\colosl uses flexible subjective views $\shared{P}{I}$, where
+assertion $P$ now describes a flexible, overlapping part of the global
+shared state, and there is a subtle dynamic relationship between this
+$P$ and 
+the flexible $I$. Subjective views  lead to simpler proofs, as 
+illustrated by the concurrent set example in
+\S{sec:five}. There are many interesting ideas present in the CAP
+literature: e.g. abstract states~\cite{carasel}; higher-order
+reasoning~\cite{iCAP}; and abstract atomicity~\cite{tada}. All these
+ideas require further investigation. Here,  our aim was to  introduce 
+subjective views as a 
+fundamental new way of  underpinning of  such reasoning. 
+
+
+Our merging of overlapping subjective views relies on the
+sepish connective introduced in~\cite{reynolds,gareth,jules}. 
+In~\cite{jules}, they demonstrate how to reason about a sequential
+spanning tree algorithm using the sepish connective. Here, we
+demonstrate
+how \colosl is naturally able to verify an concurrent tree spanning
+algorithm where the 
+overlapping of shared subgraphs is key. 
+
+
+
+
+The recent formalism of Views~\cite{views} pinpoints a common
+fundamental insight behind these program logics: assertions denote
+\emph{views} of the concrete machine state for each thread, which
+other threads cannot invalidate. Borrowing the vocabulary, existing
+formalisms (with the notable exception of Local Rely
+Guarantee~\cite{lrg}--henceforth LRG) require the view of all threads
+to map to the same portion of concrete state. This impedes
+compositionality: to use a given program specification in another
+context, the current shared state has to match that of the existing
+specification, instead of merely containing it. 
+
+our boxes very different,  fences like LRG, 
+
+
+%Future work: because we are able to specify shared state and
+%interferences locally, there is hope that \colosl can be adapted to
+%reason about distributed systems as well, as in our motivating example
+%of \S\ref{sec:intuition}.
+
+%\julescomment{This is a brain dump. Doesn't have to make it in the
+ % submitted version.}
+
+%One of the new paradigms of \colosl is the ability to manipulate the
+%interference relation, via \emph{shifting}. The focus of this paper
+%has largely been on manipulations of the spatial components of
+%subjective views, and the treatment of shifting has been left at the
+%minimum we needed to cover our range of examples. This opens the way
+%to more fine-grained reasoning about interferences. For instance, a
+%process who never receives a capability could safely over-approximate
+%the corresponding interference. Conversely, a process who never gives
+%a capability away could safely under-approximate the corresponding
+%interference relation. In \colosl, this is not yet allowed, as
+%interferences can only be shifted to equivalent ones, the only
+%exception being the ability to forget actions that have no visible
+%effect on the current subjective state. One could imagine tracking
+%which process is allowed to own which capability to be more flexible
+%in this instance. (if that can be useful at all?)

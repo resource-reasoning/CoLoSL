@@ -1,8 +1,86 @@
 \section{Further Examples}\label{sec:examples}
-\todo introductory paragraph about data structures with sharing.\\
+
 \subsection{Concurrent Spanning Tree}\label{subsec:CSTExample}
-Let $\gamma = (V, E)$ denote a directed connected binary (DCB) graph where $V$ is a finite set of vertices and $E: V \rightarrow (V \uplus \{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function associating each vertex with at most two successors. Given $\gamma = (V, E)$, we write $n \in \gamma$ for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$. Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph or a \emph{tree}. For brevity, in this section we refer to a DCB graph and an acyclic DCB graph simply as a graph and a tree, respectively. Given a graph $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all vertices of $\gamma$ with a minimal set of edges where every edge in $\theta$ is also an edge in $\gamma$. 
-For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible spanning tree where the dashed lines indicate those edges that have been removed from the graph after spanning it.
+
+Programs manipulated abitrary graphs present the following significant
+challenge for compositional verification: because of deep sharing
+between different components of a graph, changes to one subgraph may
+affect other subgraphs which may point into it. This makes it hard to
+reason about updates to each subgraph in isolation. In a concurrent
+setting, this difficulty compounds with the fact that threads working
+on different parts of the graph may affect each other in ways that are
+difficult to reason about locally to each subgraph. Central to those
+issues is the fact that different subgraphs present \emph{unspecified
+  sharing} and may overlap in arbitrary ways. We now demonstrate on a
+concurrent spanning tree example that \colosl may be just the tool you
+need in this case, as it naturally deals with arbitrary overlapping
+views of the shared state, and allows one to tailor interferences to a
+given subjective view.
+
+Our example, presented in \fig{fig:conSpanningTree}, operates on a
+\emph{directed binary graph}, henceforth simply called a \emph{graph},
+\textit{i.e.} a directed graph where each node has at most two
+successors, called its left and right children. The program computes a
+in-place spanning tree of the graph, \textit{i.e.} a tree that covers
+all nodes of the graphs from a given root, concurrently as follows:
+each time a new node is encountered, two new threads are created that
+each prune the edges of the left and right children recursively. A
+mark bit is associated to each node to keep track of which ones have
+already been visited. Crucially, each thread returns whether the root
+of the subgraph it was operating on had already been visited; if so,
+the parent thread removes the link from its root node to the
+corresponding child. Intuitively, it is allowed to do so because,
+since the child was marked by another thread, the child has to be
+already reachable via some other path in the graph.
+
+%% marking the vertices to keep track of those already visited; the
+%% return value b records the outcome of marking with \li{b}$=1$ when the
+%% top node $x$ is unmarked (not visited yet) and \li{b}$=0$
+%% otherwise. Assuming that the root vertex $x$ is unmarked initially,
+%% the algorithm continues by first marking $x$ and subsequently spanning
+%% the left and right subgraphs concurrently. When the top node of the
+%% left subgraph is already marked (\li{!b1}), the edge from $x$ into it
+%% is replaced by a null pointer. This corresponds to the case where the
+%% node has already been visited by another thread and is thus reachable
+%% from the root; \emph{mutatis mutandis} for the right subgraph.
+
+We will prove that, given a shared graph as input, the program always
+returns a tree, \textit{i.e.} all sharing and cycles have been
+appropriately removed. Pleasingly, the \colosl specification achieves
+maximal locality and allows us to reason only on the current subgraph
+manipulated by a thread, instead of the whole graph. Because of
+arbitrary sharing between the two, a global specification would be
+unpleasant indeed!  However, we do not establish that the final tree
+indeed spans the original graph. The reason it does is subtle indeed,
+as are the invariants required, but in ways unrelated to our main
+issue, which is to provide tight specifications for each thread.
+
+To reason about this program, following Hobor and
+Villard~\cite{ramification}, we use two representations of graphs. The
+first is a mathematical representation $\gamma = (V, E)$ where $V$ is
+a finite set of vertices and $E: V \rightarrow (V \uplus
+\{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function
+associating each vertex with at most two successors, where \li{null}
+denotes the absence of an edge from the node.  We write $n \in \gamma$
+for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$.
+
+
+%% Jules: definition of spanning tree is wrong (what's minimal?) since
+%% graphs need not be connected now. Not needed anyway, as we don't
+%% show that we have a spanning tree.
+%% 
+%% Similarly, let $\theta = (V, E)$ denote an \emph{acyclic} DCB graph
+%% with no sharing between subgraphs, \textit{i.e.}, a \emph{tree}. For
+%% brevity, in this section we refer to a DCB graph and an acyclic DCB
+%% graph simply as a graph and a tree, respectively. Given a graph
+%% $\gamma$, a tree $\theta$ \emph{spans} $\gamma$ if it includes all
+%% vertices of $\gamma$ with a minimal set of edges where every edge in
+%% $\theta$ is also an edge in $\gamma$.  For instance,
+%% \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible spanning
+%% tree where the dashed lines indicate those edges that have been
+%% removed from the graph after spanning it.
+
+
 
 \begin{wrapfigure}{r}{0.3\columnwidth}
 	\centering
@@ -45,14 +123,58 @@ For instance, \fig\ref{fig:graphAndTree} depicts a DCB graph and a possible span
 %\end{figure}
 %%
 
-In order to reason about graphs, we define an inductive predicate $\graph{x}{\gamma}$ as given in \fig\ref{fig:globalCST} to describe a spatial (in heap) graph rooted at address $x$ corresponding to the mathematical graph $\gamma$. It represents a spatial graph shared amongst the threads spanning it where each node can be marked (visited) via any of its incoming edges from its predecessors. For instance, in the graph of \fig\ref{fig:graphAndTree}, the $z$ node can be visited via the right edge of node $y$ ($y.r$) as well as the left edge of node $w$ ($w.l$). As such, in our reasoning we have \emph{marking} capabilities of the form $\markT{n}{e}$ where $n$ denotes the vertex (address) and $e$ the edge via which vertex $n$ is visited. For instance, the capabilities associated with marking of vertex $z$ in \fig\ref{fig:graphAndTree} are $\markT{z}{y.r}$ and $\markT{z}{w.l}$. Note that the parameterisation of our actions are merely a notational convenience and can be substituted for their full definitions. Given a graph  at root address $x$, in order to account for the ability to mark the root vertex $x$, we introduce a logical (virtual) root edge $\rootEdge$ into $x$ as depicted in \fig\ref{fig:graphAndTree} together with its associated marking capability $\markT{x}{\rootEdge}$. The shared state contains node $x$ which can be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as well as the left and right subgraphs captured recursively by the $\G{l}{\gamma}$ and $\G{r}{\gamma}$ predicates. Note that the two subgraphs and vertex $x$ are combined by the overlapping conjunction $\sepish$ since the graph can be cyclic and each node may be reachable via more than one path. 
+Mathematical graphs are connected to a second, in-memory
+representation by an inductive predicate $\graph{x}{\gamma}$, denoting
+a spatial (in-heap) graph rooted at address $x$ corresponding to the
+mathematical graph $\gamma$. The predicate definition uses the
+overlapping conjunction to account for the sharing between the left
+and right children and for potential cycles in the graph, as shown in
+\fig\ref{fig:globalCST}.  The basic action we allow on spatial graphs
+is to \emph{mark} a node, changing its mark field from $0$ to $1$ and
+claiming ownership of its left and right pointers in the process. Such
+an action is allowed by a \emph{marking} capability of the form
+$\markT{n}{e}$ where $n$ denotes the vertex (address) and $e$ the edge
+via which vertex $n$ is visited. For instance, the capabilities
+associated with marking of vertex $z$ in \fig\ref{fig:graphAndTree}
+are $\markT{z}{y.r}$ and $\markT{z}{w.l}$. Note that the
+parameterisation of our actions are merely a notational convenience
+and can be substituted for their full definitions. Given a graph at
+root address $x$, in order to account for the ability to mark the root
+vertex $x$, we introduce a logical (virtual) root edge $\rootEdge$
+into $x$ as depicted in \fig\ref{fig:graphAndTree} together with its
+associated marking capability $\markT{x}{\rootEdge}$. The shared state
+contains node $x$ which can be either unmarked ($\unmarked{x}{l}{r}$)
+or marked ($\marked{x}$); as well as the left and right subgraphs
+captured recursively by $\G{l}{\gamma}$ and $\G{r}{\gamma}$.
+%% Note that the two subgraphs and vertex $x$ are combined by
+%% the overlapping conjunction $\sepish$ since the graph can be cyclic
+%% and each node may be reachable via more than one path.
 
-Each vertex is represented as three consecutive cells in the heap tracking the mark value ($0$ or $1$) and the addresses of the left ($l$) and right ($r$) subgraphs. For brevity, we write $\cell{x}{m, l, r}$ for $\cell{x}{m} * \cell{x+1}{l} * \cell{x+2}{r}$. Moreover, in order to increase readability we write $x.m$, $x.l$ and $x.r$ for $x$, $x+1$ and $x+2$, respectively. When vertex $x$ is in the unmarked state, the mark value corresponds to $0$ ($\cell{x.m}{0}$) and the left and right pointers ($\cell{x.l}{l} * \cell{x.r}{r}$) as well as the capability to mark them ($\markT{l}{x.l} * \markT{r}{x.r}$ reside in the shared state. In the marked state the mark value is $1$ ($\cell{x.m}{1}$) and the resources associated with the left and right subgraphs (pointers and capabilities) have been claimed by the marking thread. 
+Each vertex is represented as three consecutive cells in the heap
+tracking the mark bit and the addresses of the left ($l$) and right
+($r$) subgraphs. For brevity, we write $\cell{x}{m, l, r}$ for
+$\cell{x}{m} * \cell{x+1}{l} * \cell{x+2}{r}$, and $x.m$, $x.l$, and
+$x.r$ for $x$, $x+1$, and $x+2$, respectively. When vertex $x$ is in
+the unmarked state, the whole cell $\cell{x}{0,l,r}$ and the
+capabilities to mark the children reside in the shared state. In the
+marked state, the shared state only contains $\cell{x.m}{1}$: the left
+and right subgraphs (pointers and capabilities) have been claimed by
+the thread who marked the node, while other threads need not access
+the children of $x$ once they see that $x$ is already marked. The
+atomic \li{CAS} instruction prevents several threads to concurrently
+mark the same node and claim ownership of the same resource.
 
-The interference associated with the graph is described as the union of interferences pertaining to the vertices of the graph ($n \in \gamma$). For each vertex $n \in \gamma$, the only permitted action is that of marking $n$ which can be carried out by any of the marking capabilities associated with node $n$ ($\markT{n}{-}$). Note that the anonymous quantification $-$ is yet another notational shorthand and can be substituted for the following more verbose definition.
+The interference associated with the graph is described as the union
+of interferences pertaining to the vertices of the graph ($n \in
+\gamma$). For each vertex $n \in \gamma$, the only permitted action is
+that of marking $n$ which can be carried out by any of the marking
+capabilities associated with node $n$ ($\markT{n}{-}$). Note that the
+anonymous quantification $-$ is yet another notational shorthand and
+can be substituted for the following more verbose definition.
 %
 \[
-I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r, \rootEdge\}} \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
+I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
+  p.r, \rootEdge\}}\!\!\! \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
 \]
 %
 %
@@ -82,7 +204,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \end{figure}
 %
 %
-\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by recursively marking the vertices to keep track of those already visited; the return value b records the outcome of marking with \li{b}$=1$ when the top node $x$ is unmarked (not visited yet) and \li{b}$=0$ otherwise. Assuming that the root vertex $x$ is unmarked initially, the algorithm continues by first marking $x$ and subsequently spanning the left and right subgraphs concurrently. When the top node of the left subgraph is already marked (\li{!b1}), the edge from $x$ into it is replaced by a null pointer. This corresponds to the case where the node has already been visited by another thread and is thus reachable from the root; \emph{mutatis mutandis} for the right subgraph.
+\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. It proceeds by 
 %
 \begin{figure}
 %
@@ -103,13 +225,13 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup\limits_{e \in \{p.l, p.r
 \label{fig:localCST}
 \end{figure}
 %
-The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\tx{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$
 %
 \[
 \begin{array}{@{} c @{} }
 	\color{blue}{
 	\Big\{
-		\cell{\tx{n}}{n} * \cell{\tx{b}}{-} * 
+		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
 		\left[\markT{n}{e}\right] * 
 		\g{n}{\gamma}
 	\Big\} 
@@ -119,12 +241,12 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 %
 	\color{blue}{
 	\Big\{
-		\cell{\tx{n}}{n} *  
+		\cell{\li{n}}{n} *  
 		\left[\markT{n}{e}\right] * 
 		\left(
 %		\begin{array}{@{} l @{}}
-			\cell{\tx{b}}{1} * \tr{n}{\gamma} \lor
-			\cell{\tx{b}}{0} *  \tr{\li{null}}{\gamma}
+			\cell{\li{b}}{1} * \tr{n}{\gamma} \lor
+			\cell{\li{b}}{0} *  \tr{\li{null}}{\gamma}
 %		\end{array}
 		\right)
 	\Big\}
@@ -134,8 +256,20 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 %
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the global view $\shared{\G{x}{\gamma}}{I_{\gamma}}$ that describes the resources associated with all $|\gamma|$ vertices has been replaced by $|\gamma|$ $*$-composed more local views, each describing the resources of a vertex $n \in \gamma$. Moreover, the interference of each local view concerning a vertex $n \in \gamma$ has been shifted from $I_{\gamma}$ to $I(n)$ as to reflect only those actions that affect $n$.  
 
-Similarly, the $\tr{x}{\gamma}$ predicate consists of $|\gamma|$ subjective views one for each vertex in $\gamma$. The assertion of each subjective view reflects that the corresponding vertex ($x$) has been marked $\shared{\marked{x}}{I(x)}$. The resources associated with each node $x$, namely the left and right pointers ($\cell{x.l}{l'}$ and $\cell{x.r}{r'}$) and the corresponding marking capabilities ($\markT{l}{x.l}$ and $\markT{r}{x.r}$) have been claimed by the marking thread and moved into the local state. The vertex addressed by the left pointer of $x$ (\textit{i.e.} $l'$) corresponds to either the initial value prior to marking ($l$ where $\gamma(x) = (l, r)$) or \li{null}\ when $l$ has more than one predecessors and has been marked by another thread.
-
+Similarly, the $\tr{x}{\gamma}$ predicate represents a \emph{tree}
+rooted at $x$, as is standard in separation logic~\cite{rey02}, and
+consists of $|\gamma|$ subjective views one for each vertex in
+$\gamma$. The assertion of each subjective view reflects that the
+corresponding vertex ($x$) has been marked
+$\shared{\marked{x}}{I(x)}$. The resources associated with each node
+$x$, namely the left and right pointers and the corresponding marking
+capabilities have been claimed by the marking thread and moved into
+the local state. The vertex addressed by the left pointer of $x$
+(\textit{i.e.} $l'$) corresponds to either the initial value prior to
+marking ($l$ where $\gamma(x) = (l, r)$) or \li{null}\ when $l$ has
+more than one predecessors and has been marked by another thread,
+making the whole predicate stable against actions of the program and
+the environment.
 
 We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from the global specification of \fig\ref{fig:globalCST}. 
 When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial. \\
@@ -232,8 +366,8 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
    //$\comment\left\{\begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[\markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x.r}{r} *\\ \left[\markT{l}{x.l} \right] * \g{l}{\gamma} * \left[\markT{r}{x.r}\right] * \g{r}{\gamma}  \end{array} \right\}$
      //$\comment\left\{ \left[\markT{l}{x.l} \right] * \g{l}{\gamma} * \left[\markT{r}{x.r} \right] * \g{r}{\gamma}  \right\}$   
      b1:= span(x.l) || b2:= span(x.r)
-     //$\comment\left\{\begin{array}{@{} l @{}}  \left[\markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma}\right)  \end{array}\right\}$   
-   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \left[ \markT{l}{x.l} \right] * \left( \cell{\tx{b1}}{1} *  \tr{l}{\gamma} \lor \cell{\tx{b1}}{0} * \tr{\tx{null}}{\gamma}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( \cell{\tx{b2}}{1} * \tr{r}{\gamma} \lor \cell{\tx{b2}}{0} * \tr{\tx{null}}{\gamma} \right)    \end{array}\right\}$  
+     //$\comment\left\{\begin{array}{@{} l @{}}  \left[\markT{l}{x.l} \right] * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor \cell{\tx{b1}}{0}\right) *\\ \left[ \markT{r}{x.r} \right] * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor \cell{\tx{b2}}{0} \right)  \end{array}\right\}$   
+   //$\comment\left\{\begin{array}{@{} l @{} }  \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] * \shared{\marked{x}}{I(x)} \\\cell{\tx{res}}{1} * \exsts{l, r} * \cell{x.l}{l} * \cell{x}{r} *\\ \left[ \markT{l}{x.l} \right] * \left( (\cell{\tx{b1}}{1} *  \tr{l}{\gamma}) \lor \cell{\tx{b1}}{0} \right) *\\ \left[ \markT{r}{x.r} \right] * \left( (\cell{\tx{b2}}{1} * \tr{r}{\gamma}) \lor \cell{\tx{b2}}{0} \right)    \end{array}\right\}$  
      if (!b1) then 
        $\text{[}$x.l$\text{]}$:= null
      if (!b2) then 
@@ -245,7 +379,7 @@ It thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$.
    //$\comment\left\{ \begin{array}{l} \cell{\tx{x}}{x} * \cell{\tx{b}}{-} * \left[ \markT{x}{\rootEdge} \right] *  \\  (\cell{\tx{res}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{res}}{0} ) \end{array} \right\}$      
    return res
  $\}$
- //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \left[ \markT{x}{\rootEdge} \right] *   (\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor (\cell{\tx{b}}{0} * \tr{\tx{null}}{\gamma}) \end{array} \right\}$         
+ //$\comment\left\{ \begin{array}{@{} l @{}} \cell{\tx{x}}{x}  * \left[ \markT{x}{\rootEdge} \right] *  ((\cell{\tx{b}}{1}  * \tr{x}{\gamma}) \lor \cell{\tx{b}}{0}) \end{array} \right\}$         
 \end{lstlisting}
 \hrule\vspace*{5pt}
 \caption{Concurrent Spanning Tree Implementation}

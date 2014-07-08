@@ -317,34 +317,47 @@ I_{\li x}\cup I_{\li y}\cup I_{\li z}\weakenIb{\li{x}|->10 * \li{y}|->10 * \li{z
 so, by the \shiftRule\ principle, we get the postcondition of $\mathbb{INC}$. 
 
 
-\paragraph{Comparison with other formalisms}
-Existing formalisms all require global views and global interferences
-to reason about $\mathbb{INC}$. TODO: blablabla, we're awesome.
+%\paragraph{Comparison with other formalisms}
+This concludes our \colosl proof of $\mathbb{INC}$. Using subjective
+views and manipulating the interference assertions in key places
+enables the specification and verification of each thread to be
+confined to just the resources they need, a feat that is not possible
+using previous work.
 
-\pgcomment{needs an ending. \colosl is brilliant, yeah.} 
-
-\pgcomment{might include somewhere here, needn't}
-
-Subjectivity also enables the analysis of
-portions of code without access to the whole program, and allows one
-to reuse the established specifications in any environment that
-doesn't violate their subjective views.
-%
-%
-\paragraph{\colosl Actions and Unsharing}
-As discussed above, given a subjective view $\shared P I$, the interference assertion $I$ contains actions of the form $Q \swap R$ that state how the shared resources described by $P$ may be manipulated. The actions of $I$ capture three patterns of behaviour: 
+\paragraph{\colosl reasoning}
+We complete our semi-formal overview with features of \colosl not
+showcased by the proof above. First, this example merely mutates and
+extends the shared state, while in general actions are also allowed to
+temporarily or permanently exchange resource between the local and
+shared state of a thread. More precisely, an action $P\swap Q$ may
 \begin{enumerate}
-	\item Actions can \emph{modify} resources in which case the same resource appears on both sides of $\swap$ with different values reflecting the change. For instance, in \fig\ref{fig:concurrentInc}, the action of $\token{a}_{\tx{x}} \in I$ modifies the value of \li{x} from $v$ to $v+1$ for any $v$.
-	
-	\item Actions can \emph{remove} resources from the shared state and move them into the local state of the thread performing the action; the removed resources only appear on the left hand side of $\swap$.
-	
-	\item Actions can remove resources from the local state of the thread performing the action and \emph{add} them into the shared state; the added resources only appear on the right hand side of $\swap$.
+\item
+  \emph{modify} resources: $P$ and $Q$ contain the same amount of
+  resource with different values, \textit{e.g.}
+  $\token{a}_{\tx{x}} \in I$;
+\item \emph{remove} resources from the shared state and move them into
+  the local state of the thread performing the action, for instance
+  when $P = Q * R$ for some resource to be removed $R$;
+\item
+  conversely, \emph{add} resources from the local state of the thread
+  into the shared state; the added resources only appears in $Q$,
+  \textit{e.g.} $Q = P * R$.
 \end{enumerate}   
-%
-%
-We demonstrate the latter two behaviours through our example in \S\ref{subsec:CSTExample}. These three behaviours are not mutually exclusive and an action may exhibit any combination of them. 
+We demonstrate the latter two behaviours through our examples in
+\S\ref{subsec:CSTExample}. These three behaviours are not mutually
+exclusive and an action may exhibit any combination of them.  Unlike
+CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
+an explicit \emph{unsharing} mechanism in order to claim shared
+resources and render them thread-private. Instead, this behaviour can
+be simply encoded as an additional action with the second behaviour
+described above.
 
-Unlike~\cite{cap-ecoop10} and as with~\cite{icap}, we do not provide an explicit \emph{unsharing} mechanism in order to claim shared resources and render them thread-private. Instead, this behaviour can be simply encoded as an additional action with the second behaviour described above. 
+We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
+cannot ensure that proved programs do not leak memory. Indeed, one may
+at any point of a proof stash leaked resources into a new subjective
+view, then weaken the resulting assertion to remove it from the
+current state, rendering the leak invisible as far as the proof system
+is concerned.
 
 %% This finishes the justification of all uses of \eqref{eq:shift} in the
 %% derivations of \S\ref{subsec:threads}, and thus the derivations
