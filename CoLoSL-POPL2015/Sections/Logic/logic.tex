@@ -48,7 +48,7 @@ actions in $\lmod$ and $\gmod$ are \emph{confined} to $g$.  We write
 $g \containI \lmod$ to denote that the part of state mutated by
 actions in $\lmod$ is always fully contained in $g$. As threads may
 uniterally decide to bring in part of their local states into the
-shared state at any point (by \eqref{eq:extend}), this ensures that
+shared state at any point (by \extendRule), this ensures that
 existing actions cannot affect future extra pieces of shared state. We
 will similarly require that the new actions associated with newly
 shared state are confined to that extension in the same sense, hence
@@ -351,14 +351,15 @@ the form $(\unitL,g,\lmod,\gmod)$.
 \subsection{Assertions}
 \label{sec:assertions}
 
-Our assertions extend standard separation logic with \emph{subjective
-  views}, as introduced in the previous section. \colosl is parametric
-with respect to the machine states and capability assertions and can be
-instantiated with any assertion language over states $\Heaps$ and
-capabilities $\Caps$. Here, we instantiate these languages for our
-particular instantiation with respect to our model. We assume infinite
-disjoint sets $\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program
-variables, logical variables, and tokens, respectively.
+Our assertions extend standard assertions from separation logic with
+\emph{subjective views} and \emph{capability assertions}. \colosl is
+parametric with respect to the machine states and capability
+assertions and can be instantiated with any assertion language over
+states $\Heaps$ and capabilities $\Caps$. Here, we instantiate these
+languages for our particular model of stacks, heaps, and tokens. We
+assume infinite disjoint sets $\set{PVar}$, $\set{LVar}$, and
+$\set{Token}$ of program variables, logical variables, and tokens,
+respectively.
 
 \begin{definition}[Assertion syntax]
   \label{def:assertions}
@@ -366,11 +367,9 @@ variables, logical variables, and tokens, respectively.
   the grammar below, where $\li x$ ranges over program variables, $x$
   over logical variables, and $\token a$ over tokens.
   \begin{align*}
-    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots
-    \qquad\qquad
-    K ::= a ||| K * K\\
+    E &::= x ||| 0, 1, \ldots ||| E_1 + E_2 ||| \cdots\\
     A &::=\m{false} \mid E_1 = E_2 ||| \emp ||| \li{x}|-> E |||
-    E_1 |-> E_2 \mid [K] \\
+    E_1 |-> E_2 \mid [\token a] \\
     P, Q  &::= 
     A \mid P \Rightarrow Q \mid \exsts{x} P \mid
      P * Q \mid P --* Q \mid P \sepish Q% \mid P \intersect Q
@@ -381,40 +380,47 @@ variables, logical variables, and tokens, respectively.
 
 This syntax follows from standard separation logic with variables as
 resource~\cite{entcs06} (notice that expressions $E$ do not allow
-program variables), with the exception of shared-state assertions
-$\shared P I$. $\emp$ is true of the units of $\composeW$. Predicates
-are interpreted over the logic state of a world: $\li{x}|-> E$
+program variables), with the exception of subjective views $\shared P
+I$. $\emp$ is true of the units of $\composeW$. Predicates are
+interpreted over a world's local state: $\li{x}|-> E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
-$E$ (resp.\ points to $E_2$); capability assertions $[K]$ describe the
-capability component of the local state: $\token a$ is true of the
-singleton $\{a\}$, while the $*$ of capabilities is their disjoint
-union; the spatial connectives $*$ and $--*$ are standard in
-separation logic~\cite{rey02}, and $P**Q$ is the \emph{overlapping
-  conjunction}, which states that the world can be split into three
-disjoint sub-worlds, where the first two satisfy $P$ and the last two
-satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
-have their standard classical meaning. Interference assertions $I$
-describe actions enabled by a given capability, in the form of a pre
-and post-condition. A shared state assertion $\shared P I$ is true of
-$(l,g,\lmod,\gmod)$ when $l = \unitL$, a subjective view $s$ satisfying $P$ and
-undergoing interferences $I$ can be found in the global shared state
-$g$, \textit{i.e.} $g = s\composeL r$ for some $r$, and $I$, $\lmod$,
-and $\gmod$ \emph{agree} given the decomposition $s$, $r$ in the
-following sense:
+$E$ (resp.\ points to $E_2$); the capability assertion $[\token a]$ is
+true of the singleton capability $\{\token a\}$; $P * Q$ is true of
+worlds that can be split into two according to $\composeW$ such that
+one state satisfies $P$ and the other satisfies $Q$; $P**Q$ is the
+\emph{overlapping conjunction}, true of worlds can be split three-way
+according to $\composeW$, such that the $\composeW$-composition of the
+first two worlds satisfies $P$ and the $\composeW$-composition of the
+last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and
+connectives have their standard classical meaning. Interference
+assertions $I$ describe actions enabled by a given capability, in the
+form of a pre and post-condition.
+
+A subjective view $\shared P I$ is true of $(l,g,\lmod,\gmod)$ when $l
+= \unitL$ and a subjective view $s$ can be found in the global shared
+state $g$, \textit{i.e.} $g = s\composeL r$ for some \emph{context}
+$r$, such that $s$ satisfies $P$ in the standard separation logic
+sense, and $I$, $\lmod$, and $\gmod$ \emph{agree} given the
+decomposition $s$, $r$, in the following sense:
 \begin{enumerate}
 \item
-  Every action in $I$ is reflected in $\lmod{}$.
+  every action in $I$ is reflected in $\lmod{}$;
 \item
-  Every action in $\lmod$ with visible effect on $s$ is reflected in
-  $I$.
+  every action in $\lmod$ that is potentially enabled in $g$ and has a
+  visible effect on $s$ is reflected in $I$;
 \item
-  Every action in $I$ that is enabled in $g$ is reflected is $\gmod$.
+  every action in $I$ that is potentially enabled in $g$ and whose
+  prestate is fully contained in $g$ is reflected is $\gmod$;
 \item
-  And the above is true after any number of action applications in
+  the above is true after any number of action applications in
   $I$ that affect $g$ and any number of action applications in
   $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
+These conditions will be captured by the \emph{action model closure}
+relation $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ given by the
+upcoming Definition~\ref{def:actclos} (where $\semI{I}$ is the
+interpretation of $I$).
 
 %% , and spatial predicates and connectives
 %% have been informally introduced in the previous section
@@ -422,22 +428,21 @@ following sense:
 The semantics of \colosl assertions is given by a forcing relation
 $w,\lenv|= P$ between a world $w$, an interpretation of logical
 variables $\lenv\in\LEnv == \set{LVar} --> \set{Val}$ and a formula
-$P$. We use three auxiliary forcing relations. The first one
-$\ca{},\lenv|=_K K$ interprets capability assertions. The second one
+$P$. We use two auxiliary forcing relations. The first one
 $l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
 logic sense over a logical state $l$ (and ignores shared state
-assertions). The third one $s,\lenv|=_{g,\lmod,\gmod} P$ interprets
+assertions). The second one $s,\lenv|=_{g,\lmod,\gmod} P$ interprets
 assertions over a \emph{subjective view} $s$ that is part of the
 global shared state $g$, subject to action models $\lmod$ and
 $\gmod$. This third form of satisfaction is needed to deal with
-nesting of boxed formulas.\footnote{This presentation with several
+nesting of subjective views.\footnote{This presentation with several
   forcing relations differs from the usual CAP
-  presentation~\cite{cap-ecoop10}, where formulas are interpreted over
-  worlds that are not necessarily well-formed, and then cut down to
-  well-formed ones. We found that the CAP presentation strays away
-  from separation logic models in some ways. For instance, in CAP, $*$
-  and $--*$ and not adjoints of each other; they are in our
-  presentation.}
+  presentation~\cite{cap-ecoop10}, where formulas are first
+  interpreted over worlds that are not necessarily well-formed, and
+  then cut down to well-formed ones. The CAP presentation strays from
+  separation logic models in some respects; \textit{e.g.}, in CAP, $*$
+  is not the adjoint of $--*$, the ``magicwand'' connective of
+  separation logic, omitted in this presentation; here, it is.}
 
 Moreover, since logical connectives are interpreted uniformly in all
 cases, we write $|=_\dagger$ for either of the three satisfaction
@@ -450,7 +455,9 @@ respectively.
 \begin{definition}[Assertion semantics]
   Given a logical environment $\lenv$, the semantics of \colosl
   assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$
-  denotes the semantics of interference assertions:
+  denotes the semantics of interference assertions and
+  $\extendsAM{\lmod, \gmod}{s}{r}{\semI{I}}$ will be given in
+  Definition~\ref{def:actclos}:
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
@@ -462,6 +469,7 @@ respectively.
   &&&s, \lenv |=_{g,\lmod,\gmod} P\text{ and }
   \extendsAM{\lmod, \gmod}{s}{r}{\semI[\lenv]{I}}
 \end{array}
+\vspace{-1em}
 \]
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
@@ -496,20 +504,15 @@ respectively.
   &\text{iff}&
   l =
   (\emptyset,[[|E_1|]_{\lenv}: [|E_2|]_{\lenv}],\unitCap)\\
-  l, \lenv &\slsat [K]
+  l, \lenv &\slsat [\token a]
   &\text{iff}&
-  l = (\emptyset,\unitH, \ca{}) /| \ca{},\lenv|=_K K\\
+  l = (\emptyset,\unitH, \{\token a\})\\
 %  &&\cdots\\
   l,\lenv &\slsat \m{false}
   && \text{never}\\
-  l, \lenv &\slsat \emp &\text{iff}&   l, \lenv \slsat \shared P I
-  \text{ iff } l = \unitL\\
-
-  \ca{},\lenv &|=_K \token a
-  &\text{iff}& \ca{} = \{\token a\}\\
-  \ca{},\lenv &|=_K K_1 * K_2
-  &\text{iff}& \E{\ca{1},\ca{2}} \ca{} = \ca{1}\uplus\ca{2} /|\null\\
-  &&& \ca{1},\lenv|=_K K_1 /| \ca{2}|=_K K_2
+  l, \lenv &\slsat \emp &\text{iff}&l = \unitL\\
+  l, \lenv &\slsat \shared P I&
+  \text{ iff }& l = \unitL
 \end{array}
 \]
 \vspace{-1em}
@@ -529,15 +532,24 @@ respectively.
   \end{align*}
 \end{definition}
 
+\julescomment{We don't actually use the below, do we? If not, probably
+  needs to be removed.}
 
-The semantics of separation logic predicates and connectives is
-standard and depends only on the local state.  $\shared{P}{I}$ states
-that $P$ holds for only a sub-state $s$ of the global shared state
-$s\composeL r$. The interference associated with $s$ is given by
-interference assertion $\semI[\lenv]{I}$ such that the global and
-local action models $\lmod$ and $\gmod$ are \emph{closed}
-under $\semI[\lenv]{I}$ with respect to the subjective view $s$ and
-context $r$. This will be formalised just after this lemma.
+This satisfaction relation for subjective views in $\slsat$ is purely
+for convenience: this allows us to write predicates in interference
+assertions whose definition unpacks to a formula with subjective
+views. Alternatively, we could forbid boxes in assertions evaluated
+using $\slsat$ and explicitely unpack such predicates and erase their
+subjective views.
+
+%% The semantics of separation logic predicates and connectives is
+%% standard and depends only on the local state.  $\shared{P}{I}$ states
+%% that $P$ holds for only a sub-state $s$ of the global shared state
+%% $s\composeL r$. The interference associated with $s$ is given by
+%% interference assertion $\semI[\lenv]{I}$ such that the global and
+%% local action models $\lmod$ and $\gmod$ are \emph{closed}
+%% under $\semI[\lenv]{I}$ with respect to the subjective view $s$ and
+%% context $r$. This will be formalised just after this lemma.
 %Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
 
 \begin{lemma}
@@ -565,12 +577,12 @@ context $r$. This will be formalised just after this lemma.
 Let us now turn to the definition of action model closure, as
 informally introduced at the beginning of this section. First, we need
 to revisit the effect of actions to take into account the splitting of
-the global shared state into a subjective state and a context.
+the global shared state into a subjective state $s$ and a context $r$.
 
 \begin{definition}[Action application (cont.)]
   The application of action $a$ on the subjective state $s$ together
   with the context $r$, written $a[s,r]$, is defined
-  provided that there are $s'$ and $r'$ such that
+  provided that there exist $s'$ and $r'$ such that
   \[
   \begin{array}{L}
   \m{fst}(a)\meetL (s\composeL r) /= \emptyset /|
@@ -586,10 +598,11 @@ the global shared state into a subjective state and a context.
   $(\m{snd}(\updateFP{a})\composeL s',r')$.
 \end{definition}
 
-We observe that $\m{fst}(a[s,r]) \composeL \m{snd}(a[s,r]) =
-a[s\composeL r]$.  In our informal description, we have mentioned that
-some actions must be reflected in some action models. Here is the
-formal definition.
+We observe that this new definition and Definition~\ref{def:actapp}
+are linked in the following way: $\m{fst}(a[s,r]) \composeL
+\m{snd}(a[s,r]) = a[s\composeL r]$.  In our informal description, we
+have mentioned that some actions must be reflected in some action
+models. Here is the formal definition.
 
 \begin{definition}
   An action $a$ is \emph{reflected} in a set of actions $A$ from a state
@@ -601,10 +614,9 @@ formal definition.
   \]
 \end{definition}
 
-Let us now give the formal definition of action model closure. We
-annotate parts of the definition with the items of our informal
-discussion below Defn.~\ref{def:assertions} that they implement. We
-write
+Let us now give the formal definition of action model closure. For
+each condition mentioned at the beginning of this section, we annotate
+which part of the definition implements them. We write
 \[
 \m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
 \]
@@ -623,21 +635,21 @@ resources in the prestate of $a$.
   \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
   \iffdef
   \lmod' \subseteq \lmod
-  \hfill\textit{(1.)}\\
+  \hfill\textit{(1)}\\
   \extendsAMUpto{\lmod, \gmod}{n+1}{s}{r}{\lmod'} \iffdef (\V{\ca{}}
   \V{a\in \lmod'(\ca{})}\\
   (\m{potential}(a,s\composeL r) =>
   \extendsAMUptob{\lmod,
-    \gmod}{n}{a[s, r]}{\lmod'}) \land\hfill \textit{(4.)}\\
+    \gmod}{n}{a[s, r]}{\lmod'}) \land\hfill \textit{(4)}\\
   \quad\m{enabled}(a,s\composeL r)
   => (s\composeL r,
   a[s\composeL r])\in \gmod(\ca{}))
-  /|\null\hfill \textit{(3.)}\\
+  /|\null\hfill \textit{(3)}\\
   \V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s\composeL r) =>\null\\
-  \ \m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/\null\hfill \textit{(2.)}\\
+  \ \m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/\null\hfill \textit{(2)}\\
   \ (\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
-  \extendsAMUptob{\lmod, \gmod}{n}{a[s, r]}{\lmod'})\quad \textit{(4.)}
+  \extendsAMUptob{\lmod, \gmod}{n}{a[s, r]}{\lmod'})\quad \textit{(4)}
   %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
   %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
   %% \land \updateFP{p, q} = (p', q')
@@ -666,25 +678,26 @@ resources in the prestate of $a$.
 \]
 \end{definition}
 
-We make further observations about this definition. First, the closure
-relation must hold after any number of either of the following two
-steps on $g = s\composeL r$:
-\begin{itemize}
-\item
-  An action $a$ of $\lmod'$ is potentially enabled in $g$, and $g$ is
-  updated to $a[g']$.
-\item
-  An action $a$ of $\lmod$ is potentially enabled in $g$ but invisible
-  as far as $s$ is concerned, and $g$ is updated to $a[g']$.
-\end{itemize}
-This makes our assertions robust with respect to future extensions of
-the shared state, where potentially enabled actions may be become
-enabled using additional catalyst that is not immediately
-present. Second, $\gmod$ only has to record actions from $\lmod'$
-that are enabled in any $g$ resulting from these steps, hence
-immediately possible. Finally, $\lmod'$ (and thus interference
-assertions) need not reflect actions that have no visible effect on
-the subjective state.
+%%  First, the closure
+%% relation must hold after any number of either of the following two
+%% steps on $g = s\composeL r$:
+%% \begin{itemize}
+%% \item
+%%   An action $a$ of $\lmod'$ is potentially enabled in $g$, and $g$ is
+%%   updated to $a[g']$.
+%% \item
+%%   An action $a$ of $\lmod$ is potentially enabled in $g$ but invisible
+%%   as far as $s$ is concerned, and $g$ is updated to $a[g']$.
+%% \end{itemize}
+We make further observations about this definition. First,
+property~(4) makes our assertions robust with respect to future
+extensions of the shared state, where potentially enabled actions may
+be become enabled using additional catalyst that is not immediately
+present. Second, $\gmod$ only has to record actions from $\lmod'$ that
+are enabled in any $g$ resulting from these steps, hence immediately
+possible. Finally, $\lmod'$ (and thus interference assertions) need
+not reflect actions that have no visible effect on the subjective
+state.
 
 %% in particular, the rely and guarantee relations will be
 %% computed from actions in the global action model. The local action
@@ -704,17 +717,19 @@ the subjective state.
 
 This completes the definition of the semantics of assertions. We can
 now show that the logical principles of \colosl are sound. The proof
-of the two semantic principles \eqref{eq:shift} and \eqref{eq:extend}
-is delayed to the next section, where $===>$ will be defined.
+of the \shiftRule and \extendRule principles will be
+delayed until the next section, where $===>$ is defined.
 
 \begin{lemma}\label{lem:semprinciples}
-  The logical implications \eqref{eq:forget}, \eqref{eq:split}, and \eqref{eq:merge} are \emph{valid}.
+  The logical implications \copyRule, \forgetRule, and \mergeRule are
+  \emph{valid}, \textit{i.e.} true of all worlds and logical
+  interpretations.
 \end{lemma}
 \begin{proof}
-The case of \eqref{eq:split} is straightforward from the semantics of
-assertions.  For \eqref{eq:forget}, it suffices to remark that
+The case of \copyRule is straightforward from the semantics of
+assertions.  For \forgetRule, we remark that,
 whenever the action model closure relation holds for a subjective
-state $s\leq g$ then it holds of any $s'\leq s$. For \eqref{eq:merge},
+state $s\leq g$, then it holds of any $s'\leq s$. For \mergeRule,
 we remark that the two worlds corresponding to each subjective view
 need to have the same global action model to be compatible, which
 ensures closure under the combined subjective views. The full proof is
@@ -722,12 +737,12 @@ provided in~\cite{colosl-tr14}.
 \end{proof}
 
 The following examples illustrate the need for both local and global
-action models in worlds. The first one showcases subtle reasoning
-about subjective views enabled by our logic thanks to the global
-action model.
+action models in worlds.
 
 \begin{example}
-  The following entailment is valid, where $I \eqdef (\token{a}:
+  This example showcases subtle reasoning about subjective views
+  enabled by our logic thanks to the global action model.  The
+  following entailment is valid, where $I \eqdef (\token{a}:
   \left\{\cell{x}{0} * \cell{y}{0} \swap \cell{x}{0} *
   \cell{y}{1}\right\})$:
   \[
@@ -736,15 +751,17 @@ action model.
   \shared{x|->1}{I} * \shared{y|->0}{\emptyset}
   \]
   Assertion $\shared{(x|->0 * y|-> 0) |/ x|->1}{I}$ is true of states
-  $(\unitL,g,\lmod,\gmod)$ where parts of $g$ satisfies $x|->0 * y|-> 0$, in
-  which case $\gmod$ has to include the action associated with $\token
-  a$ in $I$ according to our closure condition, and of states
-  $(\unitL,g',\lmod',\gmod')$ where parts of $g'$ satisfies $x|->1$, in which
-  case $\gmod'$ need not contain the action. The second conjunct
-  $\shared{y|->0}{\emptyset}$ does not allow the action to appear in
-  the global action models, because it potentially affects $y|->0$ yet
-  is not included in $\emptyset$. Thus, combining the two conjuncts
-  allows us to deduce that $x|->0 * y|-> 0$ is not possible.
+  $(\unitL,g,\lmod,\gmod)$ such that parts of $g$ satisfies $x|->0 *
+  y|-> 0$, in which case $\gmod$ includes the action associated with
+  $\token a$ in $I$ according to our closure condition, and of states
+  $(\unitL,g',\lmod',\gmod')$ where parts of $g'$ satisfies $x|->1$,
+  in which case $\gmod'$ need not contain the action. The second
+  conjunct $\shared{y|->0}{\emptyset}$ does not allow action $\token
+  a$ to appear in the global action models, because it potentially
+  affects $y|->0$ yet is not included in $\emptyset$. Thus, combining
+  the two conjuncts with $*$ allows us to deduce that $x|->0 * y|-> 0$
+  is not possible, thanks to knowledge captured in the global action
+  model.
 \end{example}
 
 %% Extrapolating the effect of a local action $(p,q)$ over global shared
@@ -809,31 +826,32 @@ action model.
 %% state can be updated may vary with its extension.
 
 \begin{example}
+  This example motivates the need for a local action model in worlds.
   Let $P \eqdef \cell{x}{0} * \shared{\cell{y}{0}}{I}$, where $I$ is
   as in the previous example. Since $\cell{x}{0}$ is present in the
   local state, and the local and shared states are always disjoint,
   the action associated with $\token a$ cannot be carried out by
-  either the current thread or the environment; thus the global action
+  either the current thread or the environment. Thus the global action
   model $\gmod$ of worlds satisfying $P$ need not account for this
-  action, \textit{e.g.}  $\gmod(\{\token a\}) = \emptyset$ is
+  action: \textit{e.g.}  $\gmod(\{\token a\}) = \emptyset$ is
   possible.
 
-  Anticipating on the next section, consider now the situation where
-  the current thread extends the shared state with the $\cell{x}{0}$
-  resource previously held locally and specifies no actions for it,
-  yielding the view such that $P' == \shared{\cell{x}{0}}{\emptyset} *
-  \shared{\cell{y}{0}}{I}$. Since the new shared state contains both
-  $x$ and $y$, it might be possible for a thread in possession of
-  $\token{a}$ to perform the associated action. In particular,
-  similarly to our previous example, the following entailment is
-  valid:
+  Consider now the situation where the current thread extends the
+  shared state with the $\cell{x}{0}$ resource previously held locally,
+  and specifies no actions for it, yielding the subjective view $P' ==
+  \shared{\cell{x}{0}}{\emptyset} * \shared{\cell{y}{0}}{I}$. Since
+  the new shared state contains both $x$ and $y$, it might be possible
+  for a thread in possession of $\token{a}$ to perform the associated
+  action. In particular, similarly to our previous example, the
+  following entailment is valid:
   \[
   P' *  \shared{y|->0}{\emptyset} |- \m{false}
   \]
-  If our worlds did not record local action models, from the global
-  action models of the previous state alone we could not have made
-  that deduction, as some of them ``forgot'' about the action which
-  was impossible at the time.
+  Without local action models in our worlds, \textit{i.e.} from the
+  global action models of the previous state alone we could not have
+  made that deduction, as some of the global action models ``forgot''
+  about the action which was impossible at the time, making the
+  composition of $P'$ with $\shared{y|->0}{\emptyset}$ satisfiable.
 \end{example}
 
 
