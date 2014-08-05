@@ -1,0 +1,900 @@
+\chapter{\colosl Program Logic}\label{sec:semantics}
+This section introduces the core concepts behind our program logic. We start by defining what the rely and guarantee conditions of each thread are in terms of their action models. This allows us to define \emph{stability} against rely conditions, \emph{repartitioning}, which logically represents a thread's atomic actions (and have to be in the guarantee condition), and \emph{semantic implication}. Equipped with these notions, we can justify the \shiftRule\ and \extendRule\ principles. 
+%We conclude this section with a sketch of the soundness of \colosl.
+%
+%
+\section{Proof System}
+\paragraph{Rely}
+The rely relation represents potential interferences from the environment. Although the rely will be different for every program (and indeed, every thread), it is always defined in the same way, which we can break down into three kinds of possible interferences. In the remainder of this section, given a logical state $l = (\h{},\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for $\m{fst}(l)$ and $\m{snd}(l)$, respectively.
+
+The first relation, $\extendR$, extends the shared state $g$ with new state $g'$, along with a new interference $\lmod'$ on $g'$. We proceed with the definition of \emph{action model extension} that captures the extension of the local action model in such a way that respects all previous subjective views of a world; in doing so, the global action model may change provided that the action model closure relation is preserved.
+%
+%
+\begin{definition}[Action model extension]\label{def:amodExtension}
+An action model $\gmod'$ \emph{extends} ($g, \lmod, \gmod$) with
+$(g', \lmod')$, written
+$\expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}$, iff for all
+$\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
+\[
+\extendsAM{\lmod, \gmod}{s}{r}{\lmod_0} \implies \extendsAM{\lmod \cup \lmod', \gmod'}{s}{r\composeL g'}{\lmod_0}
+\]
+\end{definition}
+%
+%
+Then the extension rely, $\extendR$, is defined as
+%
+\[
+  \extendR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace{5pt}} | @{\hspace{5pt}} l @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l , g, \lmod, \gmod),\\
+      (l, g \composeL g', \lmod \cup \lmod', \gmod')
+    \end{array}
+    \right)
+    &
+    \begin{array}{@{} l @{}}
+      \capPart{g'} \containedIn \dom{\lmod'} \cup \dom{\lmod} \land \\
+      \extendsAM{\lmod \cup \lmod', \gmod'}{g'}{g}{\lmod'} \land \\
+      \expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}
+    \end{array}
+  \end{array}
+  \right\}
+\]
+%% Intuitively, the rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
+
+
+The second kind of interference is the \emph{update} of the global state according to actions in the global action model whose capability is ``owned by the environment'', \textit{i.e.}, nowhere to be found in the current local and shared states.
+%
+\[	
+  \updateR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l, g, \lmod, \gmod),\ 
+      (l, g', \lmod, \gmod)
+    \end{array}
+    \right)
+    &
+    \begin{array}{@{} l @{} }
+      \begin{array}{@{} l @{}}
+	\exsts{\ca{} }\left( \capPart{l} \composeCap \capPart{g} \right) \compatible \ca{} \land 
+	(g, g') \in \gmod(\ca{}) \\
+      \end{array}	
+    \end{array}
+  \end{array}
+  \right\}
+\]	
+%% Moreover, at any one point the environment may update the shared state by performing an action for which it has the sufficient capability ($\ca{}$). This is described by the \updateR\ relation. For this to be possible, the thread performing the action must have the $\ca{}$ capability in its own local state and thus the $\ca{}$ capability must be disjoint from both shared and local states of the current world. 
+
+The third and last kind of interference is the \emph{shifting} of the local interference relation to a new one that allows more actions while preserving all current subjective views (as expressed by the global action model).
+%
+\[
+  \shiftR \eqdef
+  \left\{
+  \begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+    \left(
+    \begin{array}{@{} l @{}}
+      (l, g, \lmod, \gmod),
+      \left( l, g, \lmod \cup \lmod', \gmod \right)
+    \end{array}
+    \right)
+    &
+    \expandsAM{\gmod}{\unitL}{\lmod'}{g}{\lmod}{\gmod}
+  \end{array}
+  \right\}
+\]
+%% Finally, the environment may extend the local action model by shifting (rewriting) some of the existing behaviour. This is modelled by the \shiftR\ relation. This is only possible if for any subjective state $l$, context $r$ and action model $\gmod'$ under which the old action model pair was closed, the new action model pair is also closed: $\extendsAM{\gmod, \lmod \cup \lmod_0}{l}{r}{\gmod'}$. 
+
+
+\begin{definition}[Rely]
+The \emph{rely} relation $\rely: \pset{\Worlds \times \Worlds}$ is defined as follows, where $(\cdot)^{\text{*}}$ denotes the reflexive transitive closure:
+%
+\[
+  \rely \eqdef  \left(\updateR \cup \extendR \cup \shiftR \right)^{\text{*}}
+\]
+%
+\end{definition}
+
+The rely relation enables us to define the stability of assertions with respect to the environment actions.
+%
+\begin{definition}[Stability]
+An assertion $P$ is \emph{stable} ($\stable{P}$) if, for all $\lenv \in \LEnv$ and $w, w' \in \Worlds$, if $w, \lenv |= P$ and $(w, w') \in \rely$, then $w', \lenv |= P$.
+%\[	
+%\begin{array}{r @{} l}
+%	\stable{P} \iffdef &
+%	\for{\lenv}\for{w, w'} \\
+%	& w \in \sem[\lenv]{P} \land (w, w') \in \rely \implies
+%	 w' \in \sem[\lenv]{P}
+%\end{array}
+%\]
+\end{definition}
+%
+Proving that an assertion is stable is not always obvious, in particular when there are numerous transitions to consider (all those in $\extendR$, $\updateR$, $\shiftR$); as it turns out, we only need to check stability against update actions in $\updateR$, as expressed by the following lemma.
+%
+\begin{lemma}[Stability]
+If an assertion $P$ is stable with respect to actions in $\updateR$, then it is stable.
+\begin{proof}
+\todo
+\end{proof}
+%% An assertion $P$ is stable if it cannot be falsified by possible updates on the shared state from other threads:
+%% %
+%% \[
+%% \begin{array}{l}
+%% 	\for{\lenv}\for{w, w'} 
+%%     w, \lenv |= P \land (w, w') \in \updateR \implies
+%% 	 	w', \lenv |= P\\
+	 
+%% 	 \implies \stable{P}
+%% \end{array}	 
+%% \]
+\end{lemma}
+%
+\paragraph{Guarantee}
+We now define the guarantee relation that describes all possible updates the current thread can perform. In some sense, the guarantee relation is the dual of rely: the actions in the guarantee of one thread are included in the rely of concurrently running threads. Thus, it should come as no surprise that transitions in the guarantee can be categorised using three categories which resonate with those of the rely. The \emph{extension} guarantee is similar to the extension rely except that new capabilities corresponding to the new shared region are materialised in the local and shared state, and a part of the local state is moved into the shared state:
+%
+\[
+\extendG \eqdef
+\left\{
+\begin{array}{@{} l @{\hspace*{5pt}} | @{\hspace*{5pt}} l @{} }
+  \left(
+  \begin{array}{@{} l @{}}
+    (l \composeL l', g, \lmod, \gmod),\\
+%    \left(
+%    \begin{array}{@{} l @{}}
+      l \composeL (\unitH, \ca{1}),
+      g \composeL g',
+      \lmod \cup \lmod', \gmod'
+%    \end{array}
+%    \right)
+  \end{array}
+  \right)
+  &
+  \begin{array}{L}
+    g' = l' \composeL (\unitH, \ca{2})  \land\\
+    \ca{1} \composeCap \ca{2} \containedIn \dom{\lmod'} \land \\
+    \ca{1} \composeCap \ca{2} \disjoint \dom{\lmod} \land \\
+    \extendsAM{\lmod \cup \lmod', \gmod'}{g'}{g}{\lmod'} \land \\
+    \expandsAM{\gmod'}{g'}{\lmod'}{g}{\lmod}{\gmod}
+  \end{array}
+\end{array}
+\right\}
+\]
+%
+The current thread may at any point extend the shared state with some of its locally held resources $l'$; introduce new interference to describe how the new resources may be mutated ($\lmod'$) and generate new capabilities ($\ca{1} \composeCap \ca{2} \containedIn \dom{\lmod_0}$) that facilitate the new interference, with the proviso that the new capabilities are fresh ($\ca{1} \composeCap \ca{2}  \disjoint \dom{\lmod}$). The last two conjuncts enforce closure of the new action models and can be justified as in the case of \extendR.\\
+
+
+
+The \emph{update guarantee} $\updateG$ is more involved than its $\updateR$ counterpart, because updates in the guarantee may move resources from the local state into the shared state (similarly to extensions above) at the same time that it mutates them as prescribed by an enabled action. Intuitively, we want to enforce that resources
+are not created ``out of thin air'' in the process. This can be expressed as preserving the \emph{orthogonal} of the combination of the local and global states, \textit{i.e.}, the set of states compatible with that combination.
+%
+\begin{definition}[Orthogonal]\label{def:orthogonal}
+The \emph{orthogonal} of a state  $\heapSize{.}: \Heaps \rightarrow \pset{\Heaps}$ is defined as the set of all states that are compatible with it:
+%
+\[
+	\heapSize{\h{}} \eqdef \left\{ \h{}' \mid \h{} \compatL \h{}' \right\}
+\]
+\end{definition}
+%
+The \emph{update guarantee} $\updateG$ can then be defined as follows. When updating the shared state, thread are not allowed to introduce new capabilities, as this can only be achieved when extending the shared state (through $\extendG$).
+%
+\[
+	\updateG \eqdef
+ 	\left\{
+	\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+	  \left(
+%	   	\begin{array}{@{} l @{}}
+	     	(l, g, \lmod, \gmod),
+	     	(l', g', \lmod, \gmod)
+%	   	\end{array}
+		\right)
+  	&
+  	\begin{array}{@{} l @{} }
+  		\capPart{(l' \composeL s')}  = \capPart{(l \composeL g)} \land\\
+	  	\left(
+	  	\begin{array}{@{} l @{} }
+	 		g = g' \lor\\
+	 	  	\left(
+	 	  	\begin{array}{@{} l @{}}
+	 	  		\exsts{\ca{} \containedIn \capPart{l}}
+	 	  		(g, g') \in \gmod(\ca{}) \land\\
+	 	  	
+	 	  	\heapSize{\heapPart{\left(l \composeL g\right)}} \subseteq 
+	 	  	\heapSize{\heapPart{\left(l' \composeL g'\right)}}
+	 	  	\end{array}	
+	 	  	\right)
+	 	\end{array}
+   		\right)
+   		\end{array}
+ 	\end{array}
+	\right\}
+\]
+%% The current thread can update its local state arbitrarily and may
+%% update the shared state by performing an action for which it holds the
+%% necessary capability $\ca{}$ in its local state. This is described by
+%% the \updateG\ relation. For this to be possible, the total amount of
+%% capabilities held locally and in the shared state must not grow. That
+%% is, the current thread may not generate new capabilities arbitrarily
+%% since capabilities may only be generated upon extension of the shared
+%% state as captured in \extendG. Similarly, if the shared state is being
+%% updated ($g \not= g'$),  then the heap resources (the domain of the
+%% heap) may not grow ($\heapSize{\heapPart{(l \composeL g)}} \subseteq
+%% \heapSize{\heapPart{(l' \composeL g')}}$) where the $\heapSize{.}$
+%% function is as given in \defin\ref{def:orthogonal}. The intuition
+%% behind this constraint is to ensure that threads do not generate
+%% resources out of thin air in order to enable actions. Note that this
+%% does not stop a thread from local allocation/deallocation of
+%% resources. In the case of allocation, the desired effect can be
+%% achieved by first allocating the new resources locally (\textit{i.e.}
+%% extending the local state from $l$ to $l \composeL l''$), while
+%% leaving the shared state untouched; and then performing the relevant
+%% action on the shared state (\textit{i.e.} updating $g$ to $g'$)
+%% without extending the heap resources, as illustrated in the following
+%% sequence.
+%% \[
+%% \begin{array}{l}
+%% 	(l, g, \gmod, \lmod) \rightarrow (l \composeL l'', g, \gmod, \lmod) \rightarrow (l', g', \gmod, \lmod)\\
+%% 	\text{ where } \heapSize{\heapPart{(l \composeL l'' \composeL g)}} \subseteq \heapSize{\heapPart{(l' \composeL g')}}
+%% \end{array}
+%% \]
+%% Deallocation of local resources can be achieved in a similar fashion.
+%That is, all previously compatible frames remain compatible. We
+%illustrate the need for this constraint in \ex
+%~\ref{ex:compatibleFrames}.
+
+Lastly, the current thread may extend the local action model by shifting some of the existing interference. This is modelled by the \shiftG\ relation which is analogous to \shiftR.
+%
+\[
+\shiftG \eqdef
+\left\{
+\begin{array}{@{} l @{\hspace*{2pt}} | @{\hspace*{2pt}} r @{}}
+  \left(
+  \begin{array}{@{} l @{}}
+    (l, g, \lmod, \gmod),
+    \left( l, g, \lmod \cup \lmod_0, \gmod  \right)
+  \end{array}
+  \right)
+  &
+  \expandsAM{\gmod}{\unitL}{\lmod_0}{g}{\lmod}{\gmod}
+\end{array}
+\right\}
+\]
+
+\begin{definition}[Guarantee]
+The \emph{guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ is defined as
+\[
+\guarantee \eqdef  \left( \updateG \cup \extendG \cup \shiftG \right)^{\text{*}}
+\]
+\end{definition}
+
+Using the guarantee relation, we introduce the notion of \emph{repartitioning} $\repartitions{P}{Q}{R_1}{R_2}$. This relation holds whenever, from any world satisfying $P$, if whenever parts of the composition of its local and shared states that satisfies $R_1$ is exchanged for one satisfying $R_2$, it is possible to split the resulting logical state into a local and shared part again, in such a way that the resulting transition is in $\guarantee$.
+%
+%
+\begin{definition}[Repartitioning] \label{def:repartitioning}
+We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in \LEnv$, and world $w_1$ such that $w_1, \lenv |= P$, there exists states $m_1, m' \in \Heaps$ such that $(m_1, \emptyset), \lenv \slsat R_1$ and
+\begin{itemize} 
+\item $m_1 \composeH m' = \heapPart{\left(\collapseW{w_1}\right)}$; and
+\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$,
+  there exists a world $w_2$ such that $w_2, \lenv |= Q$; and
+  \begin{itemize}
+  	\item $m_2 \composeH m' = \heapPart{\left(\collapseW{w_2}\right)}$; and
+  	\item $(w_1, w_2) \in \guarantee$
+  \end{itemize}
+\end{itemize}
+\end{definition}
+
+We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in which case the repartitioning has no ``side effect'' and simply shuffles resources around between the local and shared state or modifies the action models. This is the case for (\shiftRule) and (\extendRule), whose proof will be given in the next section.
+
+%\[
+%\begin{array}{@{} r l @{}}
+%	\repartitions{P}{Q}{p}{q} \iffdef 
+%	& \for{\lenv} \repartitions{\sem[\lenv]{P}}{\sem[\lenv]{Q}}{\semH[\lenv]{\heapAss{1}}}{\semH[\lenv]{\heapAss{2}}}\\\\
+%	
+%	\repartitions{W_1}{W_2}{H_{1}}{H_{2}} \iffdef &
+%	\begin{array}{l}
+%		\for{w_1 \in W_1} \exsts{h_1 \in H_1\ , h'}\\
+%		\hspace*{0.5cm} h_1 \composeH h' = \heapPart{(\collapseW{w_1})} \;\land\\
+%		\hspace*{0.5cm} \for{h_2 \in H_2} \exsts{w_2 \in W_2}\\
+%		\hspace*{1cm} h_2 \composeH h' = \heapPart{(\collapseW{w_2})} \;\land\; (w_1, w_2) \in \guarantee
+%	\end{array}
+%\end{array}
+%\]
+%%
+%
+%
+
+\paragraph{Proof Rules}
+Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry an implicit assumption that the pre- and post-conditions of their judgements are stable. Most of the proof rules are standard and omitted for space reasons; they include the rules of concurrent separation logic~\cite{csl-tcs} (including the \proofRule{Parallel}
+rule mentioned in the introduction). We use two additional rules, similar to their CAP counterparts~\cite{cap-ecoop10}, which are as follows, where $\entails_{\textsf{SL}}$ denotes the standard sequential separation logic judgement:
+%% \begin{definition}[Proof rules]
+%%   \label{def:proofRules}
+%%   The \emph{atomic} proof judgement, \proofRule{Atom}, is defined as
+%%   follows where
+%% %
+\begin{mathpar}
+	\infer[\proofRule{Atom}]{
+		\entails \{P\} \atomic {C} \{Q\}
+	}{
+		\entails_{\textsf{SL}} \{R_1\}\ C\ \{R_2\} &
+		\repartitions{P}{Q}{R_1}{R_2}
+	}
+%% \]
+%% The \emph{rule of consequence}, \proofRule{Conseq}, is as given below.
+%% \[	
+
+	\infer[\proofRule{Conseq}]{
+		\entails \{P\}\ C\ \{Q\}
+	}{
+		P \semimplies P' &
+		\entails \{P'\}\ C\ \{Q'\} &
+		Q' \semimplies Q
+	}
+\end{mathpar}
+%% In both judgements, $\semimplies$ denotes the repartitioning of the state as described in \defin\ref{def:repartitioning}.
+%% \end{definition}
+%
+%
+%\subsection{Program logic}
+%We build the \colosl\ program logic on top of the views framework~\cite{views} instantiated as follows. Our view semigroup is the separation algebra of worlds as described in \defin\ref{def:worlds}. 
+%The machine states and the reification of worlds are given in \defin\ref{def:machineStates} and \ref{def:reification}\footnote{
+%Generally, since \colosl\ is parametric in the separation algebra of heaps, the set of machine states and the reification function over heaps are also parameterised. Further details can be found in~\cite{colosl-tr14}.
+%}. 
+%The grammar of \colosl\ atomic commands is provided in \defin\ref{def:atomicCommands}; we show the soundness of \colosl\ atomic commands in the companion technical report~\cite{colosl-tr14}. 
+%The axiomatisation of \colosl\ atomic commands are as per \defin\ref{def:proofRules}.
+%%
+%%
+%\begin{definition}[Machine States]\label{def:machineStates}
+%The set of \colosl\ \emph{Machine States} are $\MStates \eqdef \Heaps$.
+%\end{definition}
+%%
+%%
+%%
+%%
+%\paragraph{Programming language}
+% We use the programming language of the views framework \cite{views} instantiated with a set of atomic commands. \colosl\ is parametric in the set of atomic commands: we provide an atomic construct $\atomic{.}$ that can be applied to any sequential command and enforce atomic behaviour. We proceed with the grammar of \colosl atomic commands.
+%%
+%\begin{definition}[Atomic commands]\label{def:atomicCommands}
+%The \emph{atomic commands} of \colosl, $\atom{} \in \Atoms$, are defined by the following grammar
+%%
+%\begin{mathpar}
+%	\atom{} ::= \atomic{\seq{}}
+%	
+%	\seq{} ::= \bc{} \mid \li{skip} \mid \seq{1};\seq{2} \mid \seq{1}+\seq{2} \mid \seq{}^{\text{*}}
+%\end{mathpar}
+%%
+%where $\bc{} \in \Basics$ denotes a set of basic commands that can be instantiated with any set of sequential commands. In the examples of this paper, our basic commands are given by the following grammar.
+%%
+%\[
+%\bc{} ::= \li{x}:= E \mid \li{assume}(E)
+%\]
+%%
+%\end{definition}
+%
+%\paragraph{Soundness}\label{subsec:soundness}
+%In~\cite{colosl-tr14} we provide the semantics of the \colosl\ programming language; we demonstrate that the \colosl\ program logic is sound with respect to its semantics by appealing to the views framework~\cite{views}.
+
+
+\subsection{Interference Manipulations}\label{subsec:extension}
+In this section we formalise the requirements of the \extendRule\ and \shiftRule\ semantic implications and show that they are valid.
+
+\paragraph{Shared State Extension}
+When extending the shared state using currently owned local resources, one specifies a new interference assertion over these newly shared resources. While in \colosl the new interferences may mention parts of the shared state beyond the newly added resources (in particular the existing shared state), they must not allow visible updates to those parts, so as not to invalidate other threads' views of existing resources. We thus impose a locality condition on the newly added behaviour to ensure sound extension of the shared state, similarly to the confinement constraint of local fences of \defin\ref{def:actconf}. We first motivate this constraint with an example.
+
+\begin{example}\label{ex:badExtension}
+Let $P \eqdef \cell{x}{1} * \shared{\cell{y}{1} \lor \cell{y}{2}}{I}$ denote the view of the current thread with $I \eqdef \left(\token{b}: \left\{\cell{y}{1} \swap \cell{y}{2}\right\} \right)$. Since the current thread owns the location addressed by $x$, it can extend the shared state as $Q \eqdef [\token{a}] * \shared{\left(\cell{y}{1} |/  \cell{y}{2} \right) * \cell{x}{1}}{I \cup I'}$ where $ I' \eqdef \left( \token{a}: \cell{x}{1} \swap \cell{x}{2} \right) $.
+In extending the shared state, the current thread also extended the interference allowed on the shared state by adding a new action associated with the newly generated capability resource $[\token{a}]$, as given in $I'$, which updates the value of location $x$. Since location $x$ was previously owned privately by the current thread and was hence not visible to other threads, this new action will not invalidate their view of the shared state, hence this extension is a valid one.
+
+If, on the other hand, $I'$ is replaced with $I'' \eqdef \left( \token{a}: \left\{\cell{y}{1} \swap \cell{y}{3}
+\right\}\right)$, where location $y$ can be mutated, the situation above is not allowed.  Indeed, other threads may rely on the fact that the only updates allowed on location $y$ are done through the $[\token{b}]$ capability as specified in $I$, and would be spooked by this new possible behaviour they were not aware of (as it is not
+in $I$).
+\end{example}
+%
+%
+In order to ensure sound extension of the shared state, we require in \extendRule\ that the newly introduced interferences are confined to the locally owned resources.
+
+\begin{definition}
+A set of states $\mathcal P$ \emph{contains} an action model $\gmod$, written $\mathcal P \containI \gmod$, if
+%
+\[
+  \E{\fence{}} \mathcal P\subseteq \fence{} /| \fence{} \strictfences \gmod
+\]
+\end{definition}
+%
+The $P\containI I$ notation used in \extendRule is then a straightforward lift of this definition to assertions $P \in \Assertions$ and interference assertions $I \in \IAssertions$:
+%
+\[
+	P \containI I \iffdef \for{\lenv, \ca{}} \left\{l \mid l, \lenv \slsat P \right\} \containI \semI[\lenv]{I}(\ca{})
+\]
+%
+\begin{lemma}
+The semantic implication (\extendRule) is valid.
+%
+\begin{proof}[Proof (sketch)]
+It suffices to show that the repartitioning ($\semimplies$) is valid and allowed by the guarantee relation. We can show that transitions corresponding to applications of \extendRule are contained in the \extendG\ relation.
+\end{proof}
+%
+\end{lemma}
+%
+%
+\paragraph{Action Shifting}
+Notice that, according to our rely and guarantee conditions, the local action model may only grow with time. However, that is not to say that the same holds of interference relations in shared state assertions: as seen in \S\ref{sec:intuition}, they may forget about actions that are either redundant or not relevant to the current subjective view via \emph{shifting}. As for the action model closure relation (\defin~\ref{def:actclos}), this needs to be the case not only from the current subjective view but also for any evolution of it according to potential actions, both from the thread and the environment. To capture this set of possible futures, we refine our notion of local fences (\defin~\ref{def:localFence}), which was defined in the context of the global shared state, to the case where we consider only a subjective state within the global shared state.
+For this, we need to also refine a second time our notion of action application to ignore the context of a subjective state, which as far as a subjective view is concerned could be anything.
+
+%% Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
+%% of those actions that do not affect the subjective view of the shared
+%% state, as well as rewriting the behaviour of actions to gain a more
+%% accurate account of their effect. This is achieved through
+%% \emph{action shifting}, which allows the swapping of one global action
+%% model for another one that is equivalent. Here, being equivalent means
+%% that there is some fence that sees them as equivalent, in that actions
+%% from the new global action model contains only actions with the same
+%% effect from the old one, and moreover any action from the old one that
+%% affects the subjective state has to remain in the new one. Since we
+%% are working at the level of a subjective view and not the whole shared
+%% state, we need to refine our notion of action application and fences.
+
+\begin{definition}[Subjective action application]
+The \emph{subjective application} of an action $a$ on a logical state $s$, written $a(s)$ is defined provided that there exists a context $r$ for which $a[s \composeL r]$ is defined. When that is the case, we write $a(s)$ for
+%
+\[
+  \left\{ \snd{\updateFP{a}} \composeL s' \ \middle|\ \exsts{r} \fst{\updateFP{a}}= p_s \composeL r /| s = p_s \composeL s' /| s \composeL r \text{ is defined}\; \right\}
+\]
+%
+\end{definition}
+
+Note that, in contrast with $a[l]$, only \emph{parts} of the active precondition $p' = \m{fst}(\updateFP{a})$ (namely, $p_s$) has to intersect with the subjective view $s$ for $a(s)$ to apply. Thus, we fabricate a context $r$ that is compatible with the subjective view and satisfies the rest of $p'$.
+% to be able to reuse our $a[s,r]$
+%definition (\defin\ref{def:actionApplicationPair}). We observe that $\m{snd} \left( a[s, \m{fst}(\updateFP{a}) - (s\meetL \m{fst}(\updateFP{a}))] \right) = \unitL$ always, since it is fabricated as the minimum context needed. 
+
+\begin{definition}[Fenced action model]
+An action model $\lmod \in \AMods$ is \emph{fenced} by $\fence{} \in \pset{\LStates}$, written $\fence{} \fences \lmod$, if, for all $l \in \fence{}$ and all $a \in\m{rg}(\lmod)$,
+\[
+\begin{array}{L}
+  \m{visible}(a,l) =>  \for{s' \in a(l)} s' \in\fence{}
+\end{array}
+\]
+\end{definition}
+
+In contrast with local fences, fences do not require that actions be confined inside the subjective state.  We lift the notion of fences to assertions as follows, given $\fenceAss{} \in \Assertions$ and $I \in \IAssertions$:
+%
+\begin{align*}
+  \fenceAss{} \fences I &\iffdef \for{\lenv,\ca{}}
+  \{ l \mid l, \lenv \slsat F \} \fences \semI[\lenv]{I}(\ca{})
+  %% \fenceAss{} \strictfences I &\iffdef \for{\lenv,\ca{}}
+  %% \{ l \mid l, \lenv \slsat F \} \strictfences \semI[\lenv]{I}(\ca{})
+\end{align*}
+%
+
+For instance, a possible fence for the interference assertion $I_{\li{y}}$ of \fig\ref{fig:concurrentInc2} is denoted by the following assertion.
+%
+\[
+	F_{\li{y}} \eqdef \bigvee_{v = 0}^{10} (x|-> v * y|->v) |/ (x|->v+1 * y|->v)
+\]
+%
+%% \[
+%% \fence{\li{y}} \eqdef\begin{array}[t]{L}
+%% \left\{(([\li{x}:v,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\} \cup\\
+%% \left\{(([\li{x}:v+1,\li{y}:v],\emptyset),\emptyset) \mid v \in \{0,
+%% \ldots, 10\} \right\}
+%% \end{array}
+%% \]
+
+%% TODO:
+%% \julescomment{Find better/more examples, perhaps of non-fencing as
+%%   well?}
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%% \paragraph{Fences}
+%% A subjective state represents the instantaneous view of a thread at a
+%% particular instant. However, this view is subject to interferences by
+%% other threads, as well as by the thread's own actions, as specified by
+%% an action model. To reason on such states, it makes sense to consider
+%% all its potential future incarnations with respect to these
+%% modifications.  
+
+%% %  F |> s <==> \forall p, q, k, l, l', p',
+%% %    (p,q)\in s(k) /\ l o l' o p' is defined /\ l o l'\in F /\ l o p' = p /\ l\neq\emptyset
+%% %      => \exists f, l'', q'. l = l'' o f /\ q = f o q' /\
+%% %            (l''\neq\emptyset /\ q # l' => l' o q\in F)
+
+
+%% We are now ready to describe what effect an action $a$ can have on a
+%% \emph{subjective} state $l$: because the subjective state is not the
+%% whole shared state, the precondition of $a$ only needs to be
+%% \emph{compatible} with $l$. When that is the case, the action consumes
+%% the part of its active precondition that intersects with $l$ and plugs
+%% in its active postcondition instead, provided that the result is
+%% defined.
+
+
+
+
+
+\begin{definition}[Action shifting]
+Given $\lmod, \lmod' \in \AMods$ and $\mathcal{P} \in \pset{\LStates}$, $\lmod'$ is a \emph{shifting} of $\lmod$ with respect to $\mathcal{P}$, written $\lmod \weakenI{\mathcal{P}} \lmod'$, if there exists a fence $\fence{}$ such that
+%
+\[
+\begin{array}{L}
+	\mathcal{P} \subseteq \fence{} \land \fence{} \fences \lmod
+	\land
+	\for{l\in \fence{}}\for{\ca{}}\\
+	\ (\for{a\in\lmod'(\ca{})}
+	\m{reflected}(a,l,\lmod(\ca{}))) /|\null\\
+	\ \for{a\in\lmod(\ca{})}
+	a(l)\text{ is defined} {/|}\m{visible}(a,l) {=>}
+	\m{reflected}(a,l,\lmod'(\ca{}))
+\end{array}
+\]
+%
+\end{definition}
+
+The first conjunct expresses the fact that the new action model $\lmod'$ cannot introduce new actions not present in $\lmod$, and the second one that $\lmod'$ has to include all the visible potential actions of $\lmod$. We lift $\weakenI{}$ to assertions as follows:
+%
+\[
+	I \weakenI{P} I' == \V{\lenv,\ca{}} \semI[\lenv]{I} \weakenI{\{s|||  s,\lenv\slsat P\}} \semI[\lenv]{I'}
+\]
+%
+
+%% Intuitively, there exists an invariant $\fence{}$ that contains the states in $\mathcal{P}$ and encompasses the behaviour of actions in $\gmod$ and 
+%% \begin{enumerate}
+%% 	\item if an action in $\gmod'$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then there exists a similar action with the same update footprint in $\gmod$ whose precondition is also satisfiable by $l \composeL r$. 
+%% 	\item if an action in $\gmod$ is possible given a state $l \in \fence{}$ and an arbitrary context $r$ (its precondition is satisfiable by $l \composeL r$), then \emph{either}  there exists a similar action with the same update footprint in $\gmod'$ whose precondition is also satisfiable by $l \composeL r$; \emph{or} the action does not affect $l$, that is  $l \meetL p' = \{\unitL\}$ where $(p', q')$ denotes the update footprint of the action; \emph{or}  the resultant state ($q' \composeL l'$) is undefined.
+%% \end{enumerate} 
+
+
+\begin{lemma}
+The semantic implications \shiftRule\ is valid.
+%
+\begin{proof}
+It suffices to show that for all $\lenv \in \LEnv$ and $w_1 \in \Worlds$, 
+%
+\[
+\begin{array}{l l}
+	\text{if} & w_1, \lenv |= \shared{P}{I} \land \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\} } \semI[\lenv]{I'}\\
+	\text{then} & \exsts{w_2} w_2, \lenv |= \shared{P}{I'} \land  \heapPart{(\collapseW{w_1})} = \heapPart{(\collapseW{w_2})} \land (w_1, w_2) \in \guarantee
+\end{array}
+\]
+%
+Pick an arbitrary $w_1 = (l, g, \lmod, \gmod)$ such that 
+%
+\begin{align}
+	& w_1, \lenv |= \shared{P}{I}   \label{shift:Ass1}\\
+	& \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\} } \semI[\lenv]{I'} \label{shift:Ass2}
+\end{align}
+%
+and let $w_2 = (l, g, \lmod \cup \semI[\lenv]{I'}, \gmod)$. Given the definition of $\guarantee$, we are then required to show 
+%
+\begin{align}
+	& \heapPart{(\collapseW{w_1})} = \heapPart{(\collapseW{w_2})} \label{shift:Goal1}\\
+	& \for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \implies \extendsAM{\lmod \cup \semI[\lenv]{I'}, \gmod}{s'}{g-s'}{\lmod_0} \label{shift:Goal2}\\
+	& w_2, \lenv |= \shared{P}{I'} \label{shift:Goal3}
+\end{align}
+%
+From (\ref{shift:Ass1}) and definition of $w_1$ we know that there exist $s, r \in \LStates$ such that 
+%
+\begin{align}
+	& g = s \composeL r \label{shift:Ass3}\\
+	& s, \lenv |=_{g, \lmod, \gmod} P \label{shift:Ass4}\\
+	& \extendsAM{\lmod, \gmod}{s}{r}{\semI[\lenv]{I}} \label{shift:Ass5}
+\end{align}
+%(\ref{shift:Ass})
+From the following lemma and (\ref{shift:Ass4}) we know that 
+%
+\begin{align}
+	s, \lenv \slsat P \label{shift:Ass0}
+\end{align}
+%
+\nested{
+\begin{lemma}[]
+	for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \gmod \in \AMods$:  
+		\[
+			s, \lenv |=_{g, \lmod, \gmod} P \implies s, \lenv \slsat P
+		\]
+%
+\begin{proof}
+By induction on the structure of assertion $P$.	Pick an arbitrary $\lenv \in \LEnv$, then\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \gmod \in \AMods$ such that
+%
+\begin{align}
+	\tag{I.H1} & s, \lenv |=_{g, \lmod, \gmod} P_1 \implies s, \lenv \slsat P_1 \label{subshift:IH1}\\ 
+	\tag{I.H2} & s, \lenv |=_{g, \lmod, \gmod} P_2 \implies s, \lenv \slsat P_2 \label{subshift:IH2}\\
+	& s, \lenv |=_{g, \lmod, \gmod} P_1 \implies P_2 \label{subshift:Ass1}
+\end{align}
+%
+From (\ref{subshift:Ass1}) and the definition of $|=_{g, \lmod, \gmod}$ we know $s, \lenv |=_{g, \lmod, \gmod} P_1$ \text{ implies } $P_2 |=_{g, \lmod, \gmod}$; consequently, from (\ref{subshift:IH1}) and (\ref{subshift:IH2}) we have: $s, \lenv \slsat P_1$ \text{ implies } $s, \lenv \slsat P_2$. Thus, from the definition of $\slsat$ we have:
+%
+\begin{align*}
+	s, \lenv \slsat P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \gmod \in \AMods$ such that
+%
+\begin{align}
+%	\tag{I.H} & \for{s, l \in \LStates} \for{\lmod, \gmod \in \AMods} s, \lenv |=_{g, \lmod, \gmod} P' \implies s, \lenv \slsat P' \label{subshift:IH}\\ 
+	& s, \lenv |=_{g, \lmod, \gmod} \shared{P'}{I} \label{subshift:Ass2}
+\end{align}
+%
+From (\ref{subshift:Ass2}) and the definition of $|=_{g, \lmod, \gmod}$ we know $s, g, \lmod, \gmod |= \shared{P'}{I}$ and hence, from the definition of $|=$, we have $s = \unitL$. Consequently, from the definition of $\slsat$ we have: 
+%
+\begin{align*}
+	s, \lenv \slsat \shared{P'}{I}
+\end{align*}
+%
+as required.
+\end{proof}
+%
+\end{lemma}
+}
+%
+
+\noindent Consequently, from the definition of $\weakenI{}$, (\ref{shift:Ass2}) and (\ref{shift:Ass0}) we have:
+%
+\begin{align}
+	\semI[\lenv]{I} \weakenI{\{s\}} \semI[\lenv]{I'} \label{shift:Ass6}
+\end{align}
+%
+and thus from (\ref{shift:Ass5}), (\ref{shift:Ass6}) and \lem~\ref{lem:shift-closure} we have:
+%
+\begin{align}
+	\extendsAM{\lmod \cup \semI[\lenv]{I'}, \gmod}{s}{r}{\semI[\lenv]{I'}} \label{shift:Ass7}
+\end{align}
+%(\ref{shift:Ass})
+
+\noindent\textbf{RTS. (\ref{shift:Goal1})} This follows immediately from the definition of $\collapseW{.}$ and the definitions of $w_1$ and $w_2$.\\
+
+
+
+
+\noindent\textbf{RTS. (\ref{shift:Goal2})} This follows immediately from the premise of the goal, (\ref{shift:Ass3}), (\ref{shift:Ass5}), (\ref{shift:Ass6}) and \lem~\ref{lem:shift-closure-2}. \\
+%(\ref{shift:Ass})
+
+\noindent\textbf{RTS. (\ref{shift:Goal3})} 
+From \ref{shift:Ass4}, \ref{shift:Goal2} (established above), and the following \lem~ we have
+%
+\begin{align}
+	s, \lenv |=_{g, \lmod \cup \semI[\lenv]{I'}, \gmod} P \label{shift:Ass8}
+\end{align}
+%
+\nested{
+\begin{lemma}[]
+for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod', \lmod, \gmod \in \AMods$: 
+% 
+\[
+\begin{array}{@{} l @{}}
+	s, \lenv |=_{g, \lmod, \gmod} P /| \left(\for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \!\!\!\implies\!\!\! \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \right)   \\
+	\qquad\quad \implies  s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P
+\end{array}
+\]
+%
+\begin{proof}
+By induction on the structure of assertion $P$.	\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod', \lmod, \gmod \in \AMods$ such that
+%
+\begin{align}
+	& s, \lenv |=_{g, \lmod, \gmod} P_1 \implies P_2 \label{subshift2:Ass1}\\
+%	
+	&\left(\for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \implies \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \right) \label{subshift2:Ass2}\\
+%	
+	\tag{I.H1} & 
+	\hspace{-10pt} 
+	\begin{array}{@{} l @{}}
+		s, \lenv |=_{g, \lmod, \gmod} P_1 /| \left(\for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \!\!\implies\!\! \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \right)   \\
+	 	\qquad \quad \implies s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P_1
+	\end{array}\label{subshift2:IH1}\\ 
+%
+	\tag{I.H2} & 
+	\hspace{-10pt} 
+	\begin{array}{@{} l @{}}
+		s, \lenv |=_{g, \lmod, \gmod} P_2 /| \left(\for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \!\!\implies\!\! \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \right)   \\
+	 	\qquad \quad \implies s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P_2
+	\end{array} \label{subshift2:IH2}
+%	
+\end{align}
+%
+From (\ref{subshift2:Ass1}) and the definition of $|=_{g, \lmod, \gmod}$ we know $s, \lenv |=_{g, \lmod, \gmod} P_1$ \text{ implies } $P_2 |=_{g, \lmod, \gmod}$; consequently, from (\ref{subshift2:Ass2}), (\ref{subshift2:IH1}) and (\ref{subshift2:IH2}) we have: $s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P_1$ \text{ implies } $s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P_2$. Thus, from the definition of $|=_{g, \lmod \cup \lmod', \gmod}$ we have:
+%
+\begin{align*}
+	s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod_0, \lmod', \lmod, \gmod \in \AMods$ such that
+%
+\begin{align}
+%	\tag{I.H} & 
+%	\begin{array}{@{} l @{}}
+%		\for{s, s', g \in \LStates} \for{\lmod_0, \lmod', \lmod, \gmod \in \AMods}\\
+%		\quad s, \lenv |=_{g, \lmod, \gmod} P' /| \left(\extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \implies \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \right)  \implies \\
+%	 	\qquad \quad s, \lenv |=_{g, \lmod \cup \lmod', \gmod} P'
+%	\end{array} \label{subshift2:IH}\\ 
+	&s, \lenv |=_{g, \lmod, \gmod} \shared{P'}{I} \label{subshift2:Ass3}\\
+	& \for{s', \lmod_0} \extendsAM{\lmod, \gmod}{s'}{g-s'}{\lmod_0} \implies \extendsAM{\lmod \cup \lmod', \gmod}{s'}{g-s'}{\lmod_0} \label{subshift2:Ass4}
+\end{align}
+%
+From (\ref{subshift2:Ass3}) and the definition of $|=_{g, \lmod, \gmod}$ we have:
+%
+\begin{align*}
+	s = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod, \gmod} P' /| \extendsAM{\lmod, \gmod}{s'}{r'}{\semI[\lenv]{I}} 
+\end{align*}  
+%
+Thus from (\ref{subshift2:Ass4}) we have
+%
+\begin{align*}
+	s = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod, \gmod} P' /| \extendsAM{\lmod \cup \lmod', \gmod}{s'}{r'}{\semI[\lenv]{I}}
+\end{align*}
+%
+That is,
+%
+\begin{align*}
+	(s, g, \lmod \cup \lmod', \gmod), \lenv |= \shared{P'}{I}
+\end{align*}
+%
+and consequently, from the semantics of $|=_{g, \lmod \cup \lmod', \gmod}$
+%
+\begin{align*}
+	s, \lenv |=_{g, \lmod \cup \lmod', \gmod} \shared{P'}{I}
+\end{align*}
+%
+as required.
+\end{proof}
+\end{lemma}
+}
+%
+Consequently, from \ref{shift:Ass3}, \ref{shift:Ass7}, \ref{shift:Ass8} and the definitions of $|=$ and $w_2$ we have
+%
+\begin{align*}
+	w_2, \lenv |= \shared{P}{I'}
+\end{align*}
+%
+as required.
+%
+\end{proof}
+%
+\end{lemma}
+
+%
+\begin{lemma}
+The semantic implications \extendRule\ is valid.
+\begin{proof}
+
+\end{proof}
+\end{lemma}
+%We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
+%%
+%%
+%\begin{figure*}
+%\hrule\vspace*{5pt}
+%\begin{mathpar}
+%	\infer[\proofRule{Hide}]{
+%		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} * \fenceAss{}' 
+%		& \fenceAss{} * \fenceAss{}' \fences  I \cup \left\{ \capAss{}: \left\{P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\}
+%		&\exact{\fenceAss{}}
+%%		& P * \fenceAss{} * \fenceAss{}' \not\entails  false
+%		& P \sepish \fenceAss{}' \entails P * \fenceAss{}' 
+%		& \precise{P}
+%		& \precise{\fenceAss{}'}
+%	}
+%
+%
+%	\infer[\proofRule{False-L}]{	
+%		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&F \sepish P \entails \m{false}
+%	}
+%	
+%	
+%	\infer[\proofRule{False-R}]{	
+%		I \cup \left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{R} 
+%		I 	
+%	}{
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&F \sepish Q \entails \m{false}
+%	}
+%
+%
+%	\infer[\proofRule{Expand/Contract}]{
+%%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
+%		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
+%	}
+%	{	
+%		R \entails \fenceAss{} 
+%		& \fenceAss{} \fences I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+%		&\bigwedge\limits_{i \in J} \exact{R_i}
+%		& \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in J} \fenceAss{} \sepish \left(P * R_i \right)
+%	}
+%\end{mathpar}
+%%\[
+%%%\infer{
+%%%	\left(I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \weakenI{R} 
+%%%	I 	
+%%%}{
+%%%	R \entails \fenceAss{} 
+%%%	& \fenceAss{} \fences  I \cup \left\{ \capAss{}: P \swap Q\right\}
+%%%	&\exact{\fenceAss{} \intersect Q}
+%%%	& \fenceAss{} \intersect P \vdash \fenceAss{} \intersect Q
+%%%}\\\\
+%%\]
+%\hrule
+%%\vspace*{5pt}
+%\caption{Action shifting rules.}
+%\label{fig:shiftRules}
+%\end{figure*}
+
+
+%
+\section{Soundness}
+In this section we show that the program logic of \colosl\ is sound. We proceed with the definition of a \emph{valid} triple that relates the proof rules (Hoare triples) to the operational semantics of \colosl. In what follows, we write $C, m \rightarrow^{\text{*}} C', m'$ to denote the operational semantics relation where $C, C' \in \textsf{Comm}$ and $m, m' \in \Heaps$. We define a reification function that relates a \colosl\ world $w \in \Worlds$, to concrete states in \Heaps.
+%We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
+%
+\begin{definition}[Reification]\label{def:reification}
+The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}$ is defined as:
+%
+\[
+	\reifyW{(l, g, \gmod, \lmod)} \eqdef \heapPart{(l \composeL g)}
+\]
+%
+\end{definition}
+%
+%
+\begin{definition}[Valid triple] A triple is \emph{valid}, written $|= \{P\}\ C\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+%
+\[
+\begin{array}{l l}
+	\text{if} & w, \lenv |= P  \land \h{} \in \reifyW{w} \land C, \h{} \rightarrow^{\text{*}} \li{skip}, \h{}' \\
+	
+	\text{then} & \exsts{w'} w', \lenv |= Q \land \h{}' \in \reifyW{w'}
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+%
+%
+\begin{theorem}[Soundness]
+%
+The \colosl\ program logic is sound. That is, if $|-\!\{P\}\ C\ \{Q\}$ then $|=\!\{P\}\ C\ \{Q\}$.
+%
+\begin{proof}(Sketch)
+We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 
+\renewcommand{\qed}{}
+\end{proof}
+%
+\end{theorem}
+%
+%
+%\subsection{Axiomatisation of \colosl principles}
+
+%\paragraph{Action shifting}
+%We do not give the semantic model of interferences here. Instead, we
+%give rules that reduce it to logical entailments. We delay the
+%semantic definitions until \S\ref{sec:soundness}, in which we will
+%show that the rules we propose here are indeed sound.

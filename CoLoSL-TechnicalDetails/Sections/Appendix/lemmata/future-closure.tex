@@ -1,0 +1,117 @@
+\begin{lemma}[]\label{lem:future-closure}
+For all $l, r \in \LStates$, $\amod{}, \amod{L}, \amod{}' \in \AMods$ and $n \in \NatsPlus$
+%
+\[
+	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \implies \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r}{\amod{}'}
+\]
+%
+\begin{proof} By induction on number of steps $n$.\\
+Pick an arbitrary $l, r \in \LStates$, $\amod{}, \amod{L}, \amod{}' \in \AMods$ and $n \in \NatsPlus$.\\
+\textbf{Base case: n = 1}\\
+\textbf{RTS.} 
+%
+\begin{equation}
+	\extendsAMUpto{\amod{}, \amod{L}}{0}{l}{r}{\amod{}'} \nonumber
+\end{equation}
+%
+This holds trivially by definition of $\left(\amod{}, \amod{L}\right)\!\downarrow_{0}$\\
+
+\noindent\textbf{Inductive case}\\
+\textbf{Assume:}
+%
+\begin{align}
+	\extendsAMUpto{\amod{}, \amod{L}}{(n+1)}{l}{r}{\amod{}'} \label{L9:Ass1}\\
+	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \implies \extendsAMUpto{\amod{}}{(n-1)}{l}{r}{\amod{}'} \tag{I.H} \label{L9:I.H}
+\end{align}
+%
+\textbf{Show:}
+%
+\begin{align}
+	&\begin{array}{l}
+			\for{\ca{}, c, d, t, l_3, l_4} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{})} \\
+%			
+			\hspace*{0.2cm}\left(\for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL \right) \;\land\; l_1 \composeL f \leq l \composeL r \composeL t \;\land\\
+%			
+			\hspace*{0.2cm} l_1 = l_3 \composeL l_4 \;\land\; 	l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d \implies \\
+%			
+			\hspace*{0.5cm}\extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \;\land\\
+			\hspace*{0.5cm} t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) 
+			\;\lor\; l_2 \composeL c \composeL d \text{ is undefined} 	
+	\end{array}\label{L9:Goal1}\\
+%
+  &\begin{array}{l}
+  	\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \for{c, d} \\
+  \hspace*{0.2cm} l_1 \composeL f \composeL c = l \composeL r \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
+  \hspace*{0.4cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
+		\hspace*{0.4cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
+		\hspace*{0.4cm}\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r'}{\amod{}'}
+  \end{array} \label{L9:Goal2}
+\end{align}
+%
+
+\noindent\textbf{RTS. (\ref{L9:Goal1})}\\
+Pick an arbitrary $\ca{}, c, d, t, l_1, l_2, l_3, l_4, f$ such that
+%
+\begin{equation}
+\hspace*{-0.15cm}
+\begin{array}{l}
+	(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \;\land\; 
+	\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL \right)
+	\;\land\; l_1 \composeL f \leq l \composeL r \composeL t\\
+%
+	\land\; l_1 = l_3 \composeL l_4 \;\land\; 	l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d
+\end{array} \label{L9:Ass2}
+\end{equation}
+%
+From (\ref{L9:Ass1}) and (\ref{L9:Ass2}) we have:
+%
+\begin{align}
+	& \extendsAMUpto{\amod{}, \amod{L}}{n}{l_2 \composeL c}{d}{\amod{}'} \nonumber \;\land\\
+	& t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\lor\; l_2 \composeL c \composeL d \text{ is undefined} \nonumber
+\end{align}
+%
+From (\ref{L9:I.H}) we can rewrite the above as 
+%
+\begin{align}
+	& \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \nonumber \;\land\\
+	& t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\lor\; l_2 \composeL c \composeL d \text{ is undefined} \label{L9:Ass3}
+\end{align}
+%
+as required.\\
+
+\noindent\textbf{RTS. (\ref{L9:Goal2})}\\
+Pick an arbitrary $\ca{}, l_1, l_2, f, c, d$ such that
+%
+\begin{align}
+	\begin{array}{l}
+		(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})\\
+  	l_1 \composeL f \composeL c = l \composeL r \composeL d\\
+  	\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL
+	\end{array} \label{L9:Ass4}
+\end{align}
+%
+From (\ref{L9:Ass1}) and (\ref{L9:Ass4}) we have:
+%
+\begin{align}
+  \begin{array}{l}
+  	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
+		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r'}{\amod{}'}
+  \end{array}\label{L9:Ass5}
+\end{align}
+%
+From (\ref{L9:I.H}) we can rewrite (\ref{L9:Ass5}) as
+%
+\begin{align}
+	\begin{array}{l}
+  	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
+		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
+		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r'}{\amod{}'}
+  \end{array} \nonumber
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%

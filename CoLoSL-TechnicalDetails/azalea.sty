@@ -1,5 +1,7 @@
 \usepackage[utf8]{inputenc}
 %\usepackage[T1]{fontenc}
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]{\huge\bfseries}{\thechapter.\hspace{20pt}}{0pt}{\huge\bfseries}
 \usepackage{array}
 \usepackage{amsmath}
 %\usepackage{amsfonts}
@@ -36,6 +38,8 @@
 \usepackage{microtype}
 \usepackage{mathpartir}
 \usepackage{at}
+\usepackage[style=2]{mdframed}
+\usepackage[most]{tcolorbox}
 
 \input mathlig
 
@@ -49,7 +53,7 @@
 
 \usetikzlibrary{shapes}
 
-\newcommand{\comment}{\color{blue!80!black}}
+%\newcommand{\comment}{\color{blue!80!black}}
 
 \lstset{%
   language=C,
@@ -74,6 +78,25 @@
 \end{minipage}}
 \end{center}}
 
+%\newcommand{\nested}[1]{
+%\begin{center}
+%\fbox{\begin{minipage}{.98\textwidth}
+%#1
+%\end{minipage}}
+%\end{center}}
+
+%\newcommand{\nested}[1]{
+%\begin{mdframed}
+%	#1
+%\end{mdframed}
+%}
+
+\newcommand{\nested}[1]{
+\begin{tcolorbox}[breakable, enhanced]
+	#1
+\end{tcolorbox}
+}
+
 \newcommand{\pgcomment}[1]{
 \begin{center}
 \fbox{\begin{minipage}{.9\columnwidth}
@@ -95,7 +118,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 
-\theoremstyle{lemma}
+%\theoremstyle{lemma}
 \newtheorem{lemma}{Lemma}
 
 \newtheorem{theorem}{Theorem}
@@ -117,6 +140,7 @@
 \newcommand{\param}{Parameter}
 \newcommand{\defin}{Def.~}
 \newcommand{\ex}{Example}
+\newcommand{\lem}{Lemma}
 
 \newcommand{\powerset}{\mathscr{P}}
 
@@ -164,8 +188,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%% MODEL %%%%%%%%%%%%%%%%%%%%%%%%
 %
-\newcommand{\disjoint}{\sharp}
-\newcommand{\separate}{\bot}
+\newcommand{\disjoint}{\mathrel{\bot}}
+%\newcommand{\separate}{\sharp}
+\newcommand{\compatible}{\mathrel{\sharp}}
 %\newcommand{\separate}{\text{\textreferencemark}}
 
 \newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
@@ -229,7 +254,9 @@
  \newcommand{\amodelPart}[1]{#1_{\textsf{GA}}}
  \newcommand{\amodelPartL}[1]{#1_{\textsf{LA}}}
 \newcommand{\collapseW}[1]{\mathop{\downarrow}\left(#1\right)}
-\newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
+%\newcommand{\contains}[2]{\textsf{contains}\left(#1, #2\right)}
+\newcommand{\contains}[2]{#1 \prec #2}
+\newcommand{\containedIn}{\prec}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{W}}
 
 \newcommand{\gray}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
@@ -245,6 +272,7 @@
 
 \newcommand{\extendsAM}[4]{\left(#1\right) \!\downarrow \left(#2, #3, #4\right)}
 \newcommand{\extendsAMUpto}[5]{\left(#1\right) \!\downarrow_{#2} \left(#3, #4, #5\right)}
+\newcommand{\extendsAMUptob}[4]{(#1) \mathbin{\downarrow}_{#2} (#3, #4)}
 \newcommand{\expandsAM}[6]{#1 \!\uparrow^{\left(#2, #3\right)} \left(#4, #5, #6\right)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
 %\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
@@ -361,6 +389,7 @@
 \newcommand{\weakenI}[1]{\sqsubseteq^{#1}}
 \newcommand{\weakenIb}[1]{\sqsubseteq_{#1}}
 \newcommand{\containI}{\mathrel{\copyright}}
+\newcommand{\confines}{\mathrel{\copyright}}
 %\newcommand{\entangleI}[1]{\bowtie^{#1}}
 \newcommand{\agrees}{\bowtie}
 \newcommand{\respects}{\ltimes}
@@ -494,6 +523,9 @@
 \newcommand{\shiftRule}{\proofRule{Shift}}
 \newcommand{\extendRule}{\proofRule{Extend}}
 \newcommand{\copyRule}{\proofRule{Copy}}
+\newcommand{\parRule}{\proofRule{Parallel}}
+\newcommand{\weakenRule}{\proofRule{Weaken}\xspace}
+\newcommand{\stabilise}{\proofRule{Stabilise}}
 
 \newcommand{\iterStar}{\scalebox{1.5}{$\oast$}}
 
@@ -560,3 +592,5 @@
 \newatcommand Y {\ensuremath{\Psi}\xspace}
 \newatcommand z {\ensuremath{\zeta}\xspace}
 
+\newcommand{\fst}[1]{\m{fst}\left(#1\right)}
+\newcommand{\snd}[1]{\m{snd}\left(#1\right)}
