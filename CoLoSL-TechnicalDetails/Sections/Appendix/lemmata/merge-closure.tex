@@ -1,49 +1,74 @@
 \begin{lemma}[\mergeRule-Closure]\label{lem:merge-closure}
+For all $\lmod, \lmod_1, \lmod_2, \gmod \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$,
 %
 \[
 \begin{array}{l}
-	\for{s_p, s_q, s_c, r \in \LStates} \for{\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods} \for{n \in \Nats}\\
-	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod, \gmod}{n}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
+	\extendsAM{\lmod, \gmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} /| \extendsAM{\lmod, \gmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
 	\implies\\
-	\hspace*{2cm} \extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
+	\hspace*{2cm} \extendsAM{\lmod, \gmod}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
 \end{array}
 \]
 %
-\begin{proof} By induction on number of steps $n$.\\
-\noindent\textbf{Base case} $n = 0$\\
-\textbf{RTS. }
+\begin{proof} Pick an arbitrary $\lmod, \lmod_1, \lmod_2, \gmod \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$ such that 
 %
-\[
-\begin{array}{l}
-	\for{s_p, s_q, s_c, r \in \LStates} \for{\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods} \\
-	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod, \gmod}{0}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
-	\implies\\
-	\hspace*{2cm} \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
-\end{array}
-\]
+\begin{align}
+	\extendsAM{\lmod, \gmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} /| \extendsAM{\lmod, \gmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{MC:Ass1}
+\end{align} 
 %
-Pick an arbitrary $s_p, s_q, s_c, r \in \LStates$, $\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods$. Since $ \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}}$, we know $\lmod_{1} \subseteq \lmod$; similarly, from $\extendsAMUpto{\lmod, \gmod}{0}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}$ we have $\lmod_{2} \subseteq \lmod$. We can thus conclude $\lmod_{1} \cup \lmod_{2} \subseteq \lmod$ and consequently by definition of $\downarrow_0$ we have $\extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}$ as required.\\
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_1 \cup \lmod_2  \subseteq \lmod \label{MC:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}} \label{MC:Goal2}
+\end{align}
+%
 
-\noindent\textbf{Inductive Step} Pick an arbitrary $n \in \Nats$, then
+\noindent\textbf{RTS. (\ref{MC:Goal1})} \\
+Since from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\lmod_1 \subseteq \lmod /| \lmod_2 \subseteq \lmod$, we can thus conclude $\lmod_1 \cup \lmod_2 \subseteq \lmod$ as required. \\
+
+\noindent\textbf{RTS. (\ref{MC:Goal2})} \\
+Rather than proving (\ref{MC:Goal2}) directly, we first establish the following.
 %
-\begin{equation}
-	\tag{I.H.}
-	\begin{array}{l}
-		\for{s_p, s_q, s_c, r \in \LStates} \for{\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods}\\
-		\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
-		\implies\\
-		\hspace*{2cm} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
-	\end{array}\label{LMC:IH}
-\end{equation}
+\begin{align}
+	\for {n \in \Nats} \for{s_p, s_c, s_q, r \in \LStates} & \nonumber\\
+	& \hspace{-4cm}\extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod, \gmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2} \nonumber\\
+	& \hspace{-3cm} \implies \extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2} \label{MC:Goal3}
+\end{align}
 %
-Pick an arbitrary $s_p, s_q, s_c, r \in \LStates$, $\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods$ and assume:
+We can then despatch (\ref{MC:Goal2}) from (\ref{MC:Ass1}) and (\ref{MC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod, \gmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2}$ and consequently from (\ref{MC:Goal3}) we derive $\extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2}$ as required. \\
+
+\noindent\textbf{RTS. (\ref{MC:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod, \gmod}{0}{s_1}{s_2 \composeL r}{\lmod'} $ which follows trivially from the definition of $\downarrow_0$.\\
+%\noindent\textbf{Base case} $n = 0$\\
+%\textbf{RTS. }
+%%
+%\[
+%\begin{array}{l}
+%	\for{s_p, s_q, s_c, r \in \LStates} \for{\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods} \\
+%	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod, \gmod}{0}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
+%	\implies\\
+%	\hspace*{2cm} \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
+%\end{array}
+%\]
+%%
+%Pick an arbitrary $s_p, s_q, s_c, r \in \LStates$, $\lmod, \lmod_{1}, \lmod_{2}, \gmod \in \AMods$. Since $ \extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}}$, we know $\lmod_{1} \subseteq \lmod$; similarly, from $\extendsAMUpto{\lmod, \gmod}{0}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}$ we have $\lmod_{2} \subseteq \lmod$. We can thus conclude $\lmod_{1} \cup \lmod_{2} \subseteq \lmod$ and consequently by definition of $\downarrow_0$ we have $\extendsAMUpto{\lmod, \gmod}{0}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}$ as required.\\
+
+\noindent\textbf{Inductive Step} Pick an arbitrary $s_p, s_q, s_c, r \in \LStates$ and $n \in \Nats$, such that
 %
 \begin{align}
 	& \extendsAMUpto{\lmod, \gmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \label{LMC:Ass1}\\
-	& \extendsAMUpto{\lmod, \gmod}{n}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{LMC:Ass2}
+	& \extendsAMUpto{\lmod, \gmod}{n}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{LMC:Ass2}\\
+	& \for{s_p, s_q, s_c, r \in \LStates} \nonumber \\
+	&	\quad \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \nonumber \\
+	&	\tag{I.H.} \qquad\quad\implies  \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}} \label{LMC:IH}
 \end{align}
 %
-Show
+%
+\noindent\textbf{RTS.}
 %
 \begin{align}
 	& 

@@ -1,61 +1,59 @@
 \begin{lemma}[\forgetRule-Closure]\label{lem:forget-closure}
+For all $\lmod, \lmod', \gmod \in \AMods$ and $s_1, s_2, r \in \LStates$
 %
 \[
 \begin{array}{l}
-	\for{s_1, s_2, r \in \LStates} \for{\ \lmod, \lmod', \gmod \in \AMods}\for{n \in \Nats}\\
-	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \implies 
-									\extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'}
+	\extendsAM{\lmod, \gmod}{s_1 \composeL s_2}{r}{\lmod'} \implies 
+	\extendsAM{\lmod, \gmod}{s_1}{s_2 \composeL r}{\lmod'}
 \end{array}
 \]
 %
-\begin{proof} By induction on number of steps $n$.
-
-%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
-\noindent\textbf{Base case}\\
-\textbf{RTS. }
-%
-\[
-\begin{array}{l}
-	\for{s_1, s_2, r \in \LStates} \for{\ \lmod, \lmod', \gmod \in \AMods}\\
-	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{0}{s_1 \composeL s_2}{r}{\lmod'} \implies 
-									\extendsAMUpto{\lmod, \gmod}{0}{s_1}{s_2 \composeL r}{\lmod'}
-\end{array}
-\]
-%
-Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$ such that $\extendsAMUpto{\lmod, \gmod}{0}{s_1 \composeL s_2}{r}{\lmod'}$.
-Since $\extendsAMUpto{\lmod, \gmod}{0}{s_1 \composeL s_2}{r}{\lmod'}$, we know $\lmod' \subseteq \lmod$  and consequently by definition of $\downarrow_0$ we have $\extendsAMUpto{\lmod, \gmod}{0}{s_1}{s_2 \composeL r}{\lmod'}$.\\
-
-\noindent\textbf{Inductive Step} Pick an arbitrary $n \in \Nats$, such that
-%
-\begin{equation}
-	\tag{I.H.}
-%
-	\begin{array}{l}
-		\for{s_1, s_2, r \in \LStates} \for{\ \lmod, \lmod', \gmod \in \AMods}\\
-		\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{r}{\lmod'} \implies 
-										\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{s_2 \composeL r}{\lmod'}
-	\end{array}
-%
-\label{LCS:IH}
-\end{equation}
-%
-\textbf{RTS. }
-%
-\[
-\begin{array}{l}
-	\for{s_1, s_2, r \in \LStates} \for{\ \lmod, \lmod', \gmod \in \AMods}\\
-	\hspace*{0.5cm} \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \implies 
-									\extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'}
-\end{array}
-\]
-%
-Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$ such that 
+\begin{proof} Pick an arbitrary $\lmod, \lmod', \gmod \in \AMods$ and $s_1, s_2, r \in \LStates$ such that 
 %
 \begin{align}
-	& \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \label{LCS:Ass1}
+	\extendsAM{\lmod, \gmod}{s_1 \composeL s_2}{r}{\lmod'} \label{FC:Ass1}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod' \subseteq \lmod \label{FC:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'} \label{FC:Goal2}
+%	& \for {n \in \Nats} \for{s_1, s_2, r \in \LStates} \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \implies \extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'} \label{LFC:Goal2}
 \end{align}
 %
-Show
+
+\noindent\textbf{RTS. (\ref{FC:Goal1})} \\
+This follows trivially from (\ref{FC:Ass1}) and the definition of $\downarrow$.\\
+
+\noindent\textbf{RTS. (\ref{FC:Goal2})} \\
+Rather than proving (\ref{FC:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	\for {n \in \Nats} \for{s_1, s_2, r \in \LStates} & \nonumber\\
+	& \hspace{-2cm}\extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \implies \extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'} \label{FC:Goal3}
+\end{align}
+%
+We can then despatch (\ref{FC:Goal2}) from (\ref{FC:Ass1}) and (\ref{FC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{FC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'}$ and consequently from (\ref{FC:Goal3}) we derive $\extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'} $ as required. \\
+
+\noindent\textbf{RTS. (\ref{FC:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod, \gmod}{0}{s_1}{s_2 \composeL r}{\lmod'} $ which follows trivially from the definition of $\downarrow_0$.\\
+
+\noindent\textbf{Inductive Step} Pick an arbitrary $n \in \Nats$ and $s_1, s_2, r \in \LStates$ such that
+%
+\begin{align}
+	& \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \label{LCS:Ass1}\\
+%
+	&	\for{s_1, s_2, r \in \LStates} \nonumber \\	
+	& \tag{I.H.} \quad\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{r}{\lmod'} \implies 
+										\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{s_2 \composeL r}{\lmod'} \label{LCS:IH}
+\end{align}
+%
+\textbf{RTS. }
 %
 \begin{align}
 	& 
@@ -116,7 +114,7 @@ Finally, from (\ref{LCS:Ass4-6}), (\ref{LCS:Ass4-7}) and (\ref{LCS:Ass5}) we hav
 	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} \nonumber
 \end{align}
 % 
-as required.
+as required.\\
 
 %
 %

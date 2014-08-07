@@ -1,116 +1,128 @@
 \begin{lemma}[]\label{lem:future-closure}
-For all $l, r \in \LStates$, $\amod{}, \amod{L}, \amod{}' \in \AMods$ and $n \in \NatsPlus$
+For all $\lmod, \gmod, \lmod' \in \AMods$ and $n \in \NatsPlus$
 %
 \[
-	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \implies \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r}{\amod{}'}
+	\for{s, r \in \LStates} \extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'} \implies \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{r}{\lmod'}
 \]
 %
-\begin{proof} By induction on number of steps $n$.\\
-Pick an arbitrary $l, r \in \LStates$, $\amod{}, \amod{L}, \amod{}' \in \AMods$ and $n \in \NatsPlus$.\\
-\textbf{Base case: n = 1}\\
-\textbf{RTS.} 
-%
-\begin{equation}
-	\extendsAMUpto{\amod{}, \amod{L}}{0}{l}{r}{\amod{}'} \nonumber
-\end{equation}
-%
-This holds trivially by definition of $\left(\amod{}, \amod{L}\right)\!\downarrow_{0}$\\
+\begin{proof} Pick an arbitrary $s, r \in \LStates$ and proceed by induction on number of steps $n$.\\
+
+\noindent\textbf{Base case: n = 1}\\
+Pick an arbitrary $s, r \in \LStates$. We are then required to show $\extendsAMUpto{\lmod, \gmod}{0}{s}{r}{\lmod'}$ which trivially follows from the definition of $\downarrow_0$.\\
 
 \noindent\textbf{Inductive case}\\
-\textbf{Assume:}
+Pick an arbitrary $s, r \in \LStates$ such that
 %
 \begin{align}
-	\extendsAMUpto{\amod{}, \amod{L}}{(n+1)}{l}{r}{\amod{}'} \label{L9:Ass1}\\
-	\extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r}{\amod{}'} \implies \extendsAMUpto{\amod{}}{(n-1)}{l}{r}{\amod{}'} \tag{I.H} \label{L9:I.H}
+	& \extendsAMUpto{\lmod, \gmod}{(n+1)}{s}{r}{\lmod'} \label{FCL:Ass1}\\
+	& \for{s', r' \in \LStates} \extendsAMUpto{\lmod, \gmod}{n}{s'}{r'}{\lmod'} \implies \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} \tag{I.H} \label{FCL:IH}
 \end{align}
 %
-\textbf{Show:}
+\textbf{RTS. }
 %
 \begin{align}
-	&\begin{array}{l}
-			\for{\ca{}, c, d, t, l_3, l_4} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{})} \\
-%			
-			\hspace*{0.2cm}\left(\for{l'} l' \leq l_1 \;\land\; l' \leq l_2 \implies l' = \unitL \right) \;\land\; l_1 \composeL f \leq l \composeL r \composeL t \;\land\\
-%			
-			\hspace*{0.2cm} l_1 = l_3 \composeL l_4 \;\land\; 	l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d \implies \\
-%			
-			\hspace*{0.5cm}\extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \;\land\\
-			\hspace*{0.5cm} t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) 
-			\;\lor\; l_2 \composeL c \composeL d \text{ is undefined} 	
-	\end{array}\label{L9:Goal1}\\
-%
-  &\begin{array}{l}
-  	\for{\ca{}} \for{(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})} \for{c, d} \\
-  \hspace*{0.2cm} l_1 \composeL f \composeL c = l \composeL r \composeL d \;\land\; \left(\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL\right)  \;\implies\\
-  \hspace*{0.4cm}\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
-		\hspace*{0.4cm}\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
-		\hspace*{0.4cm}\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l}{r'}{\amod{}'}
-  \end{array} \label{L9:Goal2}
+	& 
+	\V{\ca{}}  \V{a\in \lmod'(\ca{})} \nonumber \\
+  &\quad \m{potential}(a, s \composeL r) /| \m{visible}(a, s) => \nonumber\\
+  & \quad\qquad\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} \label{FCL:Goal0}\\
+% 
+	&\quad \m{potential}(a, s \composeL r) /| \neg\m{visible}(a, s) => \nonumber\\
+  & \quad\qquad \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'} \label{FCL:Goal1}\\
+%   
+  &\quad \m{enabled}(a,s \composeL r)
+  => (s \composeL r, a[s \composeL r])\in \gmod(\ca{}) \label{FCL:Goal2}\\
+%  
+  &\V{\ca{}}\V{a\in \lmod(\ca{})}
+  \m{potential}(a,s \composeL r) =>\null \nonumber \\
+  &\ \m{reflected}(a, s \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
+%  
+  &\ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'}  \label{FCL:Goal3}
 \end{align}
 %
-
-\noindent\textbf{RTS. (\ref{L9:Goal1})}\\
-Pick an arbitrary $\ca{}, c, d, t, l_1, l_2, l_3, l_4, f$ such that
+\noindent\textbf{RTS. (\ref{FCL:Goal0})}\\
+Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $(s', r')$ such that 
+\begin{align}
+	& \m{potential}(a, s \composeL r) /| \m{visible}(a, s) \label{FCL:Ass2}\\
+	& (s', r') \in a[s, r] \label{FCL:Ass3}
+\end{align}
+%
+Then from (\ref{FCL:Ass2})-(\ref{FCL:Ass3}) and (\ref{FCL:Ass1}) we have:
 %
 \begin{equation}
-\hspace*{-0.15cm}
-\begin{array}{l}
-	(l_1 \composeL f, l_2 \composeL f) \in \amod{}'(\ca{}) \;\land\; 
-	\left(\for{l'} l' \leq l_1 \land l' \leq l_2 \implies l' = \unitL \right)
-	\;\land\; l_1 \composeL f \leq l \composeL r \composeL t\\
-%
-	\land\; l_1 = l_3 \composeL l_4 \;\land\; 	l_1 \maxMeetL l = l_3 \;\land\; l = l_3 \composeL c \;\land\; r = l_4 \composeL d
-\end{array} \label{L9:Ass2}
+	\extendsAMUpto{\lmod, \gmod}{n}{s'}{r'}{\lmod'} \nonumber
 \end{equation}
 %
-From (\ref{L9:Ass1}) and (\ref{L9:Ass2}) we have:
+and thus from (\ref{FCL:IH})
 %
-\begin{align}
-	& \extendsAMUpto{\amod{}, \amod{L}}{n}{l_2 \composeL c}{d}{\amod{}'} \nonumber \;\land\\
-	& t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\lor\; l_2 \composeL c \composeL d \text{ is undefined} \nonumber
-\end{align}
-%
-From (\ref{L9:I.H}) we can rewrite the above as 
-%
-\begin{align}
-	& \extendsAMUpto{\amod{}, \amod{L}}{(n-1)}{l_2 \composeL c}{d}{\amod{}'} \nonumber \;\land\\
-	& t = \unitL \implies (l_1 \composeL c \composeL d, l_2 \composeL c \composeL d) \in \amod{}(\ca{}) \;\lor\; l_2 \composeL c \composeL d \text{ is undefined} \label{L9:Ass3}
-\end{align}
-%
+\begin{align*}
+	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} 
+\end{align*}
+% 
 as required.\\
+%
+%
+%
 
-\noindent\textbf{RTS. (\ref{L9:Goal2})}\\
-Pick an arbitrary $\ca{}, l_1, l_2, f, c, d$ such that
-%
+\noindent\textbf{RTS. (\ref{FCL:Goal1})}\\
+Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $s''$ such that 
 \begin{align}
-	\begin{array}{l}
-		(l_1 \composeL f, l_2 \composeL f) \in \amod{L}(\ca{})\\
-  	l_1 \composeL f \composeL c = l \composeL r \composeL d\\
-  	\for{l'} l' \leq l_0 \land l' \leq l'_0 \implies l' = \unitL
-	\end{array} \label{L9:Ass4}
+	\m{potential}(a, s \composeL r) /| \neg\m{visible}(a, s) \label{FCL:ass2}
 \end{align}
 %
-From (\ref{L9:Ass1}) and (\ref{L9:Ass4}) we have:
+Then from (\ref{FCL:ass2}) and (\ref{FCL:Ass1}) we have:
 %
+\begin{equation}
+	\extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r]-s}{\lmod'} \nonumber
+\end{equation}
+%
+and thus from (\ref{FCL:IH})
+%
+\begin{align*}
+	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'} 
+\end{align*}
+% 
+as required.\\
+%
+%
+%
+
+\noindent\textbf{RTS. (\ref{FCL:Goal2})}\\
+Pick an arbitrary $\ca{}$ and $a \in \lmod'(\ca{})$ such that 
 \begin{align}
-  \begin{array}{l}
-  	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
-		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
-		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r'}{\amod{}'}
-  \end{array}\label{L9:Ass5}
+	\m{enabled}(a, s \composeL r) \label{FCL:Ass9}
 \end{align}
 %
-From (\ref{L9:I.H}) we can rewrite (\ref{L9:Ass5}) as
+Then from (\ref{FCL:Ass1}) and (\ref{FCL:Ass9}) we have:
 %
 \begin{align}
-	\begin{array}{l}
-  	\exsts{f', c'} (l_1 \composeL f', l_2 \composeL f') \in \amod{}'(\ca{}) \;\land\; l_1 \composeL f' \composeL c' =  l \composeL r \composeL d\\
-		\lor\;l_2 \composeL f \composeL c \text{ is undefined}\\
-		\lor\; l_1 \maxMeetL l = \unitL \;\land\; \exsts{r'} l_2 \composeL f \composeL c = l \composeL r' \composeL d \;\land\; \extendsAMUpto{\amod{}, \amod{L}}{n}{l}{r'}{\amod{}'}
-  \end{array} \nonumber
+	(s \composeL r, a[s \composeL r]) \in \gmod(\ca{}) \nonumber
 \end{align}
+% 
+as required.\\
+%
+%
+%
+
+\noindent\textbf{RTS. (\ref{FCL:Goal3})}\\
+Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that 
+\begin{align}
+	\m{potential}(a, s \composeL r) \label{FCL:Ass12}
+\end{align}
+%(\ref{LCS:Ass})
+Then from (\ref{LCS:Ass1}) we have: 
+%
+\begin{align*}
+  &\m{reflected}(a, s \composeL r,\lmod'(\ca{})) |/ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r]-s}{\lmod'}  
+\end{align*}
+%
+and consequently from (\ref{LCS:IH})
+%
+\begin{align*}
+  &\m{reflected}(a, s \composeL r, \lmod'(\ca{})) |/ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'}  
+\end{align*}
 %
 as required.
+
 \end{proof}
 \end{lemma}
 %

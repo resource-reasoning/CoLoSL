@@ -536,14 +536,15 @@ That is, $a$ can actually happen in $g$ since $g$ holds all the resources in the
 %
 %
 \begin{definition}[Action model closure]\label{def:actclos}
-A pair $(\lmod, \gmod)$ of action models is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
+A pair $(\lmod, \gmod)$ of action models is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ ({\it cf.} property (1) in \defin~\ref{def:assertions}) and $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
 %
 \[
 \begin{array}{@{} L @{}}
   \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
   \iffdef
-  \lmod' \subseteq \lmod
-  \hfill\textit{(1)}\\
+  \m{true}
+%  \lmod' \subseteq \lmod  \hfill\textit{(1)}
+  \\
   
   \extendsAMUpto{\lmod, \gmod}{n+1}{s}{r}{\lmod'} \iffdef 
   (\V{\ca{}}  \V{a\in \lmod'(\ca{})}\\

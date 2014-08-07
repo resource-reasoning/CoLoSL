@@ -57,30 +57,56 @@ From above and by definition of $a(s)$ we have $s' \in a(s)$. The rest of the pr
 %
 \begin{lemma}[\shiftRule-Closure-1]\label{lem:shift-closure}
 %
-For all $n \in \Nats$ and $\lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ 
+For all $\lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and $s, r \in \LStates$,
 %
 \[
-	\for{s, r \in \LStates} \extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s}{r}{\lmod_2}
+	\extendsAM{\lmod, \gmod}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAM{\lmod \cup \lmod_2, \gmod}{s}{r}{\lmod_2}
 \]
 %
-\begin{proof}
-By induction on $n$. \\
+\begin{proof} Pick an arbitrary $\lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and $s, r \in \LStates$ such that 
+%
+\begin{align}
+	& \extendsAM{\lmod, \gmod}{s}{r}{\lmod_1} \label{SC:Ass1}\\
+	& \lmod_1 \weakenI{\{s\}} \lmod_2 \label{SC:Ass2}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_2 \subseteq \lmod \cup \lmod_2\label{SC:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s}{r}{\lmod_2} \label{SC:Goal2}
+\end{align}
+%
+\noindent\textbf{RTS. (\ref{SC:Goal1})} \\
+This holds trivially from the definition of $\lmod \cup \lmod_2$.\\
 
-\noindent\textbf{Base case} $n = 0$\\
-Pick an arbitrary $\lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and $s, r \in \LStates$. \\
-\textbf{RTS. } $\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{0}{s}{r}{\lmod_2}$\\
-Since $\lmod_2 \subseteq \lmod \cup \lmod_2$, this case holds trivially from the definition of $\downarrow_0$.\\
+\noindent\textbf{RTS. (\ref{SC:Goal2})} \\
+Rather than proving (\ref{SC:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	& \for {n \in \Nats} \for{s, r \in \LStates} \nonumber\\
+	& \quad \extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s}{r}{\lmod_2} \label{SC:Goal3}
+\end{align}
+%
+We can then despatch (\ref{SC:Goal2}) from (\ref{SC:Ass1}), (\ref{SC:Ass2}) and (\ref{SC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{SC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod_1}$ and consequently from (\ref{SC:Ass2}) and (\ref{SC:Goal3}) we derive $\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s}{r}{\lmod_2} $ as required. \\
+
+\noindent\textbf{RTS. (\ref{SC:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s, r \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{0}{s}{r}{\lmod_2} $ which follows trivially from the definition of $\downarrow_0$.\\
+
 
 \noindent\textbf{Inductive Case}\\
-Pick an arbitrary $\lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and $s, r \in \LStates$ such that:
+Pick an arbitrary $s, r \in \LStates$ such that:
 \begin{align}
 	&\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod_1} \label{LSC:Ass1}\\
 	&\lmod_1 \weakenI{\{s\}} \lmod_2 \label{LSC:Ass2}\\
-	\tag{I.H}	
-	&\begin{array}{@{} l @{\hspace{-2cm}} l @{}}
-		\for{s, r \in \LStates} &\\
-		&\extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{(n-1)}{s}{r}{\lmod_2}
-	\end{array} \label{LSC:IH}
+%		
+	&	\for{s, r \in \LStates}  \nonumber\\
+	& \tag{I.H} 
+		\quad \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{(n-1)}{s}{r}{\lmod_2} \label{LSC:IH}
 \end{align}
 %
 \textbf{RTS. } 
@@ -357,25 +383,57 @@ as required.
 %
 %
 \begin{lemma}[\shiftRule-Closure-2]\label{lem:shift-closure-2}
-For all $\lmod_0, \lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and  $n \in \Nats$
+For all $\lmod_0, \lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and  $s_1, r_1, s_0, r_0 \in \LStates$
 %
 \[
-\begin{array}{@{} l @{\hspace{-3cm}} l @{\hspace{-1cm}} l @{} } 
-	\for{s_1, r_1, s_0, r_0 \in \LStates} & &\\
-	& \extendsAMUpto{\lmod, \gmod}{n}{s_1}{r_1}{\lmod_1} /| \lmod_1 \weakenI{\{s_1\}} \lmod_2 /| \null & \\
-	& \extendsAMUpto{\lmod, \gmod}{n}{s_0}{r_0}{\lmod_0} /| s_1 \composeL r_1 = s_0 \composeL r_0 \implies & \\
-	& &\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s_0}{r_0}{\lmod_0}
+\begin{array}{@{} l @{\hspace{-1cm}} l @{} } 
+	\extendsAM{\lmod, \gmod}{s_1}{r_1}{\lmod_1} /| \lmod_1 \weakenI{\{s_1\}} \lmod_2 /| \null & \\
+	\extendsAM{\lmod, \gmod}{s_0}{r_0}{\lmod_0} /| s_1 \composeL r_1 = s_0 \composeL r_0 \implies & \\
+	&\extendsAM{\lmod \cup \lmod_2, \gmod}{s_0}{r_0}{\lmod_0}
 \end{array}
 \]
 %
-\begin{proof}
-Pick an arbitrary $\lmod_0, \lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and proceed by induction on the number of steps $n$.\\
+\begin{proof} Pick an arbitrary $\lmod_0, \lmod_1, \lmod_2, \lmod, \gmod \in \AMods$ and $s_1, r_1, s_0, r_0 \in \LStates$ such that 
+%
+\begin{align}
+	& \extendsAM{\lmod, \gmod}{s_1}{r_1}{\lmod_1} \label{SC2:Ass1}\\
+	& \lmod_1 \weakenI{\{s_1\}} \lmod_2 \label{SC2:Ass2}\\
+	& \extendsAM{\lmod, \gmod}{s_0}{r_0}{\lmod_0} \label{SC2:Ass3}\\
+	& s_1 \composeL r_1 = s_0 \composeL r_0 \label{SC2:Ass4}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_0 \subseteq \lmod \cup \lmod_2\label{SC2:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s_0}{r_0}{\lmod_0} \label{SC2:Goal2}
+\end{align}
+%
+\noindent\textbf{RTS. (\ref{SC2:Goal1})} \\
+From (\ref{SC2:Ass3}) and the definition of $\downarrow$ we have $\lmod_0 \subseteq \lmod$ and consequently $\lmod_0 \subseteq \lmod \cup \lmod_2$ as required.\\
 
-\noindent\textbf{Base case} $n = 0$\\
-Pick an arbitrary $s_0, r_0, s_1, r_1 \in \LStates$ such that $\extendsAMUpto{\lmod, \gmod}{0}{s_0}{r_0}{\lmod_0}$. Since $\lmod_0 \subseteq \lmod$ and consequently, $\lmod_0 \subseteq \lmod \cup \lmod_2$, from the definition of $\downarrow_0$ we have $\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{0}{s_0}{r_0}{\lmod_0}$ as required.\\
+\noindent\textbf{RTS. (\ref{SC2:Goal2})} \\
+Rather than proving (\ref{SC2:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	& \for {n \in \Nats} \for{s_1, r_1, s_0, r_0 \in \LStates} \nonumber\\
+	& \quad \extendsAMUpto{\lmod, \gmod}{n}{s_1}{r_1}{\lmod_1} /| \lmod_1 \weakenI{\{s_1\}} \lmod_2 /| \nonumber\\
+	& \quad \extendsAMUpto{\lmod, \gmod}{n}{s_0}{r_0}{\lmod_0} /| s_1 \composeL r_1 = s_0 \composeL r_0 \implies \nonumber\\
+	& & \hspace{-3cm}  \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s_0}{r_0}{\lmod_0} \label{SC2:Goal3}
+\end{align}
+%
+We can then despatch (\ref{SC2:Goal2}) from (\ref{SC2:Ass1})-(\ref{SC2:Ass4}) and (\ref{SC2:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{SC2:Ass1}), (\ref{SC2:Ass3}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod, \gmod}{n}{s_1}{r_1}{\lmod_1} /| \extendsAMUpto{\lmod, \gmod}{n}{s_0}{r_0}{\lmod_0}$ and consequently from (\ref{SC2:Ass2}), (\ref{SC2:Ass4}) and (\ref{SC2:Goal3}) we derive $\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{n}{s_0}{r_0}{\lmod_0} $ as required. \\
+
+\noindent\textbf{RTS. (\ref{SC2:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s_1, r_1, s_0, r_0 \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_2, \gmod}{0}{s_0}{r_0}{\lmod_0} $ which follows trivially from the definition of $\downarrow_0$.\\
+
 
 \noindent\textbf{Inductive Case}\\
-Pick an arbitrary $s_1, r_1, s_0, r_0 \in \LStates$ such that:
+Pick an arbitrary $n \in \Nats$ and $s_1, r_1, s_0, r_0 \in \LStates$ such that:
 \begin{align}
 	&\extendsAMUpto{\lmod, \gmod}{n}{s_1}{r_1}{\lmod_1} \label{LSC2:Ass1}\\
 	&\lmod_1 \weakenI{\{s_1\}} \lmod_2 \label{LSC2:Ass2}\\
