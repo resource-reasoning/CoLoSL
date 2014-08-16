@@ -296,9 +296,10 @@ $f$.
   \vspace{-1ex}
 \[
   \vspace{-1ex}
-\begin{array}{L}
+\begin{array}{@{} l @{\hspace*{-1.5cm}} l @{}}
   g\containI a /|
-  (\m{potential}(a,g) /| \m{visible}(a,g) => a[g]\in\fence{})
+  (\m{potential}(a,g) /| (\m{visible}(a,g) |/ \m{fst}(\updateFP{a}) = \unitL) & \\
+  & => a[g]\in\fence{})
 \end{array}
 \]
 \end{definition}
@@ -657,30 +658,33 @@ resources in the pre-state of $a$.
   \label{def:actclos}
   A pair $(\lmod, \gmod)$ of action models is \emph{closed} under a
   subjective state $s$, context $r$, and action model $\lmod'$,
-  written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if
+  written $\extendsAM{\lmod, \gmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ ({\it cf. } property 1. in \defin~\ref{def:assertions} ) and 
   $\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod '}$ for all
   $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
   \vspace{-1ex}
 \[
-\begin{array}{L}
+\begin{array}{@{} l @{} }
   \extendsAMUpto{\lmod, \gmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
   \iffdef
-  \lmod' \subseteq \lmod
-  \hfill\textit{(1)}\\
+  \m{true}\\
+%  \hfill\textit{(1)}\\
   \extendsAMUpto{\lmod, \gmod}{n+1}{s}{r}{\lmod'} \iffdef (\V{\ca{}}
   \V{a\in \lmod'(\ca{})}\\
-  (\m{potential}(a,s\composeL r) =>
+  (\m{potential}(a,s\composeL r)  /| \m{visible}(a, s) => 
   \extendsAMUptob{\lmod,
-    \gmod}{n}{a[s, r]}{\lmod'}) \land\hfill \textit{(4)}\\
-  \quad\m{enabled}(a,s\composeL r)
+    \gmod}{n}{a[s, r]}{\lmod'}) \hfill \textit{(4)}\\
+  /| (\m{potential}(a,s\composeL r)  /| \neg\m{visible}(a, s) => \\
+  	\quad\qquad \extendsAMUpto{\lmod,
+    \gmod}{n}{s}{a[s \composeL r] - s}{\lmod'}) \hfill \textit{(4)}\\  
+  /| \m{enabled}(a,s\composeL r)
   => (s\composeL r,
   a[s\composeL r])\in \gmod(\ca{}))
   /|\null\hfill \textit{(3)}\\
   \V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s\composeL r) =>\null\\
   \ \m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/\null\hfill \textit{(2)}\\
-  \ (\neg\m{visible}(a,s) /| \m{fst}(a[s,r]) = s /|
-  \extendsAMUptob{\lmod, \gmod}{n}{a[s, r]}{\lmod'})\quad \textit{(4)}
+  \ (\neg\m{visible}(a,s) /|
+  \extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r] - s}{\lmod'})\hfill \textit{(4)}
   %% \hspace*{0.1cm}\for{\ca{}, l', r', t, p, q, p', q', p_l, p_r}\\
   %% \hspace*{0.2cm}(p, q) \in \lmod'(\ca{}) 
   %% \land \updateFP{p, q} = (p', q')
