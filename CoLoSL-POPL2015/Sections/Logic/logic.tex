@@ -22,12 +22,11 @@ starting with the latter.
 %% manipulate the interference relations, etc.'').
 A \emph{world} is a 4-tuple $(l,g,\lmod,\gmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ and $\gmod$ are \emph{action
-  models}; let us explain the role of each component informally. The
-\emph{local (logical) state}, or simply local state, $l$ represents
+  models}. Let us explain the role of each component informally. The
+\emph{local logical state}, or simply local state, $l$ represents
 the locally owned resources of a thread (\textit{e.g.} in
-\fig\ref{fig:concurrentInc}, the capability $\{\token a_{\li y}\}$ for
-$\mathbb{P}_{\li y}$, and the variables \li{x}, \li{y}, \li{z} at the
-beginning of $\mathbb{P}$). The \emph{shared logical state}, or shared
+\fig\ref{fig:concurrentInc}, the variables \li{x}, \li{y}, \li{z} at the
+beginning of $\mathbb{INC}$). The \emph{shared logical state}, or shared
 state, $g$ represents the \emph{whole} current shared state
 (\textit{e.g.} variables \li{x}, \li{y}, \li{z} in
 $\mathbb{P}_{\li{y}}$), and is subject to interferences as described
@@ -38,14 +37,15 @@ An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}. An action is a pair $(p,q)$ of logical states where
 $p$ is the \emph{pre-state} of the action and $q$ its
 \emph{post-state}.  The \emph{local action model} $\lmod$ corresponds
-directly to the (semantic interpretation of) an interference relation
+directly to the (semantic interpretation of) an interference assertion
 $I$. The \emph{global action model} $\gmod$ extrapolates the effect of
-some of the actions in $\lmod$ to the global shared state
+(some of) the actions in $\lmod$ to the global shared state
 $g$. Although worlds do not put further constraints on the
 relationship between $\lmod$ and $\gmod$, they will be linked more
 tightly in the semantics of assertions (\S\ref{sec:assertions}): as we
 shall see, $\gmod$ records at least those actions that matter for the
-current subjective view.
+current subjective view. 
+We elaborate on the need for both local and global action models in \S~\ref{subsec:local-global-am}. 
 
 As $g$ represents the global shared state, we will also require that
 actions in $\lmod$ and $\gmod$ are \emph{confined} to $g$.  We write
@@ -53,9 +53,9 @@ $g \containI \lmod$ to denote that the part of state mutated by
 actions in $\lmod$ is always fully contained in $g$. As threads may
 unilaterally decide to bring in part of their local states into the
 shared state at any point (by \extendRule), this ensures that
-existing actions cannot affect future extra pieces of shared state. We
-will similarly require that the new actions associated with newly
-shared state are confined to that extension in the same sense, hence
+existing actions cannot affect future extra pieces of shared state. 
+Similarly, we require that the new actions associated with newly
+shared state (through \extendRule) are confined to that extension in the same sense, hence
 extending the shared state cannot retroactively invalidate the views
 of other threads. As we shall see, confinement does not however
 prohibit \emph{referring} to existing parts of the shared state in the
@@ -76,21 +76,17 @@ capabilities in deny-guarantee reasoning~\cite{dg}: a thread in
 possession of a given capability is allowed to perform the associated
 actions (as prescribed by the \emph{action model} components of each
 world, defined below), while any capability \emph{not} owned by a
-thread means that the environment can perform the action.\footnote{In
-  general, capabilities could be fractionally owned, in which case
-  ownership of a \emph{fraction} of a capability grants the right to
-  perform the action to both the thread and the environment, while a
-  fully-owned capability \emph{denies} the right to the environment to
-  perform the associated action. For ease of exposition, we only
-  consider the case of fully-owned capabilities in our formal
-  development. See the technical report for the general case.}
-
+thread means that the environment can perform the action.
+%
 \begin{definition}[Logical states]
   A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
   $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$
   associating program variables with values, a heap $h \in \set{Heap}$
   associating heap locations with values, and a capability $\ca{}
-  \in\Caps$.
+  \in\Caps$. We
+assume infinite disjoint sets $\set{PVar}$, $\set{LVar}$, and
+$\set{Token}$ of program variables, logical variables, and tokens,
+respectively.
   \begin{mathpar}
     \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
 
@@ -113,11 +109,38 @@ thread means that the environment can perform the action.\footnote{In
   (@s\uplus @s', h\composeH h', \ca{}\composeCap \ca{}')
   \]
 \end{definition}
+%
 Although, for this presentation, we build logical states from a fixed
 $\Heaps$ and $\Caps$, the general setting allows these two objects to
-be instantiated with \emph{any} separation algebras (\textit{i.e.}
-cancellative partial commutative monoids~\cite{asl}) satisfying a
-technical \emph{cross-split} condition~\cite{colosl-tr14}.
+be instantiated with \emph{any} separation algebras\footnote{In
+  general, capabilities can be fractionally owned, in which case
+  ownership of a \emph{fraction} of a capability grants the right to
+  perform the action to both the thread and the environment, while a
+  fully-owned capability \emph{denies} the right to the environment to
+  perform the associated action. For ease of exposition, we only
+  consider the case of fully-owned capabilities in our formal
+  development. See the technical report for the general case.} (\textit{i.e.}
+cancellative partial commutative monoids~\cite{asl}) satisfying the \emph{cross-split} property\footnote{
+A separation algebra $(\mathbb{A}, +, \mathbf{1})$ satisfies the cross-split property iff for all $a, b, c, d \in \mathbb{A}$ where $a + b = c + d$, there exists $ac, ad, bc, bd \in \mathbb{A}$ s.t.
+%
+\vspace{-3pt}
+\[
+	a = ac + ad /| b = bc + bd /|
+	c = ac + bc /| d = ad + bd \vspace{-10pt}
+\]
+%
+%
+%\vspace{-5pt}
+%\[
+%	\begin{array}{@{} l @{\hspace*{3pt}} l @{\hspace{3pt}} l @{}}
+%		a + b = c + d \iff &
+%		\exsts{ac, ad, bc, bd} & 
+%		 a = ac + ad /| b = bc + bd \;/| \\
+%		 && c = ac + bc /| d = ad + bd
+%	\end{array}
+%\]
+%% 
+}~\cite{colosl-tr14}.
 
 In the following, we write $l_1\leq l_2$ when there exists $l$ such
 that $l\composeL l_1 = l_2$. We also write $l_2 - l_1$ to denote the
@@ -141,7 +164,7 @@ actions enabled by each capability.
   \end{align*}
 \end{definition}
 
-We write $\unitAM$ for an action model with empty domain.
+We write $\unitAM$ for the action model with empty domain.
 
 
 \paragraph{The Effect of Actions} As mentioned in the beginning of the
@@ -162,9 +185,11 @@ $p$ that are not mutated by $a$, \textit{i.e.}, which can also be
 found in $q$, can escape $g$'s grasp. Mutated parts must always be
 contained in $g$, so that extensions need not worry about existing
 actions interfering with new resources that were never shared
-beforehand. We start by characterising the active and passive parts of
+beforehand. 
+
+We start by characterising the active and passive parts of
 actions, then move on to define the effect of actions. This will
-enable us to define our confinement condition, and then the set of
+enable us to define our confinement condition and the set of
 well-formed worlds.
 
 An action $a = (p, q)$ is typically of the form $(p'\composeL c,
@@ -177,15 +202,15 @@ further, non-empty catalyst can be found in $(p',q')$.
 
 \begin{definition}[Active part of an action]
   Given a pair of logical states $(p, q)$, its \emph{active part}
-  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that:
-  \vspace{-1ex}
+  $\updateFP{(p,q)}$ is defined as the pair $(p', q')$ such that: \vspace{-10pt}
+%
   \[
-  \vspace{-1ex}
   \E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
   c'\leq q' => c' = \unitL
   \]
-\end{definition}
-
+  %
+\end{definition}  
+%
 For instance, the interpretations of the actions associated with token
 $\token a_{\li{x}}$ in the previous section all have the same active
 parts
@@ -195,9 +220,7 @@ the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$, and
 $([y:v,z:v],\emptyset,\emptyset)$ in $I_{\li{y}}$.
 
 
-The compatibility of an action pre-state $p$ and the shared state $g$
-will be defined using the following notion of \emph{intersection} of
-logical states.
+The compatibility of a shared state $g$ and an action pre-state $p$ is defined using the following notion of \emph{intersection} of logical states.
 
 \begin{definition}[Intersection]
 The \emph{intersection} function over logical states 
@@ -223,12 +246,10 @@ l  \mid
 %% element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
 One can check that $l_1\meetL l_2$ yields at most one element for any
 given $l_1$ and $l_2$~\cite{colosl-tr14}. Thus, we will usually omit
-the set notation.\footnote{In the general case, separation algebras
+the set notation.\footnote{In general, separation algebras
   may lack the \emph{disjointness} property, in which case
   intersection between two states may yield more than one state. Thus,
-  our general definition introduces \emph{maximal intersections} to
-  restore unicity. Since in this paper our logical states satisfy disjointness,
-  intersection is enough for our exposition.}
+  in our general definitions we use the set notation. Since in this paper our logical states satisfy disjointness, we omit the set notation in our exposition.}
 
 \begin{definition}[Action application]\label{def:actionApplication}
   The \emph{application} $a[g]$ of an action $a$ on a logical state
@@ -264,10 +285,7 @@ world $g$ is that the actions of the local action model $\lmod$ are
 confined in all possible \emph{futures} of $g$, \textit{i.e.} all the
 shared states that result from $g$ after any number of applications of
 actions in $\lmod$. For some of these actions, the active pre-state
-might be empty. In that case, we find that we do not need to take the
-action into account when considering the effect of all actions on the
-shared state, even though it is potentially enabled. We thus introduce
-the following notion of \emph{visible actions}.
+may not affect $g$, \textit{i.e.}, its intersection with $g$ may be empty. In that case, we find that even though that action is potentially enabled, we do not need to take it into account since it leaves $g$ unchanged. We thus introduce the following notion of \emph{visible actions}.
 
 \begin{definition}[Visible actions]
   An action $a$ is called \emph{visible in $g$}, written
@@ -377,11 +395,7 @@ Our assertions extend standard assertions from separation logic with
 \emph{subjective views} and \emph{capability assertions}. \colosl is
 parametric with respect to the machine states and capability
 assertions and can be instantiated with any assertion language over
-states $\Heaps$ and capabilities $\Caps$. Here, we instantiate these
-languages for our particular model of stacks, heaps, and tokens. We
-assume infinite disjoint sets $\set{PVar}$, $\set{LVar}$, and
-$\set{Token}$ of program variables, logical variables, and tokens,
-respectively.
+states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions as machine state assertions; and instantiate capability assertions with tokens. 
 
 \begin{definition}[Assertion syntax]
   \label{def:assertions}
@@ -425,11 +439,11 @@ A subjective view $\shared P I$ is true of $(l,g,\lmod,\gmod)$ when $l
 = \unitL$ and a subjective view $s$ can be found in the global shared
 state $g$, \textit{i.e.} $g = s\composeL r$ for some \emph{context}
 $r$, such that $s$ satisfies $P$ in the standard separation logic
-sense, and $I$, $\lmod$, and $\gmod$ \emph{agree} given the
+sense (ignoring the boxed assertions), and $I$, $\lmod$, and $\gmod$ \emph{agree} given the
 decomposition $s$, $r$, in the following sense:
 \begin{enumerate}
 \item
-  every action in $I$ is reflected in $\lmod{}$;
+  every action in $I$ is contained in $\lmod{}$;
 \item
   every action in $\lmod$ that is potentially enabled in $g$ and has a
   visible effect on $s$ is reflected in $I$;
@@ -451,7 +465,7 @@ interpretation of $I$).
 
 The semantics of \colosl assertions is given by a forcing relation
 $w,\lenv|= P$ between a world $w$, an interpretation of logical
-variables $\lenv\in\LEnv == \set{LVar} --> \set{Val}$ and a formula
+variables $\lenv\in\LEnv == \set{LVar} --> \set{Val} \uplus \set{Token}$ and a formula
 $P$. We use two auxiliary forcing relations. The first one
 $l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
 logic sense over a logical state $l$ (and ignores shared state
@@ -489,7 +503,7 @@ respectively.
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod,\gmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
   (l,g,\lmod,\gmod), \lenv &|= \shared P I &\text{iff}&
-  l = \unitH\text{ and }
+  l = \unitL \text{ and }
   \exsts{s,r}
   g = s\composeL r
   \text{ and}\\
@@ -777,19 +791,18 @@ for all $P$, $Q$, and $I$, which uses a property of $**$ and
 \weakenRule in the first step and \forgetRule in the second:
   \vspace{-1ex}
 \[
-  \vspace{-1ex}
 \shared{P ** Q}{I} => 
 \shared{P * \m{true}}{I} => 
-\shared{P}{I}
+\shared{P}{I}   \vspace{-0.5ex}
 \]
+%
+\subsection{On the Need for Local and Global Action Models}\label{subsec:local-global-am}
+We illustrate the need for both local and global action models in worlds through the following examples. \ex~\ref{ex:globalAM} showcases subtle reasoning about subjective views enabled by our logic thanks to global action models; example~\ref{ex:localAM} motivates the need for local action models.
 
-The following examples illustrate the need for both local and global
-action models in worlds.
-
-\begin{example}
-  This example showcases subtle reasoning about subjective views
-  enabled by our logic thanks to the global action model.  The
-  following entailment is valid, where $I \eqdef (\token{a}:
+\begin{example}\label{ex:globalAM}
+%  This example showcases subtle reasoning about subjective views
+%  enabled by our logic thanks to the global action model.  
+  The following entailment is valid, where $I \eqdef (\token{a}:
   \left\{\cell{x}{0} * \cell{y}{0} \swap \cell{x}{0} *
   \cell{y}{1}\right\})$:
   \vspace{-1ex}
@@ -874,8 +887,8 @@ action models in worlds.
 %% the underlying model is not enough as the ways in which the shared
 %% state can be updated may vary with its extension.
 
-\begin{example}
-  This example motivates the need for a local action model in worlds.
+\begin{example}\label{ex:localAM}
+%  This example motivates the need for a local action model in worlds.
   Let $P \eqdef \cell{x}{0} * \shared{\cell{y}{0}}{I}$, where $I$ is
   as in the previous example. Since $\cell{x}{0}$ is present in the
   local state, and the local and shared states are always disjoint,
