@@ -4,8 +4,8 @@
 
 We illustrate our \colosl  reasoning principles  by
 sketching a proof of a variation of Dijkstra's token ring mutual
-exclusion algorithm~\cite{dijkstra74}.  Consider the program
-$\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
+exclusion algorithm~\cite{dijkstra74}. For simpler presentation, we consider the case where the token ring consists of three threads rather than an arbitrary number $n$. However, the reasoning techniques demonstrated here can easily be adapted to handle the general case of $n$ threads.
+Consider the program $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
 constructs for concurrency: atomic sections $\atomic \_$ which
 declare that code behaves atomically; and
@@ -176,7 +176,7 @@ Fundamentally, for large systems, the burden of carrying the whole
 shared state around to analyse all threads,  can lead to intractable proofs.
 
 As a first try at simplifying the precondition, consider the following implication using the \forgetRule\
-and \shiftRule\ principles given in the introduction:
+and \shiftRule\ principles:
 %
 \[
 \begin{array}{c l}
@@ -229,15 +229,11 @@ action can be replaced by:
 This is possible  because, as the programmer knows, whenever the cells
 of \li{x} and
 \li{z} have the same value then the \li{y} cell also has the same value which, under these
-conditions, is not changed by the actions in $I$. This amended action  gives full information about how the resource of
+conditions, is not changed by the actions in $I$. This strengthened  action  gives full information about how the resource of
 the subjective view changes as \li{x} is being updated.
 Let  $I_{\li y}' $ be  $I_{\li y}$ with $\token a_{\li x}$ rewritten as above.
 As we justify in \S~\ref{sec:logic}, we can 
-use  the \shiftRule\ principle with the following judgement judgement 
-$
-I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
-$
-to replace $I_{\li y}$ by $I'_{\li y}$. 
+use  the \shiftRule\ principle with the judgement $ I\weakenIb{P} I_{\li y}' $, where $P \eqdef \cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}$, to replace $I_{\li y}$ by $I'_{\li y}$. 
 
 Using \forgetRule,  it is now safe to lose the \li{z} assertion  to
 obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$,  as 
@@ -329,29 +325,33 @@ thread to just the resources they need. This  is not possible
 using previous work.
 
 \paragraph{Further \colosl reasoning}
-We complete our semi-formal overview with a brief desription of features of \colosl not
-showcased by the proof above. First, we note that an action $P\swap Q$
-may in general performs three types of action: (1)
-%% \begin{enumerate}
-%% \item
-  \emph{modify} resources: $P$ and $Q$ contain the same amount of
-  resource with different values, \textit{e.g.}
-  $\token{a}_{\tx{x}}$ in $I$;
-%%\item
-  (2)
+We complete our semi-formal overview with a brief description of features of \colosl not
+showcased by the proof above. First, we note that an action $\token{a}: P\swap Q$
+describes how the shared resources described by $P$ can be updated into those captured by $Q$. In doing so, it may
+	\vspace{-5pt}
+ \begin{enumerate}
+ \item
+  \emph{modify} resources such that $P$ and $Q$ contain the same amount of
+  resource with different values (\textit{e.g.} $\token{a}_{\tx{x}}$ in $I$) 
+  \vspace{-5pt}
+	\item
+%  (2)
   \emph{remove} resources from the shared state and move them into
-  the local state of the thread performing the action, for instance
-  when $P = Q * R$ for some resource to be removed $R$;
-%%\item
-  (3)
-  conversely, \emph{add} resources from the local state of the thread
-  into the shared state; the added resources only appears in $Q$,
-  \textit{e.g.} $Q = P * R$.
-%%\end{enumerate}   
+  the local state of the thread performing the action (\textit{e.g.} $P = Q * R$ for some resource $R$ to be removed)
+	\vspace{-5pt}	
+	\item
+%  (3)
+  \emph{add} resources from the local state of the thread
+  into the shared state 
+%  where the added resources only appears in $Q$ 
+  (\textit{e.g.} $Q = P * R$  where $R$ only appears in $Q$)
+  \vspace{-5pt}
+\end{enumerate}   
 We demonstrate the latter two behaviours through our examples in
 \S\ref{sec:examples}. These three behaviours are not mutually
-exclusive and an action may exhibit any combination of them.  Unlike
-CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
+exclusive and an action may exhibit any combination of them. 
+
+Unlike CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
 an explicit \emph{unsharing} mechanism to claim shared
 resources and render them thread-local. Instead, this behaviour can
 be simply encoded as an additional action with the second behaviour
