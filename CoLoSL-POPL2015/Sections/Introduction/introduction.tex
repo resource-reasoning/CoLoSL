@@ -107,20 +107,9 @@ provides truly compositional reasoning  for shared-memory concurrency.
 %  subjective views} and {\em capabilities}. 
 
 A subjective view
-$\shared{P} I$ comprises an  assertion $P$ which gives {\em partial}
-information about the global shared state and interference assertion
-$I$ which describes how this partial shared state may be changed by
-the thread or the environment. The interference assertion $I$ declares
-actions of the form $\token a : P' \swap Q$, with capability assertion
-$[\token a]$ providing a thread with permission to use this action
-$\token a$. Subjective views expand or contract depending on the resource required
-by the thread, which has subtle consequences for the logical
-reasoning. In particular, it is possible to strengthen actions in $I$
-to record  some global information known to the subjective view.
-Then, the view can be weakened to just 
-the resources and possibly strengthened
-actions appropriate to  the thread. The strengthened actions retain  some
-global information despite the weakened view. 
+$\shared{P} I$ comprises an  assertion $P$ which describes {\em parts} of the global shared state and interference assertion $I$ which states how this portion of the shared state may be changed by the thread or the environment. The interference assertion $I$ declares actions of the form $\token a : P_1 \swap P_2$, asserting that whenever a thread possesses the capability captured by $\token a$, it can perform the associated update and modify parts of the shared state satisfying $P_1$ into those satisfying $P_2$. 
+Subjective views expand or contract depending on the resource required by the thread, which has subtle consequences for the logical reasoning. In particular, it is possible to strengthen actions in $I$ to reflect more of the global information known to the subjective view. The subjective view can then be weakened to just 
+the resources and (potentially strengthened) actions relevant to the thread. Consequently, the strengthened actions may retain some of the global information despite the weakened subjective view. 
 
 
 We introduce several novel reasoning principles which allow us to expand and
@@ -163,10 +152,7 @@ effect on the subjective state $P$. When this is the case, we write $
 I \weakenIb{P} I'$ and say that the actions have been  \emph{shifted}. It can
 be used to strengthen actions given by the combined global knowledge
 arising form the combination of $I$ and $P$. It can also be used to forget actions
-which are not relevant to $P$. This \shiftRule\ principle describes a flexible  behaviour of interference  which is 
-in marked  contrast with most existing formalisms, where 
-interference is fixed throughout the verification of the whole
-program.
+which are not relevant to $P$. Note that $\semimplies$ denotes \emph{semantic implication} (as introduced in the views framework~\cite{views}) rather than simple logical implication. The \shiftRule\ principle describes a flexible  behaviour of interference which is in marked contrast with most existing formalisms, where interference is fixed throughout the verification of the whole program.
 
 
 Now, with a possibly strengthened interference assertion, we are able 
@@ -257,7 +243,7 @@ is a good  introductory example, as it uses all the highlighted \colosl\ reasoni
 In \S\ref{sec:logic}, we interpret \colosl\ assertions
  over a particular domain which includes: thread-local
 state exclusively visible to the thread; {\em one} global shared state
-accessible by all thread (in contrast with the CAP approach); and {\em
+accessible by all threads (in contrast with the CAP approach which divides the shared state into disjoint regions); and {\em
   action models} describing how the global state can be updated.  In
 \S\ref{sec:semantics}, we define the rely and guarantee conditions
 of each thread in terms of their action models, and provide a
