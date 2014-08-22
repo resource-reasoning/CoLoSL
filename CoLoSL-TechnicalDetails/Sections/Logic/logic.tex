@@ -236,7 +236,7 @@ An action model $\lmod$ is \emph{confined} to a logical state $l$, written $l\co
 \end{definition}
 %
 %
-A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$ are compatible, the capabilities found in $l\composeL g$ are \emph{contained} in the local action model $\lmod$, actions in the global action model $\gmod$ correspond to actions in $\lmod$, and $\gmod$ is confined to $g$. We proceed by defining what it means for capabilities to be contained in an action model and subsequently formalise the notion of well-formed states.
+A world $(l,g,\lmod,\gmod)$ is well-formed if $l$ and $g$ are compatible, the capabilities found in $l\composeL g$ are \emph{contained} in the local action model $\lmod$, actions in the global action model $\gmod$ correspond to actions in $\lmod$, and $\lmod$ is confined to $g$. We proceed by defining what it means for capabilities to be contained in an action model and subsequently formalise the notion of well-formed states.
 %
 %
 \begin{definition}[Capability containment]
@@ -244,6 +244,12 @@ A capability $\ca{} \in \Caps$, is \emph{contained} in an action model $\lmod \i
 %
 \[
 	\exsts{K \in \pset{\Caps}} \ca{} = \prod\limits_{\ca{i} \in K}^{\composeCap} \ca{i} \land \for{\ca{i} \in K} \exsts{\ca{}' \in \dom{\lmod}} \ca{i} \leq \ca{}'
+\]
+%
+We lift the notion of containment to assertions such that a capability assertion $\capAss{} \in \KAssertions$ is \emph{contained} in an interference assertion $I \in \IAssertions$, written $\capAss{} \containedIn I$, iff for all $\lenv \in \LEnv$
+%
+\[
+	\for{\ca{} \in \semK[\lenv]{\capAss{}}} \ca{} \containedIn \semI[\lenv]{I}
 \]
 %
 \end{definition}
