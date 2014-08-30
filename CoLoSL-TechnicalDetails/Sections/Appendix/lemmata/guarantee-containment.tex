@@ -1,0 +1,266 @@
+%
+\begin{lemma}[] \label{lem:guaranteeContainment}
+%
+For all $w_1, w_2, w, w' = (l', g', \lmod', \gmod') \in \Worlds$,
+\[
+\begin{array}{l}
+	w_1 \composeW w_2 = w /| (l', g', \lmod{}', \gmod') \in \guarantee(w_1) \implies (\localPart{(w_2)}, g', \lmod', \gmod') \in \rely(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $w_1, w_2, w$ and $(l'_1, s', \amod{}')$ such that:
+%
+\begin{align}
+	& w_1 \composeW w_2 = w \label{L13:Ass1}\\
+	& (l', g', \lmod', \gmod{}') \in \guarantee(w_1) \label{L13:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align*}
+	(\localPart{(w_2)}, g', \lmod', \gmod{}') \in \rely(w_2) 
+\end{align*}
+*
+From (\ref{L13:Ass2}) and by definition of \guarantee\ we know:
+%
+\begin{align}
+	(l', g', \lmod', \gmod{}') \in \left(\updateG \cup \extendG \cup \shiftG \right)^{*}(w_2) \label{L13:Ass3}
+\end{align}
+%
+From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment}, \ref{lem:extendGContainment} and \ref{lem:shiftGContainment} we have:
+%
+\begin{align}
+	(\localPart{(w_2)}, g', \lmod', \gmod{}') \in \left(\updateR \cup \extendR \cup \shiftR \right)^{*}(w_2) \nonumber
+\end{align}
+%
+and consequently 
+%
+\begin{align}
+	(\localPart{(w_2)}, g', \lmod', \gmod{}') \in \rely(w_2) \nonumber
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%
+\begin{lemma}[] \label{lem:updateGContainment}
+%
+For all $w_1, w_2, w, w' = (l', g', \lmod', \gmod') \in \Worlds$,
+%
+\[
+\begin{array}{l}
+	w_1 \composeW w_2 = w /| (l', g', \lmod', \gmod{}') \in \updateG(w_1) \implies (\localPart{(w_2)}, g', \lmod', \gmod{}') \in \updateR(w_2)
+\end{array}
+\]
+%
+where we write $\updateR(w)$ to denote $\left\{w' \mid (w, w') \in \updateR(w) \right\}$.
+%
+\begin{proof} Pick an arbitrary $W_1 = (l_1, g_1, \lmod_{1}, \gmod_{1})$, $w_2 = (l_2, g_2, \lmod_{2}, \gmod_{2}), w$ and $(l', g', \lmod', \gmod')$ such that:
+%
+\begin{align}
+	& w_1 \composeW w_2 = w \label{L11:Ass1}\\
+	& (l', g', \lmod', \gmod') \in \updateG(w_1) \label{L11:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align*}
+	(\localPart{(w_2)}, g', \lmod', \gmod') \in \updateR(w_2) 
+\end{align*}
+*
+From (\ref{L11:Ass1}) we know:
+%
+\begin{align}
+	&g_1 = g_2 \label{L11:Ass3}\\
+	&\lmod_{1} = \lmod_{2} /|  \gmod_{1} = \gmod_{2} \label{L11:Ass4}
+\end{align}
+%
+By definition of \updateG and from (\ref{L11:Ass2}) and (\ref{L11:Ass4}) we know:
+%
+\begin{align}
+	& \lmod' = \lmod_{1} = \lmod_{2} /| \gmod{}' = \gmod_{1} = \gmod_{2} \label{L11:Ass5} \\
+	& \ortCap{\capPart{l_1 \composeL g_1)}} = \ortCap{\heapPart{(l' \composeL g')}} \label{L11:Perms} \\
+	& g' = g_1 \lor 
+	\left(\begin{array}{l}
+		\exsts{\ca{} \leq \capPart{(l_1)}}  (g_1, g') \in \gmod_{1}(\ca{}) \;\land \\
+		\ortH{\heapPart{(l_1 \composeL g_1)}} = \ortH{\heapPart{(l' \composeL g')}}
+	\end{array} \right) \nonumber
+\end{align}
+%
+There are two cases to consider:\\
+
+\noindent\textbf{Case 1.} $g_1 = g'$\\
+From (\ref{L11:Ass3}) and the assumption of the case we know $g' = g_2$. Consequently, from (\ref{L11:Ass5}) we have:
+
+\begin{equation}
+	(\localPart{(w_2)}, g', \lmod', \gmod') = (l_2, g_2, \lmod_{2}, \gmod_{2}) \label{L11:Ass6}
+\end{equation}
+%
+By definition of \updateR\ and from (\ref{L11:Ass6}) we can conclude:
+%
+\begin{equation}
+	(\localPart{(w_2)}, g', \lmod', \gmod') \in \updateR(l_2, g_2, \lmod_{2}, \gmod_{2}) \label{L11:Ass7}
+\end{equation}
+%
+as required.\\
+
+\noindent\textbf{Case 2.} 
+%
+\begin{align}
+	& \exsts{\ca{} \leq \capPart{(l_1)}} (g_1, g') \in \gmod_{1}(\ca{}) \label{L11:Ass8} \\
+	&\ortH{\heapPart{(l_1 \composeL g_1)}} = \ortH{\heapPart{(l' \composeL g')}} \label{L11:Ass9}
+\end{align}
+%
+From (\ref{L11:Ass1}), (\ref{L11:Ass3}) and (\ref{L11:Ass4}) we know that 
+%
+\begin{equation}
+	w = (l_1 \composeL l_2, g_2, \lmod_{2}, \gmod_{2}) \label{L11:Ass10}
+\end{equation}
+%
+Since $\wf{w}$ (by definition of \Worlds) and from (\ref{L11:Ass3}) we know:
+\begin{align}
+	&\capPart{(l_1 \composeL l_2 \composeL g_2)} = \capPart{(l_1)} \composeCap \capPart{(l_2)} \composeCap {(g_2)} = \capPart{(l_1 \composeL g_1)} \composeCap \capPart{(l_2)}\hspace*{0.2cm} \text{is defined} \label{L11:Ass11}\\
+%	
+	&\heapPart{(l_1 \composeL l_2 \composeL g_1)} = \heapPart{(l_1 \composeH g_1)} \composeH \heapPart{(l_2)}  \hspace*{0.2cm} \text{is defined} \label{L11:Ass12}
+\end{align}
+%
+Since $\ca{1} \leq \capPart{(l_1)}$ (\ref{L11:Ass8}), from (\ref{L11:Ass11}) and Lemma \ref{lem:disjointByOrder}, we know:
+%
+\begin{equation}
+	\ca{} \compatible\ \capPart{(l_2)} \composeCap \capPart{(g_2)} \label{L11:Ass13}
+\end{equation}
+%
+From (\ref{L11:Ass3}), (\ref{L11:Ass9}) and (\ref{L11:Ass12}) we know
+%
+\begin{equation}
+	\heapPart{(l' \composeL g')} \composeH \heapPart{(l_2)} = \heapPart{(l' \composeL l_2 \composeL g')}\hspace*{0.2cm}\text{ is defined} \label{L11:Ass14}
+\end{equation}
+%
+From (\ref{L11:Perms}) and (\ref{L11:Ass11}) we know
+%
+\begin{equation}
+	\capPart{(l' \composeL g')} \composeCap \capPart{(l_2)} = \capPart{(l' \composeL l_2 \composeL g')}\hspace*{0.2cm}\text{ is defined} \label{L11:Ass15}
+\end{equation}
+%
+From (\ref{L11:Ass14}) and (\ref{L11:Ass15}) we know $l'_1 \composeL l_2 \composeL g'$ is defined and consequently:
+%
+\begin{equation}
+	l_2 \composeL g' \hspace*{0.2cm} \text{ is defined} \label{L11:Ass16}
+\end{equation}
+%
+From (\ref{L11:Ass4}), (\ref{L11:Ass8}), (\ref{L11:Ass13}), (\ref{L11:Ass16}) and by definition of \updateR, we have:
+%
+\begin{equation*}
+	(\localPart{(w_2)}, g', \lmod', \gmod') = (l_2, g_2, \lmod_{2}, \gmod_{2}) \in \updateR(l_2, s_2, \lmod_{2}, \gmod_{2})  
+\end{equation*}
+%
+as required.
+\end{proof}
+%
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:extendGContainment}
+%
+For all $w_1, w_2, w, w' = (l', g', \lmod', \gmod') \in \Worlds$,
+\[
+\begin{array}{l}
+	w_1 \composeW w_2 = w /| w' \in \extendG(w_1) \implies (\localPart{(w_2)}, g', \lmod', \gmod') \in \extendR(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $w_1 = (l_1, g_1, \lmod_{1}, \gmod_{1})$, $w_2 = (l_2, g_2, \lmod_{2}, \gmod_{2}), w$ and $ w' = (l', g', \lmod', \gmod')$ such that:
+%
+\begin{align}
+	& w_1 \composeW  w_2 = w \label{L12:Ass1}\\
+	& w' \in \extendG(w_1) \label{L12:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align*}
+	(\localPart{(w_2)}, g', \lmod', \gmod') \in \extendR(w_2) 
+\end{align*}
+%
+From (\ref{L12:Ass1}) we know:
+%
+\begin{align}
+	& g_1 = g_2 /| \lmod_{1} = \lmod_{2} /| \gmod_{1} = \gmod_{2} \label{L12:Ass3}
+\end{align}
+%\lmod', \gmod'
+By definition of \extendG\ and from (\ref{L12:Ass2}) and (\ref{L12:Ass3}) we know there exists $l_3, l_4, g'' \in \LStates$, $\ca{1}, \ca{2} \in \Caps$ and $\lmod''$ such that
+%
+\begin{align}
+& \begin{array}{l}
+	l_1 = l_3 \composeL l_4 /| l'_1 = l_3 \composeL (\unitH, \ca{1})  \\
+	/| g'' = l_4 \composeL (\unitH, \ca{2}) /| g' = g_2 \composeL g'' \\
+	/| \ca{1} \composeCap \ca{2} \containedIn \dom{\lmod''} /|  \ca{1} \composeCap \ca{2} \disjoint \dom{\lmod_{2}} \\
+	/| \lmod' = \lmod_{2} \cup \lmod'' 
+	/| \expandsAM{\gmod'}{g''}{\lmod''}{g_2}{\lmod_{2}}{\gmod_{2}}  
+	/| \extendsAM{\lmod', \gmod'}{g''}{g_2}{\lmod''} 
+\end{array}
+\label{L12:Ass4}
+\end{align}
+%
+From (\ref{L12:Ass4}) and the definition of $\extendR$ we have:
+%
+\begin{equation*}
+	(\localPart{(w_2)}, g', \lmod{}', \gmod{}') \in \extendR(w_2) 
+\end{equation*}
+% 
+as required.
+\end{proof}
+%
+%
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:shiftGContainment}
+%
+For all $w_1, w_2, w, w' = (l', g', \lmod', \gmod') \in \Worlds$, 
+\[
+\begin{array}{l}
+	w_1 \composeW w_2 = w /| w' \in \shiftG(w_1) \implies (\localPart{(w_2)}, g', \lmod', \gmod') \in \shiftR(w_2)
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $w_1 = (l_1, g_1, \lmod_{1}, \gmod_{1})$, $w_2 = (l_2, g_2, \lmod_{2}, \gmod_{2}), w$ and $w' = (l', g', \lmod', \gmod')$ such that:
+%
+\begin{align}
+	& w_1 \composeW w_2 = w \label{LSGC:Ass1}\\
+	& w' \in \shiftG(w_1) \label{LSGC:Ass2}
+\end{align}
+%
+\textbf{RTS.}
+%
+\begin{align*}
+	(\localPart{(w_2)}, g', \lmod', \gmod') \in \shiftR(w_2) 
+\end{align*}
+%
+From (\ref{LSGC:Ass1}) we know:
+%
+\begin{align}
+	& g_1 = g_2 /| \lmod_{1} = \lmod_{2} /| \gmod_{1} = \gmod_{2} \label{LSGC:Ass3}
+\end{align}
+%
+By definition of \shiftG and from (\ref{LSGC:Ass2}), and (\ref{LSGC:Ass3}) we know there exists $\lmod'' \in \AMods$ such that
+%
+\begin{align}
+%
+	& \lmod' = \lmod_{2} \cup \lmod'' /| \expandsAM{\gmod_{2}}{\unitL}{\lmod''}{g_2}{\lmod_{2}}{\gmod_{2}}\label{LSGC:Ass7}
+%
+\end{align}
+%
+From (\ref{LSGC:Ass7}) and the definition of $\shiftR$ we have:
+%
+\begin{equation}
+	(\localPart{(w_2)}, g', \lmod', \gmod') \in \shiftR(w_2) \nonumber
+\end{equation}
+% 
+as required.
+\end{proof}
+%
+%
+\end{lemma}
+%

@@ -33,132 +33,132 @@ behaviour of the resource associated with thread $\mathbb{P}_{\li y}$.
 \begin{figure}
 \centering
 \noindent\hrule\vspace{5pt}
-\begin{tabular}{@{} l @{\hspace{25pt}} l@{\ }}
-$\mathbb{INC}$:&  \vspace{-10pt}\\
-{\hspace{20pt}\begin{lstlisting}[numbers=left,numbersep=10pt]
-//$\comment\{\tx x|-> - * \tx{y}|-> - * \tx{z}|-> - \}$
-x = 0; y = 0; z = 0;
-//$\comment\{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0 \}$
-//$\comment\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
-($\mathbb{P}_{\tx x} \ \mid\ \mid\ \mathbb{P}_{\tx y} \ \mid\ \mid\  \mathbb{P}_{\tx z}$)
-//$\comment\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> \!\!10 * \tx{y}|-> \!\!10 * \tx{z}|-> \!\!10} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
-\end{lstlisting}}
-&
-\begin{lstlisting}
-$
-	I \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		\token a_{\tx x}: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
-		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
-		
-		\token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1}\\
-    
-    \token a_{\tx z}: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
-	\end{array}
-	\right.
-$
-\end{lstlisting}
-\end{tabular}
+%\begin{tabular}{@{} l @{\hspace{25pt}} l@{\ }}
+%$\mathbb{INC}$:&  \vspace{-10pt}\\
+%{\hspace{20pt}\begin{lstlisting}[numbers=left,numbersep=10pt]
+%//$\comment\{\tx x|-> - * \tx{y}|-> - * \tx{z}|-> - \}$
+%x = 0; y = 0; z = 0;
+%//$\comment\{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0 \}$
+%//$\comment\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
+%($\mathbb{P}_{\tx x} \ \mid\ \mid\ \mathbb{P}_{\tx y} \ \mid\ \mid\  \mathbb{P}_{\tx z}$)
+%//$\comment\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> \!\!10 * \tx{y}|-> \!\!10 * \tx{z}|-> \!\!10} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
+%\end{lstlisting}}
+%&
+%\begin{lstlisting}
+%$
+%	I \eqdef 
+%	\left\{
+%	\begin{array}{@{}l@{\,}l@{}l@{}} 
+%		\token a_{\tx x}: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
+%		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
+%		
+%		\token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
+%    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1}\\
+%    
+%    \token a_{\tx z}: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
+%    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
+%	\end{array}
+%	\right.
+%$
+%\end{lstlisting}
+%\end{tabular}
 \vspace{3pt}\hrule
 \caption{The concurrent increment program together with a \colosl proof sketch. Lines starting with $\color{blue}{//}$ contain formulas that describe  the local state and the subjective shared state at the relevant program point. The codes of $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs and their proof sketches are provided in \fig~\ref{fig:concurrentInc2}.}
 \label{fig:concurrentInc}
 \end{figure}
 %
+%%
+%%
+%\begin{figure}
+%\centering
+%\noindent\hrule\vspace{5pt}
+%\begin{tabular}{@{} l @{\hspace{15pt}} l@{\ }}
+%{$\mathbb{P}_{\li x}$:}&  \vspace{-10pt}\\
+%\begin{lstlisting}
+%//$\comment\{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}} * [\token a_{\tx x}]\}$
+%while(x != 10)$\{$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx z}{v} * \cell{\tx x}{v} \lor\\ \cell{\tx z}{v} * \cell{\tx x}{v+1}\end{array}}{I_{\tx x}}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
+%  $\langle$if (x == z) x++;$\rangle$ 
+%$\}$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx z}{10} * \cell{\tx x}{10} \lor\\ \cell{\tx z}{9} * \cell{\tx x}{10}\end{array}}{I_{\tx x}}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
+%\end{lstlisting}
+%&
+%\begin{lstlisting}
+%$
+%	I_{\tx x} \eqdef 
+%	\left\{
+%	\begin{array}{@{}l@{\,}l@{}l@{}} 
+%		\token a_{\tx x}: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
+%		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
+%		
+%    
+%    \token a_{\tx z}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
+%    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
+%	\end{array}
+%	\right.
+%$
+%\end{lstlisting}\vspace{5pt}\\\hline
 %
+%&\vspace{-5pt}\\
+%{$\mathbb{P}_{\li y}$:}&  \vspace{-10pt}\\
+%\begin{lstlisting}
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{0} * \cell{\tx y}{0} \lor\\ \cell{\tx x}{1} * \cell{\tx y}{0}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+%while(y != 10)$\{$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx x}{v} * \cell{\tx y}{v} \lor\\ \cell{\tx x}{v+1} * \cell{\tx y}{v}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+%  $\langle$if (y $<$ x) y++;$\rangle$ 
+%$\}$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{10} * \cell{\tx y}{10} \lor\\ \cell{\tx x}{11} * \cell{\tx y}{10}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+%\end{lstlisting}
+%&
+%\begin{lstlisting}
+%$
+%	I_{\tx y} \eqdef 
+%	\left\{
+%	\begin{array}{@{}l@{\,}l@{}l@{}} 
+%		\token a_{\tx x}: & \exsts{v} & \cell{\tx{x}}{v} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
+%		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}\\
+%		
+%    
+%    \token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
+%    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} 
+%	\end{array}
+%	\right.
+%$
+%\end{lstlisting}\vspace{5pt}\\\hline
 %
-\begin{figure}
-\centering
-\noindent\hrule\vspace{5pt}
-\begin{tabular}{@{} l @{\hspace{15pt}} l@{\ }}
-{$\mathbb{P}_{\li x}$:}&  \vspace{-10pt}\\
-\begin{lstlisting}
-//$\comment\{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}} * [\token a_{\tx x}]\}$
-while(x != 10)$\{$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx z}{v} * \cell{\tx x}{v} \lor\\ \cell{\tx z}{v} * \cell{\tx x}{v+1}\end{array}}{I_{\tx x}}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
-  $\langle$if (x == z) x++;$\rangle$ 
-$\}$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx z}{10} * \cell{\tx x}{10} \lor\\ \cell{\tx z}{9} * \cell{\tx x}{10}\end{array}}{I_{\tx x}}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx x} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		\token a_{\tx x}: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
-		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
-		
-    
-    \token a_{\tx z}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
-	\end{array}
-	\right.
-$
-\end{lstlisting}\vspace{5pt}\\\hline
-
-&\vspace{-5pt}\\
-{$\mathbb{P}_{\li y}$:}&  \vspace{-10pt}\\
-\begin{lstlisting}
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{0} * \cell{\tx y}{0} \lor\\ \cell{\tx x}{1} * \cell{\tx y}{0}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-while(y != 10)$\{$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx x}{v} * \cell{\tx y}{v} \lor\\ \cell{\tx x}{v+1} * \cell{\tx y}{v}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-  $\langle$if (y $<$ x) y++;$\rangle$ 
-$\}$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{10} * \cell{\tx y}{10} \lor\\ \cell{\tx x}{11} * \cell{\tx y}{10}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx y} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		\token a_{\tx x}: & \exsts{v} & \cell{\tx{x}}{v} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
-		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}\\
-		
-    
-    \token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} 
-	\end{array}
-	\right.
-$
-\end{lstlisting}\vspace{5pt}\\\hline
-
-&\vspace{-5pt}\\
-{$\mathbb{P}_{\li z}$:}&  \vspace{-10pt}\\
-\begin{lstlisting}
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{0} * \cell{\tx z}{0} \lor\\ \cell{\tx y}{1} * \cell{\tx z}{0}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-while(z != 10)$\{$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx y}{v} * \cell{\tx z}{v} \lor\\ \cell{\tx y}{v+1} * \cell{\tx z}{v}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-  $\langle$if (z $<$ y) z++;$\rangle$
-$\}$
-//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{10} * \cell{\tx z}{10} \lor\\ \cell{\tx y}{11} * \cell{\tx z}{10}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx z} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		\token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
-		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v}\\
-		
-    
-    \token a_{\tx z}: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1} 
-	\end{array}
-	\right.
-$
-\end{lstlisting}
-\end{tabular}
-\vspace{3pt}\hrule\vspace{0pt}
-\caption{The code for $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs together with their \colosl proof sketches. Lines starting with $\color{blue}{//}$ contain formulas that describe the local state and the subjective shared state at the relevant program point.}
-\label{fig:concurrentInc2}
-\end{figure}
-%
-%
+%&\vspace{-5pt}\\
+%{$\mathbb{P}_{\li z}$:}&  \vspace{-10pt}\\
+%\begin{lstlisting}
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{0} * \cell{\tx z}{0} \lor\\ \cell{\tx y}{1} * \cell{\tx z}{0}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+%while(z != 10)$\{$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx y}{v} * \cell{\tx z}{v} \lor\\ \cell{\tx y}{v+1} * \cell{\tx z}{v}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+%  $\langle$if (z $<$ y) z++;$\rangle$
+%$\}$
+%//$\comment\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{10} * \cell{\tx z}{10} \lor\\ \cell{\tx y}{11} * \cell{\tx z}{10}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+%\end{lstlisting}
+%&
+%\begin{lstlisting}
+%$
+%	I_{\tx z} \eqdef 
+%	\left\{
+%	\begin{array}{@{}l@{\,}l@{}l@{}} 
+%		\token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
+%		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v}\\
+%		
+%    
+%    \token a_{\tx z}: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
+%    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1} 
+%	\end{array}
+%	\right.
+%$
+%\end{lstlisting}
+%\end{tabular}
+%\vspace{3pt}\hrule\vspace{0pt}
+%\caption{The code for $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs together with their \colosl proof sketches. Lines starting with $\color{blue}{//}$ contain formulas that describe the local state and the subjective shared state at the relevant program point.}
+%\label{fig:concurrentInc2}
+%\end{figure}
+%%
+%%
 Now consider the \colosl assertions accompanying  $\mathbb{INC}$.
 After
 initialisation, line~3 of $\mathbb{INC}$  provides a standard

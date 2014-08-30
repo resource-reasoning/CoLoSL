@@ -1,0 +1,149 @@
+\begin{lemma}[Sequential command soundness]\label{lem:seqSoundness}
+For all $\seq{} \in \Seqs$, $\left(\Hp{1}, \seq{}, \Hp{2}\right) \in \AxiomsSeq$ and $\h{} \in \Heaps$:
+%
+\[
+	\opSemSeq{\seq{}}{\reifyH{\Hp{1} \composeH \{\h{}\}}} \subseteq \reifyH{\Hp{2} \composeH \{\h{}\}}
+\]
+%
+\begin{proof}
+By induction over the structure of $\seq{}$. Pick an arbitrary $\h{} \in \Heaps$.\\
+
+\noindent\textbf{Case \hspace*{0.3cm}}\bc{}\\
+This follows immediately from parameter \ref{param:elementary-soundness}.\\
+
+
+\noindent\textbf{Case \hspace*{0.3cm}\texttt{skip}}\\
+\textbf{RTS.}
+%
+\[
+	\opSemSeq{\seq{}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	\subseteq \reifyH{\Hp{} \composeH \{\h{}\}}
+\]
+%
+\begin{proof}
+%
+\[
+\begin{array}{r l}
+	\opSemSeq{\seq{}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	= &
+	\reifyH{\Hp{} \composeH \{\h{}\}}\\
+
+	\subseteq & \reifyH{\Hp{} \composeH \{\h{}\}}
+\end{array}
+\]
+%
+as required.
+\renewcommand{\qed}{}
+\end{proof}
+%
+%
+
+\noindent\textbf{Case \hspace*{0.3cm}}$\seq{1} ; \seq{2}$\\
+\textbf{RTS.}
+%
+\[
+	\opSemSeq{\seq{1}; \seq{2}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	\subseteq \reifyH{\Hp{}' \composeH \{\h{}\}}
+\]
+%
+where $\left(\Hp{}, \seq{1}, \Hp{}'' \right), \left(\Hp{}'', \seq{2}, \Hp{}' \right)  \in \AxiomsSeq$.
+\begin{proof}
+%
+\[
+\begin{array}{r l}
+	
+	\opSemSeq{\seq{1}; \seq{2}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	= &  
+	\opSemSeq{\seq{2}}{ \opSemSeq{\seq{1}}{\reifyH{\Hp{} \composeH \{\h{}\}}}}\\
+
+	\text{(I.H.) \hspace*{0.5cm}}
+	\subseteq &
+	\opSemSeq{\seq{2}}{\reifyH{\Hp{}'' \composeH \{\h{}\}}}\\
+	
+	\text{(I.H.) \hspace*{0.5cm}}
+	\subseteq &
+	\reifyH{\Hp{}' \composeH \{\h{}\}}
+	
+\end{array}
+\]
+%
+as required.
+\renewcommand{\qed}{}
+\end{proof}
+%
+%
+
+\noindent\textbf{Case \hspace*{0.3cm}}$\seq{1} + \seq{2}$\\
+\textbf{RTS.}
+%
+\[
+	\opSemSeq{\seq{1} + \seq{2}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	\subseteq \reifyH{\Hp{}' \composeH \{\h{}\}}
+\]
+%
+where $\left(\Hp{}, \seq{1}, \Hp{}' \right), \left(\Hp{}, \seq{2}, \Hp{}' \right)  \in \AxiomsSeq$.
+\begin{proof}
+%
+\[
+\hspace*{-0.2cm}
+\begin{array}{r l}
+	
+	\opSemSeq{\seq{1} + \seq{2}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	= &  
+	\opSemSeq{\seq{1}}{\reifyH{\Hp{} \composeH \{\h{}\}}} \;\cup\; \opSemSeq{\seq{2}}{\reifyH{\Hp{} \composeH \{\h{}\}}}\\
+
+	\text{(I.H.) \hspace*{0.5cm}}
+	\subseteq &
+	\reifyH{\Hp{}' \composeH \{\h{}\}} \;\cup\; \reifyH{\Hp{}' \composeH \{\h{}\}}\\
+	
+	\subseteq &
+	\reifyH{\Hp{}' \composeH \{\h{}\}}
+	
+\end{array}
+\]
+%
+as required.
+\renewcommand{\qed}{}
+\end{proof}
+%
+%
+
+\noindent\textbf{Case \hspace*{0.3cm}}$\seq{}^{*}$\\
+\textbf{RTS.}
+%
+\[
+	\opSemSeq{\seq{}^{*}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	\subseteq \reifyH{\Hp{} \composeH \{\h{}\}}
+\]
+%
+where $\left(\Hp{}, \seq{}, \Hp{} \right)  \in \AxiomsSeq$.
+\begin{proof}
+%
+\[
+\begin{array}{r l}
+	
+	\opSemSeq{\seq{}^{*}}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+	= &  
+	\opSemSeq{\skipC + \seq{}; \seq{}^{*}}{\reifyH{\Hp{} \composeH \{\h{}\}}} \\
+	
+	= & \opSemSeq{\skipC}{\reifyH{\Hp{} \composeH \{\h{}\}}} 
+		\cup \opSemSeq{\seq{}; \seq{}^{*}}{\reifyH{\Hp{} \composeH \{\h{}\}}} \\
+
+	\text{(I.H.) \hspace*{0.5cm}}
+	\subseteq &
+	\reifyH{\Hp{} \composeH \{\h{}\}} \cup \reifyH{\Hp{} \composeH \{\h{}\}}\\
+	
+	\subseteq &
+	\reifyH{\Hp{} \composeH \{\h{}\}}
+	
+\end{array}
+\]
+%
+as required.
+\renewcommand{\qed}{}
+\end{proof}
+%
+%
+\end{proof}
+\end{lemma}
+%%

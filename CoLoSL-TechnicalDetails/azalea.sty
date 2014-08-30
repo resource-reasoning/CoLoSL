@@ -136,11 +136,11 @@
 \newcommand{\emp}{\ensuremath{\mathsf{emp}}\xspace}
 
 \newcommand{\colosl}{\text{CoLoSL}\xspace}
-\newcommand{\fig}{Fig.~}
-\newcommand{\param}{Parameter}
-\newcommand{\defin}{Def.~}
-\newcommand{\ex}{Example}
-\newcommand{\lem}{Lemma}
+\newcommand{\fig}{Fig.\xspace}
+\newcommand{\param}{Parameter\xspace}
+\newcommand{\defin}{Def.\xspace}
+\newcommand{\ex}{Example\xspace}
+\newcommand{\lem}{Lemma\xspace}
 
 \newcommand{\powerset}{\mathscr{P}}
 
@@ -204,7 +204,8 @@
 %\newcommand{\maxMeet}[1]{\mathbin{\bar{\sqcap}}_{#1}}
 \newcommand{\maxMeet}[1]{\meet{#1}^{\textsf{m}}}
 \newcommand{\unit}[1]{\ensuremath{\mathbf{0}_{#1}}}
-\newcommand{\size}[2]{\left( #1\right)_{#2}^{\bot}}
+\newcommand{\ort}[2]{\left( #1\right)_{#2}^{\bot}}
+
 
 %%%%Capabilities
 \newcommand{\Caps}{\ensuremath{\mathbb{K}}}
@@ -214,7 +215,7 @@
 \newcommand{\meetCap}{\meet{\Caps}}
 \newcommand{\maxMeetCap}{\maxMeet{\Caps}}
 \newcommand{\unitCap}{\unit{\Caps}}
-\newcommand{\capSize}[1]{\size{#1}{\Caps}}
+\newcommand{\ortCap}[1]{\ort{#1}{\Caps}}
 
 %%%%Heaps
 \newcommand{\Heaps}{\ensuremath{\mathbb{M}}\xspace}
@@ -226,7 +227,8 @@
 \newcommand{\meetH}{\meet{\Heaps}}
 \newcommand{\maxMeetH}{\maxMeet{\Heaps}}
 \newcommand{\unitH}{\unit{\Heaps}}
-\newcommand{\heapSize}[1]{\size{#1}{\Heaps}}
+%\newcommand{\heapSize}[1]{\size{#1}{\Heaps}}
+\newcommand{\ortH}[1]{\ort{#1}{\Heaps}}
 \newcommand{\reifyH}[1]{\left\lfloor #1 \right\rfloor_{\Heaps}}
 
 %%%%Machine States
@@ -287,12 +289,12 @@
 %
 \newcommand{\skipC}{\li{skip}}
 \newcommand{\opSem}[3]{\ensuremath{\left[\!\left| #1 \right |\! \right]_{#3}\left( #2 \right)}}
-\newcommand{\Axioms}[1]{\ensuremath{\textsf{Axiom}_{#1}}}
+\newcommand{\Axioms}[1]{\ensuremath{\textsc{Ax}_{#1}}}
 
-\newcommand{\Basics}{\textsf{Basic}}
-\newcommand{\bc}[1]{\ensuremath{\mathbb{B}_{#1}}}
-\newcommand{\AxiomsB}{\Axioms{\textsf{B}}}
-\newcommand{\opSemB}[2]{\opSem{#1}{#2}{\textsf{B}}}
+\newcommand{\Basics}{\textsf{Elem}}
+\newcommand{\bc}[1]{\ensuremath{\mathbb{E}_{#1}}}
+\newcommand{\AxiomsB}{\Axioms{\textsf{E}}}
+\newcommand{\opSemB}[2]{\opSem{#1}{#2}{\textsf{E}}}
 
 \newcommand{\Seqs}{\textsf{Seqs}}
 \newcommand{\seq}[1]{\ensuremath{\mathbb{S}_{#1}}}
@@ -304,7 +306,8 @@
 \newcommand{\AxiomsA}{\Axioms{\textsf{A}}}
 \newcommand{\opSemA}[2]{\opSem{#1}{#2}{\textsf{A}}}
 
-
+\newcommand{\Coms}{\textsf{Comm}}
+\newcommand{\com}[1]{\mathbb{C}_{#1}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%% Assertions %%%%%%%%%%%%%%%%%%%%%%%%
@@ -517,13 +520,13 @@
 \newcommand{\myGapsCAP}[2]{\textsf{mygaps}\left(#1, #2\right)}
 
 
-\newcommand{\proofRule}[1]{\textsc{#1}}
+\newcommand{\proofRule}[1]{\textsc{#1}\xspace}
 \newcommand{\forgetRule}{\proofRule{Forget}}
 \newcommand{\mergeRule}{\proofRule{Merge}}
 \newcommand{\shiftRule}{\proofRule{Shift}}
 \newcommand{\extendRule}{\proofRule{Extend}}
 \newcommand{\copyRule}{\proofRule{Copy}}
-\newcommand{\parRule}{\proofRule{Parallel}}
+\newcommand{\parRule}{\proofRule{Par}}
 \newcommand{\weakenRule}{\proofRule{Weaken}\xspace}
 \newcommand{\stabilise}{\proofRule{Stabilise}}
 

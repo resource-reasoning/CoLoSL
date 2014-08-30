@@ -23,26 +23,23 @@ Pick an arbitrary $s, r \in \LStates$ such that
 \begin{align}
 	& 
 	\V{\ca{}}  \V{a\in \lmod'(\ca{})} \nonumber \\
-  &\quad \m{potential}(a, s \composeL r) /| \m{visible}(a, s) => \nonumber\\
-  & \quad\qquad\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} \label{FCL:Goal0}\\
-% 
-	&\quad \m{potential}(a, s \composeL r) /| \neg\m{visible}(a, s) => \nonumber\\
-  & \quad\qquad \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'} \label{FCL:Goal1}\\
+  &\quad (\m{potential}(a, s \composeL r) => \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'})
+  \label{FCL:Goal1}\\
 %   
-  &\quad \m{enabled}(a,s \composeL r)
-  => (s \composeL r, a[s \composeL r])\in \gmod(\ca{}) \label{FCL:Goal2}\\
+  &\quad (\m{enabled}(a,s \composeL r) => (s \composeL r, a[s \composeL r])\in \gmod(\ca{}))
+  \label{FCL:Goal2}\\
 %  
   &\V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s \composeL r) =>\null \nonumber \\
   &\ \m{reflected}(a, s \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
 %  
-  &\ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'}  \label{FCL:Goal3}
+  &\ \neg\m{visible}(a, s) /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  \label{FCL:Goal3}
 \end{align}
 %
-\noindent\textbf{RTS. (\ref{FCL:Goal0})}\\
+\noindent\textbf{RTS. (\ref{FCL:Goal1})}\\
 Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $(s', r')$ such that 
 \begin{align}
-	& \m{potential}(a, s \composeL r) /| \m{visible}(a, s) \label{FCL:Ass2}\\
+	& \m{potential}(a, s \composeL r) \label{FCL:Ass2}\\
 	& (s', r') \in a[s, r] \label{FCL:Ass3}
 \end{align}
 %
@@ -63,28 +60,28 @@ as required.\\
 %
 %
 
-\noindent\textbf{RTS. (\ref{FCL:Goal1})}\\
-Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $s''$ such that 
-\begin{align}
-	\m{potential}(a, s \composeL r) /| \neg\m{visible}(a, s) \label{FCL:ass2}
-\end{align}
-%
-Then from (\ref{FCL:ass2}) and (\ref{FCL:Ass1}) we have:
-%
-\begin{equation}
-	\extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r]-s}{\lmod'} \nonumber
-\end{equation}
-%
-and thus from (\ref{FCL:IH})
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'} 
-\end{align*}
-% 
-as required.\\
-%
-%
-%
+%\noindent\textbf{RTS. (\ref{FCL:Goal1})}\\
+%Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $s''$ such that 
+%\begin{align}
+%	\m{potential}(a, s \composeL r) /| \neg\m{visible}(a, s) \label{FCL:ass2}
+%\end{align}
+%%
+%Then from (\ref{FCL:ass2}) and (\ref{FCL:Ass1}) we have:
+%%
+%\begin{equation}
+%	\extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r]-s}{\lmod'} \nonumber
+%\end{equation}
+%%
+%and thus from (\ref{FCL:IH})
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'} 
+%\end{align*}
+%% 
+%as required.\\
+%%
+%%
+%%
 
 \noindent\textbf{RTS. (\ref{FCL:Goal2})}\\
 Pick an arbitrary $\ca{}$ and $a \in \lmod'(\ca{})$ such that 
@@ -112,13 +109,15 @@ Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that
 Then from (\ref{LCS:Ass1}) we have: 
 %
 \begin{align*}
-  &\m{reflected}(a, s \composeL r,\lmod'(\ca{})) |/ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{n}{s}{a[s \composeL r]-s}{\lmod'}  
+  & \m{reflected}(a, s \composeL r,\lmod'(\ca{})) |/ \\
+  & \neg\m{visible}(a, s) /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{n}{s'}{r'}{\lmod'}  
 \end{align*}
 %
 and consequently from (\ref{LCS:IH})
 %
 \begin{align*}
-  &\m{reflected}(a, s \composeL r, \lmod'(\ca{})) |/ \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'}  
+  &\m{reflected}(a, s \composeL r, \lmod'(\ca{})) |/\\
+  & \neg\m{visible}(a, s) /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  
 \end{align*}
 %
 as required.

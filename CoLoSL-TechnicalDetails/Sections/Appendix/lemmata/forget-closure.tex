@@ -58,13 +58,10 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
 \begin{align}
 	& 
 	\V{\ca{}}  \V{a\in \lmod'(\ca{})} \nonumber \\
-  &\quad (\m{potential}(a, s_1 \composeL s_2\composeL r) /| \m{visible}(a, s_1)=> \nonumber\\
-  & \qquad \qquad\for{(s', r') \in a[s_1, s_2 \composeL r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}) \label{LCS:Goal0}\\
-%  
-  &\quad (\m{potential}(a, s_1 \composeL s_2\composeL r) /| \neg\m{visible}(a, s_1)=> \nonumber\\
-  & \qquad \qquad \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{a[s_1 \composeL s_2 \composeL r] - s_1}{\lmod'}) \label{LCS:Goal1}\\
+  &\quad (\m{potential}(a, s_1 \composeL s_2\composeL r) => \nonumber\\
+  & \qquad \qquad\for{(s', r') \in a[s_1, s_2 \composeL r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}) \label{LCS:Goal1} /| \\
 %    
-  &\quad\land \m{enabled}(a,s_1 \composeL s_2 \composeL r)
+  &\quad (\m{enabled}(a,s_1 \composeL s_2 \composeL r)
   => (s_1 \composeL s_2 \composeL r,
   a[s_1 \composeL s_2 \composeL r])\in \gmod(\ca{}))
   /|\null \label{LCS:Goal2}\\
@@ -73,116 +70,87 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
   \m{potential}(a,s_1 \composeL s_2 \composeL r) =>\null \nonumber \\
   &\ \m{reflected}(a,s_1 \composeL s_2 \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
 %  
-  &\ \neg\m{visible}(a,s_1) /| \exsts{r'} a[s_1 \composeL s_2 \composeL r] = s_1 \composeL r' /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{r'}{\lmod'}  \label{LCS:Goal3}
+  &\ \neg\m{visible}(a,s_1) /| \for{(s', r') \in a[s_1, s_2 \composeL r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  \label{LCS:Goal3}
 %
 \end{align}
 %
-\textbf{RTS. (\ref{LCS:Goal0})}\\
+\textbf{RTS. (\ref{LCS:Goal1})}\\
 Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $(s', r')$ such that 
 \begin{align}
-	\m{potential}(a, s_1 \composeL s_2 \composeL r) /| \m{visible}(a, s_1) \label{LCS:Ass2}\\
-	(s', r') \in a[s_1, s_2 \composeL r] \label{LCS:Ass3}
+	&\m{potential}(a, s_1 \composeL s_2 \composeL r) \label{LCS:Ass2}\\
+	&(s', r') \in a[s_1, s_2 \composeL r] \label{LCS:Ass3}
 \end{align}
 %
-Then from the definition of $a[s_1, s_2 \composeL r]$, the cross-split property and since $\m{visible}(a, s_1)$, we have:
+Then from the definition of $a[s_1, s_2 \composeL r]$ and by the cross-split property we know there exists $ps_1, ps_2, p_r, s_1', s_2', r''' \in \LStates$ such that :
 %
 \begin{align}
-	\exsts{ps_1 > \unitL, ps_2, pr, s'_1, s'_2, r'}\ & s_1 = ps_1 \composeL  s'_1 \label{LCS:Ass4-1}\\
-	& s_2 = ps_2 \composeL s'_2 \label{LCS:Ass4-2}\\
-	& r = pr \composeL r' \label{LCS:Ass4-3}\\
-	& \m{fst}(\updateFP{a}) = ps_1 \composeL ps_2 \composeL pr \label{LCS:Ass4-4}\\
-	& \m{snd}(\updateFP{a}) \compatible s'_1 \composeL s'_2 \composeL r'  \label{LCS:Ass4-5}\\
-	& s' = \m{snd}(\updateFP{a}) \composeL s'_1 \label{LCS:Ass4-6}\\
-	& r' = s'_2 \composeL r' \label{LCS:Ass4-7}
+	\begin{array}{l}
+		\fst{\updateFP{a}} = ps_1 \composeL ps_2 \composeL p_r /| s_1 = ps_1 \composeL s'_1 /| s_2 = ps_2 \composeL s'_2 /| r = p_r \composeL r'' /| \\
+		\left(
+		\begin{array}{@{} l @{}}
+			\left(ps_1 > \unitL /| s' = \snd{\updateFP{a}} \composeL s'_1 /| r' = s'_2 \composeL r'' \right) \\
+			|/ 
+			\left(ps_1 = \unitL s' = s_1 /| r' = \snd{\updateFP{a}} \composeL s'_2 \composeL r''	\right)					
+		\end{array}
+		\right)
+	\end{array}
+	\label{LCS:Ass4}
+\end{align}
+%
+and consequently from the definition of $a[s_1 \composeL s_2, r]$
+%
+\begin{align*}
+	\begin{array}{l}
+		\fst{\updateFP{a}} = ps_1 \composeL ps_2 \composeL p_r /| s_1 = ps_1 \composeL s'_1 /| s_2 = ps_2 \composeL s'_2 /| r = p_r \composeL r'' /| \\
+		\left(
+		\begin{array}{@{} l @{}}
+			\left(s' = \snd{\updateFP{a}} \composeL s'_1 /| r' = s'_2 \composeL r'' /| (\snd{\updateFP{a}} \composeL s'_1 \composeL s'_2, r'') \in a[s_1 \composeL s_2, r] \right) \\
+			|/ 
+			\left(
+			\begin{array}{@{} l @{}}
+				 ps_1 = \unitL s' = s_1 /| r' = \snd{\updateFP{a}} \composeL s'_2 \composeL r'' /| \\
+				 \left(
+				 \begin{array}{@{} l @{}}
+				 	(ps_2 = \unitL /| (s'_1 \composeL s'_2, \snd{\updateFP{a}} \composeL r'') \in a[s_1 \composeL s_2, r]) \\
+				 	|/ (ps_2 > \unitL /| (s'_1 \composeL \snd{\updateFP{a}} \composeL s'_2, r'') \in a[s_1 \composeL s_2, r] )
+				 \end{array}
+				 \right)
+			\end{array}
+			\right)					
+		\end{array}
+		\right)
+	\end{array}
+\end{align*}
+%
+That is,
+\begin{align}
+	\exsts{s''} (s' \composeL s'', r' - s'') \in a[s_1 \composeL s_2, r]
+	\label{LCS:Ass5}
 \end{align}
 % 
-Then from (\ref{LCS:Ass4-1})-(\ref{LCS:Ass4-5}) and by definition of $a[s_1 \composeL s_2, r]$ we know $\m{visible}(a, s_1 \composeL s_2) /| (\m{snd}(\updateFP{a}) \composeL s'_1 \composeL s'_2, r') \in a[s_1 \composeL s_2, r]$. Consequently from (\ref{LCS:Ass1}) and (\ref{LCS:Ass2}) we have:
+Then from (\ref{LCS:Ass1}) and (\ref{LCS:Ass5}) we have:
 %
 \begin{equation}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{\m{snd}(\updateFP{a} \composeL s'_1 \composeL s'_2}{r'}{\lmod'} \nonumber
+	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s' \composeL s''}{r' - s''}{\lmod'} \nonumber
 \end{equation}
 %
-and thus from (\ref{LCS:IH})
+Finally from (\ref{LCS:IH})
 %
-\begin{align}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{\m{snd}(\updateFP{a} \composeL s'_1}{s'_2 \composeL r'}{\lmod'} \label{LCS:Ass5}
-\end{align}
+\begin{align*}
+	\extendsAMUpto{\lmod, \gmod}{(n-1)}{\m{snd}(s'}{(r' - s'') \composeL s''}{\lmod'} 
+\end{align*}
 % 
-Finally, from (\ref{LCS:Ass4-6}), (\ref{LCS:Ass4-7}) and (\ref{LCS:Ass5}) we have: 
+and consequently
 %
 \begin{align}
 	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} \nonumber
 \end{align}
 % 
 as required.\\
-
 %
 %
 %
-\noindent\textbf{RTS. (\ref{LCS:Goal1})}\\
-Pick an arbitrary $\ca{}$, $a \in \lmod'(\ca{})$ and $s''$ such that 
-\begin{align}
-	\m{potential}(a, s_1 \composeL s_2 \composeL r) /| \neg\m{visible}(a, s_1) \label{LCS:ass2}\\
-	s'' = a[s_1 \composeL s_2 \composeL r] \label{LCS:ass3}
-\end{align}
 %
-There are two cases to consider:\\
-\textbf{Case 1. }$\m{visible}(a, s_1 \composeL s_2, r)$\\
-Since $a[s_1 \composeL s_2 \composeL r]$ is defined (\ref{LCS:ass2}), we know $\exsts{(s', r')} \in a[s_1 \composeL s_2, r]$. Consequently, from the definition of $a[s_1 \composeL s_2, r]$, the cross-split property and since $\neg\m{visible}(a, s_1)$ (\ref{LCS:ass2}) and $\m{visible}(a, s_2)$ (Assumption of case 1.) and from (\ref{LCS:ass3}) we have:
-%
-\begin{align}
-	\exsts{ps_2, pr, s'_2, r'}\ & s_2 = ps_2 \composeL s'_2 \label{LCS:ass4-1}\\
-	& r = pr \composeL r' \label{LCS:ass4-2}\\
-	& \m{fst}(\updateFP{a}) = ps_2 \composeL pr \label{LCS:ass4-3}\\
-	& \m{snd}(\updateFP{a}) \compatible s_1 \composeL s'_2 \composeL r'  \label{LCS:ass4-4}\\
-	& s' = \m{snd}(\updateFP{a}) \composeL s_1 \composeL  s'_2 \label{LCS:ass4-5}\\
-	& s'' = \m{snd}(\updateFP{a}) \composeL s_1 \composeL  s'_2 \composeL r' \label{LCS:ass4-6}
-\end{align}
-% 
-Consequently, from (\ref{LCS:ass2}), (\ref{LCS:Ass1}) and assumption of case 1. we have:
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}
-\end{align*}
-% 
-and consequently, from (\ref{LCS:ass4-5}) and (\ref{LCS:IH})
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{\m{snd}(\updateFP{a}) \composeL  s'_2 \composeL r'}{\lmod'}
-\end{align*}
-%
-and finally, from (\ref{LCS:ass4-6}), (\ref{LCS:ass3}) and the definition of $a[s_1 \composeL s_2 \composeL r] - s_1$, we have:
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{a[s_1 \composeL s_2 \composeL r] - s_1}{\lmod'}
-\end{align*}
-% 
-as required.\\
-%
-\noindent\textbf{Case 2. }$\neg\m{visible}(a, s_1 \composeL s_2, r)$\\
-From the assumption of case 2, (\ref{LCS:ass2}) and (\ref{LCS:Ass1}) we have:
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{a[s_1 \composeL s_2 \composeL r] - (s_1 \composeL s_2)}{\lmod'}
-\end{align*}
-% 
-and consequently from (\ref{LCS:IH})
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{a[s_1 \composeL s_2 \composeL r] - (s_1 \composeL s_2) \composeL s_2}{\lmod'}
-\end{align*}
-% 
-that is, 
-%
-\begin{align*}
-	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{a[s_1 \composeL s_2 \composeL r] - s_1}{\lmod'}
-\end{align*}
-% 
-as required.\\
-%%
-%%
-%%
-
 
 
 \noindent\textbf{RTS. (\ref{LCS:Goal2})}\\
@@ -197,7 +165,10 @@ Then from (\ref{LCS:Ass1}) and (\ref{LCS:Ass9}) we have:
 	(s_1 \composeL s_2 \composeL r, a[s_1 \composeL s_2 \composeL r]) \in \gmod(\ca{}) \nonumber
 \end{align}
 % 
-as required.
+as required.\\
+%
+%
+%
 
 \noindent\textbf{RTS. (\ref{LCS:Goal3})}\\
 Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that 
@@ -210,91 +181,49 @@ Then from (\ref{LCS:Ass1}) we have:
 \begin{align*}
   &\m{reflected}(a,s_1 \composeL s_2 \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
 %  
-  &\neg\m{visible}(a,s_1 \composeL s_2) /| \exsts{r'} a[s_1 \composeL s_2 \composeL r] = s_1 \composeL s_2 \composeL r' /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{r'}{\lmod'}  \nonumber
+  &\neg\m{visible}(a,s_1 \composeL s_2) /| \for{(s', r') \in a[s_1 \composeL s_2, r]}  \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  \nonumber
 \end{align*}
 %
-and consequently from (\ref{LCS:IH})
+If the first disjunct is the case then the desired result holds trivially. On the other hand if the second disjunct is the case then we have:
+%
+\begin{align}
+	\neg\m{visible}(a,s_1 \composeL s_2) /| \for{(s', r') \in a[s_1 \composeL s_2, r]}  \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}
+	\label{LCS:Ass13}
+\end{align}
+%
+Pick an arbitrary $s', r' \in \LStates$ such that
+\begin{align}
+	(s', r') \in a[s_1, s_2 \composeL r]
+	\label{LCS:Ass14}
+\end{align}
+%
+Then from (\ref{LCS:Ass13}), (\ref{LCS:Ass14}) and the definitions of $\m{visible}$ and $a[s_1, s_2 \composeL r]$ we know there exists $r'' \in \LStates$ such that
+%
+\begin{align}
+	& \neg\m{visible}(a, s_1) \label{LCS:Ass15}\\
+	& s' = s_1 /| r' = s_2 \composeL r'' \label{LCS:Ass16}\\
+	& (s_1 \composeL s_2, r'') \in a[s_1 \composeL s_2, r] \label{LCS:Ass17} 
+\end{align}
+%
+From (\ref{LCS:Ass13}) and (\ref{LCS:Ass17}) we then have:
+%
+\begin{align}
+	\extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{r''}{\lmod'}
+	\label{LCS:Ass18}
+\end{align}
+%
+and consequently from (\ref{LCS:IH}) and (\ref{LCS:Ass16})
+%
+\begin{align}
+  & \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  \label{LCS:Ass19}
+\end{align}
+%
+Finally from (\ref{LCS:Ass14}), (\ref{LCS:Ass15}) and (\ref{LCS:Ass19}) we have
 %
 \begin{align*}
-  &\m{reflected}(a,s_1 \composeL s_2 \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
-%  
-  &\neg\m{visible}(a,s_1 \composeL s_2) /| \exsts{r'} a[s_1 \composeL s_2 \composeL r] = s_1 \composeL s_2 \composeL r' /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{s_2 \composeL r'}{\lmod'}  \nonumber
+  &\neg\m{visible}(a,s_1) /| \for{(s', r') \in a[s_1, s_2 \composeL r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}  \nonumber
 \end{align*}
 %
-%Then from (\ref{LCS:Ass1}), the definition of $a[s_1 \composeL s_2, r]$, the cross-split property and the cancellativity of logical states separation algebras we have:
-%%
-%\begin{align}
-%&\begin{array}{l}
-%	\m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod'(\ca{}) \lor\\
-%	(\neg\m{visible}(a, s_1 \composeL s_2) \land \\
-%	\begin{array}{@{} l l @{}}
-%		\exsts{ps_1, ps_2, s'_1, s'_2, pr, r', s''} & s_1 = ps_1 \composeL s'_1\\
-%		& s_2 = ps_2 \composeL s'_2\\
-%		& r = pr \composeL r'\\
-%		& \m{fst}(\updateFP{a}) = ps_1 \composeL ps_2 \composeL pr\\
-%		& \m{snd}(\updateFP{a}) = ps_1 \composeL ps_2 \composeL s'' \land\\
-%		& \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1 \composeL s_2}{s'' \composeL r'}{\lmod'}
-%	\end{array}\\
-%	)
-%\end{array}
-%\label{LCS:Ass13}
-%\end{align}
-%% 
-%Consequently from (\ref{LCS:IH}) we have: 
-%\begin{align}
-%&\begin{array}{l}
-%	\m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod'(\ca{}) \lor\\
-%	(\neg\m{visible}(a, s_1 \composeL s_2) \land \\
-%	\begin{array}{@{} l l @{}}
-%		\exsts{ps_1, ps_2, s'_1, s'_2, pr, r', s''} & s_1 = ps_1 \composeL s'_1\\
-%		& s_2 = ps_2 \composeL s'_2\\
-%		& r = pr \composeL r'\\
-%		& \m{fst}(\updateFP{a}) = ps_1 \composeL ps_2 \composeL pr\\
-%		& \m{snd}(\updateFP{a}) \composeL s'_1= s_1 \composeL ps_2 \composeL s'' \land\\
-%		& \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{ps_2 \composeL s'' \composeL s'_2 \composeL r'}{\lmod'}
-%	\end{array}\\
-%	)
-%\end{array}
-%\nonumber
-%\end{align}
-%% 
-%%
-%and by definition of $a[s_1, s_2 \composeL r]$ we have:
-%\begin{align}
-%&\begin{array}{l}
-%	\m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod'(\ca{}) \lor\\
-%	(\neg\m{visible}(a, s_1 \composeL s_2) \land \\
-%	\begin{array}{@{} l l @{}}
-%		\exsts{s'''} & \m{fst}(a[s_1, s_2 \composeL r]) = s_1 \composeL s''' \land\\
-%		& \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{s''' \composeL \m{snd}(a[s_1, s_2 \composeL r])}{\lmod'}
-%	\end{array}\\
-%	)
-%\end{array}
-%\label{LCS:Ass14}
-%\end{align}
-Finally from the definition of $\m{visible}$ and by \lem~\ref{lem:disjointByOrder} we can rewrite the above as: 
-%
-%
-\begin{align*}
-  &\m{reflected}(a,s_1 \composeL s_2 \composeL r,\lmod'(\ca{})) |/\null \nonumber \\
-%  
-  &\neg\m{visible}(a,s_1) /| \exsts{r'} a[s_1 \composeL s_2 \composeL r] = s_1 \composeL r' /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{r'}{\lmod'}  \nonumber
-\end{align*}
-%
-%
-%\begin{align}
-%&\begin{array}{l}
-%	\m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod'(\ca{}) \lor\\
-%	(\neg\m{visible}(a, s_1) \land \\
-%	\begin{array}{@{} l l @{}}
-%		\exsts{s'''} & \m{fst}(a[s_1, s_2 \composeL r]) = s_1 \composeL s''' \land\\
-%		& \extendsAMUpto{\lmod, \gmod}{(n-1)}{s_1}{s''' \composeL \m{snd}(a[s_1, s_2 \composeL r])}{\lmod'}
-%	\end{array}\\
-%	)
-%\end{array}
-%\nonumber
-%\end{align}
-%%
 as required.
 %
 \end{proof}
