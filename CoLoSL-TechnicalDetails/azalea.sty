@@ -4,7 +4,6 @@
 \titleformat{\chapter}[hang]{\huge\bfseries}{\thechapter.\hspace{20pt}}{0pt}{\huge\bfseries}
 \usepackage{array}
 \usepackage{amsmath}
-%\usepackage{amsfonts}
 \usepackage[scaled=.9]{beramono}
 \usepackage{color}
 \usepackage{graphicx}
@@ -13,7 +12,6 @@
 \DeclareCaptionType{copyrightbox}
 \usepackage{subcaption}\captionsetup{compatibility=false}
 \usepackage{xspace}
-\usepackage{xparse}
 %\let\proof\relax 
 %\let\endproof\relax
 %\let\vec\relax
@@ -32,7 +30,7 @@
 \usepackage{fancybox}
 %\usepackage{dashrule}
 %\usepackage{enumerate}
-%\usepackage{wrapfig}
+\usepackage{wrapfig}
 \usepackage{relsize}
 \usepackage{xcolor}
 \usepackage{microtype}
@@ -50,16 +48,14 @@
   pdfauthor={Azalea Raad, Philippa Gardner, and Jules Villard}]{hyperref}
 \hypersetup{linkcolor=black,citecolor=black,filecolor=black,urlcolor=black}
 
-
+\newcommand{\codecomment}[1]{\color{blue}{#1}}
 \usetikzlibrary{shapes}
-
-%\newcommand{\comment}{\color{blue!80!black}}
-
 \lstset{%
   language=C,
-  morecomment=[n][{\comment}]{/*}{*/},
-  morecomment=[l][{\comment}]{//},
-  morecomment=[n][{\ghost}]{[}{]},
+%  morecomment=[n][{\comment}]{/*}{*/},
+%  morecomment=[l][{\comment}]{//},
+%  morecomment=[n][{\ghost}]{[}{]},
+	escapeinside={<@}{@>},
   sensitive=true,
   mathescape=true,
   showlines=true,
@@ -69,6 +65,7 @@
   numberstyle=\tiny,
   numbersep=5pt,
   boxpos=t,
+  commentstyle=\color{blue}
 }
 
 \newcommand{\azaleacomment}[1]{
@@ -468,12 +465,16 @@
 
 %%%%%%%%%%%%%%%%%%%% Set Example %%%%%%%%%%%%%%%%%%%%
 
-\DeclareDocumentCommand{\setCap}{m O{} O{-}}{#1 \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4}
-\DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\rightarrow} #3}
-\DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+%\newcommand{\ssetCap}[1]{#1}
+\DeclareDocumentCommand{\setCap}{m O{} O{-}}{#1 \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\lockT}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\unlockT}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\valueT}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\harpoonything} #4}
+\DeclareDocumentCommand{\modT}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\nextT}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\harpoonything} #3}
+
+%\newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
+%\newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
 
 \newcommand{\capChangeC}[3][1]{\left[\textsc{LChange}(#2)\right]^{#3}_{#1}}
 \newcommand{\capGapC}[5][1]{\left[\textsc{LGap}(#2, #3, #4)\right]^{#5}_{#1}}
@@ -481,11 +482,16 @@
 \newcommand{\capChangeT}[1]{\textsc{LChange}(#1)}
 \newcommand{\capGapT}[3]{\textsc{LGap}(#1, #2, #3)}
 
-\DeclareDocumentCommand{\lockC}{m O{} O{-}}{\left[#1.\textsf{L} \stackrel{#2}{\rightarrow} #3\right]}
-\DeclareDocumentCommand{\unlockC}{m O{} O{-}}{\left[#1.\textsf{U} \stackrel{#2}{\rightarrow} #3\right]}
-\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
-\DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
-\DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\lockC}{m O{} O{-}}{\left[#1.\textsf{L} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\unlockC}{m O{} O{-}}{\left[#1.\textsf{U} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{\left[#1.\uppercase{\textsf{#2}} \stackrel{#3}{\rightarrow} #4\right]}
+%\DeclareDocumentCommand{\modC}{m O{} O{-}}{\left[#1.\textsf{M} \stackrel{#2}{\rightarrow} #3\right]}
+%\DeclareDocumentCommand{\nextC}{m O{} m}{\left[#1.\textsf{N} \stackrel{#2}{\rightarrow} #3\right]}
+\DeclareDocumentCommand{\lockC}{m O{} O{-}}{#1.\textsf{L} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\unlockC}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\valueC}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\harpoonything} #4}
+\DeclareDocumentCommand{\modC}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\nextC}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\harpoonything} #3}
 
 \newcommand{\isLock}[2]{\textsf{isLock}\left(#1, #2\right)}
 \newcommand{\locked}[1]{\textsf{locked}\left(#1 \right)}
@@ -598,3 +604,11 @@
 \newcommand{\fst}[1]{\m{fst}\left(#1\right)}
 \newcommand{\snd}[1]{\m{snd}\left(#1\right)}
 \newcommand{\fresh}[1]{\m{fresh}\left(#1\right)}
+\newcommand{\happy}{\includegraphics[scale=0.09]{Sections/OdeToQ/happy.png}}
+%\newcommand{\sad}{\includegraphics[scale=0.07]{Sections/OdeToQ/sad}}
+\newcommand{\hrpoonyatom}[1]{\vcenter{\offinterlineskip\hbox{$#1\rightharpoonup$}\vskip-.45ex\hbox{$#1\rightharpoondown$}}}
+
+\newcommand{\harpoonything}{\mathrel{\mathchoice{\hrpoonyatom\displaystyle}
+{\hrpoonyatom\textstyle}
+{\hrpoonyatom\scriptstyle}
+{\hrpoonyatom\scriptscriptstyle}}}
