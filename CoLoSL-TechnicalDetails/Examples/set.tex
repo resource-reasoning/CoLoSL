@@ -498,8 +498,8 @@
 	L(a) \eqdef 
 	\left\{
 	\begin{array}{r l}
-		\lockT{a}[-]&  \cell{a}{0} * \unlockC{a}  \swap \cell{a}{1}\\
-		\unlockT{a}[1]&  \cell{a}{1} \swap \cell{a}{0} * \unlockC{a} \\
+		\lockT{a}[-]&  \cell{a.lock}{0} * \unlockC{a}  \swap \cell{a.lock}{1}\\
+		\unlockT{a}[1]&  \cell{a.lock}{1} \swap \cell{a.lock}{0} * \unlockC{a} \\
 		\lockT{a}[1] * \unlockT{a}[1] &  \cell{a}{1} \swap \lockT{a}[1] * \unlockT{a}[1]
 	\end{array}
 	\right\}
