@@ -1,8 +1,8 @@
-\begin{figure}
 %
-\hrule
+\begin{figure}[h!]
+\small\hrule\vspace{5pt}
+%
 \[
-\small
 \begin{array}{@{} l @{}}
 	\color{blue} //
 	\left\{ \inSet{\li h}{v} \lor \outSet{\li h}{v} \right \}\\
@@ -46,10 +46,45 @@
 	 	\right\}\\
 
 
+		\color{darkgreen}/* \text{ Apply the action of } \modC{\li p} \text{ wrapped in the definition of }\link{\li p}{\li c} \text{. } */ \\
+		 
+		\color{blue}//
+		\left\{
+	 	\begin{array}{@{} l @{}}
+		 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v \land \sorted{L_1 {++}  \{v_p\} {++}   v_c::L_2}  \land\\
+		 	\isLock{\li h}{\pi} * \valueT{\li h}{v}
+			*\lsg{\li h}{\li p}{L_1}{\li h} \\
+			
+		 	* \shared{\unlockedNode{\li p}{v_p}{\li c}}{I(\li p)} 
+		 	* \locked{\li p}
+		 	* \lsg{\li c}{\li{null}}{v_c ::L_2}{\li h}\\
 		 	
+		 	* \left((v_c > v \land \li b = false) \lor (v_c = v \land b = true)\right)
+	 	
+	 	\end{array}
+	 	\right\}\\
+	 	
+	 	
+	 	 	
 		\command{unlock(p);} \\
 		
 
+		\color{blue}//
+		\left\{
+	 	\begin{array}{@{} l @{}}
+		 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v \leq v_c \land \sorted{L_1 {++}  \{v_p\} {++}   v_c::L_2}  \land\\
+		 	\isLock{\li h}{\pi} * \valueT{\li h}{v}
+			*\lsg{\li h}{\li p}{L_1}{\li h} \\
+			
+		 	* \shared{\node{\li p}{v_p}{\li c}}{I(\li p)} 
+		 	* \lsg{\li c}{\li{null}}{v_c ::L_2}{\li h}\\
+	 	
+	 		* \left((v_c > v \land \li b = false) \lor (v_c = v \land b = true)\right)
+	 		
+	 	\end{array}
+	 	\right\}		\\
+	 	
+	 	
 		\color{blue}//
 		\left\{
 		 	\left((\outSet{\li h}{v} \land \li b = false) \lor (\inSet{\li h}{v} \land b = true)\right)
@@ -76,12 +111,10 @@
 \end{figure}
 %
 %
-%
 \begin{figure}
+\small\hrule
 %
-\hrule
 \[
-\small
 \begin{array}{@{} l @{}}
 	\color{blue} //
 	\left\{ \inSet{\!\li h}{v} \lor \outSet{\!\li h}{v} \right \}\\
@@ -227,7 +260,7 @@
 		 	\end{array}
 		 	\right\}\\
 		 	
-		 	\color{darkgreen} /* \text{ Apply the actions of } \valueT{h}{v} * \modT{p} \text{ and } \modT{p} \text{ in } I(p) \text{ in order. }*/\\
+		 	\color{darkgreen} /* \text{ Apply the actions of } \valueT{h}{v} * \modT{p} \text{ and } true \text{ in } I(p) \text{ in order. }*/\\
 		 	\color{darkgreen} /* \text{ Use the \copyRule, \forgetRule and \shiftRule principles in order. } */\\
 		 	
 		 	
@@ -281,10 +314,9 @@
 %
 %
 \begin{figure}
+\small\hrule\vspace{-5pt}
 %
-\hrule
 \[
-\small
 \begin{array}{@{} l @{}}
 	\color{blue} //
 	\left\{ \inSet{\li h}{v} \lor \outSet{\li h}{v} \right \}\\
@@ -398,7 +430,7 @@
 		 	
 		 	
 		 	
-		 	\color{darkgreen} /* \text{Use the \shiftRule principle; apply the action of } \lockT{c} * \unlockT{c} \text{ in } L(c) \text{.} */\\
+		 	\color{darkgreen} /* \text{Use \shiftRule; apply the action of } \lockT{c} * \unlockT{c} \text{ in } L(c) \text{.} */\\
 		 	
 		 	
 		 		 	
@@ -485,11 +517,11 @@
 	\left\{ \outSet{\!\li h}{v} \right\}
 	
 	
-\end{array}
+\end{array}\vspace{-5pt}
 \]
 %
 %
-\hrule
+\hrule\vspace{-5pt}
 \caption{Implementation of the set \li{remove} operation.}
 \label{fig:set-remove}
 \end{figure}
@@ -497,9 +529,9 @@
 %
 %
 \begin{figure}
-\hrule
+\small\hrule
+%
 \[
-\small
 \begin{array}{l}
 	
 	\color{blue} //

@@ -1,9 +1,9 @@
 \newpage
-\chapter{Examples}\label{sec:examples}
+\chapter{Examples}\label{chapter:examples}
 
 
 
-\section{Concurrent Spanning Tree}\label{sec:CSTExample}
+\section{Concurrent Spanning Tree}\label{sec:CST-example}
 Programs manipulating arbitrary graphs present the following significant
 challenge for compositional verification: because of deep sharing
 between different components of a graph, changes to one subgraph may
@@ -389,10 +389,10 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %
 %
 \vspace{-2ex}
-\clearpage\section{Set Module}\label{sec:set}
-In this section we consider a concurrent set module as described in~\cite{cap-ecoop10}. We first produce the set specification in \colosl and then compare it against its specification in Concurrent Abstract Predicates (CAP) described in~\cite{cap-ecoop10}. We demonstrate that our \colosl\ reasoning considerably improves on CAP by producing a \emph{more concise} specification and allowing for \emph{more local} reasoning. 
-\todo actual reasoning .
+\clearpage\section{Set Module}\label{sec:set-example}
+In this section we consider a concurrent set module as described in~\cite{cap-ecoop10}. We first produce the set specification in \colosl and show how to reason about its operations and verify them with respect to their specification. We then compare the \colosl specification of the set module against its specification in Concurrent Abstract Predicates (CAP) described in~\cite{cap-ecoop10}. We demonstrate that our \colosl\ reasoning considerably improves on CAP by producing a \emph{more concise} specification and allowing for \emph{more local} reasoning. 
 
+\subsection*{\colosl Specification}
 We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. Our set module provides three operations: \li{contains(h, $v$)}, \li{add(h, $v$)} and \li{remove(h, $v$)}.
 As the name suggests, the \li{contains(h, $v$)} function checks whether value $v$ is contained in the set at \li{h}; the \li{add(h, $v$)} and \command{remove(h, $v$)} functions add/remove value $v$ to/from the list, respectively.
 
@@ -422,7 +422,7 @@ As the name suggests, the \li{contains(h, $v$)} function checks whether value $v
 In what follows we first give a description of the predicates of \fig\ref{fig:coloslSetExample} and subsequently contrast our specification with that of CAP.
 %
 %
-\begin{figure*}
+\begin{figure}
 \hrule
 \[
 \begin{array}{@{} l @{}}
@@ -452,8 +452,8 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 	\left\{
 	\begin{array}{@{} r @{\hspace{2pt}}  l @{}}
 		\color{darkgreen}{\lockT{x}[-]} : &  \color{blue}{\left\{ \cell{x.lock}{0} * \unlockC{x}  \swap \cell{x.lock}{1} \right\} }\\
-		\color{darkgreen}{\unlockT{x}[1]} : &  \color{blue}{ \left\{ \cell{x.lock}{1} \swap \cell{x.lock}{0} * \unlockC{x} \right\} }\\
-		\color{darkgreen}{\lockT{x}[1] * \unlockT{x}[1]}:  &  \color{blue}{ \left\{ \cell{x.lock}{1} \swap \lockT{x}[1] * \unlockT{x}[1] \right\} }
+		\color{darkgreen}{\unlockT{x}} : &  \color{blue}{ \left\{ \cell{x.lock}{1} \swap \cell{x.lock}{0} * \unlockC{x} \right\} }\\
+		\color{darkgreen}{\lockT{x} * \unlockT{x}}:  &  \color{blue}{ \left\{ \cell{x.lock}{1} \swap \lockT{x}[1] * \unlockT{x}[1] \right\} }
 	\end{array}
 	\right\} \vspace{10pt}\\
 	
@@ -462,10 +462,19 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 	\quad
 	\left\{
 	\begin{array}{@{} r @ {\hspace*{2pt}}l @{}}
-%		\text{//Locking}\hspace*{1.4cm}&\\
-		\color{darkgreen}{true} : & \color{blue}{\left\{\exsts{v, y} \unlockedNode{x}{v}{y} \swap \lockedNode{x}{v}{y} \right\}}\vspace{5pt}\\
+%%		\text{//Locking}\hspace*{1.4cm}&\\
+%		\color{darkgreen}{true} : & \color{blue}{\left\{\exsts{v, y} \unlockedNode{x}{v}{y} \swap \lockedNode{x}{v}{y} \right\}}\vspace{5pt}\\
+%%		\color{darkgreen}{\modT{x} } : & \color{blue}{\left\{\exsts{v, y} \lockedNode{x}{v}{y} \swap \unlockedNode{x}{v}{y} \right\}} \vspace{5pt}\\
+%		
+		\color{darkgreen}{true} : 
+		& \color{blue}
+		\left\{
+		\begin{array}{@{} r @{\hspace{2pt}} l @{\hspace{3pt}} l @{\hspace{3pt}} l @{}}
+			\exsts{v, y} & \unlockedNode{x}{v}{y} & \swap & \lockedNode{x}{v}{y} \vspace{5pt}\\
+			\exsts{v, y} & \lockedNode{x}{v}{y} & \swap & \unlockedNode{x}{v}{y}
+		\end{array}		
+		\right\}		\vspace{5pt}\\
 		
-		\color{darkgreen}{\modT{x} } : & \color{blue}{\left\{\exsts{v, y} \lockedNode{x}{v}{y} \swap \unlockedNode{x}{v}{y} \right\}} \vspace{5pt}\\
 		
 		
 		\color{darkgreen}{\modT{x} * \valueT{h}{v}:} & \\		
@@ -532,28 +541,32 @@ In what follows we first give a description of the predicates of \fig\ref{fig:co
 \]
 %
 \hrule
-\caption{\colosl\ specification of the concurrent set module where the definition of $I(h, x)$ is provided in \fig~\ref{fig:set-interference}.}
+\caption{\colosl\ specification of the concurrent set module.}
 \label{fig:coloslSetExample}
-\end{figure*}
+\end{figure}
 %
 %
 
 Since \colosl is parametric in the separation algebra of capabilities and their assertions, we instantiate it with a \emph{fractional heap} to represent the separation algebra of capabilities and write heap-like assertions of the form $\setCap{a}[\pi][b]$ to denote capability $a$ with permission $\pi$. Moreover, our capabilities are \emph{stateful} in that they can capture some additional information ($b$). As we demonstrate below, this leads to conciser specifications. For readability we write $\setCap{a}[][b]$ for $\setCap{a}[1][b]$, $\setCap{a}[\pi]$ for $\exsts{b}\setCap{a}[\pi][b]$ and $\setCap{a}$ for $\exsts{b}\setCap{a}[1][b]$.
 
 %\noindent\textbf{\textsf{isLock}($a, \pi$) / \textsf{locked}($a$)} \hspace{0.3cm} 
-\paragraph{\textsf{isLock}($x, \pi$) / \textsf{locked}($x$)} 
+\paragraph{\textsf{isLock}(\textit{x}, $\pi$) / \textsf{locked}(\textit{x})} 
 Every node in the singly-linked list is protected by a lock that is to be acquired prior to its modification. The $\isLock{x}{\pi}$ predicate is similar to that in \cite{cap-ecoop10} and states that the lock at address $x$ can be acquired with permission $\pi \in (0, 1]$. Multiple threads may attempt to acquire the lock at once and thus we use the $\pi$ argument to reflect this sharing where $1$ denotes exclusive right to acquisition while $\pi \in (0, 1)$ accounts for sharing of the lock between multiple threads. The $\isLock{x}{\pi}$ predicate asserts that the thread's local state contains the capability $\lockT{x}[\pi]$ to acquire the lock and that the lock resides in the shared state where at any one point either the lock is unlocked ($\cell{x.lock}{0}$) and the shared state contains the capability to unlock it ($\unlockT{x}$); or it is locked ($\cell{x.lock}{1}$) and the unlocking capability has been claimed by the locking thread. 
 
 The $\locked{x}$ predicate asserts that the thread's local state contains the exclusive capability to unlock the lock ($[\unlockT{x}]$); and that the $x$ is in the locked state ($\cell{x.lock}{1}$). 
 
-\paragraph{\textsf{in}($h, v$) / \textsf{out}($h, v$)}
+\paragraph{\textit{L(x)}} denotes the interference associated with the lock on node at address $x$. When a thread holds a non-zero locking capability on node $x$ ($\lockC{x}[-]$), it can change the lock state from unlocked (0) to locked (1) and claim the exclusive unlocking capability in doing so ($\unlockC{x}$). 
+Similarly, a thread holding the full unlocking capability on $x$ ($\unlockC{x}$) can change the lock state from locked to unlocked and return the full unlocking capability to the shared state. 
+When removing a value $v$ from the set, the node containing the value $v$ must be removed from the shared state and disposed of. However, recall that \colosl does not have an explicit mechanism for unsharing resources modelling a dual behaviour to that of the \extendRule principle. Instead, resources can be unshared through actions explicitly specified as part of their associated interference. This is the case in the last component of $L(x)$; it is concerned with \emph{unsharing} of node $x$'s lock and making it a local resource. It states that when a thread holds full permission on both locking and unlocking capabilities of $x$, it can claim its lock in exchange for the capabilities. 
+
+\paragraph{\textsf{in}(\textit{h}, \textit{v}) / \textsf{out}(\textit{h}, \textit{v})}
 The $\inSet{h}{v}$ predicate states that the set at head address $h$ contains value $v$ and captures exclusive right to alter the set with respect to $v$ by changing whether $v$ belongs to it. It asserts that the thread owns some capability ($\pi$) to acquire the lock associated with head address ($\isLock{h}{\pi}$) and that the thread owns the exclusive capability to alter the set with respect to value $v$ ($\valueC{h}{v}$) should it own the capability to modify the address at which value $v$ is stored (\textit{cf.} the description of $\unlockedNode{x}{v}{y}$ predicate). The underlying singly-inked list is captured by the $\inList{h}{v}$ predicate. 
 The $\inList{h}{v}$ predicate uses an auxiliary carrier sorted list $L$ (such that $v \in L$) to capture the contents of the singly-linked list via the $\textsf{lsg}$ predicate. For simpler implementation, we extend $L$ with two sentinel values $-\infty$ and $\infty$, one at each end to avoid corner cases such as removing the first/last element of the list. The $\outSet{h}{v}$ predicate is analogous to $\inSet{h}{v}$ and corresponds to the case where the set does not contain $v$.
 
-\paragraph{\textsf{lsg}($x, z, L, h$)} 
+\paragraph{\textsf{lsg}(\textit{x}, \textit{z}, \textit{L}, \textit{h})} 
 This predicate is defined inductively and describes a \emph{segment} of the list at $h$ that starts at address $x$ and extends upto (but not including) address $z$ and contains the elements in the mathematical list $L$. When $L$ is empty, it corresponds to a void segment and yields no resources (\emp); otherwise, it is defined as the composition of the first node of the segment at address $x$, $\shared{\node{x}{v}{y}}{I(h, x)}$, and the tail of the list segment ($\lsg{y}{z}{L'}{h}$). The $\node{x}{v}{y}$ predicate describes a node at address $x$ with value $v$ and successor $y$ and can be either unlocked ($\unlockedNode{x}{v}{y}$) or locked ($\lockedNode{x}{v}{y}$).
 
-\paragraph{\textsf{U}($x, v, y$) / \textsf{L}($x, v, y$)}
+\paragraph{\textsf{U}(\textit{x}, \textit{v}, \textit{y}) / \textsf{L}(\textit{x}, \textit{v}, \textit{y})}
 The $\unlockedNode{x}{v}{y}$ predicate states that the node at address $x$ is unlocked, it contains value $v$ and comes before the node at address $y$. The statement of the $\lockedNode{x}{v}{y}$ predicate is analogous and describes the node when locked.
 %In both locked and unlocked states, the shared state contains the lock field ($\cell{a}{0}$ or $\cell{a}{1}$), the value field ($\cell{a+1}{v}$) and the capability that records the current successor of the node $\nextC{a}{b}$.
 %When a node is in the unlocked state, the shared state contains the next pointer of the node ($\cell{a+2}{b}$), as well as the capability to unlock the node ($[\unlockT{a}]$).
@@ -565,13 +578,19 @@ The $\unlockedNode{x}{v}{y}$ predicate states that the node at address $x$ is un
 %When a thread successfully locks the node at $a$ it claims the next pointer, the unlocking capability and the locking capability pertaining to its successors. ($\cell{a.next}{b} * [\unlockT{a}] * [\lockT{b}]$) and moves them into its local state.
 %\\
 %
-A thread can alter the set at $h$ with respect to the node at address $x$ with value $v$, only when it holds both the value capability $\valueC{h}{v}$ and the modification capability $\modC{x}$ in its local state. When the node is in the unlocked state, no thread can modify it and thus the modification capability $\modC{x}$ as well as the next pointer of the node ($\cell{x.next}{y}$) lie in the shared state. 
+%A thread can alter the set at $h$ with respect to the node at address $x$ with value $v$, only when it holds both the value capability $\valueC{h}{v}$ and the modification capability $\modC{x}$ in its local state. When the node is in the unlocked state, no thread can modify it and thus the modification capability $\modC{x}$ as well as the next pointer of the node ($\cell{x.next}{y}$) lie in the shared state. 
+A thread may modify the next pointer of node at address $x$, only when it holds the modification capability $\modC{x}$ in its local state. When the node is in the unlocked state, no thread can modify it and thus the modification capability $\modC{x}$ as well as the next pointer of the node ($\cell{x.next}{y}$) lie in the shared state. 
 %
 Recall that when traversing the list by hand-over-hand locking, no thread can overtake an other in traversing the list. Consequently, a node can only be locked by a thread that has already acquired the lock associated with the previous node. Therefore, when the node $x$ is in the unlocked state, the exclusive capability to lock its successor at address $y$ ($\isLock{y}{1}$) also lies in the shared state.
 %
-When a thread successfully locks the node at $x$, it claims the next pointer, the modification capability and the locking capability pertaining to its successors ($\link{x}{y}$), and moves them into its local state. In return, it transfers the $\locked{x}$ resource to the shared state as evidence that it is indeed the locking thread.
+When a thread successfully locks the node at $x$ (and is hence in possession of the $\locked{x}$ resource), it can then claim the next pointer, the modification capability and the locking capability pertaining to its successors (captured by $\link{x}{y}$), and move them into its local state. In return, it transfers the $\locked{x}$ resource to the shared state as evidence that it is indeed the locking thread.
 
 In both locked and unlocked states, the shared state contains the value field ($\cell{x.value}{v}$) and the ``successor'' capability $\nextC{x}{y}$. This capability is used to track the current successor of $x$ even when the node is locked and its next pointer has been claimed by the locking thread. 
+
+\paragraph{\textit{I}(\textit{h}, \textit{x})} As discussed above, given a node at address $x$ with successor $y$, any thread in possession of the $\locked{x}$ resource may change its state from unlocked ($\unlockedNode{x}{v}{y}$) to locked ($\lockedNode{x}{v}{y}$) and claim the $\link{x}{y}$ resource in exchange for $\locked{x}$. This is captured by the first action associated with the $\m{true}$ assertion; that is, no additional capability is required for performing this action and holding the $\locked{x}$ resource locally is sufficient for performing the action. Conversely, as described by the second action of $\m{true}$, a thread in possession of the $\link{x}{y}$ resource may change its state from locked ($\lockedNode{x}{v}{y}$) to unlocked ($\unlockedNode{x}{v}{y}$) and return $\link{x}{y}$ to the shared state in return for $\locked{x}$. 
+
+Consider a node at address $y$, with value $v$, successor $z$ and predecessor $x$. A thread may remove value $v$ from the set provided that both the node and its predecessor are locked by the thread; and the thread holds the value capability $\valueC{h}{v}$ as well as the update capabilities pertaining to both the node itself ($\modC{x}$) and its predecessor node ($\modC{y}$). This is captured by the first two actions associated with $\modC{x} * \valueC{h}{v}$ in $I(h, x)$. First, the next pointer of $x$ is redirected to $z$ (the first action of $\modC{x} * \valueC{h}{v}$); and then node $y$ is removed from the shared state (the second action of $\modC{y} * \valueC{h}{v}$).
+Similarly, for a thread to insert the value $v$ in between node $x$ and node $y$, the predecessor node $x$ must be locked; and the thread should hold the value capability $\valueC{h}{v}$ as well as the update capability on $x$. This is reflected in the last action of $\modC{x} * \valueC{h}{v}$.
 
 \subsection*{Reasoning about Set Operations}
 %
@@ -598,8 +617,9 @@ If \li{c.value = $v$} and consequently the set contains value $v$, node $p$ is u
 %
 a new node $z$ with value $v$ and successor $c$ is allocated and the shared state is extended by the resources associated with the new node $z$ as follows. First, the shared state is extended by $z$'s lock and in doing so the locking and unlocking capabilities pertaining to $z$ are generated on the fly. That is the $\cell{\li{z.lock}}{0}$ predicate is replaced by $\isLock{z}{1}$ as shown in the following derivation.
 %
+\small
 \begin{align*}
-	&\color{blue}\small
+	&\color{blue}
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\
@@ -613,12 +633,12 @@ a new node $z$ with value $v$ and successor $c$ is allocated and the shared stat
 %
 %
 	\stackrel{\text{(frame off)}}{}
-	& \quad\color{blue}\small
+	& \quad\color{blue}
 	\left\{ \emp \right\}\\
 %
 %
 	\stackrel{\text{alloc+assign}}{\semimplies}
-	& \quad \color{blue}\small
+	& \quad \color{blue}
 	\left\{
 		\cell{\!\li{z.value}}{v}	
 		* \cell{\!\li{z.next}}{\!\li c}
@@ -627,7 +647,7 @@ a new node $z$ with value $v$ and successor $c$ is allocated and the shared stat
 %
 %
 	\stackrel{\extendRule}{\semimplies}
-	& \quad \color{blue}\small
+	& \quad \color{blue}
 	\left\{
 		\cell{\!\li{z.value}}{v}	
 		* \cell{\!\li{z.next}}{\li c}
@@ -639,7 +659,7 @@ a new node $z$ with value $v$ and successor $c$ is allocated and the shared stat
 	%
 %
 	\stackrel{\textsf{isLock} \text{ def.}}{}
-	& \quad \color{blue}\small
+	& \quad \color{blue}
 	\left\{
 		\cell{\!\li{z.value}}{v}	
 		* \cell{\!\li{z.next}}{\!\li c}
@@ -648,7 +668,7 @@ a new node $z$ with value $v$ and successor $c$ is allocated and the shared stat
 %
 %	
 	\stackrel{\text{(frame on)}}{} 
-	&\color{blue}\small
+	&\color{blue}
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\
@@ -664,16 +684,17 @@ a new node $z$ with value $v$ and successor $c$ is allocated and the shared stat
  	\right\}
 %
 %
-\end{align*}
+\end{align*}\normalsize
 %\[
 %	\cell{\li{z.lock}}{0} \semimplies \lockT{\li z} * \shared{\cell{\li{z.lock}}{0} * \unlockT{\li z}}{L(\li z)} \implies \isLock{\li z}{1}
 %\]
 %
 The shared state is then extended with the remaining resources of node $\li z$ and the relevant capabilities are also generated; subsequently, the subjective views of nodes $p$, $z$ and $c$ are combined through an application of the \mergeRule principle as demonstrated by the following derivation. 
 %
+\small
 \begin{align*}
 	& 
-	\color{blue} \small
+	\color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\	 	
@@ -688,21 +709,21 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %	 	
 %	 	
 	\stackrel{\text{(frame off)}}{} & 
-	\quad\color{blue} \small
+	\quad\color{blue} 
 	\left\{ 
 		\link{\!\li p}{\!\li c} * \cell{\!\li{z.value}}{v} * \cell{\!\li{z.next}}{\!\li c} 
 	\right\}\\
 %	
 %
 	\stackrel{\textsf{link}\text{ def.}}{\implies} & 
-	\quad\color{blue} \small
+	\quad\color{blue} 
 	\left\{
 		\cell{\!\li{p.next}}{\!\li c} * \modC{\!\li p} * \isLock{\!\li c}{1}  * \cell{\!\li{z.next}}{\!\li c} * \cell{\!\li{z.value}}{v}
 	\right\}\\
 %	
 %
 	\stackrel{\extendRule}{\semimplies} & 
-	\quad\color{blue} \small
+	\quad\color{blue} 
 	\left\{
 		\cell{\!\li{p.next}}{\!\li c} * \modC{\!\li p} * 
 		\shared{
@@ -715,7 +736,7 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %	
 %	
 	\stackrel{\textsf{U}\text{ def.}}{\implies} & 
-	\quad\color{blue} \small
+	\quad\color{blue} 
 	\left\{
 		\cell{\!\li{p.next}}{\!\li c} * \modC{\!\li p} * 
 		\shared{
@@ -727,7 +748,7 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %	
 %	
 	\stackrel{\textsf{node}\text{ def.}}{\implies} & 
-	\quad\color{blue} \small
+	\quad\color{blue} 
 	\left\{
 		\cell{\!\li{p.next}}{\!\li c} * \modC{\!\li p} * 
 		\shared{
@@ -739,7 +760,7 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %	
 %	
 	\stackrel{\text{(frame on)}}{} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -759,7 +780,7 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %	
 %	
 	\stackrel{\textsf{lsg}\text{ def.}}{\implies} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -780,7 +801,7 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %
 %	
 	\stackrel{\text{\mergeRule}\times 2}{\implies} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -795,12 +816,14 @@ The shared state is then extended with the remaining resources of node $\li z$ a
 %
 % 
 \end{align*}	
+\normalsize
 %
 At this point, since the locking thread holds the next pointer of $p$ in its local state ($\cell{\li{p.next}}{\li c}$), it modifies it to point to the new node $z$; and through the action of $\modC{\li p} * \valueC{\li h}{v}$, the $\lockedNode{\li p}{v_p}{\li c}$ predicate is updated as $\lockedNode{\li p}{v_p}{\li z}$. Recall that the $\lockedNode{\li p}{v_p}{\li c}$ predicate states that the node at \li{p} is locked, it holds value $v_p$ and prior to locking its successor was the node at address \li{c}. As such, since the value of the new node $\li{z}$ lies between that of \li{p} and \li{c} ($v_p < v < v_c$), this action allows us to insert \li{z} in between \li{p} and \li{c} provided that \li{z} itself points to \li{c}. This is captured by the following derivation where ($\dagger$) denotes the application of the action associated with the $\modC{\li p} * \valueC{\li h}{v}$ capability in $I(\li p)$.
 %That is $\shared{\lockedNode{\li p}{v_p}{\li c} * \node{\li z}{v}{\li c} * \node{\li c}{v_c}{d}}{I(\li p) \cup I(\li z) \cup I(\li c)}$ is updated as $\shared{\lockedNode{\li p}{v_p}{\li z} * \node{\li z}{v}{\li c} * \node{\li c}{v_c}{d}}{I(\li p) \cup I(\li z) \cup I(\li c)}$.
 %
+\small
 \begin{align*}
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -815,7 +838,7 @@ At this point, since the locking thread holds the next pointer of $p$ in its loc
 %
 % 
 	\stackrel{(\!\li{p.next:= z})}{\implies} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -830,7 +853,7 @@ At this point, since the locking thread holds the next pointer of $p$ in its loc
 %
 % 
 	\stackrel{\textsf{link}\text{ def.}}{\implies} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -843,7 +866,7 @@ At this point, since the locking thread holds the next pointer of $p$ in its loc
 %
 % 
 	\stackrel{(\dagger)}{\semimplies} 
-	& \color{blue} \small
+	& \color{blue} 
 	\left\{
  	\begin{array}{@{} l @{}}
 	 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -856,10 +879,13 @@ At this point, since the locking thread holds the next pointer of $p$ in its loc
 %
 % 
 \end{align*}
+\normalsize
+%
 All that remains is to unlock the node at \li{p}; to do this, first the state of the node is changed from locked ($\lockedNode{\li{p}}{v_p}{\li{z}}$) to unlocked ($\unlockedNode{\li{p}}{v_p}{\li{z}}$) by applying the action of $\modC{\li p}$ capability. Subsequently, through several applications of \copyRule, \forgetRule and \shiftRule principles, the subjective views of \li{p}, \li{z} and \li{c} nodes are recovered as follows where ($\dagger$) denotes the application of the action associated with the $\modC{\li p}$ capability in $I(\li p)$.
 %
+\small
 \begin{align*}
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -872,7 +898,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 % 
 	\stackrel{\text{(frame off)}}{}
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 		\left\{ 
 			\shared{\lockedNode{\!\li p}{v_p}{\!\li c} * \node{\!\li z}{v}{\!\li c} * \node{\!\li c}{v_c}{d}}{I(\!\li p) \cup I(\!\li z) \cup I(\!\li c)}
 			* \link{\!\li p}{\!\li z}
@@ -880,7 +906,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %	
 %	
 	\stackrel{(\dagger)}{\semimplies}
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 		\left\{
 			\shared{\unlockedNode{\!\li p}{v_p}{\!\li z} * \node{\!\li z}{v}{\!\li c} * \node{\!\li c}{v_c}{d}}{I(\!\li p) \cup I(\!\li z) \cup I(\!\li c)}
 			* \locked{\!\li p}
@@ -888,7 +914,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 %	
 	\stackrel{\textsf{node}\text{ def.}}{\implies} 
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 		\left\{
 			\shared{\node{\!\li p}{v_p}{\!\li z} * \node{\!\li z}{v}{\!\li c} * \node{\!\li c}{v_c}{d}}{I(\!\li p) \cup I(\!\li z) \cup I(\!\li c)} 
 			\!\!* \locked{\!\li p}
@@ -896,7 +922,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 %	
 	\stackrel{\copyRule \times 2}{\implies} 
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 	\left\{
 	\begin{array}{@{} l @{}}
 		\shared{\node{\!\li p}{v_p}{\!\li z} * \node{\!\li z}{v}{\!\li c} * \node{\!\li c}{v_c}{d}}{I(\!\li p) \cup I(\!\li z) \cup I(\!\li c)}\\
@@ -908,7 +934,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %	
 %	
 	\stackrel{\forgetRule \times 3}{\implies} 
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 	\left\{
 	\begin{array}{@{} l @{}}
 		\shared{\node{\!\li p}{v_p}{\!\li z}}{I(\!\li p) \cup I(\!\li z) \cup I(\!\li c)}
@@ -919,7 +945,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %	
 %	
 	\stackrel{\shiftRule \times 3}{\semimplies} 
-	& \quad \color{blue} \small
+	& \quad \color{blue} 
 	\left\{\shared{\node{\!\li p}{v_p}{\!\li z}}{I(\!\li p)}
 	\!\!* \shared{\node{\!\li z}{v}{\!\li c}}{I(\!\li z)}
 	\!\!* \shared{\node{\!\li c}{v_c}{d}}{I(\!\li c)}
@@ -927,7 +953,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 %
 	\stackrel{\text{(frame on)}}{}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\exsts{L_1, L_2, v_p, v_c, \pi, d} v_p < v < v_c \land \sorted{L_1 ++ \{v_p\} ++ v_c :: L_2}  \land\\ 	
@@ -942,7 +968,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 % 
 	\stackrel{\textsf{lsg}\text{ def.}}{\implies}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\exsts{L, \pi} v \in L \land \sorted{L}  \land
@@ -954,7 +980,7 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 % 
 	\stackrel{\textsf{in}\text{ def.}}{\implies}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\inSet{\!\li h}{v}	
@@ -964,11 +990,13 @@ All that remains is to unlock the node at \li{p}; to do this, first the state of
 %
 % 
 \end{align*}
+\normalsize
 %
 Finally, \li{p}'s lock is released by applying the action of $\unlockC{\li p}$ capability in $L(\li p)$ and we obtain $\inSet{\li h}{v}$ as required. This is demonstrated in the following derivation where ($\dagger$) denotes applying the action of $\unlockC{\li p}$.
 %
+\small
 \begin{align*}
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\inSet{\!\li h}{v}	
@@ -978,7 +1006,7 @@ Finally, \li{p}'s lock is released by applying the action of $\unlockC{\li p}$ c
 %
 % 
 	\stackrel{\textsf{locked}\text{ def.}}{\implies}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\inSet{\!\li h}{v}	
@@ -988,7 +1016,7 @@ Finally, \li{p}'s lock is released by applying the action of $\unlockC{\li p}$ c
 %
 % 
 	\stackrel{(\dagger)}{\semimplies}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\inSet{\!\li h}{v}	
@@ -998,7 +1026,7 @@ Finally, \li{p}'s lock is released by applying the action of $\unlockC{\li p}$ c
 %
 % 
 	\stackrel{}{\implies}	
-	& \color{blue} \small
+	& \color{blue} 
 		\left\{
 	 	\begin{array}{@{} l @{}}
 		 	\inSet{\!\li h}{v}	
@@ -1007,8 +1035,9 @@ Finally, \li{p}'s lock is released by applying the action of $\unlockC{\li p}$ c
 %
 % 
 \end{align*}
+\normalsize
 %
-Note that the final implication follows directly from the semantics of \colosl. That is, for all  $P \in \Assertions$ and $I \in \IAssertions$, $\shared{P}{I} \implies \emp$ is valid.
+Note that the final implication follows directly from the semantics of \colosl. That is, for all  $P \in \Assertions$ and $I \in \IAssertions$, $\shared{P}{I} \implies \emp$ is valid.\\
 %
 %
 %We can reason about the \li{remove} operation in a similar fashion. Note that the dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. 
@@ -1027,7 +1056,7 @@ Note that the final implication follows directly from the semantics of \colosl. 
 %
 %
 %
-\subsection*{\colosl vs. CAP Specification}
+\clearpage\subsection*{\colosl vs. CAP Specification}
 The definitions of most of the predicates in \fig\ref{fig:coloslSetExample} are analogous to the correspondingly-named CAP predicates specified in~\cite{cap-ecoop10}. The difference however lies in the definitions of the $\textsf{L}_{\in}$, $\textsf{L}_{\not\in}$, and \textsf{lsg} predicates. 
 \fig~\ref{fig:capSetExample} presents the CAP definitions of these predicates. 
 
@@ -1036,7 +1065,7 @@ Each node at a given address $x$, is associated with an (\emph{infinite}) set of
 
 On the other hand, in the \colosl\ specification we use a combination of the $\modT{x}$ and $\nextT{x}{y}$ capabilities to achieve the same effect for each address $x$. Since \colosl\ allows for dynamic extension of the shared state, the capabilities associated with each address $x$ are generated upon \emph{extension} of the shared state with those addresses, thus avoiding the need to account for capabilities concerning those addresses absent from the list. 
 
-Moreover, since the fractional heaps used to represent the separation algebra of capabilities are \emph{stateful}, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we appeal to a single capability of the form $\nextT{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextT{x}{y}$ is also updated to $\nextT{x}{z}$. 
+Moreover, since the fractional heaps used to represent the separation algebra of capabilities are \emph{stateful}, rather than having a distinct capability to modify the element at address $x$ before address $y$ for each possible successor address $y$, we appeal to a single capability of the form $\nextT{x}{y}$ whereby the capability is modified accordingly to reflect the changes to the successor address. For instance, when the node at address $x$ is redirected to point from address $y$ to a new location at address $z$, $\nextT{x}{y}$ is also updated to $\nextT{x}{z}$. 
 
 %
 \begin{figure*}

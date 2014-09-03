@@ -1,9 +1,9 @@
-\chapter{\colosl Program Logic}\label{sec:semantics}
+\chapter{\colosl Program Logic}\label{chapter:semantics}
 This section introduces the core concepts behind our program logic. We start by defining what the rely and guarantee conditions of each thread are in terms of their action models. This allows us to define \emph{stability} against rely conditions, \emph{repartitioning}, which logically represents a thread's atomic actions (and have to be in the guarantee condition), and \emph{semantic implication}. Equipped with these notions, we can justify the \shiftRule\ and \extendRule\ principles. 
 %We conclude this section with a sketch of the soundness of \colosl.
 %
 %
-\section{Proof System}
+\section{Environment Semantics}
 \paragraph{Rely}
 The rely relation represents potential interferences from the environment. Although the rely will be different for every program (and indeed, every thread), it is always defined in the same way, which we can break down into three kinds of possible interferences. In the remainder of this section, given a logical state $l = (\h{},\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for $\m{fst}(l)$ and $\m{snd}(l)$, respectively.
 
@@ -759,7 +759,7 @@ as required.
 %
 %
 \paragraph{Action Shifting}
-Notice that, according to our rely and guarantee conditions, the local action model may only grow with time. However, that is not to say that the same holds of interference relations in shared state assertions: as seen in \S\ref{sec:intuition}, they may forget about actions that are either redundant or not relevant to the current subjective view via \emph{shifting}. As for the action model closure relation (\defin~\ref{def:actclos}), this needs to be the case not only from the current subjective view but also for any evolution of it according to potential actions, both from the thread and the environment. To capture this set of possible futures, we refine our notion of local fences (\defin~\ref{def:localFence}), which was defined in the context of the global shared state, to the case where we consider only a subjective state within the global shared state.
+Notice that, according to our rely and guarantee conditions, the local action model may only grow with time. However, that is not to say that the same holds of interference relations in shared state assertions: as seen in \S\ref{chapter:intuition}, they may forget about actions that are either redundant or not relevant to the current subjective view via \emph{shifting}. As for the action model closure relation (\defin~\ref{def:actclos}), this needs to be the case not only from the current subjective view but also for any evolution of it according to potential actions, both from the thread and the environment. To capture this set of possible futures, we refine our notion of local fences (\defin~\ref{def:localFence}), which was defined in the context of the global shared state, to the case where we consider only a subjective state within the global shared state.
 For this, we need to also refine a second time our notion of action application to ignore the context of a subjective state, which as far as a subjective view is concerned could be anything.
 
 %% Recall from \S\ref{sec:intuition} that \colosl\ allows for forgetting
@@ -1113,7 +1113,7 @@ as required.
 \section{Programming Language and Proof System}
 We define the \colosl proof system for deriving local Hoare triples for a simple concurrent imperative programming language. The proof system and programming language of \colosl are defined as an instantiation of the views framework~\cite{views}. 
 
-\paragraph{Programming Language} The \colosl programming language is that of the views programming language~\cite{views} instantiated with a set of \emph{atomic} commands; It consists of \texttt{skip}, sequential composition, branching, loops and parallel composition. The set of \colosl atomic commands comprises an \emph{atomic} construct $\atomic{.}$ enforcing an atomic behaviour when instantiated with any \emph{sequential} command. The sequential commands of \colosl are composed of a set of \emph{elementary} commands, \texttt{skip}, sequential composition, branching and loops excluding atomic constructs and parallel composition. That is, atomic commands cannot be nested or contain parallel composition. \colosl is parametric in the choice of elementary commands allowing for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in \ex~\ref{todo} the set of elementary commands comprises variable lookup and assignment. We proceed with the formalisation of \colosl programming language. 
+\paragraph{Programming Language} The \colosl programming language is that of the views programming language~\cite{views} instantiated with a set of \emph{atomic} commands; It consists of \texttt{skip}, sequential composition, branching, loops and parallel composition. The set of \colosl atomic commands comprises an \emph{atomic} construct $\atomic{.}$ enforcing an atomic behaviour when instantiated with any \emph{sequential} command. The sequential commands of \colosl are composed of a set of \emph{elementary} commands, \texttt{skip}, sequential composition, branching and loops excluding atomic constructs and parallel composition. That is, atomic commands cannot be nested or contain parallel composition. \colosl is parametric in the choice of elementary commands allowing for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in the token ring example of \S~\ref{chapter:intuition} the set of elementary commands comprises variable lookup and assignment. We proceed with the formalisation of \colosl programming language. 
 %
 \begin{parameter}[Elementary commands]
 Assume a set of elementary commands \Basics, ranged over by $\bc{}, \bc{1}, \cdots, \bc{n}$.

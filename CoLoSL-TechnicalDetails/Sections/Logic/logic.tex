@@ -1,4 +1,4 @@
-\chapter{\colosl Model and Assertions}\label{sec:logic}
+\chapter{\colosl Model and Assertions}\label{chapter:logic}
 We formally describe the underlying model of \colosl; we present the various ingredients necessary for defining the \colosl \emph{worlds}: the building blocks of \colosl that track the resources held by each thread, the shared resources accessible to all threads, as well as the ways in which the shared resources may be manipulated by each thread.
 
 We then proceed with the \emph{assertions} of \colosl and provide their semantics by relating them to sets of worlds. Finally, we establish the validity of \copyRule, \forgetRule and \mergeRule principles introduced in the preceding chapters by establishing their truth for all possible worlds and interpretations.
@@ -28,7 +28,7 @@ Finally, the composition of two worlds will be defined whenever their local stat
 We proceed by defining logical states, which are \colosl's notion of \emph{resource}, in the standard separation logic sense. Logical states have two components: one describes machine states (\textit{e.g.} stacks and heaps); the other
 represents \emph{capabilities}. The latter are inspired by the capabilities in deny-guarantee reasoning~\cite{dg}: a thread in possession of a given capability is allowed to perform the associated actions (as prescribed by the \emph{action model} components of each world, defined below), while any capability \emph{not} owned by a thread means that the environment can perform the action.
 
-\colosl\ is parametric in the choice of the separation algebra representing the machine states and capabilities. This allows for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in \ex~\ref{todo} the separation algebra of machine states is a standard variable stack; while capabilities are captured as a set of tokens. However, as we demonstrate in the examples of \S\ref{todo}, our programs often call for a more complex model of machine states and capabilities. For instance, we may need our capabilities to be fractionally owned, where ownership of a \emph{fraction} of a capability grants the right to perform the action to both the thread and the environment, while a fully-owned capability by the thread \emph{denies} the right to the environment to perform the associated action. 
+\colosl\ is parametric in the choice of the separation algebra representing the machine states and capabilities. This allows for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in the token ring example of \S~\ref{chapter:intuition} the separation algebra of machine states is a standard variable stack; while capabilities are captured as a set of tokens. However, as we demonstrate in the examples of \S\ref{chapter:examples}, our programs often call for a more complex model of machine states and capabilities. For instance, we may need our capabilities to be fractionally owned, where ownership of a \emph{fraction} of a capability grants the right to perform the action to both the thread and the environment, while a fully-owned capability by the thread \emph{denies} the right to the environment to perform the associated action. 
 %while in \ex~\ref{todo} we instantiate it with a pair of separation algebras comprising heaps and variable stacks. 
 
 In general, the separation algebra of machine states and capabilities can be instantiated with \emph{any} separation algebra (\textit{i.e.} a cancellative,  partial commutative monoid~\cite{asl}) that satisfies the \emph{cross-split} property. This is formalised in the following parametrisations.
@@ -525,7 +525,7 @@ and
 	\sem[\lenv]{P} \eqdef \left\{ w \mid w, \lenv |= P \right\}
 \]	
 %
-The satisfaction relation for subjective views in $\slsat$ is purely for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to write predicates in interference assertions whose definition includes subjective views, as in the example of \S\ref{sec:set}. Since actions are not allowed to modify shared state from within another subjective view, the interpretation of such subjective views collapses to $\emp$.
+The satisfaction relation for subjective views in $\slsat$ is purely for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to write predicates in interference assertions whose definition includes subjective views, as in the example of \S\ref{sec:set-example}. Since actions are not allowed to modify shared state from within another subjective view, the interpretation of such subjective views collapses to $\emp$.
 %% Alternatively, we could forbid boxes in assertions
 %% evaluated using $\slsat$ and explicitly unpack such predicates and
 %% erase their subjective views.

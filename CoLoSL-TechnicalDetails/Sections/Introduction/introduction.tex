@@ -117,22 +117,24 @@ We can proceed to verify the threads, knowing that their subjective views descri
 \end{align*}
 %
 The assertion $P ** Q$ describes the overlapping of states arising from $P$ and $Q$, using the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
-The new interference relation is simply the union of previous interferences. Finally, we can use the \shiftRule\ principle to simplify the interference assertion now that we are back with a larger subjective view.
+The new interference relation is simply the union of previous interferences. Finally, we can use the \shiftRule principle to simplify the interference assertion now that we are back with a larger subjective view.
 
-The last principle to mention is how subjective views are created using the \extendRule principle, where $\vec a, \vec b$ range over capabilities:
+The last principle to mention is how subjective views are created using the \extendRule principle:
 %
 \begin{align}\label{eq:extend}
-  P \containI I
-  &\text{ implies }
+  & P \containI I 
+  \text{ and }
+  \fresh{\exsts{\vec{x}} \capAss{1} * \capAss{2}}
+  \text{ implies } 
   P ===>
-  \exsts{\vec{{a}}, \vec{{b}}}[{a}_1] {*} \cdots {*}
-        [ a_n] * \shared{P *
-   [{b}_1] {*} \cdots {*} [{b}_n]}{I}
+  \exsts{\vec{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
   \tag{\extendRule}
 \end{align}
 %
-The side condition $P \containI I$ ensures that the actions associated with interference assertion $I$ are confined to $P$. The existential quantification of tokens is to ensure the \emph{freshness} of the generated capabilities. 
-The main novelty of this rule is the fact that new actions may refer to existing shared state, as we shall see  in our set example discussed in \S\ref{sec:examples}. Notice that we  do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
+where $\vec{x}$ range over logical variables bound in the capability assertions $\capAss{1}$ and $\capAss{2}$ with the proviso that $\vec{x}$ do not appear unbound in $P$ ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
+
+The side condition $P \containI I$ ensures that the actions associated with interference assertion $I$ are confined to $P$; the side condition $\fresh{\exsts{\vec{x}} \capAss{1} * \capAss{2}}$ is to ensure the \emph{freshness} of the generated capabilities. 
+The main novelty of this rule is the fact that new actions may refer to existing shared state, as we shall see  in our set example discussed in \S\ref{chapter:examples}. Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
 
 With these reasoning principles, we are able to expand and contract subjective views  to provide just the resource required by a thread.
 In essence, we provide  frame-like reasoning for  subjective  views. 
@@ -140,13 +142,14 @@ In essence, we provide  frame-like reasoning for  subjective  views.
 %% subtle. We are able to forget resource of the subjective assertion $P$
 %%  whilst at the same time adapting the interference relation $I$  to
 %% capture global constraints associated with that lost resource.
-In \S\ref{sec:intuition}, we demonstrate this using a variant of the famous  token ring mutual exclusion algorithm~\cite{dijkstra74}, introduced by Dijkstra to illustrate distributed, global knowledge between threads. The point is that, as well as local knowledge about how the threads behave, the programmer also has global knowledge about how the threads constrain each other. Our reasoning captures the spirit of reasoning locally about individual threads at the same time as retaining global knowledge about the overall thread behaviour. It is a good  introductory example, as it uses all the highlighted \colosl\ reasoning principles in a fundamental way. 
+In \S\ref{chapter:intuition}, we demonstrate this using a variant of the famous  token ring mutual exclusion algorithm~\cite{dijkstra74}, introduced by Dijkstra to illustrate distributed, global knowledge between threads. The point is that, as well as local knowledge about how the threads behave, the programmer also has global knowledge about how the threads constrain each other. Our reasoning captures the spirit of reasoning locally about individual threads at the same time as retaining global knowledge about the overall thread behaviour. It is a good  introductory example, as it uses all the highlighted \colosl\ reasoning principles in a fundamental way. 
 
-In \S\ref{sec:logic}, we interpret \colosl\ assertions over a particular domain which includes: thread-local state exclusively visible to the thread; {\em one} global shared state accessible by all thread (in contrast with the CAP approach); and {\em action models} describing how the global state can be updated. In \S\ref{sec:semantics}, we define the rely and guarantee conditions of each thread in terms of their action models, and provide a sketch of soundness. In particular, the reasoning principles highlighted above are simple semantic
-consequences of our generic model of program states.  The full technical details can be found in the accompanying technical report~\cite{colosl-tr14}.
+In \S\ref{chapter:logic}, we interpret \colosl\ assertions over a particular domain which includes: thread-local state exclusively visible to the thread; {\em one} global shared state accessible by all thread (in contrast with the CAP approach); and {\em action models} describing how the global state can be updated. In \S\ref{chapter:semantics}, we define the rely and guarantee conditions of each thread in terms of their action models, and provide a sketch of soundness. In particular, the reasoning principles highlighted above are simple semantic
+consequences of our generic model of program states.  
+%The full technical details can be found in the accompanying technical report~\cite{colosl-tr14}.
 
 
-In \S\ref{sec:examples}, we study two further, more challenging examples. We verify a concurrent spanning tree algorithm for graphs. This algorithm uses threads spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping subjective views of \colosl are just what we need.  We also verify a concurrent set
+In \S\ref{chapter:examples}, we study two further, more challenging examples. We verify a concurrent spanning tree algorithm for graphs. This algorithm uses threads spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping subjective views of \colosl are just what we need.  We also verify a concurrent set
 module implemented using a hand-over-hand list-locking algorithm.
 %Interestingly, this
 %example uses the \extendRule principle   to the create new actions which refer to existing

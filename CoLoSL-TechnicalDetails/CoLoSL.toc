@@ -1,0 +1,31 @@
+\contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}
+\contentsline {chapter}{\numberline {2}Informal Development}{6}{chapter.2}
+\contentsline {paragraph}{Further \text {CoLoSL}\xspace reasoning}{11}{paragraph*.12}
+\contentsline {chapter}{\numberline {3}\text {CoLoSL}\xspace Model and Assertions}{12}{chapter.3}
+\contentsline {section}{\numberline {3.1}Worlds}{12}{section.3.1}
+\contentsline {paragraph}{Overview}{12}{paragraph*.13}
+\contentsline {paragraph}{The Effect of Actions}{15}{paragraph*.14}
+\contentsline {section}{\numberline {3.2}Assertions}{19}{section.3.2}
+\contentsline {paragraph}{Action Model Closure}{22}{paragraph*.15}
+\contentsline {chapter}{\numberline {4}\text {CoLoSL}\xspace Program Logic}{27}{chapter.4}
+\contentsline {section}{\numberline {4.1}Environment Semantics}{27}{section.4.1}
+\contentsline {paragraph}{Rely}{27}{paragraph*.16}
+\contentsline {paragraph}{Guarantee}{29}{paragraph*.17}
+\contentsline {subsection}{\numberline {4.1.1}Interference Manipulations}{30}{subsection.4.1.1}
+\contentsline {paragraph}{Shared State Extension}{31}{paragraph*.18}
+\contentsline {paragraph}{Action Shifting}{37}{paragraph*.29}
+\contentsline {section}{\numberline {4.2}Programming Language and Proof System}{41}{section.4.2}
+\contentsline {paragraph}{Programming Language}{41}{paragraph*.34}
+\contentsline {paragraph}{Proof Rules}{43}{paragraph*.35}
+\contentsline {section}{\numberline {4.3}Operational Semantics}{43}{section.4.3}
+\contentsline {section}{\numberline {4.4}Soundness}{45}{section.4.4}
+\contentsline {chapter}{\numberline {5}Examples}{48}{chapter.5}
+\contentsline {section}{\numberline {5.1}Concurrent Spanning Tree}{48}{section.5.1}
+\contentsline {section}{\numberline {5.2}Set Module}{54}{section.5.2}
+\contentsline {paragraph}{\textsf {isLock}(\textit {x}, $\pi $) / \textsf {locked}(\textit {x})}{56}{paragraph*.36}
+\contentsline {paragraph}{\textit {L(x)}}{56}{paragraph*.37}
+\contentsline {paragraph}{\textsf {in}(\textit {h}, \textit {v}) / \textsf {out}(\textit {h}, \textit {v})}{56}{paragraph*.38}
+\contentsline {paragraph}{\textsf {lsg}(\textit {x}, \textit {z}, \textit {L}, \textit {h})}{57}{paragraph*.39}
+\contentsline {paragraph}{\textsf {U}(\textit {x}, \textit {v}, \textit {y}) / \textsf {L}(\textit {x}, \textit {v}, \textit {y})}{57}{paragraph*.40}
+\contentsline {paragraph}{\textit {I}(\textit {h}, \textit {x})}{58}{paragraph*.41}
+\contentsline {chapter}{\numberline {A}Auxiliary Lemmata}{70}{appendix.A}
