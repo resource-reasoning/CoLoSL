@@ -124,7 +124,7 @@ The last principle to mention is how subjective views are created using the \ext
 \begin{align}\label{eq:extend}
   & P \containI I 
   \text{ and }
-  \fresh{\exsts{\vec{x}} \capAss{1} * \capAss{2}}
+  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
   \text{ implies } 
   P ===>
   \exsts{\vec{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
@@ -133,7 +133,7 @@ The last principle to mention is how subjective views are created using the \ext
 %
 where $\vec{x}$ range over logical variables bound in the capability assertions $\capAss{1}$ and $\capAss{2}$ with the proviso that $\vec{x}$ do not appear unbound in $P$ ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
 
-The side condition $P \containI I$ ensures that the actions associated with interference assertion $I$ are confined to $P$; the side condition $\fresh{\exsts{\vec{x}} \capAss{1} * \capAss{2}}$ is to ensure the \emph{freshness} of the generated capabilities. 
+The side condition $P \containI I$ ensures that the actions associated with interference assertion $I$ are confined to $P$; the side condition $\fresh{\vec{x}, \capAss{1} * \capAss{2}}$ is to ensure the \emph{freshness} of the generated capabilities. 
 The main novelty of this rule is the fact that new actions may refer to existing shared state, as we shall see  in our set example discussed in \S\ref{chapter:examples}. Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
 
 With these reasoning principles, we are able to expand and contract subjective views  to provide just the resource required by a thread.

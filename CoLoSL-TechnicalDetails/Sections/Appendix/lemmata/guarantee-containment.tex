@@ -198,7 +198,8 @@ By definition of \extendG\ and from (\ref{L12:Ass2}) and (\ref{L12:Ass3}) we kno
 	/| \ca{1} \composeCap \ca{2} \containedIn \dom{\lmod''} /|  \ca{1} \composeCap \ca{2} \disjoint \dom{\lmod_{2}} \\
 	/| \lmod' = \lmod_{2} \cup \lmod'' 
 	/| \expandsAM{\gmod'}{g''}{\lmod''}{g_2}{\lmod_{2}}{\gmod_{2}}  
-	/| \extendsAM{\lmod', \gmod'}{g''}{g_2}{\lmod''} 
+	/| g'' \containI \lmod'' 
+%	/| \extendsAM{\lmod', \gmod'}{g''}{g_2}{\lmod''} 
 \end{array}
 \label{L12:Ass4}
 \end{align}
@@ -248,7 +249,8 @@ By definition of \shiftG and from (\ref{LSGC:Ass2}), and (\ref{LSGC:Ass3}) we kn
 %
 \begin{align}
 %
-	& \lmod' = \lmod_{2} \cup \lmod'' /| \expandsAM{\gmod_{2}}{\unitL}{\lmod''}{g_2}{\lmod_{2}}{\gmod_{2}}\label{LSGC:Ass7}
+%	& g' = g_2 /| \gmod' = \gmod_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \for{\ca{}} \for{a \in \lmod'' (\ca{})} \m{reflected}(a, g_2, \lmod_2) \label{LSGC:Ass7}
+	& g' = g_2 /| \gmod' = \gmod_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \expandsAM{\gmod_{2}}{\unitL}{\lmod''}{g_2}{\lmod_{2}}{\gmod_{2}}\label{LSGC:Ass7}
 %
 \end{align}
 %
