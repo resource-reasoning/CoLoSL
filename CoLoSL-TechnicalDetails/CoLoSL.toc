@@ -19,13 +19,13 @@
 \contentsline {paragraph}{Proof Rules}{46}{paragraph*.43}
 \contentsline {section}{\numberline {4.3}Operational Semantics}{47}{section.4.3}
 \contentsline {section}{\numberline {4.4}Soundness}{48}{section.4.4}
-\contentsline {chapter}{\numberline {5}Examples}{52}{chapter.5}
-\contentsline {section}{\numberline {5.1}Concurrent Spanning Tree}{52}{section.5.1}
-\contentsline {section}{\numberline {5.2}Set Module}{58}{section.5.2}
-\contentsline {paragraph}{\textsf {isLock}(\textit {x}, $\pi $) / \textsf {locked}(\textit {x})}{60}{paragraph*.44}
-\contentsline {paragraph}{\textit {L(x)}}{60}{paragraph*.45}
-\contentsline {paragraph}{\textsf {in}(\textit {h}, \textit {v}) / \textsf {out}(\textit {h}, \textit {v})}{60}{paragraph*.46}
-\contentsline {paragraph}{\textsf {lsg}(\textit {x}, \textit {z}, \textit {L}, \textit {h})}{61}{paragraph*.47}
-\contentsline {paragraph}{\textsf {U}(\textit {x}, \textit {v}, \textit {y}) / \textsf {L}(\textit {x}, \textit {v}, \textit {y})}{61}{paragraph*.48}
-\contentsline {paragraph}{\textit {I}(\textit {h}, \textit {x})}{62}{paragraph*.49}
-\contentsline {chapter}{\numberline {A}Auxiliary Lemmata}{74}{appendix.A}
+\contentsline {chapter}{\numberline {5}Examples}{51}{chapter.5}
+\contentsline {section}{\numberline {5.1}Concurrent Spanning Tree}{51}{section.5.1}
+\contentsline {section}{\numberline {5.2}Set Module}{57}{section.5.2}
+\contentsline {paragraph}{\textsf {isLock}(\textit {x}, $\pi $) / \textsf {locked}(\textit {x})}{59}{paragraph*.44}
+\contentsline {paragraph}{\textit {L(x)}}{59}{paragraph*.45}
+\contentsline {paragraph}{\textsf {in}(\textit {h}, \textit {v}) / \textsf {out}(\textit {h}, \textit {v})}{59}{paragraph*.46}
+\contentsline {paragraph}{\textsf {lsg}(\textit {x}, \textit {z}, \textit {L}, \textit {h})}{60}{paragraph*.47}
+\contentsline {paragraph}{\textsf {U}(\textit {x}, \textit {v}, \textit {y}) / \textsf {L}(\textit {x}, \textit {v}, \textit {y})}{60}{paragraph*.48}
+\contentsline {paragraph}{\textit {I}(\textit {h}, \textit {x})}{61}{paragraph*.49}
+\contentsline {chapter}{\numberline {A}Auxiliary Lemmata}{73}{appendix.A}
