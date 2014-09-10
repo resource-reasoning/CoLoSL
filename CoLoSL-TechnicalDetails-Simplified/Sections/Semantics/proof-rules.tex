@@ -1,0 +1,216 @@
+\begin{lemma}[Fencing rules]\label{lem:fence-rules}
+The fencing rules of \fig~\ref{fig:fence-rules} are valid. 
+%
+\begin{proof}
+By induction on the structure of judgements. \\
+
+\noindent\textbf{Case }$\downarrow$ direction.
+Pick an arbitrary $\lenv \in \LEnv$, $\fenceAss{} \in \Assertions$, $I_1, I_2 \in \IAssertions$, $\fence{} \in \pset{\LStates}$, $\lmod_1, \lmod_2 \in \AMods$ such that 
+%
+\begin{align}
+	& \fence{} = \left\{ l \mid l, \lenv \slsat \fenceAss{} \right\} \nonumber\\
+	& \lmod_1 = \semI[\lenv]{I_1} /| \lmod_2 = \semI[\lenv]{I_2} \nonumber\\
+	& \fence{} \fences \lmod_1 \label{LFR-Frame1:Ass1}\\
+	& \fence{} \fences \lmod_2 \label{LFR-Frame1:Ass2}
+\end{align}
+%
+\textbf{RTS. }
+\begin{align*}
+	\fence{} \fences \lmod_1 \cup \lmod_2
+\end{align*}
+%
+Pick an arbitrary $l \in \fence{}$ ,$\ca{} \in \Caps$ and $a \in (\lmod_1 \cup \lmod_2)(\ca{})$ such that 
+%
+\begin{align}
+	a(l) \text{ is defined} \label{LFR-Frame1:Ass3}
+\end{align}
+%
+Since $a \in (\lmod_1 \cup \lmod_2)(\ca{})$, we know either $a \in \lmod_1(\ca{})$ or $a \in \lmod_2(\ca{})$. If the former is the case then from (\ref{LFR-Frame1:Ass1}) and (\ref{LFR-Frame1:Ass3} we have $a(l) \subseteq \fence{}$. Similarly, if the latter is the case then from (\ref{LFR-Frame1:Ass2}) and (\ref{LFR-Frame1:Ass3}) we have $a(l) \subseteq \fence{}$ as required.\\
+
+%
+%
+\noindent\textbf{Case }$\uparrow$ direction.
+Pick an arbitrary $\lenv \in \LEnv$, $\fenceAss{} \in \Assertions$, $I_1, I_2 \in \IAssertions$, $\fence{} \in \pset{\LStates}$, $\lmod_1, \lmod_2 \in \AMods$ such that 
+%
+\begin{align}
+	& \fence{} = \left\{ l \mid l, \lenv \slsat \fenceAss{} \right\} \nonumber\\
+	& \lmod_1 = \semI[\lenv]{I_1} /| \lmod_2 = \semI[\lenv]{I_2} \nonumber\\
+	& \fence{} \fences \lmod_1 \cup \lmod_2 \label{LFR-Frame1:ass1}
+\end{align}
+%
+\textbf{RTS. }
+\begin{align*}
+	\fence{} \fences \lmod_1  /| \fence{} \fences \lmod_2
+\end{align*}
+%
+Pick an arbitrary $l \in \fence{}$ ,$\ca{} \in \Caps$ and $a \in \lmod_1(\ca{})$ such that 
+%
+\begin{align}
+	a(l) \text{ is defined} \label{LFR-Frame1:ass2}
+\end{align}
+%
+Since $a \in \lmod_1(\ca{})$, we know either $a \in (\lmod_1 \cup \lmod_2)(\ca{})$. Consequently, from (\ref{LFR-Frame1:ass1}) and (\ref{LFR-Frame1:ass2} we have $a(l) \subseteq \fence{}$ as required. \\
+
+\noindent Pick an arbitrary $l \in \fence{}$ ,$\ca{} \in \Caps$ and $a \in \lmod_2(\ca{})$ such that 
+%
+\begin{align}
+	a(l) \text{ is defined} \label{LFR-Frame1:ass3}
+\end{align}
+%
+Since $a \in \lmod_2(\ca{})$, we know either $a \in (\lmod_1 \cup \lmod_2)(\ca{})$. Consequently, from (\ref{LFR-Frame1:ass1}) and (\ref{LFR-Frame1:ass3} we have $a(l) \subseteq \fence{}$ as required. \\
+%
+%
+%
+%
+%
+%
+
+\noindent\textbf{Case }\\
+Pick an arbitrary $\lenv \in \LEnv$, $\fenceAss{} \in \Assertions$, $I, I' \in \IAssertions$, $\fence{} \in \pset{\LStates}$, $\lmod, \lmod' \in \AMods$ such that 
+%
+\begin{align}
+	& \fence{} = \left\{ l \mid l, \lenv \slsat \fenceAss{} \right\} \nonumber\\
+	& \lmod = \semI[\lenv]{I} /| \lmod' = \semI[\lenv]{I'} \nonumber\\
+	& \fence{} \fences \lmod' \label{LFR-weaken:Ass1}\\
+	& \lmod' \weakenI{\fence{}} \lmod \label{LFR-weaken:Ass2}
+\end{align}
+%
+\textbf{RTS. }
+\begin{align*}
+	\fence{} \fences \lmod
+\end{align*}
+%
+Pick an arbitrary $l \in \fence{}$ ,$\ca{} \in \Caps$, $a \in \lmod(\ca{})$ and $l'$ such that 
+%
+\begin{align}
+	a(l) \text{ is defined } /| l' \in a(l) \label{LFR-weaken:Ass3}
+\end{align}
+%
+From (\ref{LFR-weaken:Ass3}) and the definition of $a(l)$ we know there exists $r$ such that 
+%
+\begin{align}
+	& \fst{a} \leq l \composeL r \label{LFR-weaken:Ass4}\\
+	& (\fst{\updateFP{a}} \disjoint l /| l' = l) |/ 
+	\left(
+	\begin{array}{@{} r @{\hspace{2pt}} l @{}}
+		\exsts{p_1, p_2, p_l} & \fst{\updateFP{a}} = p_1 \composeL p_2\\
+		& l = p_1 \composeL p_l \\
+		& l' = \snd{\updateFP{a}} \composeL p_l
+	\end{array}
+	\right)
+	\label{LFR-weaken:Ass5}
+\end{align}
+%
+From (\ref{LFR-weaken:Ass2}, (\ref{LFR-weaken:Ass4}) and (\ref{LFR-weaken:Ass5}) we know there exists $a' \in \lmod'(\ca{})$ such that 
+%
+\begin{align}
+	\fst{a'} \leq l \composeL r /| \updateFP{a} = \updateFP{a'}\label{LFR-weaken:Ass6}
+\end{align}
+%
+Consequently, from the definition of $a'(l)$ and (\ref{LFR-weaken:Ass5})-(\ref{LFR-weaken:Ass6}) we have:
+%
+\begin{align}
+	l' \in a'(l)
+	\label{LFR-weaken:Ass7}
+\end{align}
+%
+Consequently, from (\ref{LFR-weaken:Ass1}) and (\ref{LFR-weaken:Ass7}) we have
+%
+\begin{align*}
+	l' \in \fenceAss{} 
+\end{align*}
+%
+as required.\\
+%
+%
+%
+%
+%
+
+\noindent\textbf{Case }\\
+Pick an arbitrary $\lenv \in \LEnv$, $\fenceAss{}, P, Q, R \in \Assertions$, $\capAss{} \in \KAssertions$, $\fence{} \in \pset{\LStates}$, $r \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that 
+%
+\begin{align}
+	& \fence{} = \left\{ l \mid l, \lenv \slsat \fenceAss{} \right\} \nonumber\\
+	& \for{l_1 \in \LStates} l_1, \lenv \slsat R \implies l_1 = r  \label{LFR-exact:Ass1}\\
+	& \dom{\lmod} = \left\{ \ca{} \mid \ca{} \in \semK[\lenv]{\capAss{}} \right\} \label{LFR-exact:Ass2}\\
+	& \for{\ca{} \in \dom{\lmod}} \lmod(\ca{}) = \left\{ (p, q) \mid p, \lenv \slsat P /| q, \lenv \slsat Q \right\} \label{LFR-exact:Ass3}\\
+	& \fence{} \fences \lmod \label{LFR-exact:Ass4}\\
+	& \dom{\lmod'} = \left\{ \ca{} \mid \ca{} \in \semK[\lenv]{\capAss{}} \right\} \label{LFR-exact:Ass5}\\
+	& \for{\ca{} \in \dom{\lmod'}} \lmod'(\ca{}) = 
+		\left\{ (p \composeL r_1, q \composeL r_2) \;\middle| \;
+			\begin{array}{@{} l @{}}
+				p, \lenv \slsat P /| q, \lenv \slsat Q /| \\
+				r_1, \lenv \slsat R /| r_2, \lenv \slsat R
+			\end{array}
+		\right\} \label{LFR-exact:Ass6}
+\end{align}
+%
+Pick an arbitrary $l \in \fence{}$ ,$\ca{} \in \dom{\lmod'}$, $a \in \lmod'(\ca{})$ and $l'$ such that 
+%
+\begin{align}
+	a(l) \text{ is defined } /| l' \in a(l) \label{LFR-exact:Ass7}
+\end{align}
+%
+\textbf{RTS. }
+\begin{align*}
+	l' \in \fence{} 
+\end{align*}
+%(\ref{LFR-exact:Ass})
+From (\ref{LFR-exact:Ass7}), (\ref{LFR-exact:Ass1}), (\ref{LFR-exact:Ass3}) and (\ref{LFR-exact:Ass6}) we know that there exists $p, q \in \LStates$  such that 
+%
+\begin{align}
+	a = (p \composeL r, q \composeL r) /| (p, q) \in \lmod(\ca{})
+	\label{LFR-exact:Ass8}
+\end{align}
+%
+and consequently by definition of $\updateFP{a}$
+%
+\begin{align}
+	\updateFP{a} = \updateFP{(p, q)}
+	\label{LFR-exact:Ass9}
+\end{align}
+%
+On the other hand, from (\ref{LFR-exact:Ass7}) and the definition of $a(l)$ we know there exists $r'$ such that 
+%(\ref{LFR-exact:Ass})
+\begin{align*}
+&
+\begin{array}{@{} l @{}}
+	(p \composeL r) \meetL (l \composeL r') \not= \emptyset
+\end{array}
+\end{align*}
+% 
+and thus 
+%
+\begin{align*}
+&
+\begin{array}{@{} l @{}}
+	p \meetL (l \composeL r') \not= \emptyset
+\end{array}
+\end{align*}
+% 
+Consequently, we have
+\begin{align}
+	(p, q)(l) \text{ is defined}
+	\label{LFR-exact:Ass10}
+\end{align}
+%(\ref{LFR-exact:Ass})
+On the other hand, from the definition of $(a(l)$ and (\ref{LFR-exact:Ass9}) we have 
+%
+\begin{align}
+	(p, q)(l) = a(l)
+	\label{LFR-exact:Ass11}
+\end{align}
+%
+Finally, from (\ref{LFR-exact:Ass4}), (\ref{LFR-exact:Ass7}), (\ref{LFR-exact:Ass10}) and (\ref{LFR-exact:Ass11}) we have:
+%
+\begin{align*}
+	l' \in \fence{}
+\end{align*}
+%
+as required.\\
+
+
+
+\end{proof}
+\end{lemma}
