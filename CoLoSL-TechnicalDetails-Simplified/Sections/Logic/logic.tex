@@ -431,8 +431,8 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   w' \composeW w_1, \lenv |= P_1 \text{ and }
   w' \composeW w_2, \lenv |= P_2\\
   
-  w, \lenv &|= P --* Q &\text{iff}&
-   \for{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
+  w, \lenv &|= P \septraction Q &\text{iff}&
+   \exsts{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
    &&&\text{ implies }w \composeW w', \lenv |= Q\\
   
 \end{array}
@@ -463,8 +463,8 @@ where
   s' \composeL s_1, \lenv |=_\dagger P_1 \text{ and }
   s' \composeL s_2, \lenv |=_\dagger P_2\\
   
-  s, \lenv &|=_\dagger P --* Q &\text{iff}&
-  \for{s'} s', \lenv |=_\dagger P \text{ and }
+  s, \lenv &|=_\dagger P \septraction Q &\text{iff}&
+  \exsts{s'} s', \lenv |=_\dagger P \text{ and }
   s \compatible s'\\
   &&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
 
@@ -504,8 +504,8 @@ where
   l' \composeL l_2, \lenv \slsat P_2\\
   
   
-  l, \lenv & \slsat P --* Q &\text{iff}&
-  \for{l'} l', \lenv \slsat P \text{ and }
+  l, \lenv & \slsat P \septraction Q &\text{iff}&
+  \exsts{l'} l', \lenv \slsat P \text{ and }
   l \compatible l'\\
   &&&\text{ implies } l \composeL l', \lenv \slsat Q
 \end{array}
@@ -696,15 +696,9 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
   
   \qquad 
   \left(
-  \begin{array}{l}
-  	\m{reflected}(a,s\composeL r,\lmod'(\ca{})) /| \hfill \text{(2)}\\
-	  \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{n}{s'}{r'}{\lmod'} \qquad \hfill \text{(3)}
-	  \end{array}
-  \right) |/\null\\
-  
-  \qquad \left(\neg\m{visible}(a,s) /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{n}{s'}{r'}{\lmod'} \right) \qquad\hfill \text{(3)}
-  
-  
+  	\m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/ \neg\m{visible}(a,s) 
+  \right)\qquad \hfill \text{(2)} \\
+  \qquad  /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{n}{s'}{r'}{\lmod'} \qquad \hfill \text{(3)}
 \end{array}
 \]
 %
