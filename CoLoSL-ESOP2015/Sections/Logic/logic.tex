@@ -1,0 +1,575 @@
+\section{\colosl Model and Assertions}\label{sec:logic}
+We formally describe the underlying model of \colosl; we present the various ingredients necessary for defining the \colosl \emph{worlds}: the building blocks of \colosl that track the resources held by each thread, the shared resources accessible to all threads, as well as the ways in which the shared resources may be manipulated by each thread.
+
+We then proceed with the \emph{assertions} of \colosl and provide their semantics by relating them to sets of worlds. We establish the validity of \copyRule, \forgetRule and \mergeRule principles introduced in the preceding sections by establishing their truth for all possible worlds and interpretations.
+%We formally introduce the assertions of \colosl and their models starting with the latter.
+
+\subsection{Worlds}
+\paragraph{\textbf{Overview}}
+A \emph{world} is a triple $(l, g, \lmod)$ that is \emph{well-formed} where $l$ and $g$ are \emph{logical states} and $\lmod$ is an \emph{action model}; let us explain the role of each component informally. The \emph{local logical state}, or simply local state, $l$ represents the locally owned resources of a thread. The \emph{shared logical state}, or shared state, $g$ represents the \emph{entire} (global) shared state, accessible to all threads, subject to interferences as described by the action models.
+
+An action model is a partial function from \emph{capabilities} to sets of \emph{actions}. An action is a pair $(p,q)$ of logical states where $p$ is the \emph{pre-state} of the action and $q$ its \emph{post-state}.  The \emph{action model} $\lmod$ corresponds directly to the (semantic interpretation of) an interference assertion $I$. Although worlds do not put further constraints on the
+relationship between $\lmod$ and $g$, they are linked more tightly in the semantics of assertions (\S\ref{subsec:assertions}). The well-formedness condition of worlds is formalised in \defin~\ref{def:well-formedness}.
+
+%As $g$ represents the global shared state, as part of the well-formedness condition we require that actions in $\lmod$ and $\gmod$ are \emph{confined} to $g$.  We write $g \containI \lmod$ to denote that those parts of the shared state mutated by actions in $\lmod$ are fully contained in $g$. As threads may unilaterally decide to introduce part of their local states into the shared state at any point (by \extendRule), this ensures that existing actions cannot affect future extensions of shared state. Similarly, we require that the new actions associated with newly shared state are confined to that extension in the same vein, hence extending the shared state cannot retroactively invalidate the views of other threads. As we will demonstrate, confinement does not however prohibit \emph{referring} to existing parts of the shared state in the new actions; rather, it only safeguards against \emph{mutation} of the already shared resources through new actions.
+
+Finally, the composition of two worlds will be defined whenever their local states are disjoint and they agree on all other two components, hence have identical knowledge of the shared state and possible interferences.\\
+
+%\paragraph{Worlds and Actions}
+We proceed by defining logical states, which are \colosl's notion of \emph{resource}, in the standard separation logic sense. Logical states have two components: one describes machine states (\textit{e.g.} stacks and heaps); the other
+represents \emph{capabilities}. The latter are inspired by the capabilities in deny-guarantee reasoning~\cite{dg}: a thread in possession of a given capability is allowed to perform the associated actions (as prescribed by the \emph{action model} components of each world, defined below), while any capability \emph{not} owned by a thread means that the environment can perform the action.
+%
+%
+\begin{definition}[Logical states]
+A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$ associating program variables with values, a heap $h \in \set{Heap}$ associating heap locations with values, and a capability $\ca{}\in\Caps$. We assume infinite disjoint sets $\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program variables, logical variables, and tokens,
+respectively.
+%
+\begin{mathpar}
+	\set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
+
+	\set{Heap} == \set{Loc} --`_{\m{fin}} \set{Val}
+
+	\Heaps == \set{Stack}\times \set{Heap}
+
+	\Caps == \powerset(\set{Token})
+
+	\LStates == \Heaps\times \Caps
+\end{mathpar}
+%
+We write $l, l_1, \cdots, l_n$ to range over either arbitrary logical states or those representing the local logical state. Similarly, we write $g, g_1, \cdots, g_n$ to range over logical states when representing the shared (global) state. We write $\unitL$ for the logical state $(\emptyset, \unitH, \unitCap)$. The \emph{composition of logical states} $ \composeL : \LStates \times \LStates \rightharpoonup \LStates $ is defined as the disjoint union $\uplus$ of their individual components:
+%
+\[
+  (@s, h,\ca{}) \composeL (@s', h', \ca{}') \eqdef
+  (@s\uplus @s', h\composeH h', \ca{}\composeCap \ca{}')
+\]
+%
+The \emph{separation algebra of logical states} is given by $(\LStates, \composeL, \unitL)$.  
+\end{definition}
+%
+%
+Although, for this presentation, we build logical states from a fixed $\Heaps$ and $\Caps$, the general theory of \colosl~\cite{colosl-tr14} allows these two objects to be instantiated with \emph{any} separation algebras (i.e. a cancellative, partial commutative monoid~\cite{asl}) that satisfies the \emph{cross-split} property\footnote{
+A separation algebra $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff for all $a, b, c, d \in \mathbb{B}$ where $a + b = c + d$, there exists $ac, ad, bc, bd \in \mathbb{B}$ s.t.
+%
+\vspace{-3pt}
+\[
+	a = ac + ad /| b = bc + bd /|
+	c = ac + bc /| d = ad + bd \vspace{-10pt}
+\]
+}.
+As we demonstrate in the examples of \S\ref{sec:examples}, our programs often call for a more complex model of machine states and capabilities. For instance, we may need our capabilities to be fractionally owned, where ownership of a \emph{fraction} of a capability grants the right to perform the action to both the thread and the environment, while a fully-owned capability by the thread \emph{denies} the right to the environment to perform the associated action. 
+
+Oftentimes, we need to compare two logical states $l_1 \leq l_2$ (or their constituent components) defined when there exists $l$ such that $l\composeL l_1 = l_2$. We also write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$. When $l_1$ and $l_2$ are compatible according to $\composeL$, we write $l_1\compatL l_2$.
+%
+%
+
+We now proceed with the next ingredient of a \colosl world, namely, action models. Recall from above that an action is simply a pair of logical states describing the pre- and post-states of the action, while an action model describes the set of actions associated with each capability.
+%
+%
+\begin{definition}[Actions, action models]
+The set of \emph{actions}, $\set{Action}$, ranged over by $a, a_1, \cdots, a_n$; and the set of \emph{action models}, $\AMods$, ranged over by $\lmod, \lmod_1, \cdots, \lmod_n$ are defined as follows.
+%
+\begin{mathpar}
+  \set{Action} == \LStates \times \LStates
+
+	\AMods == \Caps \rightharpoonup \pset{\set{Action}}
+\end{mathpar}
+%  
+We write $\unitAM$ for an action model with empty domain.
+\end{definition}
+%
+%
+\paragraph{\textbf{The Effect of Actions}} 
+Given a world $(l, g, \lmod)$, since $g$ represents the \emph{entire} shared state, as part of the well-formedness condition of worlds we require that the actions in $\lmod$ are \emph{confined} to $g$.  
+%We write $g \containI \lmod$ to denote that those parts of the shared state mutated by actions in $\lmod$ are fully contained in $g$. 
+Let us elaborate on the necessity of the confinement condition.
+
+As threads may unilaterally decide to introduce part of their local states into the shared state at any point (by \extendRule), confinement ensures that existing actions cannot affect future extensions of the shared state. Similarly, we require that the new actions associated with newly shared state are confined to that extension in the same vein, hence extending the shared state cannot retroactively invalidate the views of other threads. However, as we will demonstrate, confinement does not prohibit \emph{referring} to existing parts of the shared state in the new actions; rather, it only safeguards against \emph{mutation} of the already shared resources through new actions.
+
+Through confinement we ensure that the \emph{effect} of actions in the action model are contained to the shared state. That is, given an action $a = (p,q)$ and a shared state $g$, whenever the precondition $p$ \emph{agrees} with $g$ then the part of the state mutated by the action is contained in $g$. 
+Agreement of $p$ and $g$ merely means that $p$ and $g$ agree on the resources they have in common. 
+In particular, $g$ need not contain $p$ entirely for $a$ to take effect. This relaxation is due to the fact that other threads may extend the shared state; in particular, the extension may provide the missing resources for $p$ to be contained in the shared state, thus allowing the extending thread to perform action $a$. Crucially, however, it is not the case that any part of $p$ is allowed to be missing from $g$. Rather, only parts of $p$ that are not mutated by $a$ (and thus can also be found in $q$), can escape $g$'s grasp. Mutated parts must always be contained in $g$, so that extensions need not worry about existing actions interfering with new resources that were never shared beforehand. In order to distinguish between parts that must be contained in $g$ and those that may be missing, we characterise the \emph{active} and \emph{passive} parts of actions, and then continue to define the effect of actions. This will enable us to define our confinement condition.
+%, and then the set of well-formed worlds.
+
+An action $a = (p, q)$ is typically of the form $(p' \composeL c, q' \composeL c)$, where part of the state $c$ required for the action is \emph{passive} and acts as a mere \emph{catalyst} for the action: it has to be present for the action to take effect, but is left unchanged by the action. The \emph{active} part of the action is then the pair $(p',q')$, which should be maximal in the sense that no further, non-empty catalyst can be found in $(p',q')$.
+%
+%
+\begin{definition}[Active part of an action]
+Given an action $a = (p, q)$, its \emph{active part}, $\updateFP{(p,q)}$, is defined as the pair $(p', q')$ such that:
+%
+\[
+	\E c p = p' \composeL c /| q = q' \composeL c /| \V{c'} c'\leq p' /|
+  c'\leq q' => c' = \unitL
+\]
+%
+\end{definition}
+%
+%
+%For instance, the interpretations of the actions associated with token $\token a_{\li{x}}$ in the previous section all have the same active parts $([x:v],\emptyset,\emptyset),([x:v+1],\emptyset,\emptyset)$. Their catalysts are of the form $([z:v],\emptyset,\emptyset)$ in the interpretations of $I$, $I_{\li{x}}$, and $I_{\li{z}}$, and $([y:v,z:v],\emptyset,\emptyset)$ in $I_{\li{y}}$.
+%
+%
+The agreement of an action pre-state $p$ and the shared state $g$ will be defined using the following notion of \emph{intersection} of logical states.
+%
+%
+\begin{definition}[Intersection]
+The \emph{intersection} function over logical states,
+$
+\meetL : \left(\LStates \times \LStates \right) \rightarrow \pset{\LStates}
+$, is defined as follows.
+%
+\[
+	l_1 \meetL l_2 \eqdef 
+	\left\{ 
+		l  \mid
+		\exsts{l', l_1', l_2'}\ l_1 = l \composeL l_1' \land l_2 = l \composeL l_2' \land l \composeL l_1' \composeL l_2' = l'
+	\right\}
+\]
+%
+\end{definition}
+%
+Given our choice of logical states in this paper, $l_1\meetL l_2$ yields at most one element for any given $l_1$ and $l_2$; we thus usually omit the set notation\footnote{In general, 
+%separation algebras may lack the \emph{disjointness} property, 
+intersection between two states may yield more than one state. Thus, in our general definitions we use the set notation.}.
+%% One can check that $l_1\maxMeetL l_2$ indeed yields at most one
+%% element for any given $l_1$ and $l_2$~\cite{colosl-tr14}.
+%
+
+An action pre-state $p$ and a shared state $g$ then agree if their intersection is non-empty, i.e. $p \meetL g \not= \emptyset$. We can now define action confinement.
+%
+%
+\begin{definition}[Action confinement]\label{def:actconf}
+An action $a$ is \emph{confined} to a logical state $g$, written $g\containI a$, if:
+%
+\[
+	\m{fst}(a)\meetL g \neq\emptyset => \m{fst}(\updateFP{a})\leq g 
+\]
+\end{definition}
+%
+As discussed, only the \emph{active} precondition of $a$, i.e. the part actually mutated by the action, has to be contained in $g$. This way, future extensions of $g$ need not account for existing actions interfering with new resources.
+
+Given a shared state $g$ and an action model $\lmod$, we require that all actions of $\lmod$ are confined in all possible \emph{futures} of $g$, i.e. all shared states resulting from $g$ after any number of applications of actions in $\lmod$. For that we define \emph{action application} that describes the effect of an action on a logical state. Moreover, for some of the actions in $\lmod$, the active pre-state may not affect $g$, i.e. its intersection with $g$ may be the empty state $\unitL$. In that case, we find that even though that action is potentially enabled, we do not need to account for it since it leaves $g$ unchanged. We thus introduce the notion of \emph{visible actions} to quantify over those actions that affect (mutate) $g$. 
+%
+\begin{definition}[Action application and visibility]\label{def:actionApplication}
+The \emph{application} of an action $a$ on a logical state $g$, written $a[g]$, is defined provided there exists $l$ such that
+%
+\vspace{-7pt}
+\[
+	\m{fst}(a) \meetL g /=\emptyset /|
+	g = \m{fst}(\updateFP{a}) \composeL l /|
+	\m{snd}(\updateFP{a})\compatL l
+\]
+%
+When that is the case, we write $a[g]$ for the (uniquely defined) logical state $\m{snd}(\updateFP{a})\composeL l$. We write $\m{potential}(a,g)$ to denote that $a[g]$ is defined.
+An action $a$ is called \emph{visible in $g$}, written $\m{visible}(a,g)$, when:
+%
+\quad
+$
+	\m{fst}(\updateFP{a})\meetL g /= \unitL
+$
+%
+%
+\end{definition}
+%
+Observe that $\m{potential}(a,g)$ implies $g\containI a$.  
+%
+%
+We are now ready to define our confinement condition on action models. Inspired by Local RG~\cite{lrg}, we introduce the concept of locally fenced action models to capture all possible states reachable from the current state via some number of action applications. A set of states $\fence{}$ \emph{fences} an action model if it is invariant under interferences perpetrated by the corresponding actions. An action model is then confined to a logical state $l$ if it can be fenced by a set of states that includes $l$. In the following we write $\m{rg}(f)$ to denote the \emph{range} (or co-domain) of a function $f$.
+%
+%
+\begin{definition}[Locally-fenced action model]\label{def:localFence}
+An action model $\lmod \in \AMods$ is \emph{locally fenced} by $\fence{} \in \pset{\LStates}$, written $\fence{} \strictfences \lmod$, iff for all $g \in \fence{}$ and all $a\in\m{rg}(\lmod)$,
+%
+\vspace{-7pt}
+\[
+\begin{array}{L}
+  g\containI a /|
+%  (\m{potential}(a,g) /| (\m{visible}(a,g) |/ \fst{\updateFP{a}} = \unitL ) => a[g]\in\fence{})
+	(\m{potential}(a,g) => a[g]\in\fence{})
+\end{array}
+\]
+\end{definition}
+%
+%
+\begin{definition}[Action model confinement]
+An action model $\lmod$ is \emph{confined} to a logical state $l$, written $l\containI\lmod$, if there exists $\fence{}$ such that $l\in\fence{}$ and $\fence{}\strictfences{}\lmod$.
+\end{definition}
+%
+%
+We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is well-formed if $\lmod$ is confined to $g$, $l$ and $g$ are compatible, and the capabilities found in $l$ and $g$ are contained in the domain of $\lmod$. Since capabilities enable the manipulation of the shared state through their associated actions in the action model, the last constraints ensures that \emph{all} capabilities found in $l \composeL g$ are accounted for in $\lmod$. 
+%We proceed by defining what it means for capabilities to be contained in an action model and subsequently formalise the notion of well-formed states.
+%
+%
+\begin{definition}[Well-formedness]
+A triple $(l, g, \lmod)$ is \emph{well-formed}, written $\wf{l, g, \lmod}$, iff
+%
+\vspace{-1ex}
+\[
+\begin{array}{L}
+	g \containI \lmod
+	/|
+	(\exsts{@s, h, \ca{}}
+	l \composeL g = (@s, h, \ca{}) \land \ca{} \containedIn \lmod)
+\end{array}
+\vspace{-1ex}
+\]
+%
+\end{definition}
+%
+
+\begin{definition}[Worlds]\label{def:worlds}
+The set of \emph{worlds} is defined as
+%
+\[
+	\Worlds \eqdef 
+	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
+\]
+%
+The \emph{composition} $w\composeW w'$ of two worlds $\composeW: \Worlds \rightarrow \Worlds \rightharpoonup \Worlds$, is defined as follows.
+% w = (l,g,\lmod,\gmod)$ and $w' = (l',g',\lmod',\gmod')$ is defined as $(l\composeL l', g, \lmod, \gmod)$ when $g = g'$, $\lmod = \lmod'$, $\gmod = \gmod'$, and $\p{wf}((l\composeL l', g, \lmod, \gmod))$, and is undefined otherwise.
+%
+\[
+	(l,g,\lmod) \composeW (l',g',\lmod') \eqdef
+	\begin{cases}
+		(l\composeL l', g, \lmod) &
+		\begin{array}[t]{L}
+			\text{if }
+			g = g' \text{, and }
+			\lmod = \lmod' \text{, and }\p{wf}((l\composeL l', g, \lmod))
+		\end{array}\\
+		\textit{undefined}&\text{otherwise}
+	\end{cases}
+\]
+%
+The set of worlds with composition $\composeW$ forms a separation algebra with multiple units: all well-formed states of the form $(\unitL,g,\lmod)$. 
+%Given a world $w$, we write $\localPart{w}$ for the first projection.
+%
+\end{definition}
+%
+%
+%
+\subsection{Assertions}\label{subsec:assertions}
+Our assertions extend standard assertions from separation logic with \emph{subjective views} and \emph{capability assertions}. 
+We assume an infinite set, $\set{LVar}$, of \emph{logical variables} and a set of \emph{logical environments} $\lenv \in \LEnv: \pset{\set{LVar} --> \set{Val}}$ that associate logical variables with their values.
+
+\colosl is parametric in the assertions of machine states and capabilities and can be instantiated with any assertion language over machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions as machine state assertions; and instantiate capability assertions with tokens. 
+%
+%
+\begin{definition}[Assertion syntax]\label{def:assertions}
+The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x$ ranges over logical variables, $x$ over logical variables, and $\token{a}$ over tokens.
+%
+\begin{align*}
+  A &::=\m{false} \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [\token{\bar{a}}]\\
+%  \qquad 
+%  E ::= x \!\mid\! E_1 + E_2 \!\mid\! \cdots\\
+	\Assertions \ni P, Q  &::=  A \mid P \Rightarrow Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \mid P \septraction Q \\
+	\IAssertions \ni I &::= \emptyset \mid \{\interAss{[\token{\bar{a}}]}{\bar{y}}{P}{Q}\} \cup I
+\end{align*}
+\end{definition}
+%
+This syntax follows from standard separation logic with variables as resource~\cite{variablesAsResource} (where expressions $E$ do not allow program variables), with the exception of subjective views $\shared P I$. $\emp$ is true of the units of $\composeW$. Machine state and capability assertions are interpreted over a world's local state: $\li{x}|-> E$ (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap) where only \li{x} (resp.\ address $E_1$) is allocated and has value $E$ (resp.\ points to $E_2$); the capability assertion $[\token{\bar{a}}]$ is true of the capability $\{\token{\bar{a}}\}$.
+$P * Q$ is true of worlds that can be split into two according to $\composeW$ such that one state satisfies $P$ and the other satisfies $Q$; $P**Q$ is the \emph{overlapping conjunction}, true of worlds can be split three-way
+according to $\composeW$, such that the $\composeW$-composition of the first two worlds satisfies $P$ and the $\composeW$-composition of the last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives have their standard classical meaning. Interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition.
+
+A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l = \unitL$ and a subjective view $s$ can be found in the global shared state $g$, \textit{i.e.} $g = s\composeL r$ for some \emph{context} $r$, such that $s$ satisfies $P$ in the standard separation logic sense, and $I$ and $\lmod$ \emph{agree} given the
+decomposition $s$, $r$, in the following sense:
+%
+\begin{enumerate}
+	\item every action in $I$ is reflected in $\lmod{}$;
+	
+	\item every action in $\lmod$ that is potentially enabled in $g$ and has a visible effect on $s$ is reflected in $I$;
+	
+%	\item every action in $I$ that is potentially enabled in $g$ and whose pre-state is fully contained in $g$ is reflected in $\gmod$;
+	
+	\item the above holds after any number of action applications in $\lmod$ affecting $g$
+%	\item the above is true for any state resulting from any number of actions of $\lmod$ applied to $g$.
+%	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
+\end{enumerate}
+%
+These conditions will be captured by the \emph{action model closure} relation $\extendsAM{\lmod}{s}{r}{\semI{I}}$ given by the upcoming \defin~\ref{def:actclos} (where $\semI{I}$ is the interpretation of $I$ given a logical environment $\lenv$).
+
+The semantics of \colosl assertions is given by a forcing relation $w,\lenv|= P$ between a world $w$, a logical environment $\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing relations. The first one $l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
+logic sense over a logical state $l$ (and ignores shared state assertions). The second one $s,\lenv|=_{g,\lmod} P$ interprets assertions over a \emph{subjective view} $s$ that is part of the global shared state $g$, subject to action model $\lmod$. This third form of satisfaction is needed to deal with nesting of subjective views\footnote{This presentation with several forcing relations differs from the usual CAP presentation~\cite{cap-ecoop10}, where formulas are first interpreted over worlds that are not necessarily well-formed, and then cut down to well-formed ones. The CAP presentation strays from separation logic models in some respects; e.g. in CAP, $*$ is not the adjoint of $--*$, the ``magic wand'' connective of separation logic. Although we have omitted this connective from our presentation, its definition in \colosl would be standard and satisfy the adjunction with $*$.}.
+%
+Moreover, since logical connectives are interpreted uniformly in all cases, we write $|=_\dagger$ for either of the three satisfaction relations, and then write $u$ for elements of either $\Worlds$ or $\LStates$, and $\grey$ for either $\composeW$ or $\composeL$, depending on whether the satisfaction relation is $|=$, or either $\slsat$ or $|=_{l,\lmod}$, respectively.
+%
+%
+\begin{definition}[Assertion semantics]\label{def:assertion-semantics}
+Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ will be given in \defin~\ref{def:actclos}.
+\vspace{-1ex}
+%
+\[
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  (l,g,\lmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
+  
+  
+  (l,g,\lmod), \lenv &|= \shared P I &\text{iff}&
+  l = \unitL \text{ and }
+  \exsts{s,r}
+  g = s\composeL r
+  \text{ and}\\
+  &&&s, \lenv |=_{g,\lmod} P\text{ and }
+  \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}} \vspace{5pt}\\
+  
+  
+  s, \lenv &|=_{g,\lmod} A &\text{iff}& s, \lenv \slsat A\\
+  
+  
+  s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
+  (s,g,\lmod), \lenv |= \shared P I\\
+  
+
+  u,\lenv &|=_\dagger P => Q
+  &\text{iff}& u,\lenv |=_\dagger P\text{ implies }u,\lenv |=_\dagger Q\\
+  
+  
+  u,\lenv &|=_\dagger \exsts x P
+  &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
+  
+  
+  u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
+  \exsts{u_1,u_2} u = u_1 \grey u_2\text{ and}\\
+  &&& u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
+  
+  
+  u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
+  \exsts{u',u_1,u_2} u = u'\grey u_1\grey u_2\text{ and}\\
+  &&&
+  u' \grey u_1, \lenv |=_\dagger P_1 \text{ and }
+  u' \grey u_2, \lenv |=_\dagger P_2\\
+  
+
+ 	u, \lenv &|=_\dagger P \septraction Q &\text{iff}&
+	\exsts{u'} u', \lenv |=_\dagger P \text{ and }
+	u \sharp u'\\
+	&&&\text{ implies }u \grey u', \lenv |=_\dagger Q  \vspace{5pt}\\
+	
+  
+%  l, \lenv &\slsat [E]
+%  &\text{iff}&
+%  l = (\emptyset,\unitH, \{[|E|]_{\lenv}\})\\
+%  &&\cdots\\
+
+
+  l,\lenv &\slsat \m{false}
+  && \text{never}\\
+  
+  
+  l, \lenv &\slsat \emp &\text{iff}&l = \unitL\\
+  
+  
+  %  l,\lenv &\slsat E_1 = E_2
+%  &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
+
+
+  l, \lenv &\slsat \li{x}|->E
+  &\text{iff}&
+  l = ([\li x: [|E|]_{\lenv}], \emptyset, \emptyset)\\
+  
+  
+  l, \lenv &\slsat E_1|->E_2 
+  &\text{iff}&
+  l =
+  (\emptyset, [[|E_1|]_{\lenv}: [|E_2|]_{\lenv}], \emptyset)\\
+  
+  
+  l, \lenv & \slsat [\token{\bar{a}}]
+  & \text{iff} &
+  l = (\emptyset, \emptyset, \{\token{\bar{a}}\})\\
+  
+  
+  l, \lenv &\slsat \shared P I&
+  \text{ iff }& l = \unitL
+\end{array}
+\]
+%\vspace{-1em}
+%
+\begin{align*}
+  \semI[\lenv]{I}(\{\token{\bar{a}}\}) &==
+  \left\{
+  \begin{array}{@{}l@{\ }|@{\ }r@{}}
+    (p,q)&
+    \begin{array}{@{}l@{}}
+      \interAss{[\token{\bar{a}}]}{\bar{y}}{P}{Q} \in I /|\null\\
+      \exsts{\bar{v}}
+      p,[\lenv|||\bar y:\bar v] \slsat P \land
+      q,[\lenv|||\bar y:\bar v] \slsat Q
+    \end{array}
+  \end{array}
+  \right\}
+  \end{align*}
+\end{definition}
+%
+%\noindent Given a logical environment $\lenv$, we write $\sem[\lenv]{P}$ for the set of all worlds satisfying $P$. That is, 
+%%
+%\[
+%	\sem[\lenv]{P} \eqdef \left\{ w \mid w, \lenv |= P \right\}
+%\]	
+%%
+The satisfaction relation for subjective views in $\slsat$ is purely for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to write predicates in interference assertions whose definition includes subjective views, as in the example of \S\ref{sec:set-example}. Since actions are not allowed to modify shared state from within another subjective view, the interpretation of such subjective views collapses to $\emp$.
+%% Alternatively, we could forbid boxes in assertions
+%% evaluated using $\slsat$ and explicitly unpack such predicates and
+%% erase their subjective views.
+
+%% The semantics of separation logic predicates and connectives is
+%% standard and depends only on the local state.  $\shared{P}{I}$ states
+%% that $P$ holds for only a sub-state $s$ of the global shared state
+%% $s\composeL r$. The interference associated with $s$ is given by
+%% interference assertion $\semI[\lenv]{I}$ such that the global and
+%% local action models $\lmod$ and $\gmod$ are \emph{closed}
+%% under $\semI[\lenv]{I}$ with respect to the subjective view $s$ and
+%% context $r$. This will be formalised just after this lemma.
+%Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
+
+\begin{lemma}\label{lem:assertionFacts}
+The following formulas are valid according to the semantics above (where $x$ does not appear free in $I$):
+%
+\begin{align*}
+	\shared{P * \shared{Q}{I'}}{I} &<=> \shared{P}{I} * \shared{Q}{I'}&
+	\E x \shared P I &<=>\shared{\E x P} I\\
+%
+	(P => Q) &=> \shared{P}{I} => \shared{Q}{I}&
+	\shared{P}{I} &=> \emp
+\end{align*}
+%
+\end{lemma}
+%
+\begin{proof}
+  Immediate.
+\end{proof}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{\textbf{Action Model Closure}}
+Let us now turn to the definition of action model closure, as informally introduced at the beginning of this section. First, we need to revisit the effect of actions to take into account the splitting of the global shared state into a subjective state $s$ and a context $r$.
+%
+%
+\begin{definition}[Action application (cont.)]\label{def:actionApplicationPair}
+The \emph{application} of action $a$ on the subjective state $s$ together with the context $r$, written $a[s,r]$, is defined provided that $a[s \composeL r]$ is defined.
+%there exist $l$ such that
+%%
+%\[
+%\begin{array}{L}
+%	\m{fst}(a)\meetL (s\composeL r) /= \emptyset /| 
+%	\m{fst}(\updateFP{a}) \composeL l = s \composeL r /|
+%	\m{snd}(\updateFP{a}) \compatible l 
+%%  \m{fst}(a)\meetL (s\composeL r) /= \emptyset /|
+%%  ps \in s \meetL \m{fst}(\updateFP{a}) /| \null \\
+%%  
+%%  \begin{array}{@{} l @{\hspace{2pt}} l @{}}
+%%  	\E{p_r, r'} & s = p_s \composeL s' /|  \m{fst}(\updateFP{a}) = p_s\composeL p_r /| \null\\
+%%  	& r = p_r \composeL r' /| \m{snd}(\updateFP{a})\composeL s'\composeL r'\text{ is defined}
+%%  \end{array}
+%\end{array}
+%\]
+%
+When that is the case, we write $a[s,r]$ for
+\[
+a[s, r] ==
+\begin{cases}
+	(\m{snd}(\updateFP{a})\composeL s', r')
+	&\text{if } \exsts{p_s > \unitL} \exsts{p_r}\\	
+	& \quad \m{fst}(\updateFP{a}) = p_s\composeL p_r /| 
+  s = p_s \composeL s' /|   r = p_r \composeL r' \\
+  
+  \left(s, \m{snd}(\updateFP{a})\composeL r'\right)
+  & \text{if }\neg\m{visible}(a, s) /| \exsts{r'} r = \m{fst}(\updateFP{a}) \composeL r' 
+\end{cases}
+\]
+\end{definition}
+%
+%
+\noindent We observe that this new definition and \defin~\ref{def:actionApplication} are linked in the following way: 
+%
+\[
+	\fst{a[s, r]} \composeL \snd{a[s, r]} = a[s\composeL r]
+\]
+%
+In our informal description of action model closure in \defin~\ref{def:assertions} we stated that some actions must be \emph{reflected} in some action models. 
+Intuitively, an action is reflected in an action model if for every state in which the action can take place, the action model includes an action with a similar effect that can also occur in that state. In other words, $a$ is reflected in $\lmod$ from a state $l$ if whenever $l$ contains the pre-state of $a$ ($\fst{a} \leq l$), then there exists an action $a' \in \lmod$ with the same active part ($\updateFP{a} = \updateFP{a'}$) whose pre-state is also contained in $l$ ($\fst{a'} \leq l$).
+We proceed with the definition of action reflection.
+%
+%
+\begin{definition}
+An action $a$ is \emph{reflected} in a set of actions $A$ from a state $l$, written $\m{reflected}(a,l,A)$, if
+%
+\[
+  \V r \m{fst}(a)\leq l\composeL r =>
+  \E{a'\in A} \updateFP{a'} = \updateFP{a} /| \m{fst}(a')\leq l\composeL r
+\]
+\end{definition}
+%
+%
+Let us now give the formal definition of action model closure. For each condition mentioned in \defin\ref{def:assertions}, we annotate which part of the definition implements them. We write
+%
+\[
+\m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
+\]
+%
+That is, $a$ can actually happen in $g$ since $g$ holds all the resources in the pre-state of $a$.
+%
+%
+\begin{definition}[Action model closure]\label{def:actclos}
+An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
+%
+%
+\[
+\begin{array}{@{} L @{}}
+  \extendsAMUpto{\lmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
+  \iffdef
+  \m{true}
+  \\
+  
+  \extendsAMUpto{\lmod}{n+1}{s}{r}{\lmod'} \iffdef \\
+	 	\quad (\V{\ca{}}\V{a\in \lmod(\ca{})}
+	  \m{potential}(a,s\composeL r) =>\null\\
+	  
+		  \qquad 
+		  \left(
+		  	\m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/ \neg\m{visible}(a,s) 
+		  \right)\qquad \hfill \text{(2)} \\
+		  \qquad  /| \extendsAMUpto{\lmod}{n}{\fst{a[s, r]}}{\snd{a[s, r]}}{\lmod'} \qquad \hfill \text{(3)}
+\end{array}
+\]
+%
+\end{definition}
+%
+Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition($\lmod' \subseteq\lmod$) asserts that the subjective action model $\lmod'$ is contained in $\lmod$ ({\it cf.} property (1) in \defin~\ref{def:assertions}); consequently (from the semantics of subjective assertions), $\lmod$ represents the superset of all interferences known to subjective views.
+The above states that the $\lmod$ is closed under $(s, r, \lmod')$ if the closure relation holds for any number of steps $n \in \Nats$ where 
+\begin{itemize}
+	\item $s$ denotes the subjective view of the shared state; \vspace{0pt}
+	\item $r$ denotes the context; \vspace{0pt}
+	\item $s \composeL r$ captures the entire shared state; \vspace{0pt}
+	\item a step corresponds to the occurrence of an action as prescribed in $\lmod$ which may or may not be found in $\lmod'$ (since $\lmod \subseteq \lmod$). 
+\end{itemize}   
+%
+The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff for any action $a$ in $\lmod$, where $a$ is potentially enabled in $s \composeL r$, then:	
+\begin{enumerate}\renewcommand{\theenumi}{\alph{enumi}}
+	\item \textit{either} $a$ is reflected in $\lmod'$ ($a$ is known to the subjective view); 
+	\textit{or} $a$ does not affect the subjective state $s$ ($a$ is not visible in $s$); and 
+	\item $\lmod$ is also closed under the subjective state $s'$ and context $r'$ resulting from the application of $a$ ($\,a[s, r]= (s', r')$).
+\end{enumerate}
+%
+%
+We make further observations about this definition. First, property~(3) makes our assertions robust with respect to future extensions of the shared state, where potentially enabled actions may be become enabled using additional catalyst that is not immediately present. Second, $\lmod'$ (and thus interference assertions) need not reflect actions that have no visible effect on the subjective state.\\
+
+This completes the definition of assertion semantics. We can now show that the logical principles of \colosl are sound. The proof of the \shiftRule\ and \extendRule\ principles will be delayed until the following section, where $===>$ is defined.
+
+\begin{lemma}\label{lem:semprinciples}
+The logical implications \copyRule, \forgetRule, and \mergeRule\ are \emph{valid}; \textit{i.e.} true of all worlds and logical interpretations.
+%
+\end{lemma}
+%
+\begin{proof}
+The case of \copyRule\ is straightforward from the semantics of assertions.
+For \forgetRule, we remark that whenever the action model closure relation holds for a subjective state $s\leq g$, then it holds of any $s'\leq s$. For \mergeRule, we remark that the two worlds corresponding to each subjective view
+need to have the same action model to be compatible, which ensures closure under the combined subjective views. The full proof is provided in~\cite{colosl-tr14}.
+\end{proof}
+%
+%
+Note that, the version of \forgetRule\ where predicates are conjoined using $**$ is also valid for all $P$, $Q$, and $I$, as shown by the following derivation, where the first implication follows from the properties of $**$ and the rule of consequence.
+%
+\[
+  \vspace{-1ex}
+\shared{P ** Q}{I} \stackrel{\proofRule{Cons }}{=> }
+\shared{P * \m{true}}{I} \stackrel{\forgetRule }{=> }
+\shared{P}{I}
+\]
+%
