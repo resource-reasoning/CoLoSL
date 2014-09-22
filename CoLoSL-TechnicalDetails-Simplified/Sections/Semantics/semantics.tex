@@ -1114,12 +1114,12 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	}
 	
 	
-	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}		
-	}
-	{
-		\fenceAss{} \sepish Q |- \m{false}	
-	}
+%	\infer{
+%		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}		
+%	}
+%	{
+%		\fenceAss{} \sepish Q |- \m{false}	
+%	}
 	
 	
 	\infer{
@@ -1145,7 +1145,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %	
 \end{mathpar}
 \hrule
-\caption{Strict fencing rules where the separation algebra of logical states satisfies the disjointness property.}
+\caption{Local fencing rules where the separation algebra of logical states satisfies the disjointness property.}
 \label{fig:strict-fence-rules}
 \end{figure}
 %
@@ -1229,12 +1229,12 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	}
 	
 	
-	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}		
-	}
-	{
-		\fenceAss{} \sepish Q |- \m{false}	
-	}
+%	\infer{
+%		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}		
+%	}
+%	{
+%		\fenceAss{} \sepish Q |- \m{false}	
+%	}
 %	\infer{
 %		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}	
 %	}
@@ -1353,7 +1353,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		\fenceAss{} \sepish Q \entails \m{false}
+		\left(P \septraction (P \sepish \fenceAss{})\right) * Q \entails \m{false}
 	}
 	
 	
@@ -1415,6 +1415,242 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %\vspace*{5pt}
 \caption{Action shifting rules where we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
 \label{fig:shiftRules}
+\end{figure*}
+
+\begin{figure*}
+\hrule\vspace*{5pt}
+\begin{mathpar}
+	\infer{
+		\stable{A}	
+	}{}
+	
+
+	\infer{
+		\stable{P * Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}
+
+	
+	\infer{
+		\stable{P \sepish Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}
+	
+	
+	\infer{
+		\stable{\exsts{x} P}	
+	}
+	{
+		\stable{P}
+	}
+	
+	
+	\infer{
+		\stable{P \Rightarrow Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}
+	
+	
+	\infer{
+		\stable{P \septraction Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}	
+	
+	
+	\infer{
+		\stable{\shared{P}{I}}	
+	}
+	{
+		P \fences I	
+	}
+	
+	
+	\infer[?]{
+		\stable{\shared{P}{I}}	
+	}
+	{
+		\stable{\shared{P}{I'}} 
+		&
+		I' \weakenI{P} I
+	}
+	
+	
+	\infer{
+		\stable{P * Q}	
+	}
+	{
+		\stableTo{P}{Q}
+		&
+		\stableTo{Q}{P}	
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableTo{P}{R}	
+	}
+	{
+		\stable{P}
+	}
+	
+	
+	\infer{
+		\stableTo{P * Q}{R}
+	}
+	{
+		\stableTo{P}{Q * R}
+		&
+		\stableTo{Q}{P * R}
+	}
+	
+	
+	\infer{
+		\stableTo{P}{R * R'}
+	}
+	{
+		\stableTo{P}{R}
+	}
+	
+	
+	
+	\infer[?]{
+		\stableTo{P \sepish Q}{R}
+	}
+	{
+		\stableTo{P}{R}
+		&
+		\stableTo{Q}{R}
+	}
+	
+	
+	\infer{
+		\stableTo{\exsts{x} P}{R}
+	}
+	{
+		\stableTo{P}{R}
+	}
+	
+	
+	\infer{
+		\stableTo{P \Rightarrow Q}{R}
+	}
+	{
+		\stableTo{P}{R}
+		&
+		\stableTo{Q}{R}
+	}
+	
+	
+	\infer{
+		\stableTo{P \septraction Q}{R}
+	}
+	{
+		\stableTo{P}{R}
+		&
+		\stableTo{Q}{R}
+	}
+	
+	
+	\infer{
+		\stableTo{\shared{P}{I}}{R}
+	}
+	{
+		\stableTo{\shared{P}{I'}}{R}
+		&
+		I' \weakenI{P} I
+	}
+	
+	
+	\infer{
+		\stableTo{\shared{P}{I}}{R}
+	}
+	{
+		\stableIn{P}{I}{R * \shared{P}{I}}
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableIn{P}{I}{R}
+	}
+	{
+		\stable{P}
+	}
+	
+	
+	\infer[?]{
+		\stableIn{P}{I}{R}	
+	}
+	{
+		\stableIn{P}{I'}{R}
+		&
+		I' \weakenI{P} I
+	}
+	
+	
+	\infer{
+		\stableIn{P}{I_1 \cup I_2}{R}	
+	}
+	{
+		\stableIn{P}{I_1}{R}
+		&
+		\stableIn{P}{I_2}{R}
+	}
+	
+	
+	\infer{
+		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+	}
+	{
+		\capAss{} * R |- \m{false}
+	}
+	
+	
+	\infer{
+		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+	}
+	{
+		P * Q_1 |- \m{false}
+	}
+	
+	
+	\infer{
+		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+	}
+	{
+		\left(Q_1 \septraction (Q_1 \sepish P)\right) * Q_2 |- P * \m{true}
+	}
+	
+	
+	\infer{
+		\stableIn{P}{I}{R * R'}	
+	}
+	{
+		\stableIn{P}{I}{R}	
+	}
+\end{mathpar}
+\hrule
+%\vspace*{5pt}
+\caption{Stability judgements.}
+\label{fig:stabilityRules}
 \end{figure*}
 
 %\input{Sections/Semantics/proof-rules.tex}

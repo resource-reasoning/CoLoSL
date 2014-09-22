@@ -21,7 +21,6 @@
 \usepackage[mathscr]{euscript} % for \powerset
 \usepackage[fleqn]{mathtools}
 \usepackage{empheq} % for boxes
-%\usepackage{proof}
 %\usepackage{MnSymbol}
 \usepackage{listings}
 %\usepackage{alltt}
@@ -39,6 +38,7 @@
 \usepackage[most]{tcolorbox}
 
 \input mathlig
+\usepackage{proof}
 
 \usepackage{seplog}
 \usepackage{url}
@@ -121,7 +121,7 @@
 %
 %\newtheorem{property}{Property}
 %
-%\newtheorem{parameter}{Parameter}
+\newtheorem{parameter}{Parameter}
 %
 %\newtheorem{proposition}{Proposition}
 %
@@ -303,12 +303,12 @@
 \newcommand{\AxiomsSeq}{\Axioms{\textsf{S}}}
 \newcommand{\opSemSeq}[2]{\opSem{#1}{#2}{\textsf{S}}}
 
-\newcommand{\Atoms}{\set{Atom}}
+\newcommand{\Atoms}{\ensuremath{\set{Atom}}}
 \newcommand{\atom}[1]{\ensuremath{\mathbb{A}_{#1}}}
 \newcommand{\AxiomsA}{\Axioms{\textsf{A}}}
 \newcommand{\opSemA}[2]{\opSem{#1}{#2}{\textsf{A}}}
 
-\newcommand{\Coms}{\set{Comm}}
+\newcommand{\Coms}{\ensuremath{\set{Comm}}}
 \newcommand{\com}[1]{\mathbb{C}_{#1}}
 
 

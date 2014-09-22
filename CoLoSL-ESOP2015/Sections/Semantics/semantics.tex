@@ -1,9 +1,9 @@
-\chapter{\colosl Program Logic}\label{chapter:semantics}
+\section{\colosl Program Logic}\label{chapter:semantics}
 This section introduces the core concepts behind our program logic. We start by defining what the rely and guarantee conditions of each thread are in terms of their action models. This allows us to define \emph{stability} against rely conditions, \emph{repartitioning}, which logically represents a thread's atomic actions (and have to be in the guarantee condition), and \emph{semantic implication}. Equipped with these notions, we can justify the \shiftRule\ and \extendRule\ principles. 
 %We conclude this section with a sketch of the soundness of \colosl.
 %
 %
-\section{Environment Semantics}
+\subsection{Environment Semantics}
 \paragraph{Rely}
 The rely relation represents potential interferences from the environment. Although the rely will be different for every program (and indeed, every thread), it is always defined in the same way, which we can break down into three kinds of possible interferences. In the remainder of this section, given a logical state $l = (\h{},\ca{})$, we write $\heapPart{l}$, $\capPart{l}$ for $\m{fst}(l)$ and $\m{snd}(l)$, respectively.
 
@@ -480,7 +480,7 @@ We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in which case
 
 
 
-\subsection{Interference Manipulations}\label{subsec:extension}
+\subsubsection{Interference Manipulations}\label{subsec:extension}
 In this section we formalise the requirements of the \extendRule\ and \shiftRule\ semantic implications and show that they are valid.
 
 \paragraph{Shared State Extension}
@@ -1132,7 +1132,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		&
 		\precise{\fenceAss{}}
 		&
-		\left(P \septraction \fenceAss{} \right) * Q |- \fenceAss{}	
+		\left(P \septraction \fenceAss{} \right) * Q |- \fenceAss{}
 	}
 %	\infer{
 %		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}	
@@ -1145,7 +1145,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %	
 \end{mathpar}
 \hrule
-\caption{Strict fencing rules where the separation algebra of logical states satisfies the disjointness property.}
+\caption{Local fencing rules where the separation algebra of logical states satisfies the disjointness property.}
 \label{fig:strict-fence-rules}
 \end{figure}
 %
@@ -1419,7 +1419,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 
 %\input{Sections/Semantics/proof-rules.tex}
 %
-\section{Programming Language and Proof System}
+\subsection{Programming Language and Proof System}
 We define the \colosl proof system for deriving local Hoare triples for a simple concurrent imperative programming language. The proof system and programming language of \colosl are defined as an instantiation of the views framework~\cite{views}. 
 
 \paragraph{Programming Language} The \colosl programming language is that of the views programming language~\cite{views} instantiated with a set of \emph{atomic} commands; It consists of \texttt{skip}, sequential composition, branching, loops and parallel composition. The set of \colosl atomic commands comprises an \emph{atomic} construct $\atomic{.}$ enforcing an atomic behaviour when instantiated with any \emph{sequential} command. The sequential commands of \colosl are composed of a set of \emph{elementary} commands, \texttt{skip}, sequential composition, branching and loops excluding atomic constructs and parallel composition. That is, atomic commands cannot be nested or contain parallel composition. \colosl is parametric in the choice of elementary commands allowing for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in the token ring example of \S~\ref{chapter:intuition} the set of elementary commands comprises variable lookup and assignment. We proceed with the formalisation of \colosl programming language. 
@@ -1561,7 +1561,7 @@ is defined as follows where we write $W, W', \cdots$ to quantify over the elemen
 \end{definition}
 %
 \begin{definition}[Programming language]
-Given the set of atomic commands $\Atoms$, the set of \colosl \emph{commands} \Coms, ranged over by $\com{}, \com{1}, \cdots \com{n}$, is defined by the following grammar.
+Given the set of atomic commands \Atoms, the set of \colosl \emph{commands} \Coms, ranged over by $\com{}, \com{1}, \cdots \com{n}$, is defined by the following grammar.
 \[
 	\com ::= \atom{} \mid \mathtt{skip} \mid \com{1}; \com{2} \mid \com{1} + \com{2} \mid \com{1} || \com{2} \mid \com{}^{*}
 \]
@@ -1678,7 +1678,7 @@ Most proof rules are standard from disjoint concurrent separation logic~\cite{cs
 %%
 %\end{definition}
 %
-\section{Operational Semantics}\label{subsec:op-sem}
+\subsection{Operational Semantics}\label{subsec:op-sem}
 We define the operational semantics of \colosl in terms of a set of \emph{concrete} (low-level) states. Recall that the states of \colosl, namely worlds, are parametric in the separation algebra of machine states ($\Heaps, \composeH, \unitH$). As such, we require that the choice of concrete states is also parametrised in \colosl.
 Since \colosl is an instantiation of the views framework, its operational semantics is as defined in~\cite{views} provided with the set of concrete states and the \emph{semantics of atomic commands}.
 The semantics of atomic commands are defined in terms of the \emph{interpretation of sequential and elementary commands}. Finally, as \colosl can be instantiated with any set of elementary commands $\Basics$, the interpretation of elementary commands is also a parameter in \colosl. We proceed with the formalisation of the ingredients necessary for defining the operational semantics of atomic commands.
@@ -1765,7 +1765,7 @@ We lift the interpretation function to a set of concrete states such that for $S
 \end{definition}
 
 
-\section{Soundness}\label{subsec:soundness}
+\subsection{Soundness}\label{subsec:soundness}
 In order to establish the soundness of \colosl program logic, we relate its proof judgements to its operational semantics. To this end, we relate the \colosl states, \textit{i.e.} worlds, to the concrete states by means of a \emph{reification function}. The reification of worlds is defined in terms of relating (reifying) machine states in $\Heaps$ to concrete states in $\MStates$. As such, given that \colosl is parametric in the choice of underlying machine states, the \emph{reification of machine states} is also a parameter in \colosl.
 
 Since \colosl is an instantiation of the views framework~\cite{views}, its soundness follows immediately from the soundness of views, provided that the atomic axioms are sound with respect to their operational semantics. Recall that the axioms of atomic commands are defined in terms of the axioms pertaining to elementary commands which are parametrised in \colosl. Thus, to ensure the soundness of atomic commands, we require that the elementary axioms are also sound with respect to their operational semantics. We proceed with 
