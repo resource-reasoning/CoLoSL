@@ -1097,22 +1097,33 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \{P*R \swap Q*R \} \right\}	
+		\fenceAss{} \strictfences \left\{\capAss{}: P * R \swap Q * R \right\}	
 	}
 	{
 		\exact{R}
 		&
-		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}	
+		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}	
 	}
 	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}		
+		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
 		\fenceAss{} \sepish P |- \m{false}
 	}
 	
+	
+	\infer{
+		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
+	}
+	{
+		\fenceAss{}' |- \fenceAss{}
+		&
+		\fenceAss{} \sepish P |- \fenceAss{}' \sepish P
+		&
+		\fenceAss{}' \strictfences \left\{\capAss{}: P \swap Q \right\}		
+	}
 	
 %	\infer{
 %		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}		
@@ -1121,19 +1132,36 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %		\fenceAss{} \sepish Q |- \m{false}	
 %	}
 	
-	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \{P \swap Q \} \right\}		
+		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		P \cap Q |-_{\textsf{SL}} \emp
-		&
 		\fenceAss{} \sepish P |- \fenceAss{}
 		&
 		\precise{\fenceAss{}}
 		&
+		P \cap Q |- \emp
+		&
 		\left(P \septraction \fenceAss{} \right) * Q |- \fenceAss{}	
 	}
+	
+	
+%	\infer{
+%		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
+%	}
+%	{
+%		P \cap Q |-_{\textsf{SL}} \emp
+%		&
+%		\fenceAss{} \sepish P |- \fenceAss{}
+%		&
+%		\precise{\fenceAss{}}
+%		&
+%		\left(P \septraction \fenceAss{} \right) * Q |- \fenceAss{}	
+%	}
+%
+%
+%
+%
 %	\infer{
 %		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}	
 %	}
@@ -1145,7 +1173,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %	
 \end{mathpar}
 \hrule
-\caption{Local fencing rules where the separation algebra of logical states satisfies the disjointness property.}
+\caption{Local fencing judgements where the separation algebra of logical states satisfies the disjointness property.}
 \label{fig:strict-fence-rules}
 \end{figure}
 %
@@ -1194,35 +1222,73 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \{P*R \swap Q*R \} \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: P * R \swap Q * R \right\}	
 	}
 	{
 		\exact{R}
 		&
-		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
 	}
 	
 	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
 	}
 	{
-		\fenceAss{} \cap P |-_{\textsf{SL}} \emp	
+		\fenceAss{} \cap P |- \emp	
 	}
 	
 	
+%	\infer{
+%		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}		
+%	}
+%	{
+%		P \cap Q |-_{\textsf{SL}} \emp
+%		&
+%		\left(P \septraction (P \sepish \fenceAss{}) \right) * Q |- \fenceAss{}	
+%	}
+%
+%
+%
+%
+%	\infer{
+%		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
+%	}
+%	{
+%		P |- R * \m{true}
+%		& 
+%		Q |- R * \m{true}
+%		&
+%		\exact{R}
+%		&
+%		\left(P \septraction (P \sepish \fenceAss{}) \right) * Q |- \fenceAss{}	* R
+%	}
+%
+%
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}		
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		P \cap Q |-_{\textsf{SL}} \emp
+		P \cap Q |- \emp	
 		&
-		\left(P \septraction (P \sepish \fenceAss{}) \right) * Q |- \fenceAss{}	
+		\left(P \septraction \fenceAss{} \sepish P \right) * Q |- \fenceAss{}
+	}
+		
+	
+	\infer{
+	\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
+	}
+	{
+		\fenceAss{}' |- \fenceAss{}
+		&
+		P \sepish \fenceAss{} |- P \sepish \fenceAss{}'
+		&
+		\fenceAss{}' \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	
 	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \{P \swap Q \} \right\}		
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
 		\fenceAss{} \sepish P |- \m{false}
@@ -1246,7 +1312,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %	
 \end{mathpar}
 \hrule
-\caption{Fencing rules.}
+\caption{Fencing judgements.}
 \label{fig:fence-rules}
 \end{figure}
 %
@@ -1275,25 +1341,33 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer[\proofRule{Disj-L}]{
-		\left\{ \capAss: \bigcup_{i \in I}  \left\{P_i \swap Q \right\} \right\}
+		\bigcup_{i \in I} \left\{\capAss{} : P_i \swap Q \right\}
 		\approx^{\m{true}}
-		\left\{\capAss{}: \left\{\left( \bigvee_{i \in I} P_i \right) \swap Q\right\} \right\} 
+		\left\{\capAss{}: \left( \bigvee_{i \in I} P_i \right) \swap Q \right\} 
 	}
 	{
 	}
 	
 	
 	\infer[\proofRule{Disj-R}]{
-		\left\{ \capAss: \bigcup_{i \in I}  \left\{P \swap Q_i \right\} \right\}
+		\bigcup_{i \in I}  \left\{ \capAss{}: P \swap Q_i \right\}
 		\approx^{\m{true}}
-		\left\{\capAss{}: \left\{ P \swap \left( \bigvee_{i \in I} Q_i \right)\right\}  \right\} 
+		\left\{\capAss{}: P \swap \left( \bigvee_{i \in I} Q_i \right) \right\} 
+	}
+	{
+	}
+	
+	\infer[\proofRule{Exist}]{
+		\left\{ \capAss: \overline{\exsts{v_i \in S_i}}^{i \in I} P \swap Q \right\} 
+		\approx^{\m{true}}
+		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{\capAss{}: P\overline{[w_i /v_i]}^{i \in I} \swap  Q\overline{[w_i /v_i]}^{i \in I} \right\} 
 	}
 	{
 	}
 	
 	
-		\infer[\proofRule{Hide}]{
-		\left\{ \capAss{}: \left\{ P * R   \swap Q * R  \right\} \right\} \weakenI{\fenceAss{}} 
+	\infer[\proofRule{Hide}]{
+		\left\{ \capAss{}: P * R   \swap Q * R \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{	
 		\exact{R}
@@ -1340,7 +1414,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 
 
 	\infer[\proofRule{False-L}]{	
-		\left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{\fenceAss{}} 
+		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
@@ -1349,7 +1423,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer[\proofRule{False-R}]{	
-		\left\{ \capAss{}: \left\{ P \swap Q\right\}\right\} \weakenI{\fenceAss{}} 
+		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
@@ -1375,7 +1449,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %	}
 
 	\infer[\proofRule{Expand/Contract}]{
-		\left\{ \capAss{}: P \swap Q\right\} \;\approx^{\fenceAss{}}\;  \left\{ \capAss{}: \bigcup_{i \in I} \left\{P * R_i \swap Q * R_i\right\} \right\}	
+		\left\{ \capAss{}: P \swap Q\right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: P * R_i \swap Q * R_i \right\}	
 	}
 	{
 		\fenceAss{} \sepish P \vdash \bigvee_{i \in I} \fenceAss{} \sepish \left(P * R_i \right)
@@ -1413,7 +1487,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 %\]
 \hrule
 %\vspace*{5pt}
-\caption{Action shifting rules where we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
+\caption{Action shifting judgements; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
 \label{fig:shiftRules}
 \end{figure*}
 
@@ -1596,7 +1670,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	}
 	
 	
-	\infer[?]{
+	\infer{
 		\stableIn{P}{I}{R}	
 	}
 	{
@@ -1625,7 +1699,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer{
-		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+		\stableIn{P}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}} {R}	
 	}
 	{
 		P * Q_1 |- \m{false}
@@ -1633,7 +1707,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	
 	
 	\infer{
-		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+		\stableIn{P}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}}{R}	
 	}
 	{
 		\left(Q_1 \septraction (Q_1 \sepish P)\right) * Q_2 |- P * \m{true}

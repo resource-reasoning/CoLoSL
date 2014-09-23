@@ -520,9 +520,9 @@ and
     (p,q)&
     \begin{array}{@{}l@{}}
       \interAss{\ca{}}{\vec{y}}{P}{Q} \in I /|\null\\
-      \exsts{\vec{v}}
-      p,[\lenv|||\vec y:\vec v] \slsat P \land
-      q,[\lenv|||\vec y:\vec v] \slsat Q
+      \exsts{\vec{v}, g, \lmod}
+      (p, g, \lmod), [\lenv|||\vec y:\vec v] |= P \land
+      (q, g, \lmod), [\lenv|||\vec y:\vec v] |= Q
     \end{array}
   \end{array}
   \right\}

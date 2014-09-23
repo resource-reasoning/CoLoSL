@@ -389,9 +389,9 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
     (p,q)&
     \begin{array}{@{}l@{}}
       \interAss{[\token{\bar{a}}]}{\bar{y}}{P}{Q} \in I /|\null\\
-      \exsts{\bar{v}}
-      p,[\lenv|||\bar y:\bar v] \slsat P \land
-      q,[\lenv|||\bar y:\bar v] \slsat Q
+      \exsts{\bar{v}, g, \lmod}
+      (p, g, \lmod), [\lenv|||\bar y:\bar v] |= P \land
+      (q, g, \lmod), [\lenv|||\bar y:\bar v] |= Q
     \end{array}
   \end{array}
   \right\}
