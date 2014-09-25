@@ -363,9 +363,11 @@ Assume a set of capability assertions $\KAssertions$ ranged over by $\capAss{}, 
 The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x$ ranges over logical variables.
 %
 \begin{align*}
+%	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
+%	\Assertions \ni P, Q  &::=  A \mid P \Rightarrow Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
 	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
-	\Assertions \ni P, Q  &::=  A \mid P \Rightarrow Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
-	\IAssertions \ni I &::= \emptyset \mid \{\interAss{K}{\vec{y}}{P}{Q}\} \cup I
+	\Assertions \ni P, Q  &::=  A \mid P \land Q \mid P \lor Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
+	\IAssertions \ni I &::= \emptyset \mid \{\interAss{\capAss{}}{\vec{y}}{P}{Q}\} \cup I
 \end{align*}
 \end{definition}
 
@@ -402,114 +404,129 @@ Note that this presentation with several forcing relations differs from the usua
 \begin{definition}[Assertion semantics]\label{def:assertion-semantics}
 Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ will be given in \defin~\ref{def:actclos}.
 %
-\[
-\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  (l,g,\lmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
-  
-  (l,g,\lmod), \lenv &|= \shared P I &\text{iff}&
+%\[
+\begin{align*}
+  (l,g,\lmod), \lenv &|= A &&\text{iff  }&& l,\lenv \slsat A\\
+%  
+  (l,g,\lmod), \lenv &|= \shared P I &&\text{iff}&&
   l = \unitH\text{ and }
   \exsts{s,r}
   g = s\composeL r
   \text{ and}\\
-  &&&s, \lenv |=_{g,\lmod} P\text{ and }
+  &&&&&s, \lenv |=_{g,\lmod} P\text{ and }
   \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}\\
-  
-  w, \lenv &|= P => Q
-  &\text{iff}& w,\lenv |= P \text{ implies } w,\lenv |= Q\\
-  
+%  
+%  w, \lenv &|= P => Q
+%  &\text{iff}& w,\lenv |= P \text{ implies } w,\lenv |= Q\\
+%
+	w, \lenv &|= P \land Q
+  &&\text{iff}&& w,\lenv |= P \text{ and } w,\lenv |= Q\\
+%  
+  w, \lenv &|= P \lor Q
+  &&\text{iff}&& w,\lenv |= P \text{ or } w,\lenv |= Q\\
+%  
   w, \lenv &|= \exsts x P
-  &\text{iff}& \exsts v w, [\lenv|||x:v] |= P\\
-  
-  w, \lenv &|= P_1 * P_2 &\text{iff}&
+  &&\text{iff}&& \exsts v w, [\lenv|||x:v] |= P\\
+%  
+  w, \lenv &|= P_1 * P_2 &&\text{iff}&&
   \exsts{w_1, w_2} w = w_1 \composeW w_2\text{ and}\\
-  &&& w_1, \lenv |= P_1 \text{ and } w_2, \lenv |= P_2\\
-  
-  
-  w, \lenv &|= P_1 ** P_2 &\text{iff}&
+  &&&&& w_1, \lenv |= P_1 \text{ and } w_2, \lenv |= P_2\\
+%  
+%  
+  w, \lenv &|= P_1 ** P_2 &&\text{iff}&&
   \exsts{w',w_1, w_2} w = w' \composeW w_1 \composeW w_2\text{ and}\\
-  &&&
+  &&&&&
   w' \composeW w_1, \lenv |= P_1 \text{ and }
   w' \composeW w_2, \lenv |= P_2\\
-  
-  w, \lenv &|= P \septraction Q &\text{iff}&
+%  
+  w, \lenv &|= P \septraction Q &&\text{iff}&&
    \exsts{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
-   &&&\text{ implies }w \composeW w', \lenv |= Q\\
-  
-\end{array}
-\]
+   &&&&&\text{ implies }w \composeW w', \lenv |= Q\\
+%  
+\end{align*}
+%\]
 %
 where 
 %
-\[
-\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  s, \lenv &|=_{g,\lmod} A &\text{iff}& s, \lenv \slsat A\\
-  
-  s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
+\begin{align*}
+  s, \lenv &|=_{g,\lmod} A &&\text{iff}&& s, \lenv \slsat A\\
+%  
+  s, \lenv &|=_{g,\lmod} \shared P I &&\text{iff}&&
   (s,g,\lmod), \lenv |= \shared P I\\
-
-  s, \lenv &|=_\dagger P => Q
-  &\text{iff}& s, \lenv |=_\dagger P\text{ implies } s, \lenv |=_\dagger Q\\
-  
+%
+%  s, \lenv &|=_\dagger P => Q
+%  &\text{iff}& s, \lenv |=_\dagger P\text{ implies } s, \lenv |=_\dagger Q\\
+%  
+  s, \lenv &|=_\dagger P \land Q
+  &&\text{iff}&& s, \lenv |=_\dagger P\text{ and } s, \lenv |=_\dagger Q\\
+%  
+  s, \lenv &|=_\dagger P \lor Q
+  &&\text{iff}&& s, \lenv |=_\dagger P\text{ or } s, \lenv |=_\dagger Q\\
+%  
   s, \lenv &|=_\dagger \exsts x P
-  &\text{iff}& \exsts{v} s, [\lenv|||x:v] |=_\dagger P\\
-  
-  s, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
+  &&\text{iff}&& \exsts{v} s, [\lenv|||x:v] |=_\dagger P\\
+%  
+  s, \lenv &|=_\dagger P_1 * P_2 &&\text{iff}&&
   \exsts{s_1, s_2} s = s_1 \composeL s_2 \text{ and}\\
-  &&& s_1, \lenv |=_\dagger P_1 \text{ and } s_2, \lenv |=_\dagger P_2\\
-  
-  s, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
+  &&&&& s_1, \lenv |=_\dagger P_1 \text{ and } s_2, \lenv |=_\dagger P_2\\
+%  
+  s, \lenv &|=_\dagger P_1 ** P_2 &&\text{iff}&&
   \exsts{s', s_1, s_2} s = s' \composeL s_1 \composeL s_2\text{ and}\\
-  &&&
+  &&&&&
   s' \composeL s_1, \lenv |=_\dagger P_1 \text{ and }
   s' \composeL s_2, \lenv |=_\dagger P_2\\
-  
-  s, \lenv &|=_\dagger P \septraction Q &\text{iff}&
+%  
+  s, \lenv &|=_\dagger P \septraction Q &&\text{iff}&&
   \exsts{s'} s', \lenv |=_\dagger P \text{ and }
   s \compatible s'\\
-  &&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
-
-%\end{array}
-%\]
-%%
-%and
-%%
-%\[
-%\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l} 
-  
-  l,\lenv &\slsat \m{false} && \text{never}\\
-  
-  l, \lenv &\slsat \emp & \text{iff} & l = \unitL \\
-  
-  l, \lenv &\slsat \heapAss{} & \text{iff} & \exsts{\h{}} l = (\h{}, \unitCap) \text{ and } \h{} \in \semH[\lenv]{\heapAss{}} \\
-  
-  l, \lenv &\slsat \capAss{} & \text{iff} & \exsts{\ca{}} l = (\unitH, \ca{}) \text{ and } \ca{} \in \semK[\lenv]{\capAss{}} \\
-  
-  l, \lenv &\slsat \shared P I & \text{ iff } & l = \unitL\\
-  
-  l, \lenv & \slsat P => Q
-  &\text{iff}& l, \lenv \slsat P\text{ implies } l, \lenv \slsat Q\\
-  
+  &&&&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
+%
+%
+%
+%
+%
+%
+  l,\lenv &\slsat \m{false} &&&& \text{never}\\
+%  
+  l, \lenv &\slsat \emp && \text{iff} && l = \unitL \\
+%  
+  l, \lenv &\slsat \heapAss{} && \text{iff} && \exsts{\h{}} l = (\h{}, \unitCap) \text{ and } \h{} \in \semH[\lenv]{\heapAss{}} \\
+%  
+  l, \lenv &\slsat \capAss{} && \text{iff} && \exsts{\ca{}} l = (\unitH, \ca{}) \text{ and } \ca{} \in \semK[\lenv]{\capAss{}} \\
+%  
+  l, \lenv &\slsat \shared P I && \text{ iff } && l = \unitL\\
+%
+%  
+%  l, \lenv & \slsat P => Q
+%  &\text{iff}& l, \lenv \slsat P\text{ implies } l, \lenv \slsat Q\\
+%
+% 
+  l, \lenv & \slsat P \land Q
+  &&\text{iff}&& l, \lenv \slsat P\text{ and } l, \lenv \slsat Q\\
+%
+  l, \lenv & \slsat P \lor Q
+  &&\text{iff}&& l, \lenv \slsat P\text{ or } l, \lenv \slsat Q\\
+%
   l, \lenv & \slsat \exsts x P
-  &\text{iff}& \exsts{v} l, [\lenv|||x:v] \slsat P\\
-  
-  l, \lenv &\slsat P_1 * P_2 &\text{iff}&
+  &&\text{iff}&& \exsts{v} l, [\lenv|||x:v] \slsat P\\
+%  
+  l, \lenv &\slsat P_1 * P_2 &&\text{iff}&&
   \exsts{l_1, l_2} l = l_1 \composeL l_2 \text{ and}\\
-  &&& l_1, \lenv \slsat P_1 \text{ and } l_2, \lenv \slsat P_2\\
-  
-  
-  l, \lenv &\slsat P_1 ** P_2 &\text{iff}&
+  &&&&& l_1, \lenv \slsat P_1 \text{ and } l_2, \lenv \slsat P_2\\
+%  
+%  
+  l, \lenv &\slsat P_1 ** P_2 &&\text{iff}&&
   \exsts{l', l_1, l_2} l = l' \composeL l_1 \composeL l_2\text{ and}\\
-  &&&
+  &&&&&
   l' \composeL l_1, \lenv \slsat P_1 \text{ and }
   l' \composeL l_2, \lenv \slsat P_2\\
-  
-  
-  l, \lenv & \slsat P \septraction Q &\text{iff}&
+%  
+%  
+  l, \lenv & \slsat P \septraction Q &&\text{iff}&&
   \exsts{l'} l', \lenv \slsat P \text{ and }
   l \compatible l'\\
-  &&&\text{ implies } l \composeL l', \lenv \slsat Q
-\end{array}
-\]
+  &&&&&\text{ implies } l \composeL l', \lenv \slsat Q
+\end{align*}
 %
 and
 %\vspace{-1em}
@@ -519,7 +536,7 @@ and
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
     (p,q)&
     \begin{array}{@{}l@{}}
-      \interAss{\ca{}}{\vec{y}}{P}{Q} \in I /|\null\\
+      \interAss{\capAss{}}{\vec{y}}{P}{Q} \in I /| \ca{} \in \semK[\lenv]{\capAss{}}\land\\
       \exsts{\vec{v}, g, \lmod}
       (p, g, \lmod), [\lenv|||\vec y:\vec v] |= P \land
       (q, g, \lmod), [\lenv|||\vec y:\vec v] |= Q

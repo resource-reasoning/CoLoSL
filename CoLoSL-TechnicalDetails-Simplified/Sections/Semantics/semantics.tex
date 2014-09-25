@@ -1073,6 +1073,95 @@ as required.
 We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shifting to logical entailments. While these rules are not complete, we found them sufficient to reason about our examples. The $\approx^R$ notation in the conclusion of \proofRule{Expand/Contract}, denotes that the shifting is valid both ways (\textit{i.e.} $I_1 \approx^R I_2$ iff $I_1 \weakenI{R} I_2$ and $I_2 \weakenI{R} I_1$). We write $\exact{P}$ to denote that the assertion $P$ is \emph{exact}. That is, there exists $l$ such that for all $\lenv$ and $l'$ where $l', \lenv \slsat P$ then $l = l'$. 
 %
 %
+\begin{definition}[Flattening]
+The \emph{local (unboxed) assertions} $\LAssertions$, are defined by the following grammar. 
+%
+\[
+	\LAssertions \ni B ::= A \mid B \land B \mid B \lor B \mid \exsts{x} B \mid B * B \mid B \sepish B
+\]
+%
+The \emph{flat assertions} $\FAssertions$, are defined by the following grammar. 
+%
+\[
+	\FAssertions \ni \fass{P}, \fass{Q} ::= B \mid \shared{B}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q} 
+\]
+%
+The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows. 
+%
+\begin{align*}
+	\un{A} \eqdef & A\\
+%
+	\un{P \oplus Q} \eqdef & \un{P} \oplus \un{Q}  \quad \text{for } \oplus \in \{\land, \lor, *, \sepish\}\\
+%
+	\un{\exsts{x} P} \eqdef & \exsts{x} \un{P} \\
+%
+	\un{\shared{B}{I}} \eqdef& \shared{B}{I}\\
+%
+	\un{\shared{\exsts{x} P}{I}} \eqdef & \exsts{x} \un{\shared{P}{I}}\\	
+%
+	\un{\shared{\shared{P}{I} * Q}{I'}} \eqdef & \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+	\un{\shared{\shared{P}{I} \sepish Q}{I'}} \eqdef & \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+	\un{\shared{P \lor Q}{I}} \eqdef & \un{\shared{P}{I}} \lor \un{\shared{Q}{I}}\\
+%
+%%	\un{\shared{\shared{P}{I} \land \emp}{I'}} \eqdef & \un{\shared{P}{I}} * \shared{\emp}{I'}\\
+%
+	\un{\shared{\shared{P}{I} \land Q}{I'}} \eqdef &
+	\begin{cases}
+		\un{\shared{P}{I}} * \un{\shared{Q}{I'}} & \text{ if } Q \implies \emp\\
+		\m{false} & \text{ otherwise }
+	\end{cases}
+\end{align*}
+%
+\end{definition}
+%
+%
+\begin{definition}[Unboxing]
+The \emph{unboxing} function $\unbox{.}: \FAssertions \rightarrow \LAssertions$, is defined as follows. 
+%
+\[
+	\unbox{\fass{P}} = \overline{\exists{x}}^{x \in S}.\; B_1 * B_2 \text{ where } \ub{\fass{P}} = (S, B_1, B_2)
+\]
+%
+where the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVar}} \times \LAssertions \times \LAssertions)$ is defined inductively as follows assuming that the existentially bound variables of the left-hand assertion are renamed to be distinct in a capture-avoiding manner. 
+%
+\begin{align*}
+	\ub{B} \eqdef & (vars(B), B, \emp)\\
+%
+	\ub{\shared{B}{I}} \eqdef & (vars(B), \emp, B)\\
+%
+	\ub{\fass{P} \oplus \fass{Q}} \eqdef & \left(S \uplus S', B_1 \oplus B'_1, B_2 \sepish B'_2 \right)\\
+	& \text{ where } \ub{\fass{P}} = (S, B_1, B_2) \text{ and } \ub{\fass{Q}} = (S', B'_1, B'_2)\\
+	& \text{ and } \oplus \in \{\land, *, \sepish\}\\
+%
+	\ub{\fass{P} \lor \fass{Q}} \eqdef & \left(S \uplus S', B_1 \lor B'_1, B_2 \lor B'_2 \right)\\
+	& \text{ where } \ub{\fass{P}} = (S, B_1, B_2) \text{ and } \ub{\fass{Q}} = (S', B'_1, B'_2)\\
+%
+	\ub{\exsts{x} \fass{P}} \eqdef& (S \uplus \{x\}, B_1, B_2) \text{ where } \ub{\fass{P}} = (S, B_1, B_2)
+\end{align*}
+\end{definition}
+%
+%
+\begin{definition}[Assertion Erasure]
+The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined as follows.
+%
+\[
+	\erase{P} \eqdef \ers{\unbox{P}}
+\]
+%
+where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is defined inductively as follows. 
+%
+\begin{align*}
+	\ers{B} \eqdef & B\\
+%
+	\ers{\shared{B}{I}} \eqdef & \emp \\
+%
+	\ers{\fass{P} \oplus \fass{Q}} \eqdef & \ers{\fass{P}} \oplus \ers{\fass{Q}} \text{ where } oplus \in \{\land, \lor, *, \sepish \}\\
+%
+	\ers{\exsts{x} \fass{P}} \eqdef & \exsts{x} \ers{\fass{P}}
+\end{align*}
+\end{definition}
 \begin{figure}
 \hrule\vspace{5pt}
 \begin{mathpar}
@@ -1110,7 +1199,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		\fenceAss{} \sepish P |- \m{false}
+		\fenceAss{} \sepish P \slentails \m{false}
 	}
 	
 	
@@ -1118,9 +1207,9 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		\fenceAss{}' |- \fenceAss{}
+		\fenceAss{}' \slentails \fenceAss{}
 		&
-		\fenceAss{} \sepish P |- \fenceAss{}' \sepish P
+		\fenceAss{} \sepish P \slentails \fenceAss{}' \sepish P
 		&
 		\fenceAss{}' \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
@@ -1136,13 +1225,13 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		\fenceAss{} \sepish P |- \fenceAss{}
+		\fenceAss{} \sepish P \slentails \fenceAss{}
 		&
 		\precise{\fenceAss{}}
 		&
-		P \cap Q |- \emp
+		P \cap Q \slentails \emp
 		&
-		\left(P \septraction \fenceAss{} \right) * Q |- \fenceAss{}	
+		\left(P \septraction \fenceAss{} \right) * Q \slentails \fenceAss{}	
 	}
 	
 	
@@ -1235,7 +1324,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
 	}
 	{
-		\fenceAss{} \cap P |- \emp	
+		\fenceAss{} \cap P \slentails \emp	
 	}
 	
 	
@@ -1269,9 +1358,9 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		P \cap Q |- \emp	
+		P \cap Q \slentails \emp	
 		&
-		\left(P \septraction \fenceAss{} \sepish P \right) * Q |- \fenceAss{}
+		\left(P \septraction \fenceAss{} \sepish P \right) * Q \slentails \fenceAss{}
 	}
 		
 	
@@ -1279,9 +1368,9 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 	\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		\fenceAss{}' |- \fenceAss{}
+		\fenceAss{}' \slentails \fenceAss{}
 		&
-		P \sepish \fenceAss{} |- P \sepish \fenceAss{}'
+		P \sepish \fenceAss{} \slentails P \sepish \fenceAss{}'
 		&
 		\fenceAss{}' \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
@@ -1291,7 +1380,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
 	}
 	{
-		\fenceAss{} \sepish P |- \m{false}
+		\fenceAss{} \sepish P \slentails \m{false}
 	}
 	
 	
@@ -1418,7 +1507,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		\fenceAss{} \sepish P \entails \m{false}
+		\fenceAss{} \sepish P \slentails \m{false}
 	}
 	
 	
@@ -1427,7 +1516,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		\left(P \septraction (P \sepish \fenceAss{})\right) * Q \entails \m{false}
+		\left(P \septraction (P \sepish \fenceAss{})\right) * Q \slentails \m{false}
 	}
 	
 	
@@ -1452,7 +1541,7 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\left\{ \capAss{}: P \swap Q\right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: P * R_i \swap Q * R_i \right\}	
 	}
 	{
-		\fenceAss{} \sepish P \vdash \bigvee_{i \in I} \fenceAss{} \sepish \left(P * R_i \right)
+		\fenceAss{} \sepish P \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(P * R_i \right)
 		&
 		\exact{R_i} \text{ for } i \in I
 %		\begin{array}{@{} l @{}}
@@ -1490,7 +1579,10 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 \caption{Action shifting judgements; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
 \label{fig:shiftRules}
 \end{figure*}
-
+%
+%
+%
+%
 \begin{figure*}
 \hrule\vspace*{5pt}
 \begin{mathpar}
@@ -1498,232 +1590,279 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 		\stable{A}	
 	}{}
 	
+	\infer{
+		\stable{P}	
+	}
+	{
+		\stable{\un{P}}	
+	}
 
 	\infer{
-		\stable{P * Q}	
+		\stable{\fass{P} * \fass{Q}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 		&
-		\stable{Q}	
+		\stable{\fass{Q}}	
 	}
 
 	
 	\infer{
-		\stable{P \sepish Q}	
+		\stable{\fass{P} \sepish \fass{Q}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 		&
-		\stable{Q}	
+		\stable{\fass{Q}}	
 	}
 	
 	
 	\infer{
-		\stable{\exsts{x} P}	
+		\stable{\exsts{x} \fass{P}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 	}
-	
-	
+%	
+%	
+%	\infer{
+%		\stable{P \Rightarrow Q}	
+%	}
+%	{
+%		\stable{P}
+%		&
+%		\stable{Q}	
+%	}
+%
+%
+		
 	\infer{
-		\stable{P \Rightarrow Q}	
+		\stable{\fass{P} \land \fass{Q}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 		&
-		\stable{Q}	
+		\stable{\fass{Q}}	
 	}
 	
 	
 	\infer{
-		\stable{P \septraction Q}	
+		\stable{\fass{P} \lor \fass{Q}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 		&
-		\stable{Q}	
-	}	
-	
-	
+		\stable{\fass{Q}}	
+	}
+%	
+%	
+%	\infer{
+%		\stable{P \septraction Q}	
+%	}
+%	{
+%		\stable{P}
+%		&
+%		\stable{Q}	
+%	}	
+%	
+%	
+
+
 	\infer{
-		\stable{\shared{P}{I}}	
+		\stable{\shared{B}{I}}	
 	}
 	{
-		P \fences I	
+		B \fences I	
 	}
 	
 	
 	\infer[?]{
-		\stable{\shared{P}{I}}	
+		\stable{\shared{B}{I}}	
 	}
 	{
-		\stable{\shared{P}{I'}} 
+		\stable{\shared{B}{I'}} 
 		&
-		I' \weakenI{P} I
+		I' \weakenI{B} I
 	}
 	
 	
 	\infer{
-		\stable{P * Q}	
+		\stable{\fass{P} * \fass{Q}}	
 	}
 	{
-		\stableTo{P}{Q}
+		\stableTo{\fass{P}}{\fass{Q}}
 		&
-		\stableTo{Q}{P}	
+		\stableTo{\fass{Q}}{\fass{P}}	
 	}
 \end{mathpar}\vspace{5pt}\\
 %
 %
 \begin{mathpar}
 	\infer{
-		\stableTo{P}{R}	
+		\stableTo{\fass{P}}{\fass{R}}	
 	}
 	{
-		\stable{P}
+		\stable{\fass{P}}
 	}
 	
 	
 	\infer{
-		\stableTo{P * Q}{R}
+		\stableTo{\fass{P} * \fass{Q}}{\fass{R}}
 	}
 	{
-		\stableTo{P}{Q * R}
+		\stableTo{\fass{P}}{\fass{Q} * \fass{R}}
 		&
-		\stableTo{Q}{P * R}
+		\stableTo{\fass{Q}}{\fass{P} * \fass{R}}
 	}
 	
 	
 	\infer{
-		\stableTo{P}{R * R'}
+		\stableTo{\fass{P}}{\fass{R} * \fass{R}'}
 	}
 	{
-		\stableTo{P}{R}
+		\stableTo{\fass{P}}{\fass{R}}
 	}
 	
 	
 	
 	\infer[?]{
-		\stableTo{P \sepish Q}{R}
+		\stableTo{\fass{P} \sepish \fass{Q}}{\fass{R}}
 	}
 	{
-		\stableTo{P}{R}
+		\stableTo{\fass{P}}{\fass{R}}
 		&
-		\stableTo{Q}{R}
+		\stableTo{\fass{Q}}{\fass{R}}
 	}
 	
 	
 	\infer{
-		\stableTo{\exsts{x} P}{R}
+		\stableTo{\exsts{x} \fass{P}}{\fass{R}}
 	}
 	{
-		\stableTo{P}{R}
+		\stableTo{\fass{P}}{\fass{R}}
+	}
+	
+	
+%	\infer{
+%		\stableTo{P \Rightarrow Q}{R}
+%	}
+%	{
+%		\stableTo{P}{R}
+%		&
+%		\stableTo{Q}{R}
+%	}
+	\infer{
+		\stableTo{\fass{P} \land \fass{Q}}{\fass{R}}
+	}
+	{
+		\stableTo{\fass{P}}{\fass{R}}
+		& 
+		\stableTo{\fass{Q}}{\fass{R}}
 	}
 	
 	
 	\infer{
-		\stableTo{P \Rightarrow Q}{R}
+		\stableTo{\fass{P} \lor \fass{Q}}{\fass{R}}
 	}
 	{
-		\stableTo{P}{R}
+		\stableTo{\fass{P}}{\fass{R}}
+		& 
+		\stableTo{\fass{Q}}{\fass{R}}
+	}
+	
+	
+%	\infer{
+%		\stableTo{P \septraction Q}{R}
+%	}
+%	{
+%		\stableTo{P}{R}
+%		&
+%		\stableTo{Q}{R}
+%	}
+%	
+%	
+	\infer{
+		\stableTo{\shared{B}{I}}{\fass{R}}
+	}
+	{
+		\stableTo{\shared{B}{I'}}{\fass{R}}
 		&
-		\stableTo{Q}{R}
+		I' \weakenI{B} I
 	}
 	
 	
 	\infer{
-		\stableTo{P \septraction Q}{R}
+		\stableTo{\shared{B}{I}}{\fass{R}}
 	}
 	{
-		\stableTo{P}{R}
-		&
-		\stableTo{Q}{R}
-	}
-	
-	
-	\infer{
-		\stableTo{\shared{P}{I}}{R}
-	}
-	{
-		\stableTo{\shared{P}{I'}}{R}
-		&
-		I' \weakenI{P} I
-	}
-	
-	
-	\infer{
-		\stableTo{\shared{P}{I}}{R}
-	}
-	{
-		\stableIn{P}{I}{R * \shared{P}{I}}
+		\stableIn{B}{I}{\unbox{\fass{R} * \shared{B}{I}}}
 	}
 \end{mathpar}\vspace{5pt}\\
 %
 %
 \begin{mathpar}
+%	\infer{
+%		\stableIn{B}{I}{B'}
+%	}
+%	{
+%		\stable{B}
+%	}
+%	
+%	
 	\infer{
-		\stableIn{P}{I}{R}
+		\stableIn{B}{I}{B'}	
 	}
 	{
-		\stable{P}
-	}
-	
-	
-	\infer{
-		\stableIn{P}{I}{R}	
-	}
-	{
-		\stableIn{P}{I'}{R}
+		\stableIn{B}{I'}{B'}
 		&
-		I' \weakenI{P} I
+		I' \weakenI{B} I
 	}
 	
 	
 	\infer{
-		\stableIn{P}{I_1 \cup I_2}{R}	
+		\stableIn{B}{I_1 \cup I_2}{B'}	
 	}
 	{
-		\stableIn{P}{I_1}{R}
+		\stableIn{B}{I_1}{B'}
 		&
-		\stableIn{P}{I_2}{R}
+		\stableIn{B}{I_2}{B'}
 	}
 	
 	
 	\infer{
-		\stableIn{P}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+		\stableIn{B}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{B'}	
 	}
 	{
-		\capAss{} * R |- \m{false}
+		\capAss{} * B' \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{P}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}} {R}	
+		\stableIn{B}{\left\{\capAss{}: P \swap Q \right\}} {B'}	
 	}
 	{
-		P * Q_1 |- \m{false}
+		B \sepish \erase{P} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{P}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}}{R}	
+		\stableIn{B}{\left\{\capAss{}: P \swap Q \right\}}{B'}	
 	}
 	{
-		\left(Q_1 \septraction (Q_1 \sepish P)\right) * Q_2 |- P * \m{true}
+		\left(\erase{P} \septraction (\erase{P} \sepish B)\right) * \erase{Q} \slentails B * \m{true}
 	}
 	
 	
 	\infer{
-		\stableIn{P}{I}{R * R'}	
+		\stableIn{B}{I}{B' * B''}	
 	}
 	{
-		\stableIn{P}{I}{R}	
+		\stableIn{B}{I}{B'}	
 	}
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements.}
+\caption{Stability judgements where $P, Q, R \in \Assertions$; $\fass{P}, \fass{Q}, \fass{R} \in \FAssertions$; and $B, B', B'' \in \LAssertions$.}
 \label{fig:stabilityRules}
 \end{figure*}
 
