@@ -1077,13 +1077,13 @@ We provide a set of rules in \fig\ref{fig:shiftRules} that reduce action shiftin
 The \emph{local (unboxed) assertions} $\LAssertions$, are defined by the following grammar. 
 %
 \[
-	\LAssertions \ni B ::= A \mid B \land B \mid B \lor B \mid \exsts{x} B \mid B * B \mid B \sepish B
+	\LAssertions \ni \lass{P}, \lass{Q} ::= A \mid \lass{P} \land \lass{Q} \mid \lass{P} \lor \lass{Q} \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} \sepish \lass{Q}
 \]
 %
 The \emph{flat assertions} $\FAssertions$, are defined by the following grammar. 
 %
 \[
-	\FAssertions \ni \fass{P}, \fass{Q} ::= B \mid \shared{B}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q} 
+	\FAssertions \ni \fass{P}, \fass{Q} ::= \lass{P} \mid \shared{\lass{P}}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q} 
 \]
 %
 The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows. 
@@ -1091,11 +1091,11 @@ The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is
 \begin{align*}
 	\un{A} \eqdef & A\\
 %
-	\un{P \oplus Q} \eqdef & \un{P} \oplus \un{Q}  \quad \text{for } \oplus \in \{\land, \lor, *, \sepish\}\\
+	\un{P \odot Q} \eqdef & \un{P} \odot \un{Q}  \quad \text{for } \odot \in \{\land, \lor, *, \sepish\}\\
 %
 	\un{\exsts{x} P} \eqdef & \exsts{x} \un{P} \\
 %
-	\un{\shared{B}{I}} \eqdef& \shared{B}{I}\\
+	\un{\shared{\lass{P}}{I}} \eqdef& \shared{\lass{P}}{I}\\
 %
 	\un{\shared{\exsts{x} P}{I}} \eqdef & \exsts{x} \un{\shared{P}{I}}\\	
 %
@@ -1117,54 +1117,184 @@ The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is
 \end{definition}
 %
 %
-\begin{definition}[Unboxing]
-The \emph{unboxing} function $\unbox{.}: \FAssertions \rightarrow \LAssertions$, is defined as follows. 
-%
+\begin{definition}[Gather/merge]
+The \emph{gather}($\prodA{}$) and \emph{merge} ($\sumA{}$) functions:
 \[
-	\unbox{\fass{P}} = \overline{\exists{x}}^{x \in S}.\; B_1 * B_2 \text{ where } \ub{\fass{P}} = (S, B_1, B_2)
+\begin{array}{l}
+	\prodA{(.)}: \Assertions \rightarrow \LAssertions\\
+	\sumA{(.)}: \Assertions \rightarrow \LAssertions
+\end{array}
 \]
 %
-where the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVar}} \times \LAssertions \times \LAssertions)$ is defined inductively as follows assuming that the existentially bound variables of the left-hand assertion are renamed to be distinct in a capture-avoiding manner. 
+are defined as follows given  an assertion $P \in \Assertions$:
+\[
+\begin{array}{l @{\qquad} l}
+	\prodA{P} \eqdef \overline{\exists{x}}^{x \in S}.\; \lass{P} * \lass{Q} &
+	
+	\sumA{P} \eqdef  \overline{\exists{x}}^{x \in S}.\; \lass{P} \sepish \lass{Q} \\\\
+	
+	& \qquad \text{where } (S, \lass{P}, \lass{Q}) = \ub{\un{P}} 
+\end{array}
+\]
+%
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVar}} \times \LAssertions \times \LAssertions)$ is defined inductively over the structure of local assertions as follows; provided that the bound logical variables of the left-hand assertion are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner). 
 %
 \begin{align*}
-	\ub{B} \eqdef & (vars(B), B, \emp)\\
+	\ub{\lass{P}} \eqdef & (vars(\lass{P}), \lass{P}, \emp)\\
 %
-	\ub{\shared{B}{I}} \eqdef & (vars(B), \emp, B)\\
+	\ub{\shared{\lass{P}}{I}} \eqdef & (vars(\lass{P}), \emp, \lass{P})\\
 %
-	\ub{\fass{P} \oplus \fass{Q}} \eqdef & \left(S \uplus S', B_1 \oplus B'_1, B_2 \sepish B'_2 \right)\\
-	& \text{ where } \ub{\fass{P}} = (S, B_1, B_2) \text{ and } \ub{\fass{Q}} = (S', B'_1, B'_2)\\
-	& \text{ and } \oplus \in \{\land, *, \sepish\}\\
+	\ub{\fass{P} \odot \fass{Q}} \eqdef & \left(S_1 \uplus S_2, \lass{P} \odot \lass{Q}, \lass{P}' \sepish \lass{Q}' \right)\\
+	& \text{ where } \ub{\fass{P}} = (S_1, \lass{P}, \lass{P}') \text{ and } \ub{\fass{Q}} = (S_2, \lass{Q}, \lass{Q}')\\
+	& \text{ and } \odot \in \{\land, *, \sepish\}\\
 %
-	\ub{\fass{P} \lor \fass{Q}} \eqdef & \left(S \uplus S', B_1 \lor B'_1, B_2 \lor B'_2 \right)\\
-	& \text{ where } \ub{\fass{P}} = (S, B_1, B_2) \text{ and } \ub{\fass{Q}} = (S', B'_1, B'_2)\\
+	\ub{\fass{P} \lor \fass{Q}} \eqdef & \left(S_1 \uplus S_2, \lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)\\
+	& \text{ where } \ub{\fass{P}} = (S_1, \lass{P}, \lass{P}') \text{ and } \ub{\fass{Q}} = (S_2, \lass{P}, \lass{Q}')\\
 %
-	\ub{\exsts{x} \fass{P}} \eqdef& (S \uplus \{x\}, B_1, B_2) \text{ where } \ub{\fass{P}} = (S, B_1, B_2)
+	\ub{\exsts{x} \fass{P}} \eqdef& (S \uplus \{x\}, \lass{P}_1, \lass{P}_2) \text{ where } \ub{\fass{P}} = (S, \lass{P}_1, \lass{P}_2)
 \end{align*}
 \end{definition}
 %
 %
 \begin{definition}[Assertion Erasure]
-The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined as follows.
-%
-\[
-	\erase{P} \eqdef \ers{\unbox{P}}
-\]
-%
-where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is defined inductively as follows. 
+The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively as follows.
 %
 \begin{align*}
-	\ers{B} \eqdef & B\\
+	\erase{A} \eqdef & A \\
 %
-	\ers{\shared{B}{I}} \eqdef & \emp \\
+	\erase{\left(\shared{P}{I} \right)} \eqdef & \emp \\
 %
-	\ers{\fass{P} \oplus \fass{Q}} \eqdef & \ers{\fass{P}} \oplus \ers{\fass{Q}} \text{ where } oplus \in \{\land, \lor, *, \sepish \}\\
+	\erase{(P \odot Q)} \eqdef & \erase{P} \odot \erase{Q} \text{ where } \odot \in \{\land, \lor, *, \sepish \}\\
 %
-	\ers{\exsts{x} \fass{P}} \eqdef & \exsts{x} \ers{\fass{P}}
+	\erase{(\exsts{x} P)} \eqdef & \exsts{x} \erase{P}
 \end{align*}
+%
+%
+%The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined as follows.
+%%
+%\[
+%	\erase{P} \eqdef \ers{\compose{P}}
+%\]
+%%
+%where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is defined inductively as follows. 
+%%
+%\begin{align*}
+%	\ers{B} \eqdef & B\\
+%%
+%	\ers{\shared{B}{I}} \eqdef & \emp \\
+%%
+%	\ers{\fass{P} \odot \fass{Q}} \eqdef & \ers{\fass{P}} \odot \ers{\fass{Q}} \text{ where } oplus \in \{\land, \lor, *, \sepish \}\\
+%%
+%	\ers{\exsts{x} \fass{P}} \eqdef & \exsts{x} \ers{\fass{P}}
+%\end{align*}
 \end{definition}
+%
+%
+\begin{definition}[Combination]
+The \emph{combination} of an assertion $P$ describing the current state, and an assertion describing an action precondition $Q$, $\combine{.}{.}: \Assertions \times \Assertions \rightarrow \LAssertions$, is defined as follows, provided that the bound logical variable of $P$ and $Q$ are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner).
+%
+\[
+\begin{array}{l l l}
+	\combine{P}{Q} \eqdef & \exsts{\overline{x}^{\in S \uplus S'}} \lass{P} * (\lass{P}' \sepish \lass{Q} \sepish \lass{Q}')\\
+	& \text{where } (S, \lass{P}, \lass{P}') = \ub{\un{P}} \text{ and }  (S', \lass{Q}, \lass{Q}') = \ub{\un{Q}} 
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+
 \begin{figure}
 \hrule\vspace{5pt}
 \begin{mathpar}
+	\infer{
+		\separate{\emp}{\lass{p}}
+	}
+	{}
+	
+	
+	\infer{
+		\separate{\m{false}}{\lass{p}}
+	}
+	{}
+	
+
+	\infer{
+		\separate{\capAss{}}{\heapAss{}}
+	}
+	{}
+	
+		
+	\infer{
+		\separate{\cell{x}{v}}{\cell{x}{v'}}
+	}
+	{
+		v \not= v'
+	}
+	
+		
+	\infer{
+		\separate{\cell{x}{v}}{\cell{y}{v'}}
+	}
+	{
+		x \not= y
+	}
+	
+		
+	\infer{
+		\separate{\token{a}}{\token{b}}
+	}
+	{
+		a \not= b
+	}
+	
+	
+	\infer={
+		\separate{\lass{p}}{\lass{q}}
+	}
+	{
+		\separate{\lass{q}}{\lass{p}}
+	}
+	
+	
+	\infer[\odot \in \{*, \sepish, \land, \lor\}]{
+		\separate{(\lass{p} \odot \lass{q})}{r}
+	}
+	{	
+		\separate{\lass{p}}{\lass{r}}
+		&
+		\separate{\lass{q}}{\lass{r}}
+	}
+	
+	
+	\infer[!]{
+		\separate{(\exsts{x} \lass{p})}{r}		
+	}
+	{
+		\separate{(\lass{p}[v/x])}{r}
+		&
+		\text{for }v \in \set{Val}
+	}
+%
+%	
+\end{mathpar}
+\hrule
+\caption{Non-overlapping judgements.}
+\label{fig:overlap-rules}
+\end{figure}
+%
+%
+\begin{figure}
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+		P \confines I	
+	}
+	{
+		\erase{P} \strictfences I	
+	}
+	
+	
 	\infer={
 		\fenceAss{} \strictfences I_1 \cup I_2	
 	}
@@ -1186,32 +1316,40 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: P * R \swap Q * R \right\}	
-	}
-	{
-		\exact{R}
-		&
 		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}	
 	}
+	{
+		\fenceAss{} \strictfences \left\{\capAss{}: \sumA{P} \swap \sumA{Q} \right\}	
+	}	
 	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
 	}
 	{
-		\fenceAss{} \sepish P \slentails \m{false}
+		\exact{\lass{R}}
+		&
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}	
 	}
 	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+	}
+	{
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
+	}
+	
+	
+	\infer{
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
 		\fenceAss{}' \slentails \fenceAss{}
 		&
-		\fenceAss{} \sepish P \slentails \fenceAss{}' \sepish P
+		\fenceAss{} \sepish \lass{P} \slentails \fenceAss{}' \sepish \lass{P}
 		&
-		\fenceAss{}' \strictfences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{}' \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	
 %	\infer{
@@ -1221,20 +1359,18 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %		\fenceAss{} \sepish Q |- \m{false}	
 %	}
 	
-	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
+	\infer[\dagger]{
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
-		\fenceAss{} \sepish P \slentails \fenceAss{}
+		\fenceAss{} \sepish \lass{P} \slentails \fenceAss{}
 		&
 		\precise{\fenceAss{}}
 		&
-		P \cap Q \slentails \emp
+		\separate{\lass{P}}{\lass{Q}}
 		&
-		\left(P \septraction \fenceAss{} \right) * Q \slentails \fenceAss{}	
-	}
-	
-	
+		\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
+	}	
 %	\infer{
 %		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}		
 %	}
@@ -1262,7 +1398,7 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %	
 \end{mathpar}
 \hrule
-\caption{Local fencing judgements where the separation algebra of logical states satisfies the disjointness property.}
+\caption{Confinement and local fencing judgements where in the judgement marked $\dagger$, the separation algebra of logical states must satisfy the disjointness property.}
 \label{fig:strict-fence-rules}
 \end{figure}
 %
@@ -1310,21 +1446,32 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 	}
 	
 	
+	\infer{\fenceAss{} \fences \emptyset}{}
+	
+	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: P * R \swap Q * R \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
 	}
 	{
-		\exact{R}
+		\fenceAss{} \fences \left\{\capAss{}: \sumA{P} \swap \sumA{Q} \right\}	
+	}
+	
+	
+	\infer{
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
+	}
+	{
+		\exact{\lass{R}}
 		&
-		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}	
 	}
 	
 	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}	
 	}
 	{
-		\fenceAss{} \cap P \slentails \emp	
+		\separate{\fenceAss{}}{\lass{P}}
 	}
 	
 	
@@ -1355,32 +1502,32 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %
 %
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
-		P \cap Q \slentails \emp	
+		\separate{\lass{P}}{\lass{Q}}
 		&
-		\left(P \septraction \fenceAss{} \sepish P \right) * Q \slentails \fenceAss{}
+		\left(\lass{P} \septraction (\fenceAss{} \sepish \lass{P}) \right) * \lass{Q} \slentails \fenceAss{}
 	}
 		
 	
-	\infer{
-	\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
+	\infer[?]{
+	\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
 		\fenceAss{}' \slentails \fenceAss{}
 		&
-		P \sepish \fenceAss{} \slentails P \sepish \fenceAss{}'
+		\lass{P} \sepish \fenceAss{} \slentails \lass{P} \sepish \fenceAss{}'
 		&
-		\fenceAss{}' \fences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{}' \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	
 	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}		
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
-		\fenceAss{} \sepish P \slentails \m{false}
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
 	}
 	
 	
@@ -1410,12 +1557,20 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 \hrule\vspace*{5pt}
 \begin{mathpar}
 	\infer{
-		I \weakenI{R} I'	
+		I \weakenI{P} I'
 	}
 	{
-		R |- F
+		I \weakenI{\erase{P}} I'	
+	}
+	
+	
+	\infer{
+		I \weakenI{\lass{R}} I'	
+	}
+	{
+		\lass{R} \slentails \lass{F}
 		&
-		I \weakenI{F} I'
+		I \weakenI{\lass{F}} I'
 	}
 	
 	
@@ -1429,42 +1584,50 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 	}
 	
 	
+	\infer{
+		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} I'
+	}
+	{
+		\left\{ \capAss{}: \sumA{P} \swap \sumA{Q} \right\} \weakenI{\fenceAss{}} I'
+	}
+	
+	
 	\infer[\proofRule{Disj-L}]{
-		\bigcup_{i \in I} \left\{\capAss{} : P_i \swap Q \right\}
+		\bigcup_{i \in I} \left\{\capAss{} : \lass{P}_i \swap \lass{Q} \right\}
 		\approx^{\m{true}}
-		\left\{\capAss{}: \left( \bigvee_{i \in I} P_i \right) \swap Q \right\} 
+		\left\{\capAss{}: \left( \bigvee_{i \in I} \lass{P}_i \right) \swap \lass{Q} \right\} 
 	}
 	{
 	}
 	
 	
 	\infer[\proofRule{Disj-R}]{
-		\bigcup_{i \in I}  \left\{ \capAss{}: P \swap Q_i \right\}
+		\bigcup_{i \in I}  \left\{ \capAss{}: \lass{P} \swap \lass{Q}_i \right\}
 		\approx^{\m{true}}
-		\left\{\capAss{}: P \swap \left( \bigvee_{i \in I} Q_i \right) \right\} 
+		\left\{\capAss{}: \lass{P} \swap \left( \bigvee_{i \in I} \lass{Q}_i \right) \right\} 
 	}
 	{
 	}
 	
 	\infer[\proofRule{Exist}]{
-		\left\{ \capAss: \overline{\exsts{v_i \in S_i}}^{i \in I} P \swap Q \right\} 
+		\left\{ \capAss{}: \exists\overline{v_i \in S_i}^{i \in I}.\, \lass{P} \swap \lass{Q} \right\} 
 		\approx^{\m{true}}
-		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{\capAss{}: P\overline{[w_i /v_i]}^{i \in I} \swap  Q\overline{[w_i /v_i]}^{i \in I} \right\} 
+		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{\capAss{}: \lass{P} \overline{[w_i /v_i]}^{i \in I} \swap  \lass{Q} \overline{[w_i /v_i]}^{i \in I} \right\} 
 	}
 	{
 	}
 	
 	
 	\infer[\proofRule{Hide}]{
-		\left\{ \capAss{}: P * R   \swap Q * R \right\} \weakenI{\fenceAss{}} 
+		\left\{ \capAss{}: \lass{P} * \lass{R}   \swap \lass{Q} * \lass{R} \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{	
-		\exact{R}
+		\exact{\lass{R}}
 		&
-		\fenceAss{} \cap P |-_{\textsf{SL}} \emp
+		\separate{\fenceAss{}}{\lass{P}}
 	}
-	
-	
+%	
+%	
 %	\infer[\proofRule{Hide}]{
 %		\left\{ \capAss{}: \left\{ P * R   \swap Q * R  \right\} \right\} \weakenI{\fenceAss{}} 
 %		\emptyset 	
@@ -1485,9 +1648,9 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %%		& \precise{\fenceAss{}'}
 %	}
 %	
-	
-	
-	
+%
+%	
+%	
 %	\infer[\proofRule{Hide}]{
 %		I \cup \left\{ \capAss{}: \left\{ P * \fenceAss{}  \swap Q * \fenceAss{}  \right\}\right\} \weakenI{R} 
 %		I 	
@@ -1503,20 +1666,20 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 
 
 	\infer[\proofRule{False-L}]{	
-		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} 
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		\fenceAss{} \sepish P \slentails \m{false}
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
 	}
 	
 	
 	\infer[\proofRule{False-R}]{	
-		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} 
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
-		\left(P \septraction (P \sepish \fenceAss{})\right) * Q \slentails \m{false}
+		\left(\lass{P} \septraction (\lass{P} \sepish \fenceAss{})\right) * \lass{Q} \slentails \m{false}
 	}
 	
 	
@@ -1536,22 +1699,23 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %		& \fenceAss{} \fences  I \cup \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
 %		&F \sepish Q \entails \m{false}
 %	}
-
+%
+%
 	\infer[\proofRule{Expand/Contract}]{
-		\left\{ \capAss{}: P \swap Q\right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: P * R_i \swap Q * R_i \right\}	
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: \lass{P} * \lass{R}_i \swap \lass{Q} * \lass{R}_i \right\}	
 	}
 	{
-		\fenceAss{} \sepish P \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(P * R_i \right)
+		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
 		&
-		\exact{R_i} \text{ for } i \in I
+		\exact{\lass{R}_i} \text{ for } i \in I
 %		\begin{array}{@{} l @{}}
 %			\fenceAss{} \fences \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\} 
 %			\qquad \exact{R_i} \text{ for } i \in I\\
 %			\qquad\qquad \fenceAss{} \sepish P \vdash \bigvee\limits_{i \in I} \fenceAss{} \sepish \left(P * R_i \right)
 %		\end{array}	
 	}
-	
-	
+%	
+%	
 %	\infer[\proofRule{Expand/Contract}]{
 %%		\left( I \cup \left\{ \capAss{}: P \swap Q\right\}\right) \approx^R \left( I \cup \left\{ \capAss{}: \bigcup\limits_{i \in J} P * R_i \swap Q * R_i \right\} \right) 	
 %		I \cup \left\{ \capAss{}: P \swap Q\right\} \;\approx^R\;  I \cup \left\{ \capAss{}: \left\{P * R_i \swap Q * R_i \mid i \in J\right\} \right\}	
@@ -1669,20 +1833,20 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 
 
 	\infer{
-		\stable{\shared{B}{I}}	
+		\stable{\shared{\lass{P}}{I}}	
 	}
 	{
-		B \fences I	
+		\lass{P} \fences I	
 	}
 	
 	
 	\infer[?]{
-		\stable{\shared{B}{I}}	
+		\stable{\shared{\lass{P}}{I}}	
 	}
 	{
-		\stable{\shared{B}{I'}} 
+		\stable{\shared{\lass{P}}{I'}} 
 		&
-		I' \weakenI{B} I
+		I' \weakenI{\lass{P}} I
 	}
 	
 	
@@ -1725,7 +1889,7 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 	
 	
 	
-	\infer[?]{
+	\infer{
 		\stableTo{\fass{P} \sepish \fass{Q}}{\fass{R}}
 	}
 	{
@@ -1782,20 +1946,20 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %	
 %	
 	\infer{
-		\stableTo{\shared{B}{I}}{\fass{R}}
+		\stableTo{\shared{\lass{P}}{I}}{\fass{R}}
 	}
 	{
-		\stableTo{\shared{B}{I'}}{\fass{R}}
+		\stableTo{\shared{\lass{P}}{I'}}{\fass{R}}
 		&
-		I' \weakenI{B} I
+		I' \weakenI{\lass{P}} I
 	}
 	
 	
 	\infer{
-		\stableTo{\shared{B}{I}}{\fass{R}}
+		\stableTo{\shared{\lass{P}}{I}}{\fass{R}}
 	}
 	{
-		\stableIn{B}{I}{\unbox{\fass{R} * \shared{B}{I}}}
+		\stableIn{\lass{P}}{I}{\fass{R} * \shared{\lass{P}}{I}}
 	}
 \end{mathpar}\vspace{5pt}\\
 %
@@ -1810,59 +1974,59 @@ where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is
 %	
 %	
 	\infer{
-		\stableIn{B}{I}{B'}	
+		\stableIn{\lass{P}}{I}{\fass{R}}	
 	}
 	{
-		\stableIn{B}{I'}{B'}
+		\stableIn{\lass{P}}{I'}{\fass{R}}
 		&
-		I' \weakenI{B} I
+		I' \weakenI{\lass{P}} I
 	}
 	
 	
 	\infer{
-		\stableIn{B}{I_1 \cup I_2}{B'}	
+		\stableIn{\lass{P}}{I_1 \cup I_2}{\fass{R}}	
 	}
 	{
-		\stableIn{B}{I_1}{B'}
+		\stableIn{\lass{P}}{I_1}{\fass{R}}
 		&
-		\stableIn{B}{I_2}{B'}
+		\stableIn{\lass{P}}{I_2}{\fass{R}}
 	}
 	
 	
 	\infer{
-		\stableIn{B}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{B'}	
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{\fass{R}}	
 	}
 	{
-		\capAss{} * B' \slentails \m{false}
+		\capAss{} * \prodA{\fass{R}} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{B}{\left\{\capAss{}: P \swap Q \right\}} {B'}	
+		\stableIn{\lass{P}}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}} {\fass{R}}	
 	}
 	{
-		B \sepish \erase{P} \slentails \m{false}
+		\combine{\fass{R}}{Q_1} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{B}{\left\{\capAss{}: P \swap Q \right\}}{B'}	
+		\stableIn{\lass{P}}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}}{\fass{R}}	
 	}
 	{
-		\left(\erase{P} \septraction (\erase{P} \sepish B)\right) * \erase{Q} \slentails B * \m{true}
+		\left(\erase{Q_1} \septraction \combine{\fass{R}}{Q_1} \,\right) * \erase{Q_2} \slentails \lass{P} * \m{true}
 	}
 	
 	
 	\infer{
-		\stableIn{B}{I}{B' * B''}	
+		\stableIn{\lass{P}}{I}{\fass{R} *\fass{Q}}	
 	}
 	{
-		\stableIn{B}{I}{B'}	
+		\stableIn{\lass{P}}{I}{\fass{R}}	
 	}
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements where $P, Q, R \in \Assertions$; $\fass{P}, \fass{Q}, \fass{R} \in \FAssertions$; and $B, B', B'' \in \LAssertions$.}
+\caption{Stability judgements where $P, Q_1, Q_2 \in \Assertions$; $\fass{P}, \fass{Q}, \fass{R} \in \FAssertions$; and $\lass{P} \in \LAssertions$.}
 \label{fig:stabilityRules}
 \end{figure*}
 

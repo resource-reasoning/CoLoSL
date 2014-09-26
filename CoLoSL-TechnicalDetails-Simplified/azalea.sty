@@ -198,7 +198,7 @@
 %\newcommand{\separate}{\text{\textreferencemark}}
 
 \newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
-\newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
+\newcommand{\fenceAss}[1]{\ensuremath{\lass{F}_{#1}}}
 \newcommand{\fences}{\mathrel{\rhd}}
 
 
@@ -629,10 +629,15 @@
 \newcommand{\stableIn}[3]{\textsf{S}\left(#1, #2, #3\right)}
 \newcommand{\slentails}{\ensuremath{\vdash_{\textsf{SL}}}}
 \newcommand{\un}[1]{\textsf{f}\left(#1\right)}
-\newcommand{\unbox}[1]{\textsf{unbox}\left(#1\right)}
+%\newcommand{\unbox}[1]{\textsf{unbox}\left(#1\right)}
+\newcommand{\sumA}[1]{\bigoplus#1}
+\newcommand{\prodA}[1]{\bigotimes#1}
 \newcommand{\ub}[1]{\textsf{ub}\left(#1\right)}
 \newcommand{\LAssertions}{\textsf{LAssn}\xspace}
 \newcommand{\FAssertions}{\textsf{FAssn}\xspace}
 \newcommand{\fass}[1]{\textsc{#1}}
-\newcommand{\erase}[1]{\downharpoonleft\!\!#1}
-\newcommand{\ers}[1]{\textsf{e}\left(#1\right)}
+\newcommand{\lass}[1]{\text{\lowercase{#1}}}
+\newcommand{\erase}[1]{\downharpoonleft\!#1}
+%\newcommand{\ers}[1]{\textsf{e}\left(#1\right)}
+\newcommand{\combine}[2]{\textsf{c}\left(#1, #2\right)}
+\newcommand{\separate}[2]{\ensuremath{#1 \cap #2 \slentails \emp}}
