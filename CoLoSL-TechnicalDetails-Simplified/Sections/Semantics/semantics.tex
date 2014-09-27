@@ -1117,6 +1117,40 @@ The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is
 \end{definition}
 %
 %
+\begin{definition}[Assertion erasure]
+The \emph{erasure} of an assertion $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively as follows.
+%
+\begin{align*}
+	\erase{A} \eqdef & A \\
+%
+	\erase{\left(\shared{P}{I} \right)} \eqdef & \emp \\
+%
+	\erase{(P \odot Q)} \eqdef & \erase{P} \odot \erase{Q} \text{ where } \odot \in \{\land, \lor, *, \sepish \}\\
+%
+	\erase{(\exsts{x} P)} \eqdef & \exsts{x} \erase{P}
+\end{align*}
+%
+%
+%The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined as follows.
+%%
+%\[
+%	\erase{P} \eqdef \ers{\compose{P}}
+%\]
+%%
+%where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is defined inductively as follows. 
+%%
+%\begin{align*}
+%	\ers{B} \eqdef & B\\
+%%
+%	\ers{\shared{B}{I}} \eqdef & \emp \\
+%%
+%	\ers{\fass{P} \odot \fass{Q}} \eqdef & \ers{\fass{P}} \odot \ers{\fass{Q}} \text{ where } oplus \in \{\land, \lor, *, \sepish \}\\
+%%
+%	\ers{\exsts{x} \fass{P}} \eqdef & \exsts{x} \ers{\fass{P}}
+%\end{align*}
+\end{definition}
+%
+%
 \begin{definition}[Gather/merge]
 The \emph{gather}($\prodA{}$) and \emph{merge} ($\sumA{}$) functions:
 \[
@@ -1153,40 +1187,6 @@ with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVa
 %
 	\ub{\exsts{x} \fass{P}} \eqdef& (S \uplus \{x\}, \lass{P}_1, \lass{P}_2) \text{ where } \ub{\fass{P}} = (S, \lass{P}_1, \lass{P}_2)
 \end{align*}
-\end{definition}
-%
-%
-\begin{definition}[Assertion Erasure]
-The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively as follows.
-%
-\begin{align*}
-	\erase{A} \eqdef & A \\
-%
-	\erase{\left(\shared{P}{I} \right)} \eqdef & \emp \\
-%
-	\erase{(P \odot Q)} \eqdef & \erase{P} \odot \erase{Q} \text{ where } \odot \in \{\land, \lor, *, \sepish \}\\
-%
-	\erase{(\exsts{x} P)} \eqdef & \exsts{x} \erase{P}
-\end{align*}
-%
-%
-%The assertion \emph{erasure} function $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined as follows.
-%%
-%\[
-%	\erase{P} \eqdef \ers{\compose{P}}
-%\]
-%%
-%where the auxiliary function $\ers{.}: \FAssertions \rightarrow \LAssertions$ is defined inductively as follows. 
-%%
-%\begin{align*}
-%	\ers{B} \eqdef & B\\
-%%
-%	\ers{\shared{B}{I}} \eqdef & \emp \\
-%%
-%	\ers{\fass{P} \odot \fass{Q}} \eqdef & \ers{\fass{P}} \odot \ers{\fass{Q}} \text{ where } oplus \in \{\land, \lor, *, \sepish \}\\
-%%
-%	\ers{\exsts{x} \fass{P}} \eqdef & \exsts{x} \ers{\fass{P}}
-%\end{align*}
 \end{definition}
 %
 %
@@ -1320,6 +1320,14 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 	}
 	{
 		\fenceAss{} \strictfences \left\{\capAss{}: \sumA{P} \swap \sumA{Q} \right\}	
+	}	
+	
+	
+	\infer{
+		\fenceAss{} \strictfences \left\{\capAss{}: P \swap Q \right\}	
+	}
+	{
+		\fenceAss{} \strictfences \left\{\capAss{}: \erase{P} \swap \erase{Q} \right\}	
 	}	
 	
 	
@@ -1458,6 +1466,14 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 	
 	
 	\infer{
+		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
+	}
+	{
+		\fenceAss{} \fences \left\{\capAss{}: \erase{P} \swap \erase{Q} \right\}	
+	}
+	
+	
+	\infer{
 		\fenceAss{} \fences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
 	}
 	{
@@ -1589,6 +1605,14 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 	}
 	{
 		\left\{ \capAss{}: \sumA{P} \swap \sumA{Q} \right\} \weakenI{\fenceAss{}} I'
+	}
+	
+	
+	\infer{
+		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} I'
+	}
+	{
+		\left\{ \capAss{}: \erase{P} \swap \erase{Q} \right\} \weakenI{\fenceAss{}} I'
 	}
 	
 	
@@ -1974,6 +1998,14 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 %	
 %	
 	\infer{
+		\stableIn{\lass{P}}{I}{\fass{R} *\fass{Q}}	
+	}
+	{
+		\stableIn{\lass{P}}{I}{\fass{R}}	
+	}
+	
+	
+	\infer{
 		\stableIn{\lass{P}}{I}{\fass{R}}	
 	}
 	{
@@ -1997,36 +2029,47 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{\fass{R}}	
 	}
 	{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\sumA{Q_1}}{\sumA{Q_2}}\right\}}{\fass{R}}	
+	}
+	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{\fass{R}}	
+	}
+	{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\erase{Q_1}}{\erase{Q_2}}\right\}}{\fass{R}}	
+	}
+	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\lass{Q}_1}{\lass{Q}_2}\right\}}{\fass{R}}	
+	}
+	{
 		\capAss{} * \prodA{\fass{R}} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}} {\fass{R}}	
+		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}} {\fass{R}}	
 	}
 	{
-		\combine{\fass{R}}{Q_1} \slentails \m{false}
+		\combine{\fass{R}}{\lass{Q}_1} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\capAss{}: Q_1 \swap Q_2 \right\}}{\fass{R}}	
+		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}}{\fass{R}}	
 	}
 	{
-		\left(\erase{Q_1} \septraction \combine{\fass{R}}{Q_1} \,\right) * \erase{Q_2} \slentails \lass{P} * \m{true}
+		\left(\lass{Q}_1 \septraction \combine{\fass{R}}{\lass{Q}_1} \,\right) * \lass{Q}_2 \slentails \lass{P} * \m{true}
 	}
-	
-	
-	\infer{
-		\stableIn{\lass{P}}{I}{\fass{R} *\fass{Q}}	
-	}
-	{
-		\stableIn{\lass{P}}{I}{\fass{R}}	
-	}
+%	
+%	
+%	
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements where $P, Q_1, Q_2 \in \Assertions$; $\fass{P}, \fass{Q}, \fass{R} \in \FAssertions$; and $\lass{P} \in \LAssertions$.}
+\caption{Stability judgements where $P, Q_1, Q_2 \in \Assertions$; $\fass{P}, \fass{Q}, \fass{R} \in \FAssertions$; and $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$.}
 \label{fig:stabilityRules}
 \end{figure*}
 
