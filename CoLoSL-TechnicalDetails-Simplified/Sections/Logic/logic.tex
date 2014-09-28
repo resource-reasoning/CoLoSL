@@ -402,7 +402,7 @@ Note that this presentation with several forcing relations differs from the usua
 %
 %
 \begin{definition}[Assertion semantics]\label{def:assertion-semantics}
-Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \LEnv --> \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ will be given in \defin~\ref{def:actclos}.
+Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \IAssertions --> \LEnv --> \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ will be given in \defin~\ref{def:actclos}.
 %
 %\[
 \begin{align*}
@@ -439,9 +439,9 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   w' \composeW w_1, \lenv |= P_1 \text{ and }
   w' \composeW w_2, \lenv |= P_2\\
 %  
-  w, \lenv &|= P \septraction Q &&\text{iff}&&
-   \exsts{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
-   &&&&&\text{ implies }w \composeW w', \lenv |= Q\\
+%  w, \lenv &|= P \septraction Q &&\text{iff}&&
+%   \exsts{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
+%   &&&&&\text{ implies }w \composeW w', \lenv |= Q\\
 %  
 \end{align*}
 %\]
@@ -474,12 +474,12 @@ where
   \exsts{s', s_1, s_2} s = s' \composeL s_1 \composeL s_2\text{ and}\\
   &&&&&
   s' \composeL s_1, \lenv |=_\dagger P_1 \text{ and }
-  s' \composeL s_2, \lenv |=_\dagger P_2\\
+  s' \composeL s_2, \lenv |=_\dagger P_2\\\\
 %  
-  s, \lenv &|=_\dagger P \septraction Q &&\text{iff}&&
-  \exsts{s'} s', \lenv |=_\dagger P \text{ and }
-  s \compatible s'\\
-  &&&&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
+%  s, \lenv &|=_\dagger P \septraction Q &&\text{iff}&&
+%  \exsts{s'} s', \lenv |=_\dagger P \text{ and }
+%  s \compatible s'\\
+%  &&&&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
 %
 %
 %
@@ -519,13 +519,13 @@ where
   \exsts{l', l_1, l_2} l = l' \composeL l_1 \composeL l_2\text{ and}\\
   &&&&&
   l' \composeL l_1, \lenv \slsat P_1 \text{ and }
-  l' \composeL l_2, \lenv \slsat P_2\\
+  l' \composeL l_2, \lenv \slsat P_2
 %  
 %  
-  l, \lenv & \slsat P \septraction Q &&\text{iff}&&
-  \exsts{l'} l', \lenv \slsat P \text{ and }
-  l \compatible l'\\
-  &&&&&\text{ implies } l \composeL l', \lenv \slsat Q
+%  l, \lenv & \slsat P \septraction Q &&\text{iff}&&
+%  \exsts{l'} l', \lenv \slsat P \text{ and }
+%  l \compatible l'\\
+%  &&&&&\text{ implies } l \composeL l', \lenv \slsat Q
 \end{align*}
 %
 and
@@ -534,12 +534,16 @@ and
   \semI[\lenv]{I}(\ca{}) &==
   \left\{
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
-    (p,q)&
+    (p \composeL r, q \composeL r)&
     \begin{array}{@{}l@{}}
-      \interAss{\capAss{}}{\vec{y}}{P}{Q} \in I /| \ca{} \in \semK[\lenv]{\capAss{}}\land\\
-      \exsts{\vec{v}, g, \lmod}
-      (p, g, \lmod), [\lenv|||\vec y:\vec v] |= P \land
-      (q, g, \lmod), [\lenv|||\vec y:\vec v] |= Q
+      \interAss{\capAss{}}{\vec{y}}{P}{Q} \in I /| \ca{} \in \semK[\lenv]{\capAss{}}\land
+      \exsts{\vec{v}, \lmod}\\
+      \quad (p \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{P} \land\\
+      \quad (q \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{Q} \land \\
+      \quad p, [\lenv|||\vec y:\vec v] |=_{(p \composeL r), \lmod} P \land
+      q, [\lenv|||\vec y:\vec v] |=_{(q \composeL r), \lmod} Q 
+%      (p, g, \lmod), [\lenv|||\vec y:\vec v] |= P \land
+%      (q, g, \lmod), [\lenv|||\vec y:\vec v] |= Q
     \end{array}
   \end{array}
   \right\}

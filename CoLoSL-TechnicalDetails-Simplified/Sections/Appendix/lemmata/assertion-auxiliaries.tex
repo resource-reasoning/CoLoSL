@@ -27,7 +27,7 @@ We proceed by induction on the structure of assertion $P$.	\\
 Pick an arbitrary $\lenv \in \LEnv$, $l, g, g' \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
 %
 \begin{align}
-	& (l, g, \lmod), \lenv |= P_1 \implies P_2 \label{sub-stable-extend:Ass1}\\
+	& (l, g, \lmod), \lenv |= P_1 \lor P_2 \label{sub-stable-extend:Ass1}\\
 %	
 	&\expandsAM{\lmod'}{g'}{g}{\lmod} \label{sub-stable-extend:Ass2}\\
 %	
@@ -41,15 +41,15 @@ Pick an arbitrary $\lenv \in \LEnv$, $l, g, g' \in \LStates$ and $\lmod, \lmod' 
 %	
 \end{align}
 %
-From (\ref{sub-stable-extend:Ass1}) and the definition of $|=$ we know $(l, g, \lmod), \lenv |= P_1$ \text{ implies } $(l, g, \lmod), \lenv |= P_2$; consequently, from (\ref{sub-stable-extend:Ass2}), (\ref{sub-stable-extend:IH1}) and (\ref{sub-stable-extend:IH2}) we have: $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1$ \text{ implies } $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_2$. Thus, from the definition of $|=$ we have:
+From (\ref{sub-stable-extend:Ass1}) and the definition of $|=$ we know $(l, g, \lmod), \lenv |= P_1$ \text{ or } $(l, g, \lmod), \lenv |= P_2$; consequently, from (\ref{sub-stable-extend:Ass2}), (\ref{sub-stable-extend:IH1}) and (\ref{sub-stable-extend:IH2}) we have: $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1$ \text{ or } $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_2$. Thus, from the definition of $|=$ we have:
 %
 \begin{align*}
-	(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1 \implies P_2
+	(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1 \lor P_2
 \end{align*}
 %
 as required.\\
 
-\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$; $P \eqdef P_1 \land P_2$} \\
 These cases are analogous to the previous case and are omitted here. \\
 
 \noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
