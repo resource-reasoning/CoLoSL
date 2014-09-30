@@ -159,8 +159,12 @@
 \definecolor{darkgreen}{rgb}{0, 0.35, 0}
 \definecolor{darkred}{rgb}{0.85, 0, 0}
 %\newcommand{\eqdef}{\stackrel{\mathrm{def}}{=}}
-\newcommand{\eqdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{=}}}
+%\newcommand{\eqdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{=}}}
+\newcommand{\eqdef}{\triangleq}
 \newcommand{\iffdef}{\mathrel{\stackrel{\smash{\scriptscriptstyle{\mathrm{def}}}}{\iff}}}
+%\newcommand{\oast}{%
+%  \mathrel{\mbox{$\mathord{\ocircle\hspace*{-.66em}\scon}$\hspace*{0.05em}}}
+%}
 
 \newcommand{\Nats}{\mathbb{N}}
 \newcommand{\NatsPlus}{\Nats^{+}}
@@ -197,7 +201,7 @@
 %\newcommand{\separate}{\text{\textreferencemark}}
 
 \newcommand{\fence}[1]{\ensuremath{\mathcal{F}_{#1}}}
-\newcommand{\fenceAss}[1]{\ensuremath{F_{#1}}}
+\newcommand{\fenceAss}[1]{\ensuremath{\lass{F}_{#1}}}
 \newcommand{\fences}{\mathrel{\rhd}}
 
 
@@ -315,10 +319,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%% Assertions %%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\Assertions}{\set{Assn}\xspace}
-\newcommand{\LAssertions}{\set{LAssn}\xspace}
 \newcommand{\KAssertions}{\set{KAssn}\xspace}
 \newcommand{\HAssertions}{\set{MAssn}\xspace}
 \newcommand{\IAssertions}{\set{IAssn}\xspace}
+\newcommand{\LAssertions}{\set{LAssn}\xspace}
+\newcommand{\FAssertions}{\set{FAssn}\xspace}
 \newcommand{\PEnv}{\set{PEnv}\xspace}
 \newcommand{\LEnv}{\set{LEnv}\xspace}
 \newcommand{\penv}{\ensuremath{\Delta}\xspace}
@@ -623,3 +628,20 @@
 {\hrpoonyatom\scriptscriptstyle}}}
 
 \newcommand{\vr}[1]{\li{#1}}
+
+\newcommand{\stableTo}[2]{\textsf{St}\left(#1, #2\right)}
+\newcommand{\stableIn}[3]{\textsf{S}\left(#1, #2, #3\right)}
+\newcommand{\slentails}{\ensuremath{\vdash_{\textsf{SL}}}}
+\newcommand{\un}[1]{\textsf{f}\left(#1\right)}
+%\newcommand{\unbox}[1]{\textsf{unbox}\left(#1\right)}
+\newcommand{\sumA}[1]{\bigoplus\!#1}
+\newcommand{\prodA}[1]{\bigotimes\!#1}
+\newcommand{\ub}[1]{\textsf{ub}\left(#1\right)}
+\newcommand{\fass}[1]{\textsc{#1}}
+\newcommand{\lass}[1]{\textsf{\lowercase{#1}}}
+%\newcommand{\eraseL}[1]{\downharpoonleft_{\textsf{L}}\!#1}
+\newcommand{\erase}[1]{\downharpoonleft\!\!\xspace#1}
+%\newcommand{\eraseS}[1]{\downharpoonleft_{\textsf{S}}\!#1}
+%\newcommand{\erase}[1]{\textsf{e}\left(#1\right)}
+\newcommand{\combine}[2]{\textsf{c}\left(#1, #2\right)}
+\newcommand{\separate}[2]{\ensuremath{#1 \cap #2 \slentails \emp}}

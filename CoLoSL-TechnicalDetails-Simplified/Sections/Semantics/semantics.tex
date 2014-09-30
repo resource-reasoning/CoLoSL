@@ -1084,12 +1084,12 @@ The \emph{flat assertions} $\FAssertions$, are defined by the following grammar.
 	\FAssertions \ni \fass{P}, \fass{Q} ::= \lass{P} \mid \shared{\lass{P}}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q} 
 \]
 %
-The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows. 
+The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows where $x$ does not appear free in $I$ and $\odot \in \{\land, \lor, *, \sepish\}$. 
 %
 \begin{align*}
 	\un{A} \eqdef & A\\
 %
-	\un{P \odot Q} \eqdef & \un{P} \odot \un{Q}  \quad \text{for } \odot \in \{\land, \lor, *, \sepish\}\\
+	\un{P \odot Q} \eqdef & \un{P} \odot \un{Q}  \quad \text{for } \\
 %
 	\un{\exsts{x} P} \eqdef & \exsts{x} \un{P} \\
 %
@@ -1103,26 +1103,21 @@ The \emph{flattenig} function $\un{.} : \Assertions \rightarrow \FAssertions$ is
 %
 	\un{\shared{P \lor Q}{I}} \eqdef & \un{\shared{P}{I}} \lor \un{\shared{Q}{I}}\\
 %
-%%	\un{\shared{\shared{P}{I} \land \emp}{I'}} \eqdef & \un{\shared{P}{I}} * \shared{\emp}{I'}\\
+	\un{\shared{\shared{P}{I} \land L}{I'}} \eqdef & \m{false}\\
 %
 	\un{\shared{\shared{P}{I} \land B}{I'}} \eqdef & \un{\shared{P}{I}} * \un{\shared{B}{I'}}\\
 % 
-	\un{\shared{\shared{P}{I} \land (L \odot Q)}{I'}} \eqdef &
-	\m{false} \quad \text{ where } \odot \in \{\land, *, \sepish\}\\
 %
-	\un{\shared{\shared{P}{I} \land (L \lor Q)}{I'}} \eqdef &
-	\un{\shared{\shared{P}{I} \land Q}{I'}}
-%	\begin{cases}
-%		\un{\shared{P}{I}} * \un{\shared{Q}{I'}} & \text{ if } Q \implies \emp\\
-%		\m{false} & \text{ otherwise }
-%	\end{cases}
+	\un{\shared{\shared{P}{I} \land ((L \lor Q) \odot R)}{I'}} \eqdef &
+	\un{\shared{\shared{P}{I} \land (Q \odot R)}{I'}}
 \end{align*}
 %
 where
 %
 \begin{align*}
-	B ::= & \emp \mid \shared{P}{I} \mid B * B \mid B \sepish B \mid B \land B \mid B \lor B\\
-	L ::= & \m{false} \mid \cell{x}{v} \mid [\token{a} ]
+	B ::= \emp \mid \shared{P}{I} \mid B \odot B
+	\quad
+	L ::= \m{false} \mid \cell{x}{v} \mid [\token{a} ] \mid L \ominus Q \quad \text{for }  \ominus \in \{\land, *, \sepish\}
 \end{align*}
 \end{definition}
 %
@@ -1221,27 +1216,30 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 		\separate{\emp}{\lass{p}}
 	}
 	{}
-	
-	
+		
 	\infer{
 		\separate{\m{false}}{\lass{p}}
 	}
 	{}
 	
+	\infer{
+		\separate{[\token{a}]}{\cell{x}{v}}
+	}
+	{}	
 
 	\infer{
-		\separate{\capAss{}}{\heapAss{}}
+		\separate{[\token{a}]}{[\token{b}]}
 	}
-	{}
-	
-		
+	{
+%		a \not= b
+	}
+			
 	\infer{
 		\separate{\cell{x}{v}}{\cell{x}{v'}}
 	}
 	{
 		v \not= v'
 	}
-	
 		
 	\infer{
 		\separate{\cell{x}{v}}{\cell{y}{v'}}
@@ -1250,14 +1248,12 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 		x \not= y
 	}
 	
-		
 	\infer{
-		\separate{\token{a}}{\token{b}}
+		\separate{(\lass{p} \odot \lass{q})}{\lass{r}}
 	}
 	{
-		a \not= b
+		\separate{\lass{q}}{\lass{r}}
 	}
-	
 	
 	\infer={
 		\separate{\lass{p}}{\lass{q}}
@@ -1266,9 +1262,9 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 		\separate{\lass{q}}{\lass{p}}
 	}
 	
-	
-	\infer[\odot \in \{*, \sepish, \land, \lor\}]{
-		\separate{(\lass{p} \odot \lass{q})}{r}
+%	[\odot \in \{*, \sepish, \land, \lor\}]
+	\infer{
+		\separate{(\lass{p} \ominus \lass{q})}{r}
 	}
 	{	
 		\separate{\lass{p}}{\lass{r}}
@@ -1276,8 +1272,7 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 		\separate{\lass{q}}{\lass{r}}
 	}
 	
-	
-	\infer[!]{
+	\infer={
 		\separate{(\exsts{x} \lass{p})}{r}		
 	}
 	{
@@ -1287,6 +1282,76 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 	}
 %
 %	
+%	\infer{
+%		\separate{\emp}{\lass{p}}
+%	}
+%	{}
+%	
+%	
+%	\infer{
+%		\separate{\m{false}}{\lass{p}}
+%	}
+%	{}
+%	
+%
+%	\infer{
+%		\separate{\capAss{}}{\heapAss{}}
+%	}
+%	{}
+%	
+%		
+%	\infer{
+%		\separate{\cell{x}{v}}{\cell{x}{v'}}
+%	}
+%	{
+%		v \not= v'
+%	}
+%	
+%		
+%	\infer{
+%		\separate{\cell{x}{v}}{\cell{y}{v'}}
+%	}
+%	{
+%		x \not= y
+%	}
+%	
+%		
+%	\infer{
+%		\separate{\token{a}}{\token{b}}
+%	}
+%	{
+%		a \not= b
+%	}
+%	
+%	
+%	\infer={
+%		\separate{\lass{p}}{\lass{q}}
+%	}
+%	{
+%		\separate{\lass{q}}{\lass{p}}
+%	}
+%	
+%	
+%	\infer[\odot \in \{*, \sepish, \land, \lor\}]{
+%		\separate{(\lass{p} \odot \lass{q})}{r}
+%	}
+%	{	
+%		\separate{\lass{p}}{\lass{r}}
+%		&
+%		\separate{\lass{q}}{\lass{r}}
+%	}
+%	
+%	
+%	\infer[!]{
+%		\separate{(\exsts{x} \lass{p})}{r}		
+%	}
+%	{
+%		\separate{(\lass{p}[v/x])}{r}
+%		&
+%		\text{for }v \in \set{Val}
+%	}
+%%
+%%	
 \end{mathpar}
 \hrule
 \caption{Non-overlapping judgements.}
