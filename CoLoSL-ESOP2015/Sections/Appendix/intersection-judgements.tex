@@ -1,0 +1,83 @@
+\section{Intersection Judgements}\label{sec:intersection-judgements}
+%
+\fig~\ref{fig:intersection-rules} presents a number of judgements for establishing that two assertions do not intersect.
+%
+\begin{figure}[h!]
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+		\separate{\emp}{\lass{p}}
+	}
+	{}
+		
+	\infer{
+		\separate{\m{false}}{\lass{p}}
+	}
+	{}
+	
+	\infer{
+		\separate{[y]}{\cell{x}{v}}
+	}
+	{}	
+
+	\infer{
+		\separate{[x]}{[y]}
+	}
+	{
+		x \not= y
+	}
+			
+	\infer{
+		\separate{\cell{x}{v}}{\cell{x}{v'}}
+	}
+	{
+		v \not= v'
+	}
+		
+	\infer{
+		\separate{\cell{x}{v}}{\cell{y}{v'}}
+	}
+	{
+		x \not= y
+	}
+	
+	\infer{
+		\separate{(\lass{p} \odot \lass{q})}{\lass{r}}
+	}
+	{
+		\separate{\lass{q}}{\lass{r}}
+	}
+	
+	\infer={
+		\separate{\lass{p}}{\lass{q}}
+	}
+	{
+		\separate{\lass{q}}{\lass{p}}
+	}
+	
+%	[\odot \in \{*, \sepish, \land, \lor\}]
+	\infer{
+		\separate{(\lass{p} \ominus \lass{q})}{r}
+	}
+	{	
+		\separate{\lass{p}}{\lass{r}}
+		&
+		\separate{\lass{q}}{\lass{r}}
+	}
+	
+	\infer={
+		\separate{(\exsts{x} \lass{p})}{r}		
+	}
+	{
+		\separate{(\lass{p}[v/x])}{r}
+		&
+		\text{for }v \in \set{Val}
+	}
+%
+%	
+\end{mathpar}
+\hrule
+\caption{Intersection judgements where $\odot \in \{\land, \septraction\}$ and $\ominus \in \{\lor, *, ** \}$ .}
+\label{fig:intersection-rules}
+\end{figure}
+%
