@@ -1,0 +1,39 @@
+\section{Existential Promotion}\label{sec:exist-promotion}
+\begin{definition}[Existential promotion]
+Given an assertion $P \in \Assertions$, the \emph{existential promotion} function, $\promote{.}: \Assertions \rightarrow \LAssertions$, is defined as follows:
+%
+\begin{mathpar}
+	\promote{P} \eqdef \exists{\bar{x}^{\in S}}.\; P'
+	
+	\text{where } (S, P') = \ep{P}
+\end{mathpar}
+%
+%
+with the auxiliary function $\ep{.}: \Assertions \rightarrow (\pset{\textsf{LVar}} \times \Assertions)$ defined inductively over the structure of assertions as follows where $\odot \in \{\land, \lor, *, \sepish\}$.
+We assume that the bound logical variables of $P$ are pairwise distinct; and that the bound variables of $P$ in $\shared{P}{I}$ do not appear free in $I$\footnote{Note that it is always possible to achieve these stipulations by renaming the bound variables in a capture-avoiding manner.}.
+In what follows, $\ep{P} = (S_1, P')$ and $\ep{Q} = (S_2, Q')$ where applicable.
+%
+\begin{mathpar}
+	\ep{A} \!\!\eqdef\! (\emptyset, A) 
+	
+	\ep{\shared{P}{I}} \!\!\eqdef\!  (S_1, \shared{P'}{I})
+	
+	\ep{P \odot Q} \!\!\eqdef\! \left(S_1 \uplus S_2, P' \odot Q' \right)
+
+	\ep{\exsts{x}P} \!\!\eqdef\! \left({x} \uplus S_1, P'\right)
+\end{mathpar}
+%
+\end{definition}
+%
+%
+\begin{lemma}
+Given any assertion $P \in \Assertions$, the following is valid.
+%
+\[
+	P <=> \promote{P}
+\]
+%
+\begin{proof}
+The proof is by induction over the structure of \colosl assertions and follows from their semantics. The full proof is provided in~\cite{colosl-tr14}.
+\end{proof}
+\end{lemma}

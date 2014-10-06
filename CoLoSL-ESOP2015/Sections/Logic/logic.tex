@@ -4,46 +4,35 @@ In this section we revisit the \colosl principles introduced in the earlier sect
 %
 \todo segue why we need these next definitions. 
 %
+
+As we demonstrate in Appendix~\ref{sec:exist-promotion}, given any assertion $P$, it is always possible to rewrite it into an equivalent assertion where all the existential quantifications are promoted to the front of the assertion; that is, $P <=> \exsts{\bar{x}} P'$ where there are no bound variables in $P'$.
 %
 \begin{definition}[Gather/merge]
-For an assertion $P \in \Assertions$, the \emph{gather}, $\prodA{(.)}: \Assertions \rightarrow \LAssertions$, and \emph{merge}, $\sumA{(.)}: \Assertions \rightarrow \LAssertions$, operations are defined as follows:
+Given an assertion $P \eqdef \exsts{\bar{x}} P' \in \Assertions$ (where there are no bound variables in $P'$), the \emph{gather}, $\prodA{(.)}: \Assertions \rightarrow \LAssertions$, and \emph{merge}, $\sumA{(.)}: \Assertions \rightarrow \LAssertions$, operations are defined as follows:
 %
 \begin{mathpar}
-	\prodA{P} \eqdef \exists{\bar{x}}^{S}.\; \lass{P} * \lass{Q}
+	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
 	
-	\sumA{P} \eqdef  \exists{\bar{x}}^{S}.\; \lass{P} \sepish \lass{Q}
+	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
 	
-	\text{where } (S, \lass{P}, \lass{Q}) = \ub{\un{P}} 
+	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
 \end{mathpar}
 %
 %
-with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVar}} \times \LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\odot \in \{\land, *, \sepish\}$; and given an assertion $P$, $\m{V}(P)$ denotes its set of bound variables. We assume that the bound logical variables of the left-hand assertion are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner). In what follows, $\ub{\fass{P}} = (S_1, \lass{P}, \lass{P}')$ and $\ub{\fass{Q}} = (S_2, \lass{Q}, \lass{Q}')$ where applicable.
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\odot \in \{\land, *, \sepish\}$.
+% We assume that the bound logical variables of the left-hand assertion are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner). 
+ In what follows, $\ub{\fass{P}} = (\lass{P}, \lass{P}')$ and $\ub{\fass{Q}} = (\lass{Q}, \lass{Q}')$ where applicable.
 %
 \begin{mathpar}
-	\ub{\lass{P}} \!\!\eqdef\! (V(\lass{P}), \lass{P}, \emp) \quad\;\;
-%
-	\ub{\shared{\lass{P}}{I}} \!\!\eqdef\!  (V(\lass{P}), \emp, \lass{P})\quad\;\;
-%
-	\ub{\exsts{x} \fass{P}} \!\!\eqdef\! (S_1 \uplus \{x\}, \lass{P}, \lass{P}')
+	\ub{\lass{P}} \!\!\eqdef\! (\lass{P}, \emp) 
 	
-	\ub{\fass{P} \odot \fass{Q}} \eqdef \left(S_1 \uplus S_2, \lass{P} \odot \lass{Q}, \lass{P}' \sepish \lass{Q}' \right)
+	\ub{\shared{\lass{P}}{I}} \!\!\eqdef\!  (\emp, \lass{P})
+	
+	\ub{\fass{P} \odot \fass{Q}} \!\!\eqdef\! \left(\lass{P} \odot \lass{Q}, \lass{P}' \sepish \lass{Q}' \right)
 
-	\ub{\fass{P} \lor \fass{Q}} \eqdef \left(S_1 \uplus S_2, \lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)
+	\ub{\fass{P} \lor \fass{Q}} \!\!\eqdef\! \left(\lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)
 \end{mathpar}
 %
-%\begin{align*}
-%	\ub{\lass{P}} \eqdef & (vars(\lass{P}), \lass{P}, \emp) \quad\qquad 
-%%
-%	\ub{\shared{\lass{P}}{I}} \eqdef  (vars(\lass{P}), \emp, \lass{P})\\
-%%
-%	\ub{\fass{P} \odot \fass{Q}} \eqdef & \left(S_1 \uplus S_2, \lass{P} \odot \lass{Q}, \lass{P}' \sepish \lass{Q}' \right) \quad \text{for } \odot \in \{\land, *, \sepish\}\\
-%	& \text{ where } \ub{\fass{P}} = (S_1, \lass{P}, \lass{P}') \text{ and } \ub{\fass{Q}} = (S_2, \lass{Q}, \lass{Q}')\\
-%%
-%	\ub{\fass{P} \lor \fass{Q}} \eqdef & \left(S_1 \uplus S_2, \lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)\\
-%	& \text{ where } \ub{\fass{P}} = (S_1, \lass{P}, \lass{P}') \text{ and } \ub{\fass{Q}} = (S_2, \lass{P}, \lass{Q}')\\
-%%
-%	\ub{\exsts{x} \fass{P}} \eqdef& (S \uplus \{x\}, \lass{P}_1, \lass{P}_2) \text{ where } \ub{\fass{P}} = (S, \lass{P}_1, \lass{P}_2)
-%\end{align*}
 %
 \end{definition}
 %
@@ -88,7 +77,8 @@ with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\pset{\textsf{LVa
 \label{fig:interference-entailment-rules}
 \end{figure}
 %
-Recall from \S\ref{sec:introduction} that when extending the shared state with locally held resources described by $P$, the interference governing the newly-shared resources $I$ must be confined to $P$. This is captured by the confinement condition $P \confines I$ (see \extendRule). Confinement of interference assertions is simply the lifting of action model confinement (\defin\ref{def:confinement}) to assertions as defined below.
+
+Recall from \S\ref{sec:introduction} that when extending the shared state with locally held resources described by $P$, the interference governing the newly-shared resources $I$ must be confined to $P$. This is captured by the confinement condition $P \confines I$ (see \extendRule). Confinement of interference assertions is simply the lifting of action model confinement (\defin\ref{def:amod-confinement}) to assertions as defined below.
 %
 %
 \begin{definition}[Confinement/Local fences]
@@ -117,35 +107,27 @@ Note that although local fencing judgements are given for a local assertion $\la
 %in the top left confinement judgement one can simply check whether $\erase{P} \strictfences I$. 
 
 Pleasantly, since our local assertions do not contain subjective (boxed) assertions, entailments of the form $\lass{f} \slentails \lass{f'}$ are the familiar entailments of standard separation logic except for the overlapping conjunction ($**$) and septraction ($\septraction$) connectives. We thus provide elimination rules for $**$ in Appendix~\ref{sec:sepish-judgements}; $\septraction$ can be eliminated as described by Calcagno et al. in~\cite{vv07msc}.
-
-Finally, the $\separate{\lass{P}}{\lass{Q}}$ premise in the last judgement asserts that the states described by $\lass{P}$ and $\lass{Q}$ \emph{do not intersect}; that is, for all $\lenv \in \LEnv$, and $l_1, l_2$ such that $l_1, \lenv \slsat \lass{p}$ and $l_2, \lenv \slsat \lass{Q}$: 
-%
-\qquad
-$
-	\for{l \in \LStates} l \leq l_1 \land l \leq l_2 \implies l = \unitL
-$
-%
-
-\noindent We provide a set of judgements for establishing non-intersection in Appendix~\ref{sec:intersection-judgements}.
 %
 \begin{figure}
 \hrule\vspace{5pt}
 \begin{mathpar}
-%	\infer{
-%		P \confines I	
-%	}
-%	{
-%		\erase{P} \strictfences I	
-%	}
 	\infer{
 		P \confines I	
 	}
 	{
 		P \entails P'
-		&
+		\;\;
 		P' \strictfences I	
 	}	
-	
+%	
+	\hspace{10pt}
+%	
+	\infer{
+		\fenceAss{} \strictfences \emptyset	
+	}{}
+%	
+	\hspace{10pt}
+%	
 	\infer={
 		\fenceAss{} \strictfences I_1 \cup I_2	
 	}
@@ -181,14 +163,20 @@ $
 %		&
 %		\fenceAss{} \strictfences \left\{\capAss{}\!\!:\! P'\! \swap\! Q' \right\}	
 %	}		
-
+%
+	\hspace{10pt}
+%	
 	\infer{
 		\fenceAss{} \strictfences I	
 	}
 	{
-		I \entailsI I' \fenceAss{} \strictfences I'
+		I \entailsI I' 
+		&
+		\fenceAss{} \strictfences I'
 	}	
-		
+%	
+	\hspace{10pt}	
+%	
 	\infer{
 		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
 	}
@@ -199,7 +187,7 @@ $
 	}	
 	
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+		\fenceAss{} \!\strictfences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
 		\fenceAss{} \sepish \lass{P} \slentails \m{false}
@@ -219,15 +207,33 @@ $
 	\infer{
 		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
-	{
-		\fenceAss{} \sepish \lass{P} \slentails \fenceAss{}
-		&
-		\precise{\fenceAss{}}
-		&
-		\separate{\lass{P}}{\lass{Q}}
-		&
+	{	
+%		\separate{\lass{P}}{\lass{Q}}
+%		&
 		\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
+		&
+		\fenceAss{} \!<=>\! \bigvee\limits_{i \in I}\fenceAss{i} 		
+		&
+		(\precise{\fenceAss{i}}
+		\land
+		\fenceAss{i} \sepish \lass{P} \slentails \fenceAss{i}
+		\;\;\text{for } i \in I)
 	}	
+%	{
+%		\begin{array}{@{} l @{}}			
+%			\separate{\lass{P}}{\lass{Q}}
+%			\quad
+%			\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
+%			\quad
+%			\fenceAss{} <=> \bigvee\limits_{i \in I}\fenceAss{i} 		\\
+%			%
+%			\precise{\fenceAss{i}}
+%			\quad 
+%			\fenceAss{i} \sepish \lass{P} \slentails \fenceAss{i}
+%			\quad
+%			\text{for } i \in I
+%		\end{array}
+%	}	
 %	
 \end{mathpar}
 \hrule
@@ -253,6 +259,23 @@ $
 %
 \end{definition}
 %
+\paragraph{\textbf{Shifting/fencing judgements}}We present a number of judgements that reduce fencing conditions and action shifting to logical entailments in \fig~\ref{fig:fencing-rules} and~\ref{fig:shifting-rules}. As with the local fencing judgements, the entailments in the premises of these rules are those of standard separation logic ($\slentails$) where the ($**$) and ($\septraction$) connectives can be eliminated as described above. 
+
+The premises of the form $\separate{\lass{P}}{\lass{Q}}$ assert that the states described by $\lass{P}$ and $\lass{Q}$ \emph{do not intersect}; that is, for all $\lenv \in \LEnv$, and for all $l_1, l_2$ such that $l_1, \lenv \slsat \lass{p}$ and $l_2, \lenv \slsat \lass{Q}$, then: 
+%
+\qquad
+$
+	\for{l \in \LStates} l \leq l_1 \land l \leq l_2 \implies l = \unitL
+$\\
+%
+The $\separate{\lass{P}}{\lass{Q}}$ entailment can be rewritten equivalently as follows:
+%
+\[
+	\separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
+\]
+%
+However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judgements for establishing non-intersection directly rather than performing semantic checks.
+%
 \begin{figure}
 \hrule\vspace{5pt}
 \begin{mathpar}
@@ -260,10 +283,10 @@ $
 		\m{true} \fences I	
 	}{}	
 	
-	\infer{
-		\fenceAss{} \fences \emptyset
-	}{}
-	
+%	\infer{
+%		\fenceAss{} \fences \emptyset
+%	}{}
+%	
 	\infer{
 		\fenceAss{} \fences I	
 	}{
@@ -287,15 +310,6 @@ $
 		&
 		\fenceAss{} \fences I'
 	}
-
-	\infer{
-		\fenceAss{} \fences I
-	}
-	{
-		\fenceAss{} \fences I'
-		&
-		I' \weakenI{\fenceAss{}} I	
-	}
 %	
 %	\infer{
 %		\fenceAss{} \fences \left\{\capAss{}: P \swap Q \right\}	
@@ -318,23 +332,32 @@ $
 	{
 		\exact{\lass{R}}
 		&
-		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}	
+		\fenceAss{} \!\fences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
 	}
 		
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}	
+		\fenceAss{} \fences I
+	}
+	{
+		\fenceAss{} \fences I'
+		&
+		I' \weakenI{\fenceAss{}} I	
+	}
+	
+	\infer{
+		\fenceAss{} \fences \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
 	}
 	{
 		\separate{\fenceAss{}}{\lass{P}}
 	}	
 	
-	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
-	}
-	{
-		\fenceAss{} \sepish \lass{P} \slentails \m{false}
-	}
-	
+%	\infer{
+%		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+%	}
+%	{
+%		\fenceAss{} \sepish \lass{P} \slentails \m{false}
+%	}
+%	
 	\infer{
 		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
 	}
@@ -358,7 +381,7 @@ $
 \end{mathpar}
 \hrule
 \caption{Fencing judgements.}
-\label{fig:fence-rules}
+\label{fig:fencing-rules}
 \end{figure}
 %
 %
@@ -392,21 +415,30 @@ $
 	}	
 	
 	\infer{
-		I \weakenI{\fenceAss{}} \emptyset
+		I  \weakenI{\fenceAss{}} \emptyset
 	}
 	{
-		I \entailsI I' 
+		I  \entailsI I'
 		&
 		I' \weakenI{\fenceAss{}} \emptyset
 	}
-		
+%	
+%	\infer{
+%		I \cup I' \weakenI{\fenceAss{}} I
+%	}
+%	{
+%		I \cup I' \entailsI I''
+%		&
+%		I'' \weakenI{\fenceAss{}} I
+%	}
+%		
 %	\infer{
 %		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} I'
 %	}
 %	{
 %		\left\{ \capAss{}: \erase{P} \swap \erase{Q} \right\} \weakenI{\fenceAss{}} I'
 %	}
-%		
+		
 	\infer
 %	[\proofRule{Disj-L}]
 	{
@@ -493,24 +525,30 @@ $
 \hrule
 %\vspace*{5pt}
 \caption{Action shifting judgements; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
-\label{fig:shiftRules}
+\label{fig:shifting-rules}
 \end{figure*}
 %
 %
+
+Recall from \S\ref{sec:intuition} that when reasoning we often need to \emph{stabilise} our assertions describing the shared state. That is, we need to weaken our knowledge of the shared state such that tit is robust to the possible changes it may be subjected to by the environment. In \S\ref{sec:semantics} we formulate the \emph{rely} relation that describes the ways in which the environment may manipulate the shared state. We then formalise what it means for an assertion to be \emph{stable} with respect to the rely relation. In the meantime, we provide syntactic judgements that allows us to ascertain the stability of an assertion without performing the necessary semantic checks. 
+
+\todo Why do we need this next definition?
 %
 \begin{definition}[Combination]
-The \emph{combination} of an assertion $P$ describing the current state, and an assertion describing an action precondition $Q$, $\combine{.}{.}: \Assertions \times \Assertions \rightarrow \LAssertions$, is defined as follows, provided that the bound logical variable of $P$ and $Q$ are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner).
+The \emph{combination} of an assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current state, and an assertion $Q \eqdef \exsts{\bar{y}}Q'$ describing an action precondition, $\combine{.}{.}: \Assertions \times \Assertions \rightarrow \LAssertions$, is defined as follows. We assume that the bound variables of  $P$ and $Q$ have been promoted to the top as described above such that $P'$ and $Q'$ have no bound variables.
 %
 \[
-\begin{array}{l l l}
-	\combine{P}{Q} \eqdef & \exsts{\overline{x}^{\in S \uplus S'}} \lass{P} * (\lass{P}' \sepish \lass{Q} \sepish \lass{Q}')\\
-	& \text{where } (S, \lass{P}, \lass{P}') = \ub{\un{P}} \text{ and }  (S', \lass{Q}, \lass{Q}') = \ub{\un{Q}} 
+\begin{array}{l l}
+	\combine{P}{Q} \eqdef & \exsts{\bar{x}, \bar{y}} \lass{P} * (\lass{P}' \sepish \lass{Q} \sepish \lass{Q}')\\
+	& \quad \text{where } (\lass{P}, \lass{P}') = \ub{\un{P'}} \text{ and }  (\lass{Q}, \lass{Q}') = \ub{\un{Q'}} 
 \end{array}
 \]
 %
 \end{definition}
 %
 %
+\paragraph{\textbf{Stability judgements}}
+\fig~\ref{fig:stability-rules} presents a number of judgements that reduce stability checks to logical entailments. \todo complete this.
 %
 \begin{figure*}
 \hrule\vspace*{5pt}
@@ -704,6 +742,6 @@ The \emph{combination} of an assertion $P$ describing the current state, and an 
 \hrule
 %\vspace*{5pt}
 \caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$; $\dot \in \{\land, \lor, *, **\}$ and $\ominus \in \{\land, \lor, **\}$.}
-\label{fig:stabilityRules}
+\label{fig:stability-rules}
 \end{figure*}
 %
