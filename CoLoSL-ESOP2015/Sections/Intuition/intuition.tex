@@ -1,5 +1,5 @@
-\section{Informal Development}\label{chapter:intuition}
-We illustrate our \colosl  reasoning principles  by
+\section{Informal Development}\label{sec:intuition}
+We illustrate our \colosl reasoning principles  by
 sketching a proof of a variation of Dijkstra's token ring mutual
 exclusion algorithm~\cite{dijkstra74}. 
 
@@ -47,13 +47,13 @@ $
 	I \eqdef 
 	\left\{
 	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		\token a_{\tx x}: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
+		[\token a_{\tx x}]: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
 		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
 		
-		\token a_{\tx y}: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
+		[\token a_{\tx y}]: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
     &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1}\\
     
-    \token a_{\tx z}: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
+    [\token a_{\tx z}]: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
     &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
 	\end{array}
 	\right.
@@ -152,7 +152,9 @@ $
 \end{lstlisting}
 \end{tabular}
 \vspace{10pt}\hrule
-\caption{The code for $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs together with their \colosl proof sketches. Lines starting with $\color{blue}{//}$ contain formulas that describe the local state and the subjective shared state at the relevant program point.}
+\caption{The $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs and their \colosl proof sketches. 
+%Lines starting with $\color{blue}{//}$ contain formulas that describe the local state and the subjective shared state at the relevant program point.
+}
 \label{fig:concurrentInc2}
 \end{figure}
 %
@@ -162,86 +164,82 @@ $
 Consider the \colosl assertions accompanying  $\mathbb{INC}$.
 After initialisation, line~3 of $\mathbb{INC}$ provides a standard assertion from separation logic~\cite{seplog} with variables as resource~\cite{variablesAsResource}. The assertion  declares  that the variable cells addressed by \li{x}, \li{y} and \li{z}  have the same value  $0$. This variable resource in the thread-local state is fully owned by  the thread. Using the \extendRule\ principle, the thread is able to give up  this local resource and transfer it  to the global shared state. For example,
 line~4 demonstrates the creation of a subjective view $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|-> 0}I$, where {part} of the underlying global shared state now contains the three variable  cells and the 
-interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action 
+interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action \vspace*{-5pt}
 %
 \[
- \token a_{\li y}:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
- \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}
+ [\token a_{\li y}]:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
+ \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\vspace*{-5pt}
 \]
 %
 can increment \li{y} under the condition that the value of \li{x} is one more than \li{y}. 
-This update is only possible when the local state of a thread has the { capability} $[\token a_{\li y}]$. For  this particular example, the assertion in line~4 simply has all the capabilities $[\token a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the $I$-actions in the local state; in general, capabilities can be buried inside boxes, only to emerge as a consequence of an action (see \S\ref{chapter:examples}). 
+This update is only possible when the local state of a thread has the { capability} $[\token a_{\li y}]$. For  this particular example, the assertion in line~4 simply has all the capabilities $[\token a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the actions of $I$ in the local state; in general, capabilities can be buried inside boxes, only to emerge as a consequence of an action (see \S\ref{sec:examples}). 
 
-
-
-Using the \copyRule\ principle for subjective views and the disjoint concurrency rule, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:
+Using the \copyRule\ principle for subjective views and the disjoint concurrency rule, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:\vspace*{2pt}
 %
-\[
+$
 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
-\]
+$
 %
-However, this precondition is more complicated than we need. Intuitively, the specification of each thread should only use the variable resource relevant to that thread, and need only consider actions that affect that resource. In this example, the extraneous piece of state is the variable cell  \li{z}. This additional resource  might seem an acceptable price to pay, but straightforward generalisations to $n$ participants yields extra state of $n-2$ variable cells with their associated interferences which are of no interest to the particular thread.
-Fundamentally, for large systems, the burden of carrying the whole shared state around to analyse all threads,  can lead to intractable proofs.
 
-As a first try at simplifying the precondition, consider the following implication using the \forgetRule and \shiftRule principles given in the introduction:
+However, this precondition is more complicated than we need. Intuitively, the specification of each thread should only use the variable resource relevant to that thread, and need only consider actions that affect that resource. In this example, the extraneous piece of state is the variable cell  \li{z}. This additional resource  might seem an acceptable price to pay, but straightforward generalisations to $n$ participants yields extra state of $n-2$ variable cells with their associated interferences which are of no interest to the particular thread.
+Fundamentally, for large systems, the burden of carrying the whole shared state around to analyse all threads, can lead to intractable proofs.
+
+As a first try at simplifying the precondition, consider the following implication using the \forgetRule and \shiftRule principles given in the introduction\vspace*{-5pt}
 %
 \begin{align*}
- 	& \quad \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
-	\stackrel{(\forgetRule)}{=>}  & \quad\shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
- 	\stackrel{(\shiftRule)}{\semimplies}  & \quad\shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\li z}} *[\token a_{\li y}]\\
-	\stackrel{(\stabilise)}{=>}  & \quad\shared{\exists v, v'.  (\li{x}|-> v * \li{y}|->v' ) \wedge v\geq v'}{I\backslash \token a_{\li z}} *[\token a_{\li y}]
+ 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
+	\stackrel{(\forgetRule)}{=>} & \; \shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
+ 	\stackrel{(\shiftRule)}{\semimplies}&\; \shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\small\li z}} *[\token a_{\li y}]\\
+	\stackrel{\text{(stabilise)}}{=>} & \;\shared{\exists v,\! v'\!.  (\li{x}|-> v \!*\! \li{y}|->v' ) \!\land\! v\geq v'}{I\backslash \token a_{\small\li z}} \!\!*[\token a_{\li y}]
 \end{align*}
 %
-The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the variable assertion $\li{z} \mapsto 0$. The variable cell \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the action $\token a_{\li z}$ does not affect the resources described by the assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by $\token a_{\li z}$, and after undergoing any number of actions from $I$, the resulting subjective view remains unaffected by $\token a_{\li z}$. Using the \shiftRule principle, we can therefore forget the $\token{a}_{\li z}$ action. 
+The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the variable assertion $\li{z} \mapsto 0$. The variable cell \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the action of $[\token a_{\li z}]$ does not affect the resources described by the assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by this action, and after undergoing any number of actions from $I$, the resulting subjective view remains unaffected by it. Using the \shiftRule principle, we can therefore forget the action of $[\token{a}_{\li z}]$.
 
-Finally, as is normal when reasoning about concurrency, we stabilise so that, whatever the environment can do to the state, the assertion inside the box still holds (the assertion is \emph{stable}). However, we have   lost information about \li{z}. Intuitively, we know that the value of \li{y} depends on the value
+Finally, as is normal when reasoning about concurrency, we stabilise so that, whatever the environment can do to the state, the assertion inside the box still holds (the assertion is \emph{stable}). However, we have lost information about \li{z}. Intuitively, we know that the value of \li{y} depends on the value
 of \li{z}, but there is nothing now to constrain \li{z}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
 %
-It is however possible to give a  stronger specification, as follows: 
+It is however possible to give a  stronger specification, as follows\vspace*{-8pt} 
 %
 \begin{align*}
- 	& \quad \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
-  \stackrel{(\shiftRule)}{\semimplies} \null & \quad\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
- 	\stackrel{(\forgetRule)}{=>}\null & \quad\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
- 	\stackrel{(\shiftRule)}{\semimplies}\null & \quad \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
-	\stackrel{(\stabilise)}{=>} &
-	\quad \shared{
+ 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
+  \stackrel{(\shiftRule)}{\semimplies} &\; \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ] \vspace*{-5pt}\\
+ 	\stackrel{(\forgetRule)}{=>} & \;\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
+ 	\stackrel{(\shiftRule)}{\semimplies} &\; \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
+	\stackrel{\text{(stabilise)}}{=>} &\;
+	\shared{
 		\begin{array}{@{}l<{\null}@{}l<{\null}@{}}
 			\cell{\li{x}}{0} * \cell{\li{y}}{0} |/ 
 			\cell{\li{x}}{1} * \cell{\li{y}}{0}
 		\end{array}
 	}{I_{\li y}}
-	* [\token a_{\li y}]
+	* [\token a_{\li y}]\vspace*{-5pt}
 \end{align*}
 %
 This implication involves subtle interaction between the assertion and the interference relation of the subjective view. 
-Consider the action $\token a_{\li x}$ of $I$ and the initial state with value $0$ in all the cells. This
-action can be replaced by:
+Consider the action of $[\token a_{\li x}]$ ib $I$ and the initial state with value $0$ in all the cells. This action can be replaced by \vspace*{-5pt}
 %
 \[
-	\token a_{\li x} : 
+	[\token a_{\li x}] : 
 		\exsts{v} \;\cell{\li{x}}{v} * \cell{\li{y}}{v} * \cell{\li{z}}{v}
 		\swap
-		\cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v}
+		\cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v}\vspace*{-5pt}
 \]
 %
-This is possible  because, as the programmer knows, whenever the cells of \li{x} and \li{z} have the same value then the \li{y} cell also has the same value which, under these conditions, is not changed by the actions in $I$. This amended action  gives full information about how the resource of the subjective view changes as \li{x} is being updated.
-Let  $I_{\li y}' $ be  $I_{\li y}$ with $\token a_{\li x}$ rewritten as above.
-As we justify in \S~\ref{chapter:logic}, we can use the \shiftRule principle with the following judgement to replace $I_{\li y}$ by $I'_{\li y}$. 
-%
-\[
-I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
-\]
-%
-Using \forgetRule, it is now safe to lose the \li{z} assertion to obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$, as the new $\token a_{\li x}$ action in $I'_{\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
-Since action $\token a_{\li z}$ only affects the \li{z} cell, which has been forgotten, leaving  the cells \li{x} and \li{y} unaltered, we can again use the \shiftRule\ principle to change the interface relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interface relation is now as simple as it can get, whilst retaining enough information about the connection between the \li{x}, \li{y} and \li{z}. We weaken
-the assertion $\li{x}|-> 0 * \li{y}|->0$ to make it stable with respect to $I_{\li y}$ and obtain our final
-precondition of thread $\mathbb{P}_{\li y}$, which retains much more information about the values of the \li{x} and \li{y} cells. 
+This is possible  because, as the programmer knows, whenever \li{x} and \li{z} have the same value then \li{y} also has the same value which, under these conditions, is not changed by the actions in $I$. This amended action gives full information about how the resource of the subjective view changes as \li{x} is being updated.
+Let  $I_{\li y}' $ be  $I_{\li y}$ with action of $[\token a_{\li x}]$ rewritten as above.
+As we justify in \S~\ref{sec:todo}, by using the judgement $I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'$, we can use the \shiftRule principle to replace $I_{\li y}$ by $I'_{\li y}$. 
+%%
+%\[
+%I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
+%\]
+%%
+Using \forgetRule, it is now safe to lose the \li{z} assertion to obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$, as the new action of $\token a_{\li x}$ in $I'_{\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
+Since the action of $[\token a_{\li z}]$ only affects the \li{z} cell, which has been forgotten, leaving  the cells \li{x} and \li{y} unaltered, we can again use the \shiftRule\ principle to change the interference relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interference relation is now as simple as it can get, whilst retaining enough information about the connection between \li{x}, \li{y} and \li{z}. We weaken the assertion $\li{x}|-> 0 * \li{y}|->0$ to stabilise it with respect to $I_{\li y}$ and obtain our final precondition of thread $\mathbb{P}_{\li y}$, which retains much more information about the values of \li{x} and \li{y}. 
 
-There is one more subtlety to mention about this precondition. The thread has the capability $[\token a_{\li y}]$ to perform action $\token a_{\li y}$ which only requires the resource described by the assertion. However, the action $\token a_{\li x}$ depends on the resource given by \li{z}, which is no longer a part of the subjective view of the thread. Since another thread in the environment may own the $[\token{a_{\li x}}]$ capability, it may perform the $\token{a_{\li x}}$ action whenever its subjective view is {\em compatible} with the pre-condition of the action.
+There is one more subtlety to mention about this precondition. The thread has the capability $[\token a_{\li y}]$ to perform its action which only requires the resource described by the assertion. However, the action of $[\token a_{\li x}]$ depends on the resource given by \li{z}, which is no longer a part of the subjective view of the thread. Since another thread in the environment may own the $[\token{a_{\li x}}]$ capability, it may perform its action whenever its subjective view is {\em compatible} with the pre-condition of the action.
 When that is the case, the piece of the state corresponding to the overlap between the state and the
 precondition of the action is removed, and the entire postcondition of the action is added in its place.
-Diagrammatically, a subjective state (represented by the circle) is affected as follows by an action $P\swap Q$:
+Diagrammatically, a subjective state (represented by the circle) is affected as follows by an action $P\swap Q$:\vspace*{-8pt}
 %
 \[
  \begin{tikzpicture}[baseline]
@@ -262,50 +260,41 @@ Diagrammatically, a subjective state (represented by the circle) is affected as 
  \text{ and }
  \begin{tikzpicture}[baseline]
  \draw[thick,yshift=-.1cm] (0,0) rectangle (.6cm,.4cm);
- \end{tikzpicture}|= Q\right)
+ \end{tikzpicture}|= Q\right)\vspace*{-5pt}
 \]
 %
-This is a direct consequence of the fact that the subjective view describes the thread's partial knowledge about the shared state, while the environment may have both the knowledge that the thread has, as well as some additional knowledge. In this case, while the thread does not have the capability to do action $\token a_{\li x}$, the environment might.
-
+This is a due to the fact that the subjective view describes the thread's partial knowledge about the shared state, while the environment may have some additional knowledge to what the thread knows. In this case, while the thread does not have the capability to do the action of $[\token a_{\li x}]$, the environment might.
 
 The proof of the specification of the thread $\mathbb{P}_{\li y}$ is now relatively straightforward. By inspection, the invariant of the while loop is stable with respect to $I_{\li y}$. The atomic section allows safe manipulation of the contents of the subjective region.
 The final postcondition of $\mathbb{P}_{\li y}$ follows from the invariant and the boolean expression of the while. We join up the postconditions of the threads using the \mergeRule\ principle. Since $|/$
 distributes over $**$, the subjective view simplifies to $\shared{\li{x}|->10 * \li{y}|->10 * \li{z}|->10}{I_{\li x}\cup I_{\li y}\cup I_{\li z}} $.
-Finally, we have 
-\[
-I_{\li x}\cup I_{\li y}\cup I_{\li z}\weakenIb{\li{x}|->10 * \li{y}|->10 * \li{z}|->10} I
-\]
-so, by the \shiftRule principle, we get the postcondition of $\mathbb{INC}$. 
+Finally, since
+$
+I_{\li x}\cup I_{\li y}\cup I_{\li z}$ $\weakenIb{\li{x}|->10 * \li{y}|->10 * \li{z}|->10} I
+$,
+by the \shiftRule principle, we get the postcondition of $\mathbb{INC}$. 
 
 
 %\paragraph{Comparison with other formalisms}
-This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and
-contraction  of  subjective
-views, with in particular  our shifting of the interference assertions
-in key places, 
-enables us to confine the specification and verification of each
-thread to just the resources they need. This  is not possible
-using previous work.
-
-\paragraph{Further \colosl reasoning}
-We complete our semi-formal overview with a brief desription of features of \colosl not
+This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and contraction of subjective
+views, in particular with shifting of interference assertions in key places, enables us to confine the specification and verification of each thread to just the resources they need. This  is not possible using previous work.
+%
+\paragraph{\textbf{Further \colosl reasoning}}
+We complete our semi-formal overview with a brief description of features of \colosl not
 showcased by the proof above. First, we note that an action $P\swap Q$
-may in general performs three types of action: (1)
+may in general perform three types of actions: (1)
 %% \begin{enumerate}
 %% \item
   \emph{modify} resources: $P$ and $Q$ contain the same amount of
-  resource with different values, \textit{e.g.}
-  $\token{a}_{\tx{x}}$ in $I$;
+  resource with different values, (e.g. action of $[\token{a}_{\tx{x}}]$ in $I$);
 %%\item
   (2)
-  \emph{remove} resources from the shared state and move them into
-  the local state of the thread performing the action, for instance
-  when $P = Q * R$ for some resource to be removed $R$;
+  \emph{remove} resources from the shared state and transfer them into
+  the local state of the thread performing the action, (e.g. when $P = Q * R$ for some resource $R$ to be removed);
 %%\item
   (3)
   conversely, \emph{add} resources from the local state of the thread
-  into the shared state; the added resources only appears in $Q$,
-  \textit{e.g.} $Q = P * R$.
+  into the shared state, (e.g. when $Q = P * R$).
 %%\end{enumerate}   
 We demonstrate the latter two behaviours through our examples in
 \S\ref{chapter:examples}. These three behaviours are not mutually
