@@ -1,8 +1,4 @@
-\section{Introduction}\label{sec:introduction}
-%% Jules: be more general than just program logics? Model-checking,
-%% etc.?
-
-
+\vspace*{-10pt}\section{Introduction}\label{sec:introduction}\vspace{-5pt}
 %\pg{This is what we should answer by the introduction: 
 %What's the problem with the current state of the art?
 %What is our solution?
@@ -11,16 +7,51 @@
 %Why do we do better than existing work?
 %What are the lessons learnt from the paper?}
 
-
 A key difficulty in verifying properties of shared-memory concurrent programs is to be able to reason compositionally about each thread in isolation, even though in reality the correctness of the whole system is the collaborative result of intricately intertwined actions of the threads. Such compositional reasoning is essential for verifying large concurrent systems, library code and more generally incomplete programs, and for replicating a programmer's intuition about why their implementations are correct.
 
-Separation logic reasoning~\cite{seplog,csl-tcs} has been used to demonstrate the importance of reasoning about only the portions of the local machine state (the resource) actually accessed by programs. Recently, several techniques have been built on top of separation logic, such as those related to CAP reasoning~\cite{cap-ecoop10,icap,tada}, which have made substantial advances in fine-grained compositional reasoning about complex algorithms which access the global shared state.  However, the rigidity of existing techniques forces us to work with {\em static} global shared state, such as a shared data structure for representing sets, even though a thread might only access just a small part of it.  This global state must be robust with respect to all possible interferences from the environment, {even on parts of the shared state not actually accessed by the current thread}. Intuitively, compositionality calls for reasoning that only refers to the part of the global shared state actually accessed by each thread.  Existing reasoning techniques are too rigid to achieve this. 
+Rely-guarantee (RG) reasoning~\cite{rg}, is a well-known technique for verifying shared-memory concurrent programs. In this method, each thread specifies its expectations (the rely condition or $R$) of the transitions made by the environment as well as the transitions made by the thread itself (the guarantee condition or $G$) where $R;G$ constitute the overall \emph{interference}. However, in practice formulating the rely and guarantee conditions is difficult: the \emph{entire} program state is treated as a shared resource (accessible by all threads) where rely and guarantee conditions \emph{globally} specify the behaviour of threads over the whole shared state and need to be checked throughout the execution of the thread. We proceed with a brief overview of the shortcomings of RG reasoning and how the existing approaches tackle \emph{some} of these limitations. 
+%
+The global nature of RG reasoning limits its compositionality and practicality in the following ways:\vspace{-3pt}
+%
+\begin{enumerate}%\setlength{\itemindent}{-5pt}
+	\item Even when parts of the state are owned by a single thread, they are exposed to all other threads in the $R;G$ conditions. Simply put, the boundary between private (thread-local) and shared resources is blurred.
+	
+	\item Since the shared resources are globally known, sharing of \emph{dynamically} allocated resources is difficult. That is, \emph{extending} the shared state is not easy.
+	
+	\item When parts of the shared state are accessible by only a subset of threads, it is not possible to hide \emph{either} the resources \emph{or} their associated interference ($R;G$ conditions) from the unconcerned threads. In short, reasoning \emph{locally} about threads with \emph{disjoint} footprints is not possible.
+	
+	\item Similarly, when different threads access different but \emph{overlapping} parts of the shared state, it is not possible to hide \emph{either} the resources \emph{or} their associated interference from unconcerned threads. In brief, reasoning \emph{locally} about threads with \emph{overlapping} footprints is not possible. As we will demonstrate, this issue is particularly pertinent when reasoning about concurrent operations on data structures with \emph{unspecified} sharing such as graphs. 
+	
+	\item When describing the specification of a program module, the $R;G$ conditions need to reflect the entire shared state even when the module accesses only parts of it. This limits the \emph{modularity} of verification since the module specification becomes context-dependent and it may not always be reusable.
+%	 in different applications even if the module specification is disjoint from that of its context. This is particularly difficult when the specification of the module client overlaps module specification overlaps 
+	
+	\item Since the $R;G$ conditions are defined statically and cannot evolve, in order to temporarily disable/enable certain operations by certain threads (e.g. allowing a lock to be released only by the thread who has acquired it) one must appeal to complex (unscalable) techniques such as auxiliary states. 
+	
+	\item As a program executes, its footprint grows/shrinks in tandem with the resources it accesses. It is thus valuable for the reasoning to mimic the programmer's intuition by reflecting the changes in the footprint. This calls for appropriate (de)composition of the shared state as well as its associated interference which cannot be achieved with a global view of the shared state. \vspace{-5pt}
+\end{enumerate}
+%
+%
+%Separation logic reasoning~\cite{seplog,csl-tcs} has been used to demonstrate the importance of reasoning  only about the portions of the state (resources) actually accessed by programs.
+%
+%RGSep
+Recent work on RGSep~\cite{viktor-marriage} has combined the compositionality of separation logic~\cite{seplog,csl-tcs} with the concurrent techniques of RG reasoning. In RGSep reasoning, the program state is split into private (thread-local) and shared parts ensuring that the private resources of each thread are untouched by others and the $R;G$ conditions are specified only over the shared state. However, since the shared state itself remains globally specified and is visible to all threads in its entirety, this separation only addresses the first problem outlined above.
 
-
-This paper introduces the program logic \colosl, where  threads access one global shared state and are verified with respect to their \emph{subjective views} of this state. Each subjective (personalised) view  is an assertion which provides a thread-specific description of part of the shared state. It describes the partial shared resource necessary for the thread to run and the  thread-specific interference describing how the thread and the environment can effect this partial shared resource. Subjective views may arbitrarily overlap with each other, and subtly expand and contract to the natural resources and the interference required by  the current thread. 
-This flexibility provides truly compositional reasoning  for shared-memory concurrency.
-
-
+%
+%LRG
+Set out to overcome the limitations of both RG and RGSep reasoning, Feng introduced Local Rely-Guarantee (LRG) reasoning in~\cite{lrg}. As in RG and unlike RGSep, in LRG reasoning the program state is treated as a single shared resource accessible by all threads. Moreover, the compositionality afforded by the separating conjunction of separation logic $*$ is applied to both resources of the shared state \emph{and} the $R;G$ conditions. This way, threads can hide (frame off) irrelevant parts of the shared state and their interference (resolving 1-3, 5 above) allowing for more local reasoning provided that they operate on completely \emph{disjoint} resources. However, when reasoning about data structures with intricate and unspecified sharing (e.g. graphs), since decomposition of overlapping resources is not possible in a disjoint manner, LRG reasoning enforces a global treatment of the shared state, thus betraying its very objective of locality (issue 4; and 5 in the presence of overlapping module specifications). Furthermore, as with RG reasoning, the $R;G$ conditions are specified statically (albeit decomposable); hence temporary (un)blocking of certain actions by certain threads is not easy (issue 6). Finally, while LRG succeeds to capture the programmer's intuition of the program state by dynamically growing/shrinking the footprint when dealing with disjoint resources, it fails to achieve this level of fine-grained locality when dealing with overlapping (entangled) resources (issue 7).\\
+%
+% CAP Family
+\indent Much like LRG reasoning, the reasoning framework of Concurrent Abstract Predicates (CAP)~\cite{cap-ecoop10} and its extended variants~\cite{icap,tada} apply the compositionality of separation logic to concurrent reasoning. In these techniques, the state is split into private (exclusive to each thread) and shared parts where the shared state itself is divided into an arbitrary number of \emph{regions} disjoint from one another. Each region is governed by an \emph{interference} relation $I$ that encompasses both the $R$ and $G$ conditions: the transitions in $I$ are enabled by \emph{capabilities} and a thread holding the relevant capability locally (in its private state) may perform the associated transition. 
+% As such, the $R$ and $G$ conditions are indirectly implied form the transitions in $I$ and the distribution of capabilities amongst threads. 
+As with LRG, this fine-grained division of the shared state into regions, allows for more local reasoning with the constraint that the the regions are pairwise \emph{disjoint} (resolving 1, 3, 5). Dynamically allocated resources can be shared through creation of new regions (resolving 2). Moreover, since CAP is built on top of \emph{deny-guarantee} reasoning~\cite{dg} (an extension to rely-guarantee reasoning where \emph{deny} permissions are used to block certain behaviour over a period of time) dynamic manipulation of interference transitions is straightforward (resolving 6). However, since the contents of regions must be disjoint from one another, when tackling data structures with complex and unspecified patterns of sharing that do not lend themselves to a clean decomposition, the entire data structure along with its interference must be confined to a single region, forsaking the notion of locality once again (issue 4; and 5 in case of overlapping module specifications). Furthermore, since the capabilities and interference associated with each region are defined upon its creation and remain unchanged throughout its lifetime, it is often necessary to foresee all possible extensions to the region (including dynamically allocated resources and their interference). As we will show, this not only limits the locality of reasoning, but also gives way to unnatural specifications that contrast with the footprint of programs (issue 7).\\
+%
+%Recently, several techniques have been built on top of separation logic, such as those related to CAP reasoning~\cite{cap-ecoop10,icap,tada}, which have made substantial advances in fine-grained compositional reasoning about complex algorithms which access the global shared state.  However, the rigidity of existing techniques forces us to work with {\em static} global shared state, such as a shared data structure for representing sets, even though a thread might only access just a small part of it.  This global state must be robust with respect to all possible interferences from the environment, {even on parts of the shared state not actually accessed by the current thread}. Intuitively, compositionality calls for reasoning that only refers to the part of the global shared state actually accessed by each thread.  Existing reasoning techniques are too rigid to achieve this. 
+%
+%
+\indent This paper introduces the program logic of \colosl, where threads access one global shared state and are verified with respect to their \emph{subjective views} of this state. Each subjective (personalised) view  is an assertion which provides a thread-specific description of parts of the shared state. It describes the partial shared resource necessary for the thread to run and the thread-specific interference describing how the thread and the environment may affect this partial shared resource. Subjective views may arbitrarily overlap with each other, and subtly expand and contract to the natural resources and the interference required by  the current thread. 
+This flexibility provides truly compositional reasoning  for shared-memory concurrency.\\
+%
+%
 %This paper presents the program logic \colosl, which achieves
 %compositional reasoning for concurrent programs by enabling
 %\emph{subjective} views of the shared state. Subjective views may be
@@ -31,9 +62,9 @@ This flexibility provides truly compositional reasoning  for shared-memory concu
 %than existing work by enabling \emph{finer-grained} sharing: the
 %program logic can consider that threads share only what is relevant to
 %their function, a key ingredient of compositionality.
-
-
-
+%
+%
+%
 %Driven by the ever-increasing need for concurrency in software,
 %%  spurred by recent hardware developments, 
 %program logics for shared-memory concurrency have progressed towards
@@ -51,11 +82,11 @@ This flexibility provides truly compositional reasoning  for shared-memory concu
 %% integrated the notion of interference in the logic
 %% itself~\cite{rg}.
 %% 
-
+%
 %% Consider for instance
 %% a program where threads operate on subgraphs of a global graph.
-
-
+%
+%
 %%  dubbed their \emph{subjective states}.  One may then reuse these
 %%   specifications in the context of any larger local state (as is
 %%   standard in separation logic~\cite{rey02}), and, crucially for
@@ -63,24 +94,22 @@ This flexibility provides truly compositional reasoning  for shared-memory concu
 %%   shared state. The subjective states of different threads in a
 %%   program are allowed to overlap arbitrarily, ensuring maximum
 %%   reusability of proofs.
-
-
-%\colosl assertions comprise standard assertions from the
-%separation-logic literature~\cite{rey02,ramification}, plus {\em
-%  subjective views} and {\em capabilities}. 
-
-A subjective view $\shared{P} I$ comprises an  assertion $P$ which gives {\em partial} information about the global shared state and interference assertion $I$ which describes how this partial shared state may be changed by the thread or the environment. The interference assertion $I$ declares actions of the form $\token a : P' \swap Q$, with capability assertion $[\token a]$ providing a thread with permission to use this action $\token a$. Subjective views expand or contract depending on the resource required by the thread, which has subtle consequences for the logical reasoning. In particular, it is possible to strengthen actions in $I$ to record  some global information known to the subjective view.
-Then, the view can be weakened to just the resources and possibly strengthened actions appropriate to  the thread. The strengthened actions retain  some global information despite the weakened view. 
-
-We introduce several novel reasoning principles which allow us to expand and contract subjective views. Subjective views can always be duplicated using the \copyRule\ principle:
 %
-\begin{align*}
-  \label{eq:split}
+%
+%
+%
+\indent A subjective view $\shared{P} I$ comprises an  assertion $P$ which describes {\em parts} of the global shared state; and an interference assertion $I$ which characterises how this partial shared state may be changed by the thread or the environment. Similar to interference assertions of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$, where a thread in possession of the $[\token a]$ capability (in its private state) may carry out its transition and update parts of the shared state that satisfy $Q$ to those described by $R$. Assertions of subjective views must be {\em stable}; that is, robust with respect to interferences from the environment (as prescribed in $I$).
+% Subjective views can expand or contract depending on the resources required by the thread, which has subtle consequences for the logical reasoning. In particular, it is possible to strengthen actions in $I$ to record  some global information known to the subjective view.
+%Then, the view can be weakened to just the resources and possibly strengthened actions appropriate to  the thread. The strengthened actions retain  some global information despite the weakened view. 
+
+We introduce several novel reasoning principles which allow us to expand and contract subjective views. Subjective views can always be duplicated using the \copyRule principle:\vspace*{-17pt}
+%
+\begin{align*}\label{eq:copyRule}\vspace{-10pt}
   \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
 \end{align*}
 %
 %
-In combination with the usual law of parallel composition of separation logic~\cite{csl-tcs}, this yields a powerful mechanism to distribute the shared state between several threads:
+In combination with the usual law of parallel composition of separation logic~\cite{csl-tcs}, this yields a powerful mechanism to distribute the shared state between several threads: \vspace*{-5pt}
 %
 \[
 \infer[\parRule]
@@ -94,71 +123,73 @@ In combination with the usual law of parallel composition of separation logic~\c
 	}
 \]
 %
-The subjective views of each thread will be typically too strong, describing resource that is not necessarily being used by the thread. However, before  weakening the view, it will sometimes be useful to strengthen some of the actions in the interference assertion to preserve global knowledge. We achieve this using the \shiftRule\ principle:
+The subjective views of each thread will be typically too strong, describing resources that are not being used by the thread. However, as we demonstrate in \S\ref{sec:intuition}, before weakening the view, it is sometimes useful to strengthen some of the interference transitions to preserve global knowledge. We achieve this using the \shiftRule\ principle: \vspace*{-17pt}
 %
 \begin{align*}
   \label{eq:shift}
-  I \weakenIb{P} I'
+  I \weakenI{P} I'
   &\text{ implies }
   \shared{P}{I} ===> \shared{P}{I'}
   \tag{\shiftRule}
 \end{align*}
 %
-This principle states that an interference assertion $I$ can be exchanged for any other interference assertion $I'$ that has the same projected effect on the subjective state $P$. When this is the case, we write $I \weakenIb{P} I'$ and say that the actions have been  \emph{shifted}. It can be used to strengthen actions given by the combined global knowledge arising form the combination of $I$ and $P$. It can also be used to forget actions which are not relevant to $P$. This \shiftRule\ principle describes a flexible  behaviour of interference  which is in marked  contrast with most existing formalisms, where interference is fixed throughout the verification of the whole program.
+This principle states that an interference assertion $I$ can be exchanged for any other interference assertion $I'$ that has the same projected effect on the subjective state $P$. When this is the case, we write $I \weakenI{P} I'$ and say that the actions have been  \emph{shifted}. It can be used to strengthen actions with knowledge of the global shared state arising form the combination of $I$ and $P$. It can also be used to forget (frame off) actions which are irrelevant to $P$. This \shiftRule principle provides a flexible mechanism for interference manipulation and is in marked contrast with most existing formalisms, where interference is fixed throughout the verification.
 
-Now, with a possibly strengthened interference assertion, we are able to use the \forgetRule\ principle to zoom  on the resource required by the current thread:
+With a possibly strengthened interference assertion, we can then frame off parts of the shared state and zoom on resources required by the current thread using the \forgetRule principle: \vspace{-17pt}
 %
 \begin{align*}\label{eq:forget}
   \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
 \end{align*}
 %
-We can again use the \shiftRule\ principle to, this time, forget some of the actions that are no longer relevant to the subjective view. Finally, as usual, we must {\em stabilise} the assertion of the subjective view,  so that the view is robust with respect to interferences from the environment. If the knowledge given by the combination of the assertion $P$ and the interference assertion $I$ is too weak, then this stabilisation results in a precondition that is too weak. 
+At this point, the \shiftRule\ principle may be applied again to forget those actions that are no longer relevant to the new subjective view captured by  $P$. 
+ However, a stable subjective view may no longer be stable after forgetting parts of the shared state. This is often due to the combined knowledge of $P$ and $I$ being too weak and can be avoided by strengthening $I$ (through \shiftRule) prior to forgetting. 
 
 These reasoning principles enable us to provide subjective views for the threads which are just right. 
-We can proceed to verify the threads, knowing that their subjective views describe personalised preconditions which only describe the resource relevant to the individual threads. The resulting postconditions naturally describe overlapping parts of the shared state, which are then joined together using the disjoint concurrency rule and the \mergeRule\ principle:
+We can proceed to verify the threads, knowing that their subjective views describe personalised preconditions which only describe the resource relevant to the individual threads. The resulting postconditions naturally describe overlapping parts of the shared state, which are then joined together using the disjoint concurrency rule and the \mergeRule\ principle: \vspace{-5pt}
 %
 \begin{align*}\label{eq:merge}
   \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
 \end{align*}
 %
-The assertion $P ** Q$ describes the overlapping of states arising from $P$ and $Q$, using the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
-The new interference relation is simply the union of previous interferences. Finally, we can use the \shiftRule principle to simplify the interference assertion now that we are back with a larger subjective view.
+The $P ** Q$ assertion describes the overlapping of states arising from $P$ and $Q$, using the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
+The new interference is simply the union of previous interferences. Using the \shiftRule principle, we can once again simplify the interference assertion with respect to this new larger subjective view.
 
-The last principle to mention is how subjective views are created using the \extendRule principle:
+Lastly, locally owned resources (described by $P$) can be shared using the \extendRule principle: \vspace{-17pt}
 %
 \begin{align}\label{eq:extend}
-  & P \containI I 
-  \text{ and }
-  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
+   &\hspace{45pt} P \containI I 
+%  \text{ and }
+%  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
   \text{ implies } 
   P ===>
-  \exsts{\vec{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
+  \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
   \tag{\extendRule}
 \end{align}
 %
-where $\vec{x}$ range over logical variables bound in the capability assertions $\capAss{1}$ and $\capAss{2}$ with the proviso that $\vec{x}$ do not appear unbound in $P$ ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
+where $\bar{x}$ range over bound logical variables of capability assertions $\capAss{1}$, $\capAss{2}$ and are distinct from unbound variables of $P$. % ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
+%
+The side condition $P \containI I$ ensures that the actions of the new interference assertion $I$ are confined to $P$ (more in \S\ref{}).
+%
+As we demonstrate in our set example in \S\ref{sec:examples}, the main novelty of this rule is that the new actions in $I$ may refer to existing shared resources, unlike CAP where all possible futures of the region must be accounted for upon its creation. 
+%Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
 
-The side condition $P \containI I$ ensures that the actions associated with interference assertion $I$ are confined to $P$; the side condition $\fresh{\vec{x}, \capAss{1} * \capAss{2}}$ is to ensure the \emph{freshness} of the generated capabilities. 
-The main novelty of this rule is the fact that new actions may refer to existing shared state, as we shall see  in our set example discussed in \S\ref{sec:examples}. Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
+With these reasoning principles, we are able to expand and contract subjective views to provide just the resources required by a thread. In essence, we provide a framing mechanism both on shared resources as well as their interferences even in the presence of overlapping footprints and entangled resources.
 
-With these reasoning principles, we are able to expand and contract subjective views  to provide just the resource required by a thread.
-In essence, we provide  frame-like reasoning for  subjective  views. 
-%% The interaction between  these principles is
-%% subtle. We are able to forget resource of the subjective assertion $P$
-%%  whilst at the same time adapting the interference relation $I$  to
-%% capture global constraints associated with that lost resource.
-In \S\ref{sec:intuition}, we demonstrate this using a variant of the famous  token ring mutual exclusion algorithm~\cite{dijkstra74}, introduced by Dijkstra to illustrate distributed, global knowledge between threads. The point is that, as well as local knowledge about how the threads behave, the programmer also has global knowledge about how the threads constrain each other. Our reasoning captures the spirit of reasoning locally about individual threads at the same time as retaining global knowledge about the overall thread behaviour. It is a good  introductory example, as it uses all the highlighted \colosl\ reasoning principles in a fundamental way. 
+We conclude this section by noting that while \colosl enables reasoning about \emph{fine-grained} concurrency, the logic of subjective concurrent separation logic (SCSL)~\cite{SCSL} employs auxiliary states to reason about \emph{coarse-grained} concurrency. That is, although both techniques share the spirit of \emph{subjectivity}, their applications are completely orthogonal. As the authors note in~\cite{SCSL}, CAP (and by design \colosl) can be employed to reason about their case studies of coarse-grained concurrency. However, SCSL cannot be used to reason about the fine-grained concurrency scenarios that \colosl tackles, either when the resources are distributed disjointly amongst threads or when they are intricately entangled.\vspace{-10pt}
+%
+\paragraph{\textbf{Paper outline}}
+In \S\ref{sec:intuition}, we exhibit the main principles of \colosl through a variant of the famous mutual exclusion algorithm~\cite{dijkstra74} introduced by Dijkstra to illustrate distributed, global knowledge between threads. In this scenario, as well as the local knowledge about how each thread behaves, the programmer also has global knowledge about how threads constrain one another. Pleasantly, our reasoning captures the spirit of local reasoning about individual threads while retaining global knowledge about the overall interactions between threads. 
+%It is a good  introductory example, as it uses all the highlighted \colosl\ reasoning principles in a fundamental way. 
 
-In \S\ref{sec:logic}, we interpret \colosl\ assertions over a particular domain which includes: thread-local state exclusively visible to the thread; {\em one} global shared state accessible by all thread (in contrast with the CAP approach); and {\em action models} describing how the global state can be updated. In \S\ref{sec:semantics}, we define the rely and guarantee conditions of each thread in terms of their action models, and provide a sketch of soundness. In particular, the reasoning principles highlighted above are simple semantic
+\todo In \S\ref{sec:logic}, we interpret \colosl\ assertions over a particular domain which includes: thread-local state exclusively visible to the thread; {\em one} global shared state accessible by all thread (in contrast with the CAP approach); and {\em action models} describing how the global state can be updated. In \S\ref{sec:semantics}, we define the rely and guarantee conditions of each thread in terms of their action models, and provide a sketch of soundness. In particular, the reasoning principles highlighted above are simple semantic
 consequences of our generic model of program states.  
 %The full technical details can be found in the accompanying technical report~\cite{colosl-tr14}.
 
 
-In \S\ref{sec:examples}, we study two further, more challenging examples. We verify a concurrent spanning tree algorithm for graphs. This algorithm uses threads spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping subjective views of \colosl are just what we need.  We also verify a concurrent set
-module implemented using a hand-over-hand list-locking algorithm.
-%Interestingly, this
-%example uses the \extendRule principle   to the create new actions which refer to existing
-%state in a fundamental way. 
+In \S\ref{sec:examples}, we study further, more challenging examples. We verify a concurrent spanning tree algorithm for graphs. This algorithm uses threads spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping subjective views of \colosl are just what we need.  We also verify a concurrent set module implemented using a hand-over-hand list-locking algorithm.
+%
 The flexibility of \colosl's subjective views leads to a considerably simpler correctness proof compared to that of CAP. 
+%
+Finally, we demonstrate how the mutual exclusion ring of \S\ref{sec:intuition} can be generalised to synchronise access to a concurrent database.
 
 
