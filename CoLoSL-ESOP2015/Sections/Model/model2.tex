@@ -1,0 +1,986 @@
+\section{\colosl}
+
+\subsection{\colosl Model}\label{sec:model}
+
+We informally describe the underlying model of \colosl and present the
+various ingredients necessary to prove programs using \colosl, in
+particular the \extendRule and \shiftRule rules.
+
+\paragraph{Worlds overview}
+A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
+\emph{logical states} and $\lmod$ is an \emph{action model}. The
+\emph{local logical state}, or simply local state $l$ represents the
+locally owned resources of a thread, in the standard separation logic
+sense. Logical states have two components: one describes machine
+states (\textit{e.g.} stacks and heaps); the other represents
+\emph{capabilities}. The latter are inspired by the capabilities in
+deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
+capability is allowed to perform the associated actions (as prescribed
+by the \emph{action model} components of each world, defined below),
+while any capability \emph{not} owned by a thread means that the
+environment can perform the action. This can be seen as a unified
+treatment of rely and guarantee relations in rely-guarantee
+reasoning~\cite{rg}: a capability fully owned (reps.\ fully not owned)
+during the entire lifetime of a thread represents its guarantee
+(resp.\ its rely), while a partially-owned capability means that the
+corresponding action is both in the rely and the
+guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
+in particular, they may be transferred between threads and the
+environment just like any other resource. See the presentation of
+deny-guarantee~\cite{dg} or, \textit{e.g.}, CAP~\cite{cap} for further
+details and motivation.
+
+In general, each component of a logical state is taken from an
+arbitrary \emph{separation algebra}~\cite{asl} (i.e. a cancellative,
+partial commutative monoid~\cite{asl}) that satisfies the
+\emph{cross-split} property\footnote{ A separation algebra
+  $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
+  for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
+  exists $\mathit{ac}, \mathit{ad}, \mathit{bc}, \mathit{bd} \in
+  \mathbb{B}$ s.t.\ $a = \m{ac} + \m{ad}$, $b = \m{bc} + \m{bd}$, $c =
+  \m{ac} + \m{bc}$, and $d = \m{ad} + \m{bd}$.}  As we demonstrate in
+the examples of \S\ref{sec:examples}, our programs often call for a
+more complex model of machine states and capabilities. For instance,
+we may need our capabilities to be fractionally owned, where ownership
+of a \emph{fraction} of a capability grants the right to perform the
+action to both the thread and the environment, while a fully-owned
+capability by the thread \emph{denies} the right to the environment to
+perform the associated action.  For ease of presentation, the focus of
+this paper is on the standdard stack and heap model for machine
+states, and finite sets of \emph{tokens} (which are simple names) for
+capabilities.
+
+\begin{definition}[Logical states]
+  A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
+  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$
+  associating program variables with values, a heap $h \in \set{Heap}$
+  associating heap locations with values, and a capability
+  $\ca{}\in\Caps$. We assume infinite disjoint sets $\set{PVar}$,
+  $\set{LVar}$, and $\set{Token}$ of program variables, logical
+  variables, and tokens, respectively.
+  \begin{mathpar}
+    \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
+    
+    \set{Heap} == \set{Loc} --`_{\m{fin}} \set{Val}
+    
+    \Heaps == \set{Stack}\times \set{Heap}
+    
+    \Caps == \powerset_{\m{fin}}(\set{Token})
+    
+    \LStates == \Heaps\times \Caps
+  \end{mathpar}
+\end{definition}
+
+The \emph{shared logical state}, or shared state $g$ represents the
+\emph{entire} and unique shared state, accessible to all threads,
+subject to interferences as described by the action model $\lmod$. It
+is also represented as a logical state, which has to be
+\emph{compatible} with the current local logical state (capturing the
+intuition that privately-owned resources are disjoint from shared
+resources).
+
+\begin{definition}[Logical state composition]
+  The \emph{composition of logical states} $ \composeL : \LStates
+  \times \LStates \rightharpoonup \LStates $ is defined
+  component-wise:
+  \[
+  (@s, h,\ca{}) \composeL (@s', h', \ca{}') \eqdef
+  (@s\uplus @s', h\composeH h', \ca{}\composeCap \ca{}')
+  \]
+  The \emph{separation algebra of logical states} is given by
+  $(\LStates, \composeL, \unitL)$.
+\end{definition}
+
+We write $l, l_1, \cdots, l_n$ to range over either arbitrary logical
+states or those representing the local logical state. Similarly, we
+write $g, g_1, \cdots, g_n$ to range over logical states when
+representing the shared (global) state. The empty logical state
+$(\emptyset, \unitH, \unitCap)$ is written $\unitL$. We write $l_1
+\leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
+$l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
+exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
+$l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
+
+An action model is a partial function from \emph{capabilities} to sets
+of \emph{actions}. An action is a pair $(p,q)$ of logical states where
+$p$ is the \emph{pre-state} of the action and $q$ its
+\emph{post-state}.  The \emph{action model} $\lmod$ corresponds
+directly to the (semantic interpretation of) an interference assertion
+$I$. Although worlds do not put further constraints on the
+relationship between $\lmod$ and $g$, they are linked more tightly in
+the semantics of assertions (\S\ref{sec:assertions}).
+
+\begin{definition}[Actions, action models]
+  The set of \emph{actions} $\set{Action}$, ranged over by $a, a_1,
+  \cdots, a_n$, and the set of \emph{action models} $\AMods$, ranged
+  over by $\lmod, \lmod_1, \cdots, \lmod_n$ are defined as follows.
+  \begin{mathpar}
+    \set{Action} == \LStates \times \LStates
+    
+    \AMods == \Caps \rightharpoonup \pset{\set{Action}}
+  \end{mathpar}
+  We write $\unitAM$ for an action model with empty domain.
+\end{definition}
+
+\paragraph{Well-formed worlds}
+\colosl worlds are triples
+$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy a
+well-formedness condition: 1) the local and shared states are always
+disjoint ($l\compatL g$), 2) the capabilities owned by $l$ and $g$ are
+in the domain of $\lmod$, and 3) actions in $\lmod$ are
+\emph{confined} to $g$ (written $g\containI\lmod$), \textit{i.e.}
+whenever they are enabled (in that their pre-state is compatible with
+$g$), the part of the state that they mutate is a sub-part of $g$. For
+ease of presentation, we postpone the formal definition of
+$g\containI\lmod$ to \S\ref{sec:assertions}.
+
+\begin{definition}[Well-formedness]
+  \label{def:wf}
+  A triple $(l, g, \lmod)\in\LStates\times\LStates\times\AMods$, where
+  $l = (-,-,\ca{l})$ and $g = (-,-,\ca{g})$ is \emph{well-formed},
+  written $\wf{l, g, \lmod}$, iff
+  \vspace{-1ex}
+  \[
+  \begin{array}{L}
+    l\compatL g
+    /|
+    \ca{l}\cup\ca{g}\subseteq \bigcup \m{dom}(\lmod)
+    /|
+    g \containI \lmod
+  \end{array}
+\vspace{-1ex}
+\]
+%
+\end{definition}
+
+\begin{definition}[Worlds]\label{def:worlds}
+The set of \emph{worlds} is defined as
+%
+\[
+	\Worlds \eqdef 
+	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
+\]
+\end{definition}
+
+Finally, the composition of two worlds combines their local logical
+states, and is defined whenever the worlds agree on the other two
+components and the resulting tuple is a well-formed world.
+
+\begin{definition}[World composition]
+  The \emph{composition} $w\composeW w'$ of two worlds $\composeW: \Worlds \rightarrow \Worlds \rightharpoonup \Worlds$, is defined as:.
+  \[
+	(l,g,\lmod) \composeW (l',g',\lmod') \eqdef
+	\begin{cases}
+		(l\composeL l', g, \lmod) &
+		\begin{array}[t]{L}
+			\text{if }
+			g = g' \text{, and }
+			\lmod = \lmod' \text{, and }\p{wf}((l\composeL l', g, \lmod))
+		\end{array}\\
+		\textit{undefined}&\text{otherwise}
+	\end{cases}
+\]
+\end{definition}
+
+The set of well-formed worlds with composition $\composeW$ forms a
+separation algebra with multiple units: all well-formed worlds of the
+form $(\unitL,g,\lmod)$.
+
+\subsection{\colosl Assertions}\label{sec:assertions}
+We describe the \emph{assertions} of \colosl and provide their semantics by relating them to sets of worlds. We establish the validity of \copyRule, \forgetRule and \mergeRule principles introduced in the preceding sections by establishing their truth for all possible worlds and interpretations.
+
+Our assertions extend standard assertions from separation logic with \emph{subjective views} and \emph{capability assertions}. 
+We assume an infinite set, $\set{PVar}$, of program variables; an infinite set, $\set{LVar}$, of \emph{logical variables}; and a set of \emph{logical environments} $\lenv \in \LEnv: \pset{\set{LVar} --> \set{Val}}$ that associate logical variables with their values.
+
+\colosl is parametric in the assertions of machine states and capabilities and can be instantiated with any assertion language over machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions as machine state assertions; and instantiate capability assertions with tokens.
+%We thus assume an infinite set, $\set{Token}$, of tokens.
+%
+%
+\begin{definition}[Assertion syntax]\label{def:assertions}
+The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$. We write $[A]$ as a shorthand for $\oast_{\token{a} \in A}[\token{a}]$.
+%
+\begin{align*}	 
+  A &::=\m{false} \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [\token{a}] \mid [x]
+  \quad
+  E ::= x \!\mid\! E_1 + E_2 \!\mid\! \cdots \\
+%
+  P,Q & ::= A \mid \lass{P} \lor \lass{Q} \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
+%
+  I &::= \emptyset \mid \{\interAss{[A]}{\bar{y}}{P}{Q}\} \cup I
+\end{align*}
+\end{definition}
+%
+This syntax follows from standard separation logic with variables as resource~\cite{variablesAsResource} (where expressions $E$ do not allow program variables), with the exception of the subjective views $\shared P I$. 
+Machine state and capability assertions are interpreted over a world's local state: $\li{x}|-> E$ (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap) where only \li{x} (resp.\ address $E_1$) is allocated and has value $E$ (resp.\ points to $E_2$); the capability assertion $[\token{a}]$ is true of the capability $\{\token{a}\}$. 
+$\emp$ is true of states where the the units of $\composeW$. 
+$P * Q$ is true of worlds that can be split into two according to $\composeW$ such that one state satisfies $P$ and the other satisfies $Q$; $P**Q$ is the \emph{overlapping conjunction}, true of worlds can be split three-way according to $\composeW$, such that the $\composeW$-composition of the first two worlds satisfies $P$ and the $\composeW$-composition of the last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives have their standard classical meaning. Interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition.
+
+A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l = \unitL$ and a \emph{subjective view} $s$ can be found in the global shared state $g$ (i.e. $g = s\composeL r$ for some \emph{context} $r$), such that $s$ satisfies $P$ in the standard separation logic sense, and $I$ and $\lmod$ \emph{agree} given the
+decomposition $s$, $r$, in the following sense:
+\begin{enumerate}
+	\item every action in $I$ is reflected in $\lmod{}$;
+	
+	\item every action in $\lmod$ that has a visible effect on $s$ is reflected in $I$;
+	
+	\item the above holds after any number of actions in $\lmod$ takes place.
+%	\item the above is true for any state resulting from any number of actions of $\lmod$ applied to $g$.
+%	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
+\end{enumerate}
+These conditions will be captured by the \emph{action model closure} relation $\extendsAM{\lmod}{s}{r}{\semI{I}}$ given by the upcoming \defin~\ref{def:actclos} in \S\ref{} (where $\semI{I}$ is the interpretation of $I$ given a logical environment $\lenv$).
+
+The semantics of \colosl assertions is given by a forcing relation $w,\lenv|= P$ between a world $w$, a logical environment $\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing relations. The first one $l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
+logic sense over a logical state $l$ (and ignores shared state assertions). The second one $s,\lenv|=_{g,\lmod} P$ interprets assertions over a \emph{subjective view} $s$ that is part of the global shared state $g$, subject to action model $\lmod$. This third form of satisfaction is needed to deal with nesting of subjective views\footnote{This presentation with several forcing relations differs from the usual CAP presentation~\cite{cap-ecoop10}, where formulas are first interpreted over worlds that are not necessarily well-formed, and then cut down to well-formed ones. The CAP presentation strays from separation logic models in some respects; e.g. in CAP, $*$ is not the adjoint of $--*$, the ``magic wand'' connective of separation logic. Although we have omitted this connective from our presentation, its definition in \colosl would be standard and satisfy the adjunction with $*$.}.
+%
+Moreover, since logical connectives are interpreted uniformly in all cases, we write $|=_\dagger$ for either of the three satisfaction relations, and then write $u$ for elements of either $\Worlds$ or $\LStates$, and $\grey$ for either $\composeW$ or $\composeL$, depending on whether the satisfaction relation is $|=$, or either $\slsat$ or $|=_{l,\lmod}$, respectively.
+%
+%
+\begin{definition}[Assertion semantics]\label{def:assertion-semantics}
+Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \LEnv \rightarrow \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ is formalised in \defin~\ref{def:actclos}.
+\vspace{-1ex}
+%
+\[
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  (l,g,\lmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
+  
+  (l,g,\lmod), \lenv &|= \shared P I &\text{iff}&
+  l = \unitL \text{ and }
+  \exsts{s,r}
+  g = s\composeL r\text{ and }
+  s, \lenv |=_{g,\lmod} P\text{ and }
+  \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}
+  \vspace{-1ex}
+\end{array}
+\]
+\[
+\begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
+  s, \lenv &|=_{g,\lmod} A &\text{iff}& s, \lenv \slsat A\\
+  
+  s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
+  (s,g,\lmod), \lenv |= \shared P I\\
+
+  u,\lenv &|=_\dagger P \land Q
+  &\text{iff}& u,\lenv |=_\dagger P\text{ and }u,\lenv |=_\dagger Q\\
+  
+  u,\lenv &|=_\dagger \neg P
+  &\text{iff}& u,\lenv \not{|=_\dagger} P\\
+  
+  u,\lenv &|=_\dagger \exsts x P
+  &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
+  
+  u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
+  \exsts{u_1,u_2} u = u_1 \grey u_2\text{ and }
+  u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
+  
+  u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
+  \exsts{u',u_1,u_2} u = u'\grey u_1\grey u_2\text{ and}\\
+  &&&
+  u' \grey u_1, \lenv |=_\dagger P_1 \text{ and }
+  u' \grey u_2, \lenv |=_\dagger P_2\\
+  
+
+% 	u, \lenv &|=_\dagger \lass{P} \septraction \lass{Q} &\text{iff}&
+%	\exsts{u'} u', \lenv |=_\dagger \lass{P} \text{ and }
+%	u \sharp u'\\
+%	&&&\text{ implies }u \grey u', \lenv |=_\dagger \lass{Q} \\
+	
+  
+%  l, \lenv &\slsat [E]
+%  &\text{iff}&
+%  l = (\emptyset,\unitH, \{[|E|]_{\lenv}\})\\
+%  &&\cdots\\
+
+
+		
+  l,\lenv &\slsat \m{false}
+  && \text{never}\\
+  
+  
+  l, \lenv &\slsat \emp &\text{iff}&l = \unitL\\
+  
+  
+  %  l,\lenv &\slsat E_1 = E_2
+%  &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
+
+
+  l, \lenv &\slsat \li{x}|->E
+  &\text{iff}&
+  l = ([\li x: [|E|]_{\lenv}], \emptyset, \emptyset)\\
+  
+  
+  l, \lenv &\slsat E_1|->E_2 
+  &\text{iff}&
+  l =
+  (\emptyset, [[|E_1|]_{\lenv}: [|E_2|]_{\lenv}], \emptyset)\\
+  
+  
+  l, \lenv & \slsat [\token{a}]
+  & \text{iff} &
+  l = (\emptyset, \emptyset, \{\token{a}\})\\
+  
+  
+  l, \lenv &\slsat \lass{P} \septraction \lass{Q} &\text{iff}&
+	\exsts{l'} l', \lenv \slsat \lass{P} \text{ and }
+	l \sharp l'\text{ implies }l \composeL l', \lenv \slsat \lass{Q} 
+	
+%  l, \lenv &\slsat \shared P I&
+%  \text{ iff }& l = \unitL
+\end{array}
+\]
+\vspace{-1em}
+%
+\begin{align*}
+\semI[\lenv]{I}(\token{A}) &==
+  \left\{
+  \begin{array}{@{}l@{\ }|@{\ }r@{}}
+    (p \composeL r, q \composeL r)&
+    \begin{array}{@{}l@{}}
+      \interAss{A}{\bar{y}}{P}{Q} \in I /|  \exsts{\bar{v}, \lmod} \\
+%      \lenv' = [\lenv|||\bar y:\bar v] \\
+%      /| (p \composeL r), \lenv'\slsat \sumA{P} 
+%      /| (q \composeL r), \lenv' \slsat \sumA{Q} \\
+      \quad p, [\lenv|||\bar y:\bar v]  |=_{p \composeL r, \lmod} P 
+      /| q, [\lenv|||\bar y:\bar v]  |=_{q \composeL r, \lmod} Q 
+    \end{array}
+  \end{array}
+  \right\}
+\end{align*}
+\end{definition}
+
+
+
+
+
+\begin{lemma}\label{lem:assertion-facts}
+The following entailments are valid.
+%
+%
+%\begin{figure}
+%\hrule\vspace{5pt}
+\begin{mathpar}
+	%% \infer{
+	%% 	P <=> \un{P}
+	%% }
+	%% {}
+	%% 
+	%% \infer{
+	%% 	P \entails \erase{P}
+	%% }
+	%% {}
+        %% 
+	\infer{
+		\shared{P}{I} \entails \shared{Q}{I}
+	}
+	{
+		P \entails Q
+	}
+	
+	\infer{
+		\shared{P}{I} * \shared{Q}{I'} \entails \m{false}
+	}
+	{
+		P \sepish Q \entails \m{false}
+	}
+	
+	\infer{
+		\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
+	}
+	{
+		R \entails P
+		&
+		P \sepish Q \entails R \sepish Q
+	}
+\end{mathpar}
+%\hrule
+%\caption{Useful entailments where we write $P <=> Q$ for $P \entails Q \land Q \entails P$.}
+%\label{fig:assertion-facts}
+%\end{figure}
+%
+%\begin{mathpar}
+%	P => \erase{P} %\shared{P}{I} \implies \emp
+%	
+%	P <=> \un{P}
+%\end{mathpar}
+%%
+\begin{proof}
+%% The proof follows immediately from the semantics of \colosl assertions and is provided in~\cite{colosl-tr14}.
+\end{proof}
+%
+\end{lemma}
+
+\subsection{Fencing, confinement and Shifting}
+
+\colosl models the shared state as a single ``region'' of memory and a
+set of potential actions on that region, represented by the last two
+components of each world $(l,g,\lmod)$. \colosl reasoning's most
+distinguishing features are the ability to focus on a sub-part of this
+shared region, to extend the shared state, and to exchange an
+interference relation for an other that is equivalent as far as the
+subjective view is concerned. The soundness of \colosl hinges on the
+fact that the action model $\lmod$ of a world contains all the actions
+that could possibly affect the shared state $g$. (Similarly, the
+action model closure ensures that subjective views in assertions have
+to account for all actions potentially affecting their piece of shared
+state.) At the same time, pieces $l'$ of local state can migrate to
+the shared state at any time under a new set of actions $\lmod'$,
+yielding a new shared state $g\composeL l'$ and action model $\lmod
+\cup \lmod'$.
+
+\paragraph{Confinement}
+In order not to invalidate the views that other threads hold of the
+shared state, in the situation above we require that the actions in
+$\lmod'$ are \emph{confined} to $l'$: whenever an action $(p,q)$ of
+$\lmod'$ is enabled, the part of $g\bullet l'$ modified by the action
+must be a substate of $l'$.  However, new actions are allowed to
+require the presence of some neutral resource outside of $l'$ provided
+they are conserved by the action (\textit{i.e.}\ are present in $q$).
+%
+For instance, abusing notations temporarily to ignore empty stack and
+capability components in logical states, the action $a = ([10:0, 12:0,
+  14:0],[10:1, 12:1, 14:0])$, which modifies the cells at addresses 10
+and 12 to point from 0 to 1 provided that location 14 points to 0, is
+confined in the states $l_1=[10:0,12:0]$ and $l_2=[10:1]$, but not in
+$l_3=[10:0]$. Indeed $p$ is compatible with $l_1$ and $l_3$, and the
+modified cells 10 and 12 are fully contained in $l_1$ but not in
+$l_3$; $p$ is not compatible with $l_2$, hence $a$ has no effect on
+$l_2$ and is automatically confined to $l_2$.
+%
+Moreover, in general we require not only that all actions in $\lmod'$
+are confined to $l'$ in this sense, but also that all states resulting
+from the succive application of actions in $\lmod'$ themselves confine
+all actions in $\lmod'$.
+
+In the logic, the shared state is extended by resource in $P$ under
+the interference $I$ via the \extendRule principle, which requires
+that $P\containI I$. Instead of giving a semantic definition of that
+definition, it is easier to understand from the rules in
+\fig~\ref{fig:local-fencing-rules}. These rules assume that actions in
+$I$ are of the form $\lass{P} \swap \lass{Q}$ where
+$P,Q\in\LAssertions$, \textit{i.e.} the action assertions do not
+mention subjective views. It is always possible to transform
+assertions mentioning subjective views into ones that do not (see \S
+XXX). As expressed by the first rule of
+\fig~\ref{fig:local-fencing-rules}, $P\containI I$ if there is a
+weaker assertion $F$ that acts as a \emph{local fence} for $I$,
+denoted by $F\strictfences I$. This fencing condition is checked for
+each action in $I$ (as expressed by the second rule). For each action
+$P\swap Q$, the three remaining rules of the figure may apply. In the
+first of these rules, the action cannot possibly fire, because its
+precondition is incompatible with $F$: no state satisfying $F$ may be
+extended such that a sub-part satisfies $P$. The second of these rules
+allows one to trim neutral parts $R$ of an action $P\swap Q$: if $R$
+appears both in $P$ and $Q$, and $R$ is exact, then the part of the
+state denoted by $R$ is uniquely determined and left unchanged by the
+action. The last rule finally reduces local fencing to entailment
+checking, provided the fence $F$ can be expressed as a disjunction of
+precise formulas. The first premise states that $F$ is invariant under
+the action $P\swap Q$, in a similar fashion as \textit{i.e.} RGSep
+encodes stability checks as separation logic entailments. The third
+premise checks the confinement condition: if a sub-part of an
+extension of a state in $F_i$ satisfies $P$ ($l_1\composeL l_2|= F_i$
+and $l_2\composeL l_3 |= P$), then that it is also a sub-part of that
+state ($l_1\composeL l_2\composeL l_3|=F_i$, hence by precision of
+$F_i$, $l_2\composeL l_3\leq l_1\composeL l_2\composeL l_3 =
+l_1\composeL l_2$).
+
+The rules of \fig~\ref{fig:local-fencing-rules} can be used to reduce
+the checking of confinement conditions in \colosl to familiar
+entailment checking in separation logic. Moreover, if actions and
+frames can be expressed in the symbolic heap fragment used in
+automatic tools based on separation logic, these entailments can also
+be reduced to symbolic heaps by extending the $--o$-elimination
+procedure of Calcagno et al. in~\cite{vv07msc} to deal with $**$ as
+well. We leave the details of this adaptation to XXX. These
+characteristics are also true of the axiomatisations of shifting and
+stability presented below.
+
+\begin{figure}
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+	  P \confines I	
+	}
+	{
+	  P \entails F\\
+	  F \strictfences I	
+	}
+	
+	\infer{
+		\fenceAss{} \strictfences I
+	}
+	{
+          \for{\capAss{}: \lass{P} \swap \lass{Q}\in I}\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}
+	}		
+
+	\infer{
+		\fenceAss{} \!\strictfences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}		
+	}
+	{
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
+	}	
+
+	\infer{
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
+	}
+	{
+          P \slentails P' * R\\
+          Q \slentails Q' * R\\
+	  \exact{\lass{R}}\\
+	  \fenceAss{} \strictfences \left\{\capAss{}\!\!:\! \lass{P'} \swap \lass{Q'} \right\}
+	}	
+		
+%	\infer{
+%		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+%	}
+%	{
+%		\fenceAss{}' \slentails \fenceAss{}
+%		&
+%		\fenceAss{} \sepish \lass{P} \slentails \fenceAss{}' \sepish \lass{P}
+%		&
+%		\fenceAss{}' \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+%	}
+%		
+	\infer{
+		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+	}
+	{	
+%		\separate{\lass{P}}{\lass{Q}}
+%		&
+		\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
+		\\
+		\fenceAss{} \!<=>\! \bigvee\limits_{i \in I}\fenceAss{i} 		
+		\\
+		(\precise{\fenceAss{i}}
+		\land
+		\fenceAss{i} \sepish \lass{P} \slentails \fenceAss{i}
+		\;\;\text{for } i \in I)
+	}	
+%	{
+%		\begin{array}{@{} l @{}}			
+%			\separate{\lass{P}}{\lass{Q}}
+%			\quad
+%			\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
+%			\quad
+%			\fenceAss{} <=> \bigvee\limits_{i \in I}\fenceAss{i} 		\\
+%			%
+%			\precise{\fenceAss{i}}
+%			\quad 
+%			\fenceAss{i} \sepish \lass{P} \slentails \fenceAss{i}
+%			\quad
+%			\text{for } i \in I
+%		\end{array}
+%	}	
+%	
+\end{mathpar}
+\hrule
+\caption{Confinement and local fencing rules, where all assertions are
+  in $\LAssertions$.}
+\label{fig:local-fencing-rules}
+\end{figure}
+
+
+Just like all newly-created shared states are confined, any world
+should also be confined. The formal definition to
+$\wf{l,g,\lmod}$ used in \defin~\ref{def:wf} in terms of its logical
+equivalent (a semantic, direct definition is also possible, see XXX):
+\julescomment{Actually, we'd need to define an inverse of
+  $\semI{\cdot}$. Perhaps leave the formal def of $g\containI \lmod$ out.}
+
+
+\paragraph{Shifting/fencing judgements}We present a number of judgements that reduce fencing conditions and action shifting to logical entailments in \fig~\ref{fig:fencing-rules} and~\ref{fig:shifting-rules}. As with the local fencing judgements, the entailments in the premises of these rules are those of standard separation logic ($\slentails$) where the ($**$) and ($\septraction$) connectives can be eliminated as described above. 
+
+The premises of the form $\separate{\lass{P}}{\lass{Q}}$ assert that the states described by $\lass{P}$ and $\lass{Q}$ \emph{do not intersect}; that is, for all $\lenv \in \LEnv$, and for all $l_1, l_2$ such that $l_1, \lenv \slsat \lass{p}$ and $l_2, \lenv \slsat \lass{Q}$, then: 
+%
+\qquad
+$
+	\for{l \in \LStates} l \leq l_1 \land l \leq l_2 \implies l = \unitL
+$\\
+%
+The $\separate{\lass{P}}{\lass{Q}}$ entailment can be rewritten equivalently as follows:
+%
+\[
+	\separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
+\]
+%
+However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judgements for establishing non-intersection directly rather than performing semantic checks.
+%
+\begin{figure}
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+		\fenceAss{} \fences I
+	}
+	{
+          \for{\capAss{}: \lass{P} \swap \lass{Q}\in I}\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}
+	}		
+
+	\infer{
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
+	}
+	{
+		\exact{\lass{R}}
+		&
+		\fenceAss{} \!\fences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
+	}
+		
+	\infer{
+		\fenceAss{} \fences \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
+	}
+	{
+		\separate{\fenceAss{}}{\lass{P}}
+	}	
+	
+%	\infer{
+%		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+%	}
+%	{
+%		\fenceAss{} \sepish \lass{P} \slentails \m{false}
+%	}
+%	
+	\infer{
+		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+	}
+	{
+		\separate{\lass{P}}{\lass{Q}}
+		&
+		\left(\lass{P} \septraction (\fenceAss{} \sepish \lass{P}) \right) * \lass{Q} \slentails \fenceAss{}
+	}	
+
+	\infer{
+		I \weakenI{P} I'	
+	}
+	{
+		P \entails F\\
+		I \weakenI{F} I'
+	}	
+	
+	\infer{
+		I \cup I_1 \weakenI{\fenceAss{}} I \cup I_2
+	}
+	{
+		\fenceAss{} \fences I \cup I_1	
+		&
+		I_1 \weakenI{\fenceAss{}} I_2
+	}	
+	
+	\infer
+%	[\proofRule{Hide}]
+	{
+		\left\{ \capAss{}: \lass{P'}  \swap \lass{Q'} \right\} \weakenI{P}
+		\emptyset
+	}{	
+		\exact{\lass{R}}
+		&
+		\separate{\fenceAss{}}{\lass{P}}
+	}
+
+	\infer
+%	[\proofRule{False-L}]
+	{	
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
+		\emptyset 	
+	}{
+%		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
+	}	
+	
+	\infer
+%	[\proofRule{False-R}]
+	{	
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
+		\emptyset 	
+	}
+	{
+%		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
+		\left(\lass{P} \septraction (\lass{P} \sepish \fenceAss{})\right) * \lass{Q} \slentails \m{false}
+	}	
+	
+	\infer
+%	[\proofRule{Expand/Contract}]
+	{
+		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: \lass{P} * \lass{R}_i \swap \lass{Q} * \lass{R}_i \right\}	
+	}
+	{
+		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
+		&
+		\exact{\lass{R}_i} \text{ for } i \in I
+	}
+
+	\infer
+%	[\proofRule{Disj}]
+	{
+	  \bigcup\limits_{i \in I,j\in J}\!\! \left\{\capAss{}\!\!:\!\exists\bar{y}. P_i \!\swap\! Q_j \right\}
+	  \mathrel{\approx^{\m{true}}}
+	  \left\{\!\capAss{}\!\!: \exsts{\bar{y}}
+          \bigvee_{i \in I} P_i \!\swap\!
+          \bigvee_{j\in J}Q_j \right\} 
+	}
+	{
+	}
+
+	\infer{
+		\m{true} \fences I	
+	}{}	
+\end{mathpar}
+\hrule
+%\vspace*{5pt}
+\caption{Action shifting judgements; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
+\label{fig:shifting-rules}
+\end{figure}
+
+
+
+
+
+
+
+\subsection{Stability}
+
+\begin{figure*}
+\hrule\vspace*{5pt}
+\begin{mathpar}
+	\infer{
+		\stable{\lass{p}}	
+	}{}
+	
+%	\infer{
+%		\stable{P}	
+%	}
+%	{
+%		\stable{\un{P}}	
+%	}
+%
+	\infer{
+		\stable{P \odot Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}
+
+	\infer{
+		\stable{\exsts{x} P}	
+	}
+	{
+		\stable{P}
+	}
+
+%	\infer{
+%		\stable{\shared{\lass{P}}{I}}	
+%	}
+%	{
+%		\lass{P} \fences I	
+%	}	
+%	
+%	\infer[?]{
+%		\stable{\shared{\lass{P}}{I}}	
+%	}
+%	{
+%		\stable{\shared{\lass{P}}{I'}} 
+%		&
+%		I' \weakenI{\lass{P}} I
+%	}
+%	
+%	
+	\infer{
+		\stable{P * Q}	
+	}
+	{
+		\stableTo{P}{Q}
+		&
+		\stableTo{Q}{P}	
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableTo{P}{R}	
+	}
+	{
+		\stable{P}
+	}	
+	
+	\infer{
+		\stableTo{P * Q}{R}
+	}
+	{
+		\stableTo{P}{Q * R}
+		&
+		\stableTo{Q}{P * R}
+	}	
+	
+	\infer{
+		\stableTo{P}{R * R'}
+	}
+	{
+		\stableTo{P}{R}
+	}	
+		
+	\infer{
+		\stableTo{P \ominus Q}{R}
+	}
+	{
+		\stableTo{P}{R}
+		&
+		\stableTo{Q}{R}
+	}	
+	
+	\infer{
+		\stableTo{\exsts{x} P}{R}
+	}
+	{
+		\stableTo{P}{R}
+	}
+	
+	\infer{
+		\stableTo{\shared{\lass{P}}{I}}{R}
+	}
+	{
+		\stableTo{\shared{\lass{P}}{I'}}{R}
+		&
+		I' \weakenI{\lass{P}} I
+	}
+	
+	
+	\infer{
+		\stableTo{\shared{\lass{P}}{I}}{R}
+	}
+	{
+		\stableIn{\lass{P}}{I}{R * \shared{\lass{P}}{I}}
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableIn{\lass{P}}{I_1 \cup I_2}{R}	
+	}
+	{
+		\stableIn{\lass{P}}{I_1}{R}
+		&
+		\stableIn{\lass{P}}{I_2}{R}
+	}	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+	}
+	{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\sumA{Q_1}}{\sumA{Q_2}}\right\}}{R}	
+	}	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+	}
+	{
+		Q_1 \entails Q'_1
+		&
+		Q_2 \entails Q'_2
+		&
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q'_1}{Q'_2}\right\}}{R}	
+	}
+	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\lass{Q}_1}{\lass{Q}_2}\right\}}{R}	
+	}
+	{
+		\capAss{} * \prodA{R} \slentails \m{false}
+	}
+	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}} {R}	
+	}
+	{
+		\combine{R}{\lass{Q}_1} \slentails \m{false}
+	}
+	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}}{R}	
+	}
+	{
+		\left(\lass{Q}_1 \septraction \combine{R}{\lass{Q}_1} \,\right) * \lass{Q}_2 \slentails \lass{P} * \m{true}
+	}
+%	
+%	
+%	
+\end{mathpar}
+\hrule
+%\vspace*{5pt}
+\caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$; $\dot \in \{\land, \lor, *, **\}$ and $\ominus \in \{\land, \lor, **\}$.}
+\label{fig:stability-rules}
+\end{figure*}
+%
+
+
+\julescomment{These rules are rules I took out from the figures. We
+  have to decide if we want to mention them or leave them to the
+  appendix. Which ones are used in the examples?}
+
+\begin{mathpar}
+%	\infer{
+%		\fenceAss{} \fences \emptyset
+%	}{}
+%	
+	\infer{
+		\fenceAss{} \fences I	
+	}{
+		\fenceAss{} \strictfences I	
+	}
+	
+	\infer{
+		\fenceAss{} \fences I
+	}
+	{
+		I \entailsI I' 
+		&
+		\fenceAss{} \fences I'
+	}
+
+	\infer{
+		\fenceAss{} \fences I
+	}
+	{
+		\fenceAss{} \fences I'
+		&
+		I' \weakenI{\fenceAss{}} I	
+	}
+	
+	
+	\infer{
+		I  \weakenI{\fenceAss{}} \emptyset
+	}
+	{
+		I  \entailsI I'
+		&
+		I' \weakenI{\fenceAss{}} \emptyset
+	}
+%	
+%	\infer{
+%		I \cup I' \weakenI{\fenceAss{}} I
+%	}
+%	{
+%		I \cup I' \entailsI I''
+%		&
+%		I'' \weakenI{\fenceAss{}} I
+%	}
+%		
+%	\infer{
+%		\left\{ \capAss{}: P \swap Q \right\} \weakenI{\fenceAss{}} I'
+%	}
+%	{
+%		\left\{ \capAss{}: \erase{P} \swap \erase{Q} \right\} \weakenI{\fenceAss{}} I'
+%	}
+		
+	\infer
+%	[\proofRule{Exist}]
+	{
+		\left\{ \capAss{}: \exists\overline{v_i \in S_i}^{i \in I}.\, P \swap Q \right\} 
+		\approx^{\m{true}}
+		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{\capAss{}: P \overline{[w_i /v_i]}^{i \in I} \swap  Q \overline{[w_i /v_i]}^{i \in I} \right\} 
+	}
+	{
+	}	
+\end{mathpar}

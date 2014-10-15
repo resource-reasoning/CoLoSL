@@ -146,7 +146,7 @@ interference relation $I$ declares  how  this  part of the  shared state can cha
 can increment \li{y} under the condition that the
 value of \li{x} is one more than \li{y}. 
 This update is only possible when the
-local state of a thread has the { capability} $[\token a_{\li y}]$. For  this
+local state of a thread has the capability $[\token a_{\li y}]$. For  this
 particular 
 example, the assertion in line~4 simply has all the capabilities $[\token
 a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the $I$-actions   in the local state; in general,
@@ -193,7 +193,7 @@ assertion of the subjective view neither in its current state nor at any point d
 from $I$, the resulting subjective view remains unaffected by $\token
 a_{\li z}$. Using the \shiftRule\  principle, we
 can therefore forget the $\token{a}_{\li z}$ action. 
-Finally, as is normal when reasoning about concurrency, we stabalise  so
+Finally, as is normal when reasoning about concurrency, we stabilise so
 that, whatever the environment can do to the state, the assertion
 inside the box still holds (the assertion is \emph{stable}). However, we have   lost information about
 \li{z}. Intuitively, we know that the value of \li{y} depends on the value
@@ -204,13 +204,13 @@ values of \li{x} and \li{y} are connected together through \li{z}.
 It is however possible to give a  stronger specification, as follows: 
 \begin{align*}
  & \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]\\
-  \stackrel{(\shiftRule)}{\semimplies} \null& \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
- \stackrel{(\forgetRule)}{=>}\null& \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
- \stackrel{(\shiftRule)}{\semimplies}\null&  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] 
- \stackrel{(\stabilise)}{=>}\null
-    \shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\li{x}}{0} *
-        \cell{\li{y}}{0} \lor\\ \cell{\li{x}}{1} *
-        \cell{\li{y}}{0}\end{array}}{I_{\li y}}\!\!\!\!\!\! * [\token a_{\li y}]
+  \stackrel{\smash{(\shiftRule)}}{\semimplies} \null& \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ]\\
+ \stackrel{\smash{(\forgetRule)}}{=>}\null& \shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
+ \stackrel{\smash{(\shiftRule)}}{\semimplies}\null&  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
+ \stackrel{\smash{(\stabilise)}}{=>}\null&
+    \shared{\cell{\li{x}}{0} *
+        \cell{\li{y}}{0} \lor \cell{\li{x}}{1} *
+        \cell{\li{y}}{0}}{I_{\li y}} * [\token a_{\li y}]
 \end{align*}
 This implication involves subtle interaction between the assertion and
 the interference relation of the subjective view. 
@@ -231,7 +231,7 @@ of \li{x} and
 \li{z} have the same value then the \li{y} cell also has the same value which, under these
 conditions, is not changed by the actions in $I$. This strengthened  action  gives full information about how the resource of
 the subjective view changes as \li{x} is being updated.
-Let  $I_{\li y}' $ be  $I_{\li y}$ with $\token a_{\li x}$ rewritten as above.
+Let  $I_{\li y}' $ be  $I$ with $\token a_{\li x}$ rewritten as above.
 As we justify in \S~\ref{sec:logic}, we can 
 use  the \shiftRule\ principle with the judgement $ I\weakenIb{P} I_{\li y}' $, where $P \eqdef \cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}$, to replace $I_{\li y}$ by $I'_{\li y}$. 
 
@@ -241,8 +241,8 @@ the new $\token a_{\li x}$ action in $I'_{\li y}$ retains enough information abo
 \li{x}, \li{y} and \li{z} are related.
 Since action $\token a_{\li z}$ only affects the \li{z} cell, which has been
 forgotten, leaving  the cells \li{x} and \li{y} unaltered, we can again use the
-\shiftRule\ principle to change  the interface
-relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interface relation
+\shiftRule\ principle to change  the interference
+relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interference relation
 is now as simple as it can get, whilst retaining enough information
 about the 
 connection between the \li{x}, \li{y} and \li{z}. We weaken

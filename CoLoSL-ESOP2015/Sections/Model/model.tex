@@ -14,10 +14,27 @@ relationship between $\lmod$ and $g$, they are linked more tightly in the semant
 Finally, the composition of two worlds will be defined whenever their local states are disjoint and they agree on all other two components, hence have identical knowledge of the shared state and possible interferences.\\
 
 %\paragraph{Worlds and Actions}
-We proceed by defining logical states, which are \colosl's notion of \emph{resource}, in the standard separation logic sense. Logical states have two components: one describes machine states (\textit{e.g.} stacks and heaps); the other
-represents \emph{capabilities}. The latter are inspired by the capabilities in deny-guarantee reasoning~\cite{dg}: a thread in possession of a given capability is allowed to perform the associated actions (as prescribed by the \emph{action model} components of each world, defined below), while any capability \emph{not} owned by a thread means that the environment can perform the action.
-%
-%
+We proceed by defining logical states, which are \colosl's notion of
+\emph{resource}, in the standard separation logic sense. Logical
+states have two components: one describes machine states
+(\textit{e.g.} stacks and heaps); the other represents
+\emph{capabilities}. The latter are inspired by the capabilities in
+deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
+capability is allowed to perform the associated actions (as prescribed
+by the \emph{action model} components of each world, defined below),
+while any capability \emph{not} owned by a thread means that the
+environment can perform the action. This can be seen as a unified
+treatment of rely and guarantee relations in rely-guarantee
+reasoning~\cite{rg}: a capability fully owned (reps.\ fully not owned)
+during the entire lifetime of a thread represents its guarantee
+(resp.\ its rely), while a partially-owned capability means that
+the corresponding action is both in the rely and the
+guarantee. Capabilities go beyond the rely-guarantee
+model~\cite{dg}; in particular, they may be transferred between
+threads and the environment just like any other resource. See the
+presentation of deny-guarantee~\cite{dg} or, \textit{e.g.},
+CAP~\cite{cap} for further details and motivation.
+
 \begin{definition}[Logical states]
 A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$ associating program variables with values, a heap $h \in \set{Heap}$ associating heap locations with values, and a capability $\ca{}\in\Caps$. We assume infinite disjoint sets $\set{PVar}$, $\set{LVar}$, and $\set{Token}$ of program variables, logical variables, and tokens,
 respectively.
