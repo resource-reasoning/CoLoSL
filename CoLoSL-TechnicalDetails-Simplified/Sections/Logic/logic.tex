@@ -28,7 +28,7 @@ Finally, the composition of two worlds will be defined whenever their local stat
 We proceed by defining logical states, which are \colosl's notion of \emph{resource}, in the standard separation logic sense. Logical states have two components: one describes machine states (\textit{e.g.} stacks and heaps); the other
 represents \emph{capabilities}. The latter are inspired by the capabilities in deny-guarantee reasoning~\cite{dg}: a thread in possession of a given capability is allowed to perform the associated actions (as prescribed by the \emph{action model} components of each world, defined below), while any capability \emph{not} owned by a thread means that the environment can perform the action.
 
-\colosl\ is parametric in the choice of the separation algebra representing the machine states and capabilities. This allows for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in the token ring example of \S~\ref{chapter:intuition} the separation algebra of machine states is a standard variable stack; while capabilities are captured as a set of tokens. However, as we demonstrate in the examples of \S\ref{chapter:examples}, our programs often call for a more complex model of machine states and capabilities. For instance, we may need our capabilities to be fractionally owned, where ownership of a \emph{fraction} of a capability grants the right to perform the action to both the thread and the environment, while a fully-owned capability by the thread \emph{denies} the right to the environment to perform the associated action. 
+\colosl\ is parametric in the choice of the separation algebra representing the machine states and capabilities. This allows for suitable \emph{instantiation} of \colosl\ depending on the programs being verified. For instance, in the token ring example of \S\ref{chapter:intuition} the separation algebra of machine states is a standard variable stack; while capabilities are captured as a set of tokens. However, as we demonstrate in the examples of \S\ref{chapter:examples}, our programs often call for a more complex model of machine states and capabilities. For instance, we may need our capabilities to be fractionally owned, where ownership of a \emph{fraction} of a capability grants the right to perform the action to both the thread and the environment, while a fully-owned capability by the thread \emph{denies} the right to the environment to perform the associated action. 
 %while in \ex~\ref{todo} we instantiate it with a pair of separation algebras comprising heaps and variable stacks. 
 
 In general, the separation algebra of machine states and capabilities can be instantiated with \emph{any} separation algebra (\textit{i.e.} a cancellative,  partial commutative monoid~\cite{asl}) that satisfies the \emph{cross-split} property. This is formalised in the following parametrisations.
@@ -366,8 +366,10 @@ The assertions of \colosl are elements of $\Assertions$ described by the grammar
 %	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
 %	\Assertions \ni P, Q  &::=  A \mid P \Rightarrow Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
 	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
-	\Assertions \ni P, Q  &::=  A \mid P \land Q \mid P \lor Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
-	\IAssertions \ni I &::= \emptyset \mid \{\interAss{\capAss{}}{\vec{y}}{P}{Q}\} \cup I
+	\LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \lass{P} \land \lass{Q} \mid \lass{P} \lor \lass{Q} \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{p} \septraction \lass{q}\\
+%
+	\Assertions \ni P, Q  &::=  \lass{P} \mid P \land Q \mid P \lor Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
+	\IAssertions \ni I &::= \emptyset \mid \{\interAss{\capAss{}}{\bar{y}}{P}{Q}\} \cup I
 \end{align*}
 \end{definition}
 
@@ -538,8 +540,8 @@ and
     \begin{array}{@{}l@{}}
       \interAss{\capAss{}}{\vec{y}}{P}{Q} \in I /| \ca{} \in \semK[\lenv]{\capAss{}}\land
       \exsts{\vec{v}, \lmod}\\
-      \quad (p \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{P} \land\\
-      \quad (q \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{Q} \land \\
+%      \quad (p \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{P} \land\\
+%      \quad (q \composeL r), [\lenv|||\vec y:\vec v] \slsat \sumA{Q} \land \\
       \quad p, [\lenv|||\vec y:\vec v] |=_{(p \composeL r), \lmod} P \land
       q, [\lenv|||\vec y:\vec v] |=_{(q \composeL r), \lmod} Q 
 %      (p, g, \lmod), [\lenv|||\vec y:\vec v] |= P \land
@@ -556,37 +558,203 @@ and
 	\sem[\lenv]{P} \eqdef \left\{ w \mid w, \lenv |= P \right\}
 \]	
 %
-The satisfaction relation for subjective views in $\slsat$ is purely for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to write predicates in interference assertions whose definition includes subjective views, as in the example of \S\ref{sec:set-example}. Since actions are not allowed to modify shared state from within another subjective view, the interpretation of such subjective views collapses to $\emp$.
-%% Alternatively, we could forbid boxes in assertions
-%% evaluated using $\slsat$ and explicitly unpack such predicates and
-%% erase their subjective views.
+%The satisfaction relation for subjective views in $\slsat$ is purely for convenience, as in CAP~\cite{cap-ecoop10}: this allows us to write predicates in interference assertions whose definition includes subjective views, as in the example of \S\ref{sec:set-example}. Since actions are not allowed to modify shared state from within another subjective view, the interpretation of such subjective views collapses to $\emp$.
+%
 
-%% The semantics of separation logic predicates and connectives is
-%% standard and depends only on the local state.  $\shared{P}{I}$ states
-%% that $P$ holds for only a sub-state $s$ of the global shared state
-%% $s\composeL r$. The interference associated with $s$ is given by
-%% interference assertion $\semI[\lenv]{I}$ such that the global and
-%% local action models $\lmod$ and $\gmod$ are \emph{closed}
-%% under $\semI[\lenv]{I}$ with respect to the subjective view $s$ and
-%% context $r$. This will be formalised just after this lemma.
-%Since shared state assertions are partial subjective description of the shared state, separating conjunction between them behaves as overlapping conjunction 
-
-\begin{lemma}\label{lem:assertionFacts}
-The following formulas are valid according to the semantics above (where $x$ does not appear free in $I$):
+Although \colosl allows for nested subjective views (e.g. $\shared{P * \shared{Q}{I'}}{I}$), it is often useful to \emph{flatten} them into equivalent assertions with no nested boxes. 
+We introduce 
+%\emph{local assertions}, $\LAssertions \subset \Assertions$, a subset of assertions that do not contain any subjective views; as well as \emph{flat assertions}, 
+\emph{flat assertions}, $\FAssertions \subset \Assertions$, to capture a subset of assertions with no nested subjected views and provide a \emph{flattening mechanism} to rewrite \colosl assertions as equivalent flat assertions. 
+%
+%
+\begin{definition}[Flattening]
+The set of \emph{flat assertions} $\FAssertions$ is defined by the following grammar. \vspace*{-5pt}
 %
 \begin{align*}
-	\shared{P * \shared{Q}{I'}}{I} &<=> \shared{P}{I} * \shared{Q}{I'}&
-	\E x \shared P I &<=>\shared{\E x P} I\\
-%
-	(P => Q) &=> \shared{P}{I} => \shared{Q}{I}&
-	\shared{P}{I} &=> \emp
+	\FAssertions \ni \fass{P}, \fass{Q} & ::= \lass{P} \mid \shared{\lass{P}}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q}
 \end{align*}
+%
+The \emph{flattening} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows where $x$ does not appear free in $I$ and $\odot \in \{\land, \lor, *, **\}$. 
+%
+\begin{align*}
+	& \un{\lass{p}} \eqdef  \lass{p} \quad &&  
+	\un{P \odot Q} \eqdef  \un{P} \odot \un{Q}  \\%\quad \text{for } \odot \in \{\land, \lor, *, \sepish\}\\
+%
+%
+	& \un{\exsts{x} P} \eqdef  \exsts{x} \un{P} &&
+	\un{\shared{\shared{P}{I} * Q}{I'}} \eqdef  \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+%
+	& \un{\shared{\lass{P}}{I}} \eqdef  \shared{\lass{P}}{I} \quad &&
+	\un{\shared{\shared{P}{I} \sepish Q}{I'}} \eqdef  \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+%
+	& \un{\shared{\exsts{x} P}{I}} \eqdef  \exsts{x} \un{\shared{P}{I}} &&
+	\un{\shared{P \lor Q}{I}} \eqdef \un{\shared{P}{I}} \lor \un{\shared{Q}{I}}\\
+%
+%
+	& \un{\shared{\shared{P}{I} \land L}{I'}} \eqdef \m{false} &&
+	\un{\shared{\shared{P}{I} \!\land\! ((L \!\lor\! Q) \!\odot\! R)}{I'}} \!\eqdef\! 
+	\un{\shared{\shared{P}{I} \!\land\! (Q \!\odot\! R)}{I'}}\\
+%
+%
+	&&&
+	\un{\shared{\shared{P}{I} \land B}{I'}} \eqdef
+	\un{\shared{P}{I}} * \un{\shared{B}{I'}} \vspace*{-30pt}
+\end{align*}\vspace{-10pt}
+%
+\begin{mathpar}
+	B ::= \emp|\, \shared{P}{I}|\, B \odot B
+	
+	L ::= \m{false} \mid \cell{x}{v} \mid [\token{a}] \mid L \ominus Q \quad \text{for }\ominus \in \{\land, *, \sepish\}
+\end{mathpar}
+%
+\end{definition}
+%
+%
+\begin{definition}[Erasure]
+The \emph{erasure} of an assertion $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively over the structure of assertions as follows with $\odot\in\{\land, \lor, *, \sepish \}$
+%
+\begin{mathpar}
+	\erase{A} \eqdef A  
+
+	\erase{\left(\shared{P}{I}\right)} \eqdef \emp 
+
+	\erase{(\exsts{x} P)} \eqdef \exsts{x}\erase{P} 
+
+	\erase{(P \odot Q)} \eqdef  \erase{P} \odot \erase{Q}\vspace*{-5pt}
+\end{mathpar}
+%
+%
+\end{definition}
+%
+%
+%
+\begin{definition}[Existential promotion]
+Given an assertion $P \in \Assertions$, the \emph{existential promotion} function, $\promote{.}: \Assertions \rightarrow \LAssertions$, is defined as follows:
+%
+\begin{mathpar}
+	\promote{P} \eqdef \exists{\bar{x}^{\in S}}.\; P'
+	
+	\text{where } (S, P') = \ep{P}
+\end{mathpar}
+%
+%
+with the auxiliary function $\ep{.}: \Assertions \rightarrow (\pset{\textsf{LVar}} \times \Assertions)$ defined inductively over the structure of assertions as follows where $\odot \in \{\land, \lor, *, \sepish\}$.
+We assume that the bound logical variables of $P$ are pairwise distinct; and that the bound variables of $P$ in $\shared{P}{I}$ do not appear free in $I$\footnote{Note that it is always possible to achieve these stipulations by renaming the bound variables in a capture-avoiding manner.}.
+In what follows, $\ep{P} = (S_1, P')$ and $\ep{Q} = (S_2, Q')$ where applicable.
+%
+\begin{mathpar}
+	\ep{A} \!\!\eqdef\! (\emptyset, A) 
+	
+	\ep{\shared{P}{I}} \!\!\eqdef\!  (S_1, \shared{P'}{I})
+	
+	\ep{P \odot Q} \!\!\eqdef\! \left(S_1 \uplus S_2, P' \odot Q' \right)
+
+	\ep{\exsts{x}P} \!\!\eqdef\! \left({x} \uplus S_1, P'\right)
+\end{mathpar}
+%
+\end{definition}
+%
+As we demonstrate in Appendix~\ref{app:lemmata} (\lem~\ref{lem:existential-promotion}), given any assertion $P$, it is always possible to rewrite it into an equivalent assertion where all the existential quantifications are promoted to the front of the assertion; that is, $P <=> \promote{P}$. 
+%
+\begin{definition}[Gather/merge]
+Given an assertion $P \eqdef \exsts{\bar{x}} P' \in \Assertions$ (where there are no bound variables in $P'$), the \emph{gather}, $\prodA{(.)}: \Assertions \rightarrow \LAssertions$, and \emph{merge}, $\sumA{(.)}: \Assertions \rightarrow \LAssertions$, operations are defined as follows:
+%
+\begin{mathpar}
+	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
+	
+	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
+	
+	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
+\end{mathpar}
+%
+%
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\odot \in \{\land, *, \sepish\}$. In what follows, $\ub{\fass{P}} = (\lass{P}, \lass{P}')$ and $\ub{\fass{Q}} = (\lass{Q}, \lass{Q}')$ where applicable.
+%
+\begin{mathpar}
+	\ub{\lass{P}} \!\!\eqdef\! (\lass{P}, \emp) 
+	
+	\ub{\shared{\lass{P}}{I}} \!\!\eqdef\!  (\emp, \lass{P})
+	
+	\ub{\fass{P} \odot \fass{Q}} \!\!\eqdef\! \left(\lass{P} \odot \lass{Q}, \lass{P}' \sepish \lass{Q}' \right)
+
+	\ub{\fass{P} \lor \fass{Q}} \!\!\eqdef\! \left(\lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)
+\end{mathpar}
+%
+%
+\end{definition}
+%
+%
+\begin{lemma}\label{lem:assertion-facts}
+The following judgements are valid.
+%
+\begin{mathpar}
+	\infer{
+		P <=> \un{P}
+	}
+	{}
+	
+	\infer{
+		P \entails \erase{P}
+	}
+	{}
+	
+	\infer{
+		\shared{P}{I} \entails \shared{Q}{I}
+	}
+	{
+		P \entails Q
+	}
+	
+	\infer{
+		\shared{P}{I} * \shared{Q}{I'} \entails \m{false}
+	}
+	{
+		P \sepish Q \entails \m{false}
+	}
+	
+	\infer{
+		\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
+	}
+	{
+		R \entails P
+		&
+		P \sepish Q \entails R \sepish Q
+	}
+	
+	\infer{
+		I \cup I_1 \entailsI I \cup I_2
+	}
+	{
+		I_1 \entailsI I_2
+	}	
+	
+	\infer{
+		\left\{ \interAss{\capAss{}}{\bar{y}}{P}{Q} \right\}	
+		\entailsI
+		\left\{ \interAss{\capAss{}}{\bar{y}}{\sumA{P}}{\sumA{Q}} \right\}	
+	}{}
+		
+	\infer{
+		\left\{ \interAss{\capAss{}}{\bar{y}}{P}{Q} \right\}	
+		\entailsI
+		\left\{ \interAss{\capAss{}}{\bar{y}}{P'}{Q'} \right\}	
+	}
+	{
+		P \entails\! P'
+		&
+		Q \entails Q'	
+	}
+\end{mathpar}
+%
+\begin{proof}
+\todo
+%
+\end{proof}
 %
 \end{lemma}
 %
-\begin{proof}
-  Immediate.
-\end{proof}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \paragraph{Action Model Closure}

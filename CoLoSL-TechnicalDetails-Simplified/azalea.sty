@@ -626,21 +626,32 @@
 
 \newcommand{\vr}[1]{\li{#1}}
 
-\newcommand{\stableTo}[2]{\textsf{St}\left(#1, #2\right)}
-\newcommand{\stableIn}[3]{\textsf{S}\left(#1, #2, #3\right)}
-\newcommand{\slentails}{\ensuremath{\vdash_{\textsf{SL}}}}
-\newcommand{\un}[1]{\textsf{f}\left(#1\right)}
-%\newcommand{\unbox}[1]{\textsf{unbox}\left(#1\right)}
-\newcommand{\sumA}[1]{\bigoplus\!#1}
-\newcommand{\prodA}[1]{\bigotimes\!#1}
-\newcommand{\ub}[1]{\textsf{ub}\left(#1\right)}
+
 \newcommand{\LAssertions}{\textsf{LAssn}\xspace}
 \newcommand{\FAssertions}{\textsf{FAssn}\xspace}
 \newcommand{\fass}[1]{\textsc{#1}}
 \newcommand{\lass}[1]{\text{\lowercase{#1}}}
-%\newcommand{\eraseL}[1]{\downharpoonleft_{\textsf{L}}\!#1}
 \newcommand{\erase}[1]{\downharpoonleft\!\!\xspace#1}
-%\newcommand{\eraseS}[1]{\downharpoonleft_{\textsf{S}}\!#1}
-%\newcommand{\erase}[1]{\textsf{e}\left(#1\right)}
 \newcommand{\combine}[2]{\textsf{c}\left(#1, #2\right)}
 \newcommand{\separate}[2]{\ensuremath{#1 \cap #2 \slentails \emp}}
+\newcommand{\promote}[1]{\textsf{promote}\left(#1\right)}
+\newcommand{\ep}[1]{\textsf{ep}\left(#1\right)}
+
+\newcommand{\stableTo}[2]{\textsf{St}\left(#1, #2\right)}
+\newcommand{\stableIn}[3]{\textsf{S}\left(#1, #2, #3\right)}
+\newcommand{\slentails}{\ensuremath{\vdash_{\textsf{SL}}}}
+\newcommand{\entailsI}{\ensuremath{\vdash_{\text{I}}}}
+\newcommand{\un}[1]{\textsf{f}\left(#1\right)}
+\newcommand{\sumA}[1]{\bigoplus\!#1}
+\newcommand{\prodA}[1]{\bigotimes\!#1}
+\newcommand{\ub}[1]{\textsf{ub}\left(#1\right)}
+
+
+
+
+\newcommand{\dnode}[3]{\textsf{node}\left(#1,#2,#3\right)}
+\newcommand{\dturn}[3]{\textsf{turn}\left(#1,#2,#3\right)}
+\newcommand{\dring}[3]{\textsf{ring}\left(#1,#2, #3\right)}
+\newcommand{\db}[3]{\textsf{DB}\left(#1,#2,#3\right)}
+\newcommand{\database}[1]{\textsf{data-base}(#1)}
+\newcommand{\dbtoken}[2]{#1 \harpoonything #2}
