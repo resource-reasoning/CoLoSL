@@ -6,12 +6,12 @@
 \hrule\vspace{5pt}
 \begin{mathpar}
 	\infer{
-		\separate{\emp}{\lass{p}}
+		\separate{\emp}{\lass{P}}
 	}
 	{}
 		
 	\infer{
-		\separate{\m{false}}{\lass{p}}
+		\separate{\m{false}}{\lass{P}}
 	}
 	{}
 	
@@ -49,27 +49,36 @@
 	}
 	
 	\infer={
-		\separate{\lass{p}}{\lass{q}}
+		\separate{\lass{P}}{\lass{Q}}
 	}
 	{
-		\separate{\lass{q}}{\lass{p}}
+		\separate{\lass{Q}}{\lass{P}}
 	}
 	
 %	[\odot \in \{*, \sepish, \land, \lor\}]
 	\infer{
-		\separate{(\lass{p} \odot \lass{q})}{r}
+		\separate{(\lass{P} \odot \lass{Q})}{R}
 	}
 	{	
-		\separate{\lass{p}}{\lass{r}}
+		\separate{\lass{P}}{\lass{R}}
 		&
-		\separate{\lass{q}}{\lass{r}}
+		\separate{\lass{Q}}{\lass{R}}
 	}
 	
 	\infer={
-		\separate{(\exsts{x} \lass{p})}{r}		
+		\separate{(\exsts{x} \lass{P})}{R}		
 	}
 	{
-		\separate{(\lass{p}[v/x])}{r}
+		\separate{(\lass{P}[v/x])}{R}
+		&
+		\text{for }v \in \set{Val}
+	}
+	
+	\infer={
+		\separate{(\for{x} \lass{P})}{R}		
+	}
+	{
+		\separate{(\lass{P}[v/x])}{R}
 		&
 		\text{for }v \in \set{Val}
 	}
@@ -77,7 +86,7 @@
 %	
 \end{mathpar}
 \hrule
-\caption{Intersection judgements where $\odot \in \{\lor, *, ** \}$ .}
+\caption{Intersection judgements where $\odot \in \{\lor, *, ** \}$ and $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
 \label{fig:intersection-rules}
 \end{figure}
 %
