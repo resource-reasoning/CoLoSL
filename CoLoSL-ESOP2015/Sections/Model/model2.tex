@@ -12,7 +12,7 @@ A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{local logical state}, or simply local state $l$ represents the
 locally owned resources of a thread, in the standard separation logic
 sense. Logical states have two components: one describes machine
-states (\textit{e.g.} stacks and heaps); the other represents
+states (e.g. stacks and heaps); the other represents
 \emph{capabilities}. The latter are inspired by the capabilities in
 deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
 capability is allowed to perform the associated actions (as prescribed
@@ -27,7 +27,7 @@ corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between threads and the
 environment just like any other resource. See the presentation of
-deny-guarantee~\cite{dg} or, \textit{e.g.}, CAP~\cite{cap} for further
+deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap} for further
 details and motivation.
 
 In general, each component of a logical state is taken from an
@@ -128,7 +128,7 @@ $(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy a
 well-formedness condition: 1) the local and shared states are always
 disjoint ($l\compatL g$), 2) the capabilities owned by $l$ and $g$ are
 in the domain of $\lmod$, and 3) actions in $\lmod$ are
-\emph{confined} to $g$ (written $g\containI\lmod$), \textit{i.e.}
+\emph{confined} to $g$ (written $g\containI\lmod$), i.e.
 whenever they are enabled (in that their pre-state is compatible with
 $g$), the part of the state that they mutate is a sub-part of $g$. For
 ease of presentation, we postpone the formal definition of
@@ -197,7 +197,7 @@ We assume an infinite set, $\set{PVar}$, of program variables; an infinite set, 
 %
 %
 \begin{definition}[Assertion syntax]\label{def:assertions}
-The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$. We write $[A]$ as a shorthand for $\oast_{\token{a} \in A}[\token{a}]$.
+The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
 %
 \begin{align*}	 
   A &::=\m{false} \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [\token{a}] \mid [x]
@@ -206,7 +206,7 @@ The assertions of \colosl are elements of $\Assertions$ described by the grammar
 %
   P,Q & ::= A \mid \lass{P} \lor \lass{Q} \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
 %
-  I &::= \emptyset \mid \{\interAss{[A]}{\bar{y}}{P}{Q}\} \cup I
+  I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{y}}{P}{Q}\} \cup I
 \end{align*}
 \end{definition}
 %
@@ -258,8 +258,8 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
   (s,g,\lmod), \lenv |= \shared P I\\
 
-  u,\lenv &|=_\dagger P \land Q
-  &\text{iff}& u,\lenv |=_\dagger P\text{ and }u,\lenv |=_\dagger Q\\
+  u,\lenv &|=_\dagger P \lor Q
+  &\text{iff}& u,\lenv |=_\dagger P\text{ or }u,\lenv |=_\dagger Q\\
   
   u,\lenv &|=_\dagger \neg P
   &\text{iff}& u,\lenv \not{|=_\dagger} P\\
@@ -334,7 +334,7 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
     (p \composeL r, q \composeL r)&
     \begin{array}{@{}l@{}}
-      \interAss{A}{\bar{y}}{P}{Q} \in I /|  \exsts{\bar{v}, \lmod} \\
+      \interAss{[\token{A}]}{\bar{y}}{P}{Q} \in I /|  \exsts{\bar{v}, \lmod} \\
 %      \lenv' = [\lenv|||\bar y:\bar v] \\
 %      /| (p \composeL r), \lenv'\slsat \sumA{P} 
 %      /| (q \composeL r), \lenv' \slsat \sumA{Q} \\
@@ -407,7 +407,7 @@ The following entailments are valid.
 %
 \end{lemma}
 
-\subsection{Fencing, confinement and Shifting}
+\subsection{Fencing, Confinement and Shifting}
 
 \colosl models the shared state as a single ``region'' of memory and a
 set of potential actions on that region, represented by the last two
@@ -425,14 +425,14 @@ the shared state at any time under a new set of actions $\lmod'$,
 yielding a new shared state $g\composeL l'$ and action model $\lmod
 \cup \lmod'$.
 
-\paragraph{Confinement}
+\paragraph{\textbf{Confinement}}
 In order not to invalidate the views that other threads hold of the
 shared state, in the situation above we require that the actions in
 $\lmod'$ are \emph{confined} to $l'$: whenever an action $(p,q)$ of
 $\lmod'$ is enabled, the part of $g\bullet l'$ modified by the action
 must be a substate of $l'$.  However, new actions are allowed to
 require the presence of some neutral resource outside of $l'$ provided
-they are conserved by the action (\textit{i.e.}\ are present in $q$).
+they are conserved by the action (i.e.\ are present in $q$).
 %
 For instance, abusing notations temporarily to ignore empty stack and
 capability components in logical states, the action $a = ([10:0, 12:0,
@@ -446,7 +446,7 @@ $l_2$ and is automatically confined to $l_2$.
 %
 Moreover, in general we require not only that all actions in $\lmod'$
 are confined to $l'$ in this sense, but also that all states resulting
-from the succive application of actions in $\lmod'$ themselves confine
+from the successive application of actions in $\lmod'$ themselves confine
 all actions in $\lmod'$.
 
 In the logic, the shared state is extended by resource in $P$ under
@@ -455,7 +455,7 @@ that $P\containI I$. Instead of giving a semantic definition of that
 definition, it is easier to understand from the rules in
 \fig~\ref{fig:local-fencing-rules}. These rules assume that actions in
 $I$ are of the form $\lass{P} \swap \lass{Q}$ where
-$P,Q\in\LAssertions$, \textit{i.e.} the action assertions do not
+$P,Q\in\LAssertions$, i.e. the action assertions do not
 mention subjective views. It is always possible to transform
 assertions mentioning subjective views into ones that do not (see \S
 XXX). As expressed by the first rule of
@@ -473,7 +473,7 @@ state denoted by $R$ is uniquely determined and left unchanged by the
 action. The last rule finally reduces local fencing to entailment
 checking, provided the fence $F$ can be expressed as a disjunction of
 precise formulas. The first premise states that $F$ is invariant under
-the action $P\swap Q$, in a similar fashion as \textit{i.e.} RGSep
+the action $P\swap Q$, in a similar fashion as i.e. RGSep
 encodes stability checks as separation logic entailments. The third
 premise checks the confinement condition: if a sub-part of an
 extension of a state in $F_i$ satisfies $P$ ($l_1\composeL l_2|= F_i$
@@ -508,24 +508,24 @@ stability presented below.
 		\fenceAss{} \strictfences I
 	}
 	{
-          \for{\capAss{}: \lass{P} \swap \lass{Q}\in I}\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}
+          \for{\left([\token{A}]: \lass{P} \swap \lass{Q}\right)\in I}\fenceAss{} \strictfences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}
 	}		
 
 	\infer{
-		\fenceAss{} \!\strictfences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}		
+		\fenceAss{} \!\strictfences\! \left\{[\token{A}]\!:\! \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
 		\fenceAss{} \sepish \lass{P} \slentails \m{false}
 	}	
 
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
+		\fenceAss{} \strictfences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}	
 	}
 	{
           P \slentails P' * R\\
           Q \slentails Q' * R\\
 	  \exact{\lass{R}}\\
-	  \fenceAss{} \strictfences \left\{\capAss{}\!\!:\! \lass{P'} \swap \lass{Q'} \right\}
+	  \fenceAss{} \strictfences \left\{[\token{A}]\!\!:\! \lass{P'} \swap \lass{Q'} \right\}
 	}	
 		
 %	\infer{
@@ -540,7 +540,7 @@ stability presented below.
 %	}
 %		
 	\infer{
-		\fenceAss{} \strictfences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+		\fenceAss{} \strictfences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{	
 %		\separate{\lass{P}}{\lass{Q}}
@@ -586,7 +586,7 @@ equivalent (a semantic, direct definition is also possible, see XXX):
   $\semI{\cdot}$. Perhaps leave the formal def of $g\containI \lmod$ out.}
 
 
-\paragraph{Shifting/fencing judgements}We present a number of judgements that reduce fencing conditions and action shifting to logical entailments in \fig~\ref{fig:fencing-rules} and~\ref{fig:shifting-rules}. As with the local fencing judgements, the entailments in the premises of these rules are those of standard separation logic ($\slentails$) where the ($**$) and ($\septraction$) connectives can be eliminated as described above. 
+\paragraph{\textbf{Shifting/fencing judgements}}We present a number of judgements that reduce fencing conditions and action shifting to logical entailments in \fig~\ref{fig:fencing-rules} and~\ref{fig:shifting-rules}. As with the local fencing judgements, the entailments in the premises of these rules are those of standard separation logic ($\slentails$) where the ($**$) and ($\septraction$) connectives can be eliminated as described above. 
 
 The premises of the form $\separate{\lass{P}}{\lass{Q}}$ assert that the states described by $\lass{P}$ and $\lass{Q}$ \emph{do not intersect}; that is, for all $\lenv \in \LEnv$, and for all $l_1, l_2$ such that $l_1, \lenv \slsat \lass{p}$ and $l_2, \lenv \slsat \lass{Q}$, then: 
 %
@@ -610,20 +610,20 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 		\fenceAss{} \fences I
 	}
 	{
-          \for{\capAss{}: \lass{P} \swap \lass{Q}\in I}\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}
+          \for{\left([\token{A}]: \lass{P} \swap \lass{Q}\right)\in I}\fenceAss{} \fences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}
 	}		
 
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
+		\fenceAss{} \fences \left\{[\token{A}]: \lass{P} * \lass{R} \swap \lass{Q} * \lass{R} \right\}	
 	}
 	{
 		\exact{\lass{R}}
 		&
-		\fenceAss{} \!\fences\! \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
+		\fenceAss{} \fences \left\{[\token{A}]\!:\! \lass{P} \swap \lass{Q} \right\}	
 	}
 		
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}\!\!:\! \lass{P} \swap \lass{Q} \right\}	
+		\fenceAss{} \fences \left\{[\token{A}]\!:\! \lass{P} \swap \lass{Q} \right\}	
 	}
 	{
 		\separate{\fenceAss{}}{\lass{P}}
@@ -637,7 +637,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 %	}
 %	
 	\infer{
-		\fenceAss{} \fences \left\{\capAss{}: \lass{P} \swap \lass{Q} \right\}		
+		\fenceAss{} \fences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}		
 	}
 	{
 		\separate{\lass{P}}{\lass{Q}}
@@ -662,10 +662,10 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 		I_1 \weakenI{\fenceAss{}} I_2
 	}	
 	
-	\infer
+	\infer[?]
 %	[\proofRule{Hide}]
 	{
-		\left\{ \capAss{}: \lass{P'}  \swap \lass{Q'} \right\} \weakenI{P}
+		\left\{[\token{A}]: \lass{P'}  \swap \lass{Q'} \right\} \weakenI{P}
 		\emptyset
 	}{	
 		\exact{\lass{R}}
@@ -676,7 +676,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	\infer
 %	[\proofRule{False-L}]
 	{	
-		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
+		\left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}{
 %		& \fenceAss{} \fences  \left\{ \capAss{}: \left\{ P \swap Q \right\}\right\}
@@ -686,7 +686,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	\infer
 %	[\proofRule{False-R}]
 	{	
-		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
+		\left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\} \weakenI{\fenceAss{}} 
 		\emptyset 	
 	}
 	{
@@ -697,7 +697,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	\infer
 %	[\proofRule{Expand/Contract}]
 	{
-		\left\{ \capAss{}: \lass{P} \swap \lass{Q} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{ \capAss{}: \lass{P} * \lass{R}_i \swap \lass{Q} * \lass{R}_i \right\}	
+		\left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{[\token{A}]: \lass{P} * \lass{R}_i \swap \lass{Q} * \lass{R}_i \right\}	
 	}
 	{
 		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
@@ -708,9 +708,9 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	\infer
 %	[\proofRule{Disj}]
 	{
-	  \bigcup\limits_{i \in I,j\in J}\!\! \left\{\capAss{}\!\!:\!\exists\bar{y}. P_i \!\swap\! Q_j \right\}
+	  \bigcup\limits_{i \in I,j\in J}\!\! \left\{[\token{A}]\!:\!\exists\bar{y}. P_i \!\swap\! Q_j \right\}
 	  \mathrel{\approx^{\m{true}}}
-	  \left\{\!\capAss{}\!\!: \exsts{\bar{y}}
+	  \left\{\![\token{A}]\!: \exsts{\bar{y}}
           \bigvee_{i \in I} P_i \!\swap\!
           \bigvee_{j\in J}Q_j \right\} 
 	}
@@ -863,34 +863,34 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	}	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
 	}
 	{
-		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\sumA{Q_1}}{\sumA{Q_2}}\right\}}{R}	
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{\sumA{Q_1}}{\sumA{Q_2}}\right\}}{R}	
 	}	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{Q_1}{Q_2}\right\}}{R}	
 	}
 	{
 		Q_1 \entails Q'_1
 		&
 		Q_2 \entails Q'_2
 		&
-		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{Q'_1}{Q'_2}\right\}}{R}	
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{Q'_1}{Q'_2}\right\}}{R}	
 	}
 	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\interAss{\capAss{}}{\bar{y}}{\lass{Q}_1}{\lass{Q}_2}\right\}}{R}	
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{\lass{Q}_1}{\lass{Q}_2}\right\}}{R}	
 	}
 	{
-		\capAss{} * \prodA{R} \slentails \m{false}
+		[\token{A}] * \prodA{R} \slentails \m{false}
 	}
 	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}} {R}	
+		\stableIn{\lass{P}}{\left\{[\token{A}]: \lass{Q}_1 \swap \lass{Q}_2 \right\}} {R}	
 	}
 	{
 		\combine{R}{\lass{Q}_1} \slentails \m{false}
@@ -898,7 +898,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	
 	
 	\infer{
-		\stableIn{\lass{P}}{\left\{\capAss{}: \lass{Q}_1 \swap \lass{Q}_2 \right\}}{R}	
+		\stableIn{\lass{P}}{\left\{[\token{A}]: \lass{Q}_1 \swap \lass{Q}_2 \right\}}{R}	
 	}
 	{
 		\left(\lass{Q}_1 \septraction \combine{R}{\lass{Q}_1} \,\right) * \lass{Q}_2 \slentails \lass{P} * \m{true}
@@ -909,7 +909,7 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$; $\dot \in \{\land, \lor, *, **\}$ and $\ominus \in \{\land, \lor, **\}$.}
+\caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$; $\odot \in \{\land, \lor, *, **\}$ and $\ominus \in \{\land, \lor, **\}$.}
 \label{fig:stability-rules}
 \end{figure*}
 %
@@ -977,9 +977,9 @@ However, in Appendix~\ref{sec:intersection-judgements} we provide a set of judge
 	\infer
 %	[\proofRule{Exist}]
 	{
-		\left\{ \capAss{}: \exists\overline{v_i \in S_i}^{i \in I}.\, P \swap Q \right\} 
+		\left\{[\token{A}]: \exists\overline{v_i \in S_i}^{i \in I}.\, P \swap Q \right\} 
 		\approx^{\m{true}}
-		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{\capAss{}: P \overline{[w_i /v_i]}^{i \in I} \swap  Q \overline{[w_i /v_i]}^{i \in I} \right\} 
+		\bigcup\limits_{\overline{w_i \in S_i}^{i \in I}} \left\{[\token{A}]: P \overline{[w_i /v_i]}^{i \in I} \swap  Q \overline{[w_i /v_i]}^{i \in I} \right\} 
 	}
 	{
 	}	

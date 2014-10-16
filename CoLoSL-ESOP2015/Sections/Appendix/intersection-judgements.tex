@@ -42,7 +42,7 @@
 	}
 	
 	\infer{
-		\separate{(\lass{p} \odot \lass{q})}{\lass{r}}
+		\separate{(\lass{p} \septraction \lass{q})}{\lass{r}}
 	}
 	{
 		\separate{\lass{q}}{\lass{r}}
@@ -57,7 +57,7 @@
 	
 %	[\odot \in \{*, \sepish, \land, \lor\}]
 	\infer{
-		\separate{(\lass{p} \ominus \lass{q})}{r}
+		\separate{(\lass{p} \odot \lass{q})}{r}
 	}
 	{	
 		\separate{\lass{p}}{\lass{r}}
@@ -77,7 +77,7 @@
 %	
 \end{mathpar}
 \hrule
-\caption{Intersection judgements where $\odot \in \{\land, \septraction\}$ and $\ominus \in \{\lor, *, ** \}$ .}
+\caption{Intersection judgements where $\odot \in \{\lor, *, ** \}$ .}
 \label{fig:intersection-rules}
 \end{figure}
 %
