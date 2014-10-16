@@ -3,7 +3,6 @@ CoLoSL.pdf
 *.aux
 *.tex~
 *.aux
-*.txt
 *.log
 *.blb
 *.bbl
