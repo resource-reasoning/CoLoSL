@@ -204,7 +204,7 @@ The assertions of \colosl are elements of $\Assertions$ described by the grammar
   \quad
   E ::= x \!\mid\! E_1 + E_2 \!\mid\! \cdots \\
 %
-  P,Q & ::= A \mid \lass{P} \lor \lass{Q} \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
+  P,Q & ::= A \mid \for{x} P \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
 %
   I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{y}}{P}{Q}\} \cup I
 \end{align*}
@@ -257,15 +257,18 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   
   s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
   (s,g,\lmod), \lenv |= \shared P I\\
-
-  u,\lenv &|=_\dagger P \lor Q
-  &\text{iff}& u,\lenv |=_\dagger P\text{ or }u,\lenv |=_\dagger Q\\
-  
-  u,\lenv &|=_\dagger \neg P
-  &\text{iff}& u,\lenv \not{|=_\dagger} P\\
+%  
+%  u,\lenv &|=_\dagger \neg P
+%  &\text{iff}& u,\lenv \not{|=_\dagger} P\\
   
   u,\lenv &|=_\dagger \exsts x P
   &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
+  
+  u,\lenv &|=_\dagger \for{x} P
+  &\text{iff}& \for{v}u, [\lenv|||x:v] |=_\dagger P\\
+  
+  u,\lenv &|=_\dagger P \lor Q
+  &\text{iff}& u,\lenv |=_\dagger P\text{ or }u,\lenv |=_\dagger Q\\
   
   u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
   \exsts{u_1,u_2} u = u_1 \grey u_2\text{ and }
