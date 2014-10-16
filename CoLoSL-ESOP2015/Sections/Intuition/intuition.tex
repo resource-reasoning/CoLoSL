@@ -3,6 +3,128 @@ We illustrate our \colosl reasoning principles  by
 sketching a proof of a variation of Dijkstra's token ring mutual
 exclusion algorithm~\cite{dijkstra74}. 
 
+\begin{figure}
+\begin{align*}
+  (P => Q)
+  &=>
+  \shared{P}{I} => \shared{P}{Q}
+  &\mathllap{(\weakenRule)}&
+  &
+  \shared{P}{I} &
+  => \shared{P}{I} * \shared P I \tag{\copyRule}
+  \\
+  \shared{P * Q}{I} &=> \shared{P}{I}  &\mathllap{(\forgetRule)}&
+  &
+  \shared{P}{I_1}\!\! * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
+  \\
+  I \weakenI{P} I'
+  &\text{ implies }
+  \shared{P}{I} ===> \shared{P}{I'}
+  &(\shiftRule)&
+  &
+  P \containI I 
+%  \text{ and }
+%  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
+  &\text{ implies } 
+  P ===>
+  \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
+  \tag{\extendRule}
+\end{align*}
+
+
+\[
+\infer[\parRule]
+	{
+		\{P_1 * P_2\} \;\mathbb{C}_1 || \mathbb{C}_2\; \{Q_1 * Q_2\}		
+	}
+	{
+		\{P_1\} \;\mathbb{C}_1\; \{Q_1\}
+		\qquad
+		\{P_2\} \;\mathbb{C}_2\; \{Q_2\}
+	}
+\]
+
+
+\caption{\colosl main reasoning principles.}
+\label{fig:principles}
+\end{figure}
+
+A subjective view $\shared{P} I$ comprises an  assertion $P$ which describes {\em parts} of the global shared state; and an interference assertion $I$ which characterises how this partial shared state may be changed by the thread or the environment. Similar to interference assertions of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$, where a thread in possession of the $[\token a]$ capability (in its private state) may carry out its transition and update parts of the shared state that satisfy $Q$ to those described by $R$. Assertions of subjective views must be {\em stable}; that is, robust with respect to interferences from the environment (as prescribed in $I$).
+
+ Subjective views can always be duplicated using the \copyRule principle:\vspace*{-17pt}
+%
+\begin{align*}\label{eq:copyRule}\vspace{-10pt}
+  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
+\end{align*}
+%
+%
+In combination with the usual law of parallel composition of separation logic~\cite{csl-tcs}, this yields a powerful mechanism to distribute the shared state between several threads: \vspace*{-5pt}
+%
+\[
+\infer[\parRule]
+	{
+		\{P_1\} \;\mathbb{C}_1\; \{Q_1\}
+		\qquad
+		\{P_2\} \;\mathbb{C}_2\; \{Q_2\}
+	}
+	{
+		\{P_1 * P_2\} \;\mathbb{C}_1 || \mathbb{C}_2\; \{Q_1 * Q_2\}		
+	}
+\]
+%
+The subjective views of each thread will be typically too strong, describing resources that are not being used by the thread. However, as we demonstrate in \S\ref{sec:intuition}, before weakening the view, it is sometimes useful to strengthen some of the interference transitions to preserve global knowledge. We achieve this using the \shiftRule\ principle: \vspace*{-17pt}
+%
+\begin{align*}
+  \label{eq:shift}
+  I \weakenI{P} I'
+  &\text{ implies }
+  \shared{P}{I} ===> \shared{P}{I'}
+  \tag{\shiftRule}
+\end{align*}
+%
+This principle states that an interference assertion $I$ can be exchanged for any other interference assertion $I'$ that has the same projected effect on the subjective state $P$. When this is the case, we write $I \weakenI{P} I'$ and say that the actions have been  \emph{shifted}. It can be used to strengthen actions with knowledge of the global shared state arising form the combination of $I$ and $P$. It can also be used to forget (frame off) actions which are irrelevant to $P$. This \shiftRule principle provides a flexible mechanism for interference manipulation and is in marked contrast with most existing formalisms, where interference is fixed throughout the verification.
+
+With a possibly strengthened interference assertion, we can then frame off parts of the shared state and zoom on resources required by the current thread using the \forgetRule principle: \vspace{-17pt}
+%
+\begin{align*}\label{eq:forget}
+  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
+\end{align*}
+%
+At this point, the \shiftRule\ principle may be applied again to forget those actions that are no longer relevant to the new subjective view captured by  $P$. 
+ However, a stable subjective view may no longer be stable after forgetting parts of the shared state. This is often due to the combined knowledge of $P$ and $I$ being too weak and can be avoided by strengthening $I$ (through \shiftRule) prior to forgetting. 
+
+These reasoning principles enable us to provide subjective views for the threads which are just right. 
+We can proceed to verify the threads, knowing that their subjective views describe personalised preconditions which only describe the resource relevant to the individual threads. The resulting postconditions naturally describe overlapping parts of the shared state, which are then joined together using the disjoint concurrency rule and the \mergeRule\ principle: \vspace{-5pt}
+%
+\begin{align*}\label{eq:merge}
+  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
+\end{align*}
+%
+The $P ** Q$ assertion describes the overlapping of states arising from $P$ and $Q$, using the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
+The new interference is simply the union of previous interferences. Using the \shiftRule principle, we can once again simplify the interference assertion with respect to this new larger subjective view.
+
+Lastly, locally owned resources (described by $P$) can be shared using the \extendRule principle: \vspace{-17pt}
+%
+\begin{align}\label{eq:extend}
+   &\hspace{45pt} P \containI I 
+%  \text{ and }
+%  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
+  \text{ implies } 
+  P ===>
+  \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
+  \tag{\extendRule}
+\end{align}
+%
+where $\bar{x}$ range over bound logical variables of capability assertions $\capAss{1}$, $\capAss{2}$ and are distinct from unbound variables of $P$. % ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
+%
+The side condition $P \containI I$ ensures that the actions of the new interference assertion $I$ are confined to $P$ (more in \S\ref{}).
+%
+As we demonstrate in our set example in \S\ref{sec:examples}, the main novelty of this rule is that the new actions in $I$ may refer to existing shared resources, unlike CAP where all possible futures of the region must be accounted for upon its creation. 
+%Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
+
+
+
+
 Consider the program $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
 constructs for concurrency: atomic sections $\atomic \_$ which
