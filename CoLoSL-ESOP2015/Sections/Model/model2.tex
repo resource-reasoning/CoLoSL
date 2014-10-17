@@ -474,7 +474,6 @@ all actions in $\lmod'$.
 In the logic, the shared state is extended by the resources in $P$ under
 the interference $I$ via the \extendRule principle, which requires
 that $P\containI I$. We postpone the semantic definition of $P \confines I$ until \S XXX and instead provide a set of syntactic rules in \fig~\ref{fig:local-fencing-rules} that are easier to understand.
-\azaleacomment{The grammar of $\LAssertions$ is removed!!}
 These rules assume that actions in
 $I$ are of the form $\lass{P} \swap \lass{Q}$ where
 $P,Q\in\LAssertions$, i.e. the action assertions do not
@@ -926,9 +925,9 @@ re-establish $Q$.
 	}
 
 	\infer{
-          \stable{\shared{F}{I}}
+  	\stable{\shared{P}{I}}
 	}{
-	  \fenceAss{} \fences I	
+	  P \fences I	
 	}
 
 	\infer={
