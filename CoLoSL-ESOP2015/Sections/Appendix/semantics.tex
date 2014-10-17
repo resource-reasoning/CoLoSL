@@ -1,4 +1,4 @@
-\section{\colosl Program Logic}\label{sec:semantics}
+\section{Rely, Guarantee and Soundness}\label{sec:semantics}
 This section introduces the core concepts behind our program logic. We start by defining what the rely and guarantee conditions of each thread are in terms of their action models. This allows us to define \emph{stability} against rely conditions, \emph{repartitioning}, which logically represents a thread's atomic actions (and have to be in the guarantee condition), and \emph{semantic implication}. Equipped with these notions, we can justify the \shiftRule\ and \extendRule\ principles. 
 %We conclude this section with a sketch of the soundness of \colosl.
 %
@@ -21,7 +21,7 @@ $\lmod_0 \subseteq \lmod$ and $s, r$ such that $s \composeL r = g$:
 \end{definition}
 %
 %
-Then the extension rely, $\extendR$, is defined as
+The rely extension, $\extendR$, is then defined as
 %
 \[
   \extendR \eqdef
@@ -43,10 +43,10 @@ Then the extension rely, $\extendR$, is defined as
   \end{array}
   \right\}
 \]
-%% Intuitively, the rely relation describes all possible updates by the environment. At any one point, a thread in the environment may extend the shared state with additional resources ($g'$), introduce new interference to describe how the new resources can be manipulated ($\lmod_0$) and consequently rewrite the global action model ($\gmod'$). This is captured by the \extendR\ relation. For this to be possible, the resultant action model pair $(\gmod', \lmod \cup \lmod_0)$ must be closed under the newly added resources and interference: $\extendsAM{\gmod', \lmod \cup \lmod_0}{g'}{g}{\lmod_0}$. Additionally, for all subjective state $l_1$, context $r$ and action model $\lmod_1$ under which the old action model pair was closed, the new action model pair must also  be closed when the context is extended with the new resources $\extendsAM{\gmod', \lmod \cup \lmod_0}{l_1}{r \composeL g'}{\lmod_1}$. 
+%
+That is, at any one point a thread in the environment may extend the shared state with additional resources ($g'$) and introduce new interference to describe how the new resources can be manipulated ($\lmod'$). When that is the case, the capabilities found in the new extension must be accounted for in the extended action model  ($\capPart{g'} \containedIn \bigcup\left(\dom{\lmod'} \cup \dom{\lmod} \right)$). Moreover, the new interference $\lmod'$ must be confined to the new extension $g'$, and all action model closure relations must be preserved by the extension. These last two constraints ensure that the existing threads' view of the shared state is not invalidated by the extension.
 
-
-The second kind of interference is the \emph{update} of the global state according to actions in the global action model whose capability is ``owned by the environment'', i.e., nowhere to be found in the current local and shared states.
+The second kind of interference is the \emph{update} of the global state according to the actions in the action model whose capability is ``owned by the environment'', i.e., nowhere to be found in the current local and shared states.
 %
 \[	
   \updateR \eqdef
@@ -374,7 +374,7 @@ Given any separation algebra $(\mathbb{B}, \compose{\mathbb{B}}, \unit{\mathbb{B
 \]
 \end{definition}
 %
-The \emph{update guarantee} $\updateG$ can then be defined as follows. When updating the shared state, thread are not allowed to introduce new capabilities, as this can only be achieved when extending the shared state (through $\extendG$).
+The \emph{update guarantee} $\updateG$ can then be defined as follows. 
 %
 \[
 	\updateG \eqdef
@@ -388,7 +388,7 @@ The \emph{update guarantee} $\updateG$ can then be defined as follows. When upda
 		\right)
   	&
   	\begin{array}{@{} l @{} }
-  		\ortCap{\capPart{(l' \composeL g')}}  = \ortCap{\capPart{(l \composeL g)}} \land\\
+  		\capPart{(l' \composeL g')}  = \capPart{(l \composeL g)} \land\\
 	  	\left(
 	  	\begin{array}{@{} l @{} }
 	 		g = g' \lor\\
@@ -409,6 +409,8 @@ The \emph{update guarantee} $\updateG$ can then be defined as follows. When upda
 \]
 %
 %
+When updating the shared state, thread are not allowed to introduce new capabilities ($\capPart{(l' \composeL g')}  = \capPart{(l \composeL g)}$), as this can only be achieved when extending the shared state (through $\extendG$).
+A thread may freely update its local (private) state (from $l$ to arbitrary $l'$). On the other hand, it may either leave the shared state unchanged ($g = g'$); or it may update according to an action prescribed in the action model ($(g, g') \in \padAM{\lmod}(\ca{})$) for which it holds the associated capability locally ($\ca{} \leq \capPart{l}$). Finally, the thread must preserve the orthogonal of the combined local and shared states as to not procure resources ``out of thin air".
 
 Lastly, the current thread may extend the local action model by shifting some of the existing interference. This is modelled by the \shiftG\ relation which is analogous to \shiftR.
 %
@@ -436,29 +438,29 @@ The \emph{guarantee} relation $\guarantee: \powerset (\Worlds \times \Worlds)$ i
 \]
 \end{definition}
 
-Using the guarantee relation, we introduce the notion of \emph{repartitioning} $\repartitions{P}{Q}{R_1}{R_2}$. This relation holds whenever, from any world satisfying $P$, if whenever parts of the composition of its local and shared states that satisfies $R_1$ is exchanged for one satisfying $R_2$, it is possible to split the resulting logical state into a local and shared part again, in such a way that the resulting transition is in $\guarantee$.
+Using the guarantee relation, we introduce the notion of \emph{repartitioning} $\repartitions{P}{Q}{R_1}{R_2}$. This relation holds whenever, from any world satisfying $P$, if whenever parts of the composition of its local and shared states that satisfies $R_1$ is exchanged for one satisfying $R_2$, it is possible to split the resulting logical state into a local and shared part again, in such a way that the resulting transition is in $\guarantee$. Given $m_1 = (@s_1, h_1)$ and $m_2 = (@s_2, h_2)$, in what follows we write $m_1 \uplus m_2$ for $(@s_1 \uplus @s_2, h_1 \uplus h_2)$.
 %
 %
 \begin{definition}[Repartitioning] \label{def:repartitioning}
-We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in \LEnv$, and world $w_1 = (l_1, g_1, \lmod_1)$ such that $w_1, \lenv |= P$, there exists states $(@s_1, h_1), (@s', h') \in \Heaps$ such that $(@s_1, h_1, \emptyset), \lenv \slsat R_1$ and
+We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in \LEnv$, and world $w_1 = (l_1, g_1, \lmod_1)$ such that $w_1, \lenv |= P$, there exists states $m_1, m' \in \Heaps$ such that $(m_1, \emptyset), \lenv \slsat R_1$ and
 \begin{itemize} 
-\item $(@s_1 \uplus @s', h_1 \uplus h') = \heapPart{\left(l_1 \composeL g_1\right)}$; and
-\item for every $(@s_2, h_2)$ where $(@s_2, h_2, \emptyset), \lenv \slsat R_2$,
+\item $m_1 \uplus m' = \heapPart{\left(l_1 \composeL g_1\right)}$; and
+\item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$,
   there exists a world $w_2 = (l_2, g_2, \lmod_2)$ such that $w_2, \lenv |= Q$; and
   \begin{itemize}
-  	\item $(@s_2 \uplus @s', h_2 \uplus h') = \heapPart{\left(l_2 \composeL g_2\right)}$; and
+  	\item $m_2 \uplus m' = \heapPart{\left(l_2 \composeL g_2\right)}$; and
   	\item $(w_1, w_2) \in \guarantee$
   \end{itemize}
 \end{itemize}
 \end{definition}
 
-We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in which case the repartitioning has no ``side effect'' and simply shuffles resources around between the local and shared state or modifies the action models. This is the case for (\shiftRule) and (\extendRule), whose proof will be given shortly.
+We write $P \semimplies Q$ for $\repartitions{P}{Q}{\emp}{\emp} $, in which case the repartitioning has no ``side effect'' and simply shuffles resources around between the local and shared state or modifies the action models. This is the case for (\shiftRule) and (\extendRule), as formalised in the following lemma.
 %
 %
 \begin{lemma}
 The semantic implications of \extendRule and \shiftRule principles are valid. 
-\begin{proof}[Proof (sketch)]
-It suffices to show that the repartitioning ($\semimplies$) is valid and allowed by the guarantee relation. We can show that transitions corresponding to applications of \extendRule principle are contained in the \extendG relation. Analogously, we can show that transitions corresponding to applications of \shiftRule principle are contained in the \shiftRule relation. The full proof is provided in the technical appendix~\cite{colosl-tr14}.
+\begin{proof}[sketch]
+It suffices to show that the repartitioning ($\semimplies$) is valid and allowed by the guarantee relation. We show that the transitions corresponding to the applications of \extendRule principle are contained in the \extendG relation. Analogously, we show that the transitions corresponding to the applications of \shiftRule principle are contained in the \shiftG relation. The full proof is provided in the technical appendix~\cite{colosl-tr14}.
 \end{proof}
 \end{lemma}
 %
@@ -466,9 +468,9 @@ It suffices to show that the repartitioning ($\semimplies$) is valid and allowed
 \paragraph{\textbf{Proof Rules}}
 Our proof rules are of the form $\entails \{P\}\ C\ \{Q\}$ and carry
 an implicit assumption that the pre- and post-conditions of their
-judgements are stable. Most of the proof rules are standard and
-omitted for space reasons; they include the rules of concurrent
-separation logic~\cite{csl-tcs} (including the \proofRule{Parallel}
+judgements are stable assertions. Most of the proof rules are standard and
+are provided in~\cite{colosl-tr14}; they include the rules of concurrent
+separation logic~\cite{csl-tcs} (including the \parRule
 rule mentioned in the introduction). We use two additional rules,
 similar to their CAP counterparts~\cite{cap-ecoop10}, which are as
 follows, where $\entails_{\textsf{SL}}$ denotes the standard
@@ -497,8 +499,7 @@ sequential separation logic judgement:
 
 
 \subsection{Soundness}
-\vspace{-.5ex}
-In this section we show that the program logic of \colosl\ is sound. We proceed with the definition of a \emph{valid} triple that relates the proof rules (Hoare triples) to the operational semantics of \colosl. In what follows, we write $C, m \rightarrow^{\text{*}} C', m'$ to denote the operational semantics relation where $C, C' \in \textsf{Comm}$ and $m, m' \in \Heaps$. We define a reification function that relates a \colosl\ world $w \in \Worlds$, to concrete states in \Heaps.
+We show that the program logic of \colosl\ is sound. We proceed with the definition of a \emph{valid} triple that relates the proof rules (Hoare triples) to the operational semantics of \colosl. In what follows, we write $C, m \rightarrow^{\text{*}} C', m'$ to denote the operational semantics relation where $C, C' \in \textsf{Comm}$ and $m, m' \in \Heaps$. We define a reification function that relates a \colosl\ world $w \in \Worlds$, to concrete states in \Heaps.
 %We proceed by  providing the definition of a reification function that maps \colosl\ worlds onto states.
 %
 \begin{definition}[Reification]\label{def:reification}
@@ -530,7 +531,7 @@ The \emph{reification of worlds}, $\reifyW{.}: \Worlds \rightarrow \pset{\Heaps}
 %
 The \colosl\ program logic is sound. That is, if $|-\!\{P\}\ C\ \{Q\}$ then $|=\!\{P\}\ C\ \{Q\}$.
 %
-\begin{proof}(Sketch)
+\begin{proof}[sketch]
 We build the \colosl\ program logic on top of the views framework~\cite{views} and provide the full details of  how we instantiate the framework in~\cite{colosl-tr14}. To establish the soundness of \colosl, it then suffices to show that the atomic triple in the conclusion of (\proofRule{Atom}) rule is valid; the full proof is presented in~\cite{colosl-tr14}. 
 \renewcommand{\qed}{}
 \end{proof}

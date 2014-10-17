@@ -48,8 +48,7 @@ $, is defined as follows.
 %
 \end{definition}
 %
-Given our choice of logical states in this paper, $l_1\meetL l_2$ yields at most one element for any given $l_1$ and $l_2$; we thus usually omit the set notation\footnote{In general, separation algebras may lack the \emph{disjointness} property, 
-intersection between two states may yield more than one state. Thus, in our general definitions we use the set notation.}.
+Given our choice of logical states in this paper, $l_1\meetL l_2$ yields at most one element for any given $l_1$ and $l_2$; we thus usually omit the set notation\footnote{In general, separation algebras may lack the \emph{disjointness} property and thus intersection between two states may yield more than one state. Hence, in our general definitions we use the set notation.}.
 
 An action pre-state $p$ and a shared state $g$ then agree if their intersection is non-empty, i.e. $p \meetL g \not= \emptyset$. We can now define action confinement.
 %
@@ -64,7 +63,7 @@ An action $a$ is \emph{confined} to a logical state $g$, written $g\containI a$,
 %
 As discussed, only the \emph{active} precondition of $a$, i.e. the part actually mutated by the action, has to be contained in $g$. This way, future extensions of $g$ need not account for existing actions interfering with new resources.
 
-Given a shared state $g$ and an action model $\lmod$, we require that all actions of $\lmod$ are confined in all possible \emph{futures} of $g$, i.e. all shared states resulting from $g$ after any number of applications of actions in $\lmod$. For that we define \emph{action application} that describes the effect of an action on a logical state. Moreover, for some of the actions in $\lmod$, the active pre-state may not affect $g$, i.e. its intersection with $g$ may be the empty state $\unitL$. In that case, we find that even though that action is potentially enabled, we do not need to account for it since it leaves $g$ unchanged. We thus introduce the notion of \emph{visible actions} to quantify over those actions that affect (mutate) $g$. 
+Given a shared state $g$ and an action model $\lmod$, we require that all actions of $\lmod$ are confined in all possible \emph{futures} of $g$, i.e. all shared states resulting from $g$ after any number of applications of actions in $\lmod$. For that we define \emph{action application} that describes the effect of an action on a logical state. Moreover, for some of the actions in $\lmod$, the active pre-state may not affect $g$, i.e. its intersection with $g$ may be empty. In that case, we find that even though that action is potentially enabled, we do not need to account for it since it leaves $g$ unchanged. We thus introduce the notion of \emph{visible actions} to quantify over those actions that affect (mutate) $g$. 
 %
 \begin{definition}[Action application and visibility]\label{def:actionApplication}
 The \emph{application} of an action $a$ on a logical state $g$, written $a[g]$, is defined provided there exists $l$ such that
@@ -80,7 +79,7 @@ An action $a$ is called \emph{visible in $g$}, written $\m{visible}(a,g)$, when:
 %
 \quad
 $
-	\m{fst}(\updateFP{a})\meetL g /= \unitL
+	\exsts{l \in \m{fst}(\updateFP{a})\meetL g} l /= \unitL
 $
 %
 %
@@ -133,8 +132,8 @@ A triple $(l, g, \lmod)$ is \emph{well-formed}, written $\wf{l, g, \lmod}$, iff
 \begin{array}{L}
 	\{g\} \containI \lmod
 	/|
-	(\exsts{@s, h, \ca{}}
-	l \composeL g = (@s, h, \ca{}) \land \ca{} \containedIn \lmod)
+	\left(\exsts{@s, h, \ca{}}
+	l \composeL g = (@s, h, \ca{}) \land \ca{} \containedIn  \bigcup \dom{\lmod}\right)
 \end{array}
 \]
 %
@@ -142,7 +141,7 @@ A triple $(l, g, \lmod)$ is \emph{well-formed}, written $\wf{l, g, \lmod}$, iff
 %
 %
 \subsection{Action Model Closure}
-Let us now turn to the definition of action model closure, as informally introduced in \S{sec:model}. First, we need to revisit the effect of actions to take into account the splitting of the global shared state into a subjective state $s$ and a context $r$.
+Let us now turn to the definition of action model closure, as informally introduced in \S\ref{sec:model}. First, we need to revisit the effect of actions to take into account the splitting of the global shared state into a subjective state $s$ and a context $r$.
 %
 %
 \begin{definition}[Action application (cont.)]\label{def:actionApplicationPair}
@@ -150,33 +149,44 @@ The \emph{application} of action $a$ on the subjective state $s$ together with t
 When that is the case, we write $a[s,r]$ for
 %
 \[
-\begin{array}{l @{\hspace{3pt}} l}
-	& \left\{ 
-		\left(\m{snd}(\updateFP{a})\composeL s',r'\right) \ \middle|  
-		\begin{array}{@{\hspace{3pt}} l @{} }
-%			ps \in  s \meetL \m{fst}(\updateFP{a}) /| 
-			\m{fst}(\updateFP{a}) = p_s\composeL p_r /| p_s > \unitL \\
-  		\land\ s = p_s \composeL s' /|   r = p_r \composeL r' 
-		\end{array}
-	\right\}\\
-	\cup&
-	\left\{ 
-		\left(s, \m{snd}(\updateFP{a})\composeL r'\right) \ \middle|\
-  		r = \m{fst}(\updateFP{a}) \composeL r' 
-	\right\}
-\end{array}
+\begin{cases}
+	\left(\m{snd}(\updateFP{a})\composeL s',r'\right) &
+	\text{if }\;\exsts{p_s, p_r, s', r'} \\
+	&	\quad \m{fst}(\updateFP{a}) = p_s\composeL p_r \land\ s = p_s \composeL s' /|   p_s > \unitL /| r = p_r \composeL r' \\
+		
+	\left(s, \m{snd}(\updateFP{a})\composeL r'\right) & 
+	\text{if }\;\exsts{r'} r = \m{fst}(\updateFP{a}) \composeL r' 
+\end{cases}
 \]
+%
+%\[
+%\begin{array}{l @{\hspace{3pt}} l}
+%	& \left\{ 
+%		\left(\m{snd}(\updateFP{a})\composeL s',r'\right) \ \middle|  
+%		\begin{array}{@{\hspace{3pt}} l @{} }
+%%			ps \in  s \meetL \m{fst}(\updateFP{a}) /| 
+%			\m{fst}(\updateFP{a}) = p_s\composeL p_r /| p_s > \unitL \\
+%  		\land\ s = p_s \composeL s' /|   r = p_r \composeL r' 
+%		\end{array}
+%	\right\}\\
+%	\cup&
+%	\left\{ 
+%		\left(s, \m{snd}(\updateFP{a})\composeL r'\right) \ \middle|\
+%  		r = \m{fst}(\updateFP{a}) \composeL r' 
+%	\right\}
+%\end{array}
+%\]
 \end{definition}
 %
 %
 \noindent We observe that this new definition and \defin~\ref{def:actionApplication} are linked in the following way: 
 %
 \[
-	\for{s', r' \in a[s, r] } s' \composeL r' = a[s\composeL r]
+	\fst{a[s, r]} \composeL \snd{a[s, r]} = a[s\composeL r]
 \]
 %
 In our informal description of action model closure in \defin~\ref{def:assertions} we stated that some actions must be \emph{reflected} in some action models. 
-Intuitively, an action is reflected in an action model if for every state in which the action can take place, the action model includes an action with a similar effect that can also occur in that state. In other words, $a$ is reflected in $\lmod$ from a state $l$ if whenever $l$ contains the pre-state of $a$ ($\fst{a} \leq l$), then there exists an action $a' \in \lmod$ with the same active part ($\updateFP{a} = \updateFP{a'}$) whose pre-state is also contained in $l$ ($\fst{a'} \leq l$).
+Intuitively, an action is reflected in a set of actions if for every state in which the action can take place, the set includes an action with a similar effect that can also occur in that state. In other words, $a$ is reflected in a set of actions $A$ from a state $l$ if whenever $l$ contains the pre-state of $a$ ($\fst{a} \leq l$), then there exists an action $a' \in A$ with the same effect ($\updateFP{a} = \updateFP{a'}$) whose pre-state is also contained in $l$ ($\fst{a'} \leq l$).
 We proceed with the definition of action reflection.
 %
 %
@@ -190,17 +200,18 @@ An action $a$ is \emph{reflected} in a set of actions $A$ from a state $l$, writ
 \end{definition}
 %
 %
-Let us now give the formal definition of action model closure. For each condition mentioned in \defin\ref{def:assertions}, we annotate which part of the definition implements them. We write
-%
-\[
-\m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
-\]
-%
-That is, $a$ can actually happen in $g$ since $g$ holds all the resources in the pre-state of $a$.
-%
-%
+Let us now give the formal definition of action model closure. For each condition mentioned in \defin\ref{def:assertions}, we annotate which part of the definition implements them. 
+%We write
+%%
+%\[
+%\m{enabled}(a,g) == \m{potential}(a,g) /| \m{fst}(a)\leq g
+%\]
+%%
+%That is, $a$ can actually happen in $g$ since $g$ holds all the resources in the pre-state of $a$.
+%%
+%%
 \begin{definition}[Action model closure]\label{def:actclos}
-An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
+An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ ({\it cf.} property (1) in \defin~\ref{def:assertions}) and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
 %
 %
 \[
@@ -211,46 +222,39 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
   \\
   
   \extendsAMUpto{\lmod}{n+1}{s}{r}{\lmod'} \iffdef \\
-%  \quad (\V{\ca{}}  \V{a\in \lmod'(\ca{})} \\
-%  \qquad (\m{potential}(a,s\composeL r) => \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{n}{s'}{r'}{\lmod'}) /| \qquad \hfill \text{(4)}\\
-  
-    
-%  \qquad (\m{enabled}(a, s\composeL r) => (s\composeL r, a[s\composeL r])\in \gmod(\ca{})) ) /|
-%  \hfill \text{(3)}  \null\\
-  
- 	\quad (\V{\ca{}}\V{a\in \lmod(\ca{})}
-  \m{potential}(a,s\composeL r) =>\null\\
+ 	\quad \V{\ca{}}\V{a\in \lmod(\ca{})} \for{s', r'}
+  \m{potential}(a,s\composeL r) /| a[s, r] = (s', r')  => \qquad \null\\
   
   \qquad 
   \left(
   	\m{reflected}(a,s\composeL r,\lmod'(\ca{})) |/ \neg\m{visible}(a,s) 
   \right)\qquad \hfill \text{(2)} \\
-  \qquad  /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{n}{s'}{r'}{\lmod'} \qquad \hfill \text{(3)}
+  \qquad  /| \extendsAMUpto{\lmod}{n}{s'}{r'}{\lmod'} \qquad \hfill \text{(3)}
 \end{array}
 \]
 %
 \end{definition}
 %
-Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition($\lmod' \subseteq\lmod$) asserts that the subjective action model $\lmod'$ is contained in $\lmod$ ({\it cf.} property (1) in \defin~\ref{def:assertions}); consequently (from the semantics of subjective assertions), $\lmod$ represents the superset of all interferences known to subjective views.
+Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition($\lmod' \subseteq\lmod$) asserts that the subjective action model $\lmod'$ is contained in $\lmod$ (property (1) in \defin~\ref{def:assertions}); consequently (from the semantics of subjective assertions), $\lmod$ represents the superset of all interferences known to subjective views.
 
 The above states that the $\lmod$ is closed under $(s, r, \lmod')$ if the closure relation holds for any number of steps $n \in \Nats$ where 
 \begin{itemize}
 	\item $s$ denotes the subjective view of the shared state; 
 	\item $r$ denotes the context; 
 	\item $s \composeL r$ captures the entire shared state; 
-	\item a step corresponds to the occurrence of an action as prescribed in $\lmod$ which may or may not be found in $\lmod'$ (since $\lmod \subseteq \lmod$). 
+	\item a step corresponds to the occurrence of an action as prescribed in $\lmod$ which may or may not be found in $\lmod'$ (since $\lmod' \subseteq \lmod$). 
 \end{itemize}   
 %
-The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff for any action $a$ in $\lmod$, where $a$ is potentially enabled in $s \composeL r$, then \textit{either}:
+The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff for any action $a$ in $\lmod$, where $a$ is potentially enabled in $s \composeL r$, then:
 %	
 \begin{enumerate}\renewcommand{\theenumi}{\alph{enumi}}
-	\item $a$ is reflected in $\lmod'$ ($a$ is known to the subjective view), and $\lmod$ is also closed under any subjective state $s'$ and context $r'$ resulting from application of $a$ ($\,(s', r') \in a[s, r]$); \textit{or} 
-	\item  \label{item:closure4}
-	$a$ does not affect the subjective state $s$ ($a$ is not visible in $s$), and $\lmod$ is also closed under any subjective state $s'$ and context $r'$ resulting from application of $a$ ($(s', r') \in a[s, r]$). 
+	\item $\lmod$ is also closed under the subjective state $s'$ and context $r'$ resulting from the application of $a$ ($\,(s', r') = a[s, r]$); \textit{and} 
+	
+	\item \label{item:closure4} \emph{either} $a$ is reflected in $\lmod'$ ($a$ is known to the subjective view); \textit{or} $a$ does not affect the subjective state $s$ ($a$ is not visible in $s$). 
 \end{enumerate}
 %
 %
-Note that in the last item above (\ref{item:closure4}), since $a$ is not visible in $s$, given any $(s', r') \in a[s, r]$, from the definition of action application we then know $s' = s$. 
+Note that in the last item above (\ref{item:closure4}),when $a$ is not visible in $s$, given any $(s', r') = a[s, r]$, from the definition of action application we then know $s' = s$. 
 
 We make further observations about this definition. First, property~(3) makes our assertions robust with respect to future extensions of the shared state, where potentially enabled actions may be become enabled using additional catalyst that is not immediately present. Second, $\lmod'$ (and thus interference assertions) need not reflect actions that have no visible effect on the subjective state.
 
@@ -263,10 +267,8 @@ The logical implications \copyRule, \forgetRule, and \mergeRule\ are \emph{valid
 \begin{proof}
 %
 The case of \copyRule\ is straightforward from the semantics of assertions. For \forgetRule, we remark that, whenever the action model closure relation holds for a subjective
-state $s\leq g$, then it holds of any $s'\leq s$. For \mergeRule,
-we remark that the two worlds corresponding to each subjective view
-need to have the same global action model to be compatible, which
-ensures closure under the combined subjective views. The full proof is
+state $s\leq g$, then it holds of any $s'\leq s$. Similarly, for \mergeRule,
+we note that whenever the action model closure relation holds for two (potentially overlapping) subjective states, then it also holds for their combined subjective views. The full proof is
 provided in~\cite{colosl-tr14}.
 %
 \end{proof}
@@ -299,12 +301,12 @@ The \emph{subjective application} of an action $a$ on a logical state $s$, writt
   \begin{array}{l}
 %  	\exsts{p_s > \unitL} \exsts{s', r}\\
 		\exsts{r}\
-  	s \compatible r /| (s', -) \in a[s, r]
+  	s \compatible r /| (s', -) = a[s, r]
   \end{array}\; \right\}
 \]
 %
 \end{definition}
-Note that, in contrast with $a[l]$, only \emph{parts} of the active precondition has to intersect with the subjective view $s$ for $a(s)$ to apply. Thus, we fabricate a context $r$ that is compatible with the subjective view and satisfies the rest of the precondition. 
+Note that, in contrast with $a[l]$, only \emph{parts} of the active precondition has to intersect with the subjective view $s$ for $a(s)$ to apply. Thus, we fabricate a context $r$ that is compatible with the subjective view and satisfies the rest of the precondition. Moreover, given our choice of separation algebras for logical states in this exposition, $a(s)$ yields a singular set (exactly one state) when defined. 
 %
 %
 \begin{definition}[Fenced action model]
