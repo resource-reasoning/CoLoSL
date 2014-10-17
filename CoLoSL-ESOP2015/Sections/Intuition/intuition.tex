@@ -5,51 +5,66 @@ We illustrate our \colosl reasoning principles by sketching a proof of
 a variation of Dijkstra's token ring mutual exclusion
 algorithm~\cite{dijkstra74}.  These principles are laid out in
 \fig\ref{fig:principles}, together with the usual concurrency rule of
-separation logic~\cite{csl-tcs}. We will explain them as needed during
-the proof of our example.
+separation logic~\cite{csl-tcs}, and the view shift rule from
+Views~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
+introduce them informally as needed during the proof of our example,
+and present them in more details in \S\ref{sec:colosl}.
 
 \begin{figure}
 \centering
 \noindent\hrule
 \begin{align*}
-  (P => Q)
-  &=>
-  \shared{P}{I} => \shared{P}{Q}
-  &\mathllap{(\weakenRule)}&
-  &
-  \shared{P}{I} &
-  => \shared{P}{I} * \shared P I \tag{\copyRule}
-  \\
   \shared{P * Q}{I} &=> \shared{P}{I}  &\mathllap{(\forgetRule)}&
   &
-  \shared{P}{I_1}\!\! * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
+  \shared{P}{I_1}\!\! * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1
+    \cup I_2}
+  \tag{\mergeRule}
   \\
+  (P => Q)
+  &=>
+  \shared{P}{I} => \shared{Q}{I}
+  &(\weakenRule)&
+  &
   I \weakenI{P} I'
-  &\text{ implies }
+  \text{ implies }&
   \shared{P}{I} ===> \shared{P}{I'}
-  &(\shiftRule)&
+  &\tag{\shiftRule}
+  \\
+  \shared{P}{I} &
+  => \shared{P}{I} * \shared P I
+  &(\copyRule)&
   &
   P \containI I 
 %  \text{ and }
 %  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
-  &\text{ implies } 
+  \text{ implies }&
   P ===>
-  \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
+  \exsts{\token A, \token A'} [\token A] * \shared{P * [\token A']}{I}
   \tag{\extendRule}
 \end{align*}
 
 \vspace{-15pt}
-\[
+\begin{mathpar}
 \infer[\parRule]
 	{
 		\{P_1 * P_2\} \;\mathbb{C}_1 || \mathbb{C}_2\; \{Q_1 * Q_2\}		
 	}
 	{
 		\{P_1\} \;\mathbb{C}_1\; \{Q_1\}
-		\qquad
+		\\
 		\{P_2\} \;\mathbb{C}_2\; \{Q_2\}
 	}
-\]
+
+\infer[\weakRule]
+	{
+	  \hoare{P}{\mathbb{C}}{Q}
+	}
+	{
+          P ===> P'&
+	  \hoare{P'}{\mathbb{C}}{Q'}&
+          Q' ===> Q
+	}
+\end{mathpar}
 
 
 \hrule
@@ -69,81 +84,87 @@ shared state that satisfy $Q$ to those described by $R$. Assertions of
 subjective views must be {\em stable}; that is, robust with respect to
 interferences from the environment (as prescribed in $I$).
 
-
-
- Subjective views can always be duplicated using the \copyRule principle:\vspace*{-17pt}
-%
-\begin{align*}\label{eq:copyRule}\vspace{-10pt}
-  \shared{P}{I} &=> \shared{P}{I} * \shared P I \tag{\copyRule}
-\end{align*}
-%
-%
-In combination with the usual law of parallel composition of separation logic~\cite{csl-tcs}, this yields a powerful mechanism to distribute the shared state between several threads: \vspace*{-5pt}
-%
+\begin{figure}
+\centering
+\noindent\hrule\vspace{10pt}
+\begin{tabular}{@{} l @{\hspace{25pt}} l@{\ }}
+$\mathbb{INC}$:&
+$\mathbb{P}_{\li x}$:
+\vspace{-5pt}\\
+{\hspace{20pt}\begin{lstlisting}[numbers=left,numbersep=10pt]
+//$\color{blue}\{\tx x|-> - * \tx{y}|-> - * \tx{z}|-> - \}$
+x = 0; y = 0; z = 0;
+//$\color{blue} \{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0 \}$
+//$\color{blue} \left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
+($\mathbb{P}_{\tx x} \ \mid\ \mid\ \mathbb{P}_{\tx y} \ \mid\ \mid\  \mathbb{P}_{\tx z}$)
+//$\color{blue}\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> \!\!10 * \tx{y}|-> \!\!10 * \tx{z}|-> \!\!10} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
+\end{lstlisting}}
+&
+\begin{lstlisting}
+//$\color{blue} \{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}'} * [\token a_{\tx x}]\}$
+while(x != 10)$\{$
+//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx z}{v} * \cell{\tx x}{v} \lor\\ \cell{\tx z}{v} * \cell{\tx x}{v+1}\end{array}}{I_{\tx x}'}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
+  $\langle$if (x == z) x++;$\rangle$ 
+$\}$
+//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx z}{10} * \cell{\tx x}{10} \lor\\ \cell{\tx z}{9} * \cell{\tx x}{10}\end{array}}{I_{\tx x}'} * [\token a_{\tx x}]\right\}$
+\end{lstlisting}\\
+{$\mathbb{P}_{\li y}$:}&
+{$\mathbb{P}_{\li z}$:}
+\vspace{-5pt}\\
+\begin{lstlisting}
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{0} * \cell{\tx y}{0} \lor\\ \cell{\tx x}{1} * \cell{\tx y}{0}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+while(y != 10)$\{$
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx x}{v} * \cell{\tx y}{v} \lor\\ \cell{\tx x}{v+1} * \cell{\tx y}{v}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+  $\langle$if (y $<$ x) y++;$\rangle$ 
+$\}$
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{10} * \cell{\tx y}{10} \lor\\ \cell{\tx x}{11} * \cell{\tx y}{10}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+\end{lstlisting}
+&
+\begin{lstlisting}
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{0} * \cell{\tx z}{0} \lor\\ \cell{\tx y}{1} * \cell{\tx z}{0}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+while(z != 10)$\{$
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx y}{v} * \cell{\tx z}{v} \lor\\ \cell{\tx y}{v+1} * \cell{\tx z}{v}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+  $\langle$if (z $<$ y) z++;$\rangle$
+$\}$
+//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{10} * \cell{\tx z}{10} \lor\\ \cell{\tx y}{11} * \cell{\tx z}{10}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+\end{lstlisting}
+\end{tabular}
 \[
-\infer[\parRule]
-	{
-		\{P_1\} \;\mathbb{C}_1\; \{Q_1\}
-		\qquad
-		\{P_2\} \;\mathbb{C}_2\; \{Q_2\}
-	}
-	{
-		\{P_1 * P_2\} \;\mathbb{C}_1 || \mathbb{C}_2\; \{Q_1 * Q_2\}		
-	}
+\begin{array}{@{}r@{}l@{}l@{}}
+  a_{\li x} &\null ==
+  [\token a_{\li x}]: \exsts{v} \cell{\li{z}}{v} * \cell{\li{x}}{v} &\null\swap
+  \cell{\li{z}}{v} * \cell{\li{x}}{v+1}\\
+  a_{\li y} &\null ==
+  [\token a_{\li y}]: \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} &\null\swap
+  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\\
+  a_{\li z} &\null ==
+  [\token a_{\li z}]: \exsts{v} \cell{\li{y}}{v+1} * \cell{\li{z}}{v} &\null\swap
+  \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1}\\
+  a_{\li x}' &\null ==
+  [\token a_{\li x}]: \exsts{v} \cell{\li{z}}{v} * \cell{\li{x}}{v} * \cell{\li{y}}{v} &\null\swap
+  \cell{\li{z}}{v} * \cell{\li{x}}{v+1} * \cell{\li{y}}{v}\\
+  a_{\li y}' &\null ==
+  [\token a_{\li y}]: \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v} &\null\swap
+  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1} * \cell{\li{z}}{v}\\
+  a_{\li z}' &\null ==
+  [\token a_{\li z}]: \exsts{v} \cell{\li{y}}{v+1} * \cell{\li{z}}{v} * \cell{\li{x}}{v+1}&\null\swap
+  \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1} * \cell{\li{x}}{v+1}
+\end{array}
 \]
-%
-The subjective views of each thread will be typically too strong, describing resources that are not being used by the thread. However, as we demonstrate in \S\ref{sec:intuition}, before weakening the view, it is sometimes useful to strengthen some of the interference transitions to preserve global knowledge. We achieve this using the \shiftRule\ principle: \vspace*{-17pt}
-%
-\begin{align*}
-  \label{eq:shift}
-  I \weakenI{P} I'
-  &\text{ implies }
-  \shared{P}{I} ===> \shared{P}{I'}
-  \tag{\shiftRule}
-\end{align*}
-%
-This principle states that an interference assertion $I$ can be exchanged for any other interference assertion $I'$ that has the same projected effect on the subjective state $P$. When this is the case, we write $I \weakenI{P} I'$ and say that the actions have been  \emph{shifted}. It can be used to strengthen actions with knowledge of the global shared state arising form the combination of $I$ and $P$. It can also be used to forget (frame off) actions which are irrelevant to $P$. This \shiftRule principle provides a flexible mechanism for interference manipulation and is in marked contrast with most existing formalisms, where interference is fixed throughout the verification.
+\vspace{-5pt}
+\begin{mathpar}
+  I \eqdef \{a_{\li x}, a_{\li y}, a_{\li z}\}
 
-With a possibly strengthened interference assertion, we can then frame off parts of the shared state and zoom on resources required by the current thread using the \forgetRule principle: \vspace{-17pt}
-%
-\begin{align*}\label{eq:forget}
-  \shared{P * Q}{I} &=> \shared{P}{I}  \tag{\forgetRule}
-\end{align*}
-%
-At this point, the \shiftRule\ principle may be applied again to forget those actions that are no longer relevant to the new subjective view captured by  $P$. 
- However, a stable subjective view may no longer be stable after forgetting parts of the shared state. This is often due to the combined knowledge of $P$ and $I$ being too weak and can be avoided by strengthening $I$ (through \shiftRule) prior to forgetting. 
+  I_{\li x}' \eqdef \{a_{\li x}, a_{\li z}'\}
 
-These reasoning principles enable us to provide subjective views for the threads which are just right. 
-We can proceed to verify the threads, knowing that their subjective views describe personalised preconditions which only describe the resource relevant to the individual threads. The resulting postconditions naturally describe overlapping parts of the shared state, which are then joined together using the disjoint concurrency rule and the \mergeRule\ principle: \vspace{-5pt}
-%
-\begin{align*}\label{eq:merge}
-  \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1 \cup I_2} \tag{\mergeRule}
-\end{align*}
-%
-The $P ** Q$ assertion describes the overlapping of states arising from $P$ and $Q$, using the overlapping conjunction $**$~\cite{ramification,js-popl12}. 
-The new interference is simply the union of previous interferences. Using the \shiftRule principle, we can once again simplify the interference assertion with respect to this new larger subjective view.
+  I_{\li y}' \eqdef \{a_{\li x}', a_{\li y}\}
 
-Lastly, locally owned resources (described by $P$) can be shared using the \extendRule principle: \vspace{-17pt}
-%
-\begin{align}\label{eq:extend}
-   &\hspace{45pt} P \containI I 
-%  \text{ and }
-%  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
-  \text{ implies } 
-  P ===>
-  \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}
-  \tag{\extendRule}
-\end{align}
-%
-where $\bar{x}$ range over bound logical variables of capability assertions $\capAss{1}$, $\capAss{2}$ and are distinct from unbound variables of $P$. % ($\m{fv}(P) \cap \vec{x} = \emptyset$). 
-%
-The side condition $P \containI I$ ensures that the actions of the new interference assertion $I$ are confined to $P$ (more in \S\ref{}).
-%
-As we demonstrate in our set example in \S\ref{sec:examples}, the main novelty of this rule is that the new actions in $I$ may refer to existing shared resources, unlike CAP where all possible futures of the region must be accounted for upon its creation. 
-%Notice that we do not require a corresponding principle for destroying subjective views since this is achieved by the \forgetRule principle. 
-
-
-
+  I_{\li z}' \eqdef \{a_{\li y}', a_{\li z}\}
+\end{mathpar}
+\vspace{-5pt}\hrule
+\caption{The concurrent increment program together with a \colosl proof sketch. Lines starting with $\color{blue}{//}$ contain formulas that describe  the local state and the subjective shared state at the relevant program point.}
+\label{fig:concurrentInc}
+\end{figure}
 
 Consider the program $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
@@ -159,264 +180,185 @@ repeats until $\li{x} = \li{y} = \li{z} = 10$.  This example code is
 interesting because the threads are intricately intertwined. In the case of the $\mathbb{P}_{\li y}$ thread, the programmer knows that the code depends on the values of variables
 \li{x} and \li{y}  and that it can increment  \li{y} as long as its value is less than that of \li{x}.
 However, he also knows a much more complex behaviour of the thread: given the initial setting where all variables have value $0$, then the thread can only increase the value of \li{y} by $1$ if \li{x} is one more than \li{y},  and the environment can only increase \li{x} by one if \li{x} and \li{z} (and in fact \li{y}) have the same value. Finally, the programmer knows that at the end all the variables will have value $10$. 
-%
-\begin{figure}
-\centering
-\noindent\hrule\vspace{10pt}
-\begin{tabular}{@{} l @{\hspace{25pt}} l@{\ }}
-$\mathbb{INC}$:&  \vspace{-5pt}\\
-{\hspace{20pt}\begin{lstlisting}[numbers=left,numbersep=10pt]
-//$\color{blue}\{\tx x|-> - * \tx{y}|-> - * \tx{z}|-> - \}$
-x = 0; y = 0; z = 0;
-//$\color{blue} \{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0 \}$
-//$\color{blue} \left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
-($\mathbb{P}_{\tx x} \ \mid\ \mid\ \mathbb{P}_{\tx y} \ \mid\ \mid\  \mathbb{P}_{\tx z}$)
-//$\color{blue}\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> \!\!10 * \tx{y}|-> \!\!10 * \tx{z}|-> \!\!10} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
-\end{lstlisting}}
-&
-\begin{lstlisting}
-$
-	I \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		[\token a_{\tx x}]: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
-		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
-		
-		[\token a_{\tx y}]: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1}\\
-    
-    [\token a_{\tx z}]: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
-	\end{array}
-	\right.
-$
-\end{lstlisting}
-\end{tabular}
-\vspace{10pt}\hrule
-\caption{The concurrent increment program together with a \colosl proof sketch. Lines starting with $\color{blue}{//}$ contain formulas that describe  the local state and the subjective shared state at the relevant program point. The codes of $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs and their proof sketches are provided in \fig~\ref{fig:concurrentInc2}.}
-\label{fig:concurrentInc}
-\end{figure}
-%
-%%
-%%
-\begin{figure}
-\centering
-\noindent\hrule\vspace{10pt}
-\begin{tabular}{@{} l @{\hspace{15pt}} l@{\ }}
-{$\mathbb{P}_{\li x}$:}&  \vspace{-5pt}\\
-\begin{lstlisting}
-//$\color{blue} \{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}} * [\token a_{\tx x}]\}$
-while(x != 10)$\{$
-//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx z}{v} * \cell{\tx x}{v} \lor\\ \cell{\tx z}{v} * \cell{\tx x}{v+1}\end{array}}{I_{\tx x}}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
-  $\langle$if (x == z) x++;$\rangle$ 
-$\}$
-//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx z}{10} * \cell{\tx x}{10} \lor\\ \cell{\tx z}{9} * \cell{\tx x}{10}\end{array}}{I_{\tx x}} * [\token a_{\tx x}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx x} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		[\token a_{\tx x}]: & \exsts{v} & \cell{\tx{z}}{v} * \cell{\tx{x}}{v} \swap\\ 
-		&&\quad \cell{\tx{z}}{v} * \cell{\tx{x}}{v+1}\\
-		
-    
-    [\token a_{\tx z}]: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1}
-	\end{array}
-	\right.
-$
-\end{lstlisting}\vspace{10pt}\\\hline\\
-
-%&\vspace{-5pt}\\
-{$\mathbb{P}_{\li y}$:}&  \vspace{-5pt}\\
-\begin{lstlisting}
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{0} * \cell{\tx y}{0} \lor\\ \cell{\tx x}{1} * \cell{\tx y}{0}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-while(y != 10)$\{$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx x}{v} * \cell{\tx y}{v} \lor\\ \cell{\tx x}{v+1} * \cell{\tx y}{v}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-  $\langle$if (y $<$ x) y++;$\rangle$ 
-$\}$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{10} * \cell{\tx y}{10} \lor\\ \cell{\tx x}{11} * \cell{\tx y}{10}\end{array}}{I_{\tx y}}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx y} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		[\token a_{\tx x}]: & \exsts{v} & \cell{\tx{x}}{v} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
-		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}\\
-		
-    
-    [\token a_{\tx y}]: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} \swap \\
-    &&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} 
-	\end{array}
-	\right.
-$
-\end{lstlisting}\vspace{10pt}\\\hline\\
-
-%&\vspace{-5pt}\\
-{$\mathbb{P}_{\li z}$:}&  \vspace{-5pt}\\
-\begin{lstlisting}
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{0} * \cell{\tx z}{0} \lor\\ \cell{\tx y}{1} * \cell{\tx z}{0}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-while(z != 10)$\{$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx y}{v} * \cell{\tx z}{v} \lor\\ \cell{\tx y}{v+1} * \cell{\tx z}{v}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-  $\langle$if (z $<$ y) z++;$\rangle$
-$\}$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{10} * \cell{\tx z}{10} \lor\\ \cell{\tx y}{11} * \cell{\tx z}{10}\end{array}}{I_{\tx z}}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-$
-	I_{\tx z} \eqdef 
-	\left\{
-	\begin{array}{@{}l@{\,}l@{}l@{}} 
-		[\token a_{\tx y}]: & \exsts{v} & \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v} * \cell{\tx{z}}{v}  \swap\\
-		&&\quad \cell{\tx{x}}{v+1} * \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v}\\
-		
-    
-    [\token a_{\tx z}]: & \exsts{v} & \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v} \swap \\
-    &&\quad \cell{\tx{y}}{v+1} * \cell{\tx{z}}{v+1} 
-	\end{array}
-	\right.
-$
-\end{lstlisting}
-\end{tabular}
-\vspace{10pt}\hrule
-\caption{The $\mathbb{P}_{\li x}$, $\mathbb{P}_{\li y}$ and $\mathbb{P}_{\li z}$ programs and their \colosl proof sketches. 
-%Lines starting with $\color{blue}{//}$ contain formulas that describe the local state and the subjective shared state at the relevant program point.
-}
-\label{fig:concurrentInc2}
-\end{figure}
-%
-%
 
 \colosl can simply specify this complex behaviour of the resources associated with thread $\mathbb{P}_{\li y}$.
 Consider the \colosl assertions accompanying  $\mathbb{INC}$.
-After initialisation, line~3 of $\mathbb{INC}$ provides a standard assertion from separation logic~\cite{seplog} with variables as resource~\cite{variablesAsResource}. The assertion  declares  that the variable cells addressed by \li{x}, \li{y} and \li{z}  have the same value  $0$. This variable resource in the thread-local state is fully owned by  the thread. Using the \extendRule\ principle, the thread is able to give up  this local resource and transfer it  to the global shared state. For example,
-line~4 demonstrates the creation of a subjective view $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|-> 0}I$, where {part} of the underlying global shared state now contains the three variable  cells and the 
-interference relation $I$ declares  how  this  part of the  shared state can change. For example,  the action \vspace*{-5pt}
-%
-\[
- [\token a_{\li y}]:  \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} \swap 
- \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\vspace*{-5pt}
-\]
-%
-can increment \li{y} under the condition that the value of \li{x} is one more than \li{y}. 
-This update is only possible when the local state of a thread has the { capability} $[\token a_{\li y}]$. For  this particular example, the assertion in line~4 simply has all the capabilities $[\token a_{\li x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the actions of $I$ in the local state; in general, capabilities can be buried inside boxes, only to emerge as a consequence of an action (see \S\ref{sec:examples}). 
+After initialisation, line~3 of $\mathbb{INC}$ provides a standard
+assertion from separation logic~\cite{seplog} with variables as
+resource~\cite{variablesAsResource}. The assertion  declares  that the
+variable cells addressed by \li{x}, \li{y} and \li{z}  have the same
+value  $0$. This variable resource in the thread-local state is fully
+owned by  the thread. Using the \extendRule\ principle, the thread is
+able to give up  this local resource and transfer it  to the global
+shared state.
 
-Using the \copyRule\ principle for subjective views and the disjoint concurrency rule, we obtain a  precondition for thread $\mathbb{P}_{\li y}$:\vspace*{2pt}
-%
+In its general form, the \extendRule adds locally-help resources
+described by $P$ to the shared state, under the new interference
+relation $I$, and creates fresh tokens $\token A$, $\token A'$, some
+kept locally and some shared. The side-condition $P\containI I$
+ensures that $I$ cannot modify resource outside of the new region
+delimited by $P$, in particular preserving any pre-existing subjective
+view of the shared state which otherwise would need to suddenly
+account for new interference in $I$. As will be crucial for the set
+example in \S\ref{sec:examples} (but unimportant here), a novel
+feature of this rule is that actions in $I$ may refer to existing
+shared resources, unlike e.g.\ CAP where all possible futures of the
+region must be accounted for upon its creation.  The \weakRule rule is
+then applied to start using the resulting assertion in Hoare triples.
+
+Line~4 demonstrates the creation of a subjective view
+$\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|-> 0}I$ under three
+similar actions. For instance, $a_{\li y}$ can increment \li{y} under
+the condition that the value of \li{x} is one more than \li{y}.  This
+update is only possible when the local state of a thread has the {
+  capability} $[\token a_{\li y}]$. For this particular example, the
+assertion in line~4 simply has all the capabilities $[\token a_{\li
+    x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the actions of
+$I$ in the local state; in general, capabilities can be buried inside
+boxes, only to emerge as a consequence of an action (see
+\S\ref{sec:examples}).
+
+This subjective view may them be freely duplicated using the \copyRule
+principle and each thread is given a copy together with the
+appropriate capability using the \parRule rule. For instance, thread
+$\mathbb{P}_{\li y}$ gets
 $
-	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
-$
-%
+\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
+$.
 
-However, this precondition is more complicated than we need. Intuitively, the specification of each thread should only use the variable resource relevant to that thread, and need only consider actions that affect that resource. In this example, the extraneous piece of state is the variable cell  \li{z}. This additional resource  might seem an acceptable price to pay, but straightforward generalisations to $n$ participants yields extra state of $n-2$ variable cells with their associated interferences which are of no interest to the particular thread.
-Fundamentally, for large systems, the burden of carrying the whole shared state around to analyse all threads, can lead to intractable proofs.
+However, this precondition is more complicated than we
+need. Intuitively, the specification of each thread should only use
+the variable resource relevant to that thread, and need only consider
+actions that affect that resource. In this example, the extraneous
+piece of state is the variable cell \li{z}. This additional resource
+might seem an acceptable price to pay, but straightforward
+generalisations to $n$ participants yields extra state of $n-2$
+variable cells with their associated interferences which are of no
+interest to the particular thread.  Fundamentally, for large systems,
+the burden of carrying the whole shared state around to analyse all
+threads, can lead to intractable proofs. In our example, this would be
+acceptable since the each thread is small, but in general needlessly
+verbose state requires extraneous stability checks at every program
+point.
 
-As a first try at simplifying the precondition, consider the following implication using the \forgetRule and \shiftRule principles given in the introduction\vspace*{-5pt}
-%
+Because subjective views only describe \emph{part} of the shared
+state, we can use \forgetRule to obtain a weaker view of the shared
+state that omits cell \li{z}. The \shiftRule principle allows us to
+replace $I$ with any interference relation $I'$ that has the same
+observable effect on the subjective assertion $P$ (written $I
+\weakenI{P} I'$). Without the \li{z} cell, action $a_{\li z}$ does not
+have observable effects since it leaves other cells unchanged. We thus
+get:
 \begin{align*}
- 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
-	\stackrel{(\forgetRule)}{=>} & \; \shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
- 	\stackrel{(\shiftRule)}{\semimplies}&\; \shared{\li{x}|-> 0 * \li{y}|->0 }{I\backslash\token a_{\small\li z}} *[\token a_{\li y}]\\
-	\stackrel{\text{(stabilise)}}{=>} & \;\shared{\exists v,\! v'\!.  (\li{x}|-> v \!*\! \li{y}|->v' ) \!\land\! v\geq v'}{I\backslash \token a_{\small\li z}} \!\!*[\token a_{\li y}]
+ 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]&
+	\stackrel{(\forgetRule)}{=>} \shared{\li{x}|-> 0 * \li{y}|->0}{I} *[\token a_{\li y} ]\\
+ 	&\stackrel{(\shiftRule)}{\semimplies}
+        \shared{\li{x}|-> 0 * \li{y}|->0 }{I\setminus a_{\small\li z}} *[\token a_{\li y}]\\
+	&\stackrel{(\weakenRule)}{=>}
+        \shared{\exsts{v, v'}  (\li{x}|-> v \!*\! \li{y}|->v' ) \!\land\! v\geq v'}{I\setminus a_{\small\li z}} \!\!*[\token a_{\li y}]
 \end{align*}
-%
-The thread $\mathbb{P}_{\li y}$ does not modify \li{z} and we can thus forget the variable assertion $\li{z} \mapsto 0$. The variable cell \li{z} is no longer visible to $\mathbb{P}_{\li y}$ and the action of $[\token a_{\li z}]$ does not affect the resources described by the assertion of the subjective view neither in its current state nor at any point during its lifetime. That is, the current subjective view is unaffected by this action, and after undergoing any number of actions from $I$, the resulting subjective view remains unaffected by it. Using the \shiftRule principle, we can therefore forget the action of $[\token{a}_{\li z}]$.
 
 %Finally, we stabilise the resulting subjective view such that whatever the environment does to the state, the assertion inside the box still holds (the assertion is \emph{stable}).
 %it is invariant under all possible actions by the environment.. 
-Finally, we stabilise the resulting subjective view such that it is invariant under all possible actions by the environment.
+Finally, we stabilise (weaken) the resulting subjective view such that it is invariant under all possible actions by the environment.
 %Since the thread owns $[\token{a}_{\li{y}}]$ locally, the environment can't perform its action and thus the subjective view is stable against it. On the other hand, as the environment may hold $[\token{a}_{\li{x}}]$, we should stabilise with respect to its action. 
 Since we no longer know the value of \li{z}, after stabilising against the action of $[\token{a}_{\li{x}}]$, the resulting assertion is too weak. Intuitively, we know that \li{x} can only be incremented when its value is equal to \li{z} and \li{y}. However, this is not reflected in he action of $[\token{a}_{\li{x}}]$; since we have forgotten \li{z}, there is nothing to constrain the increment on \li{x}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
 %
 It is however possible to give a stronger specification, as follows: \vspace*{-8pt} 
 %
 \begin{align*}
- 	\shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\li y}]
-  \stackrel{(\shiftRule)}{\semimplies} &\; \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I'_{\li y}} *[\token a_{\li y} ] \vspace*{-5pt}\\
- 	\stackrel{(\forgetRule)}{=>} & \;\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}} *[\token a_{\li y}]\\
- 	\stackrel{(\shiftRule)}{\semimplies} &\; \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\li y}} *[\token a_{\li y}] \\
-	\stackrel{\text{(stabilise)}}{=>} &\;
-	\shared{
-		\begin{array}{@{}l<{\null}@{}l<{\null}@{}}
-			\cell{\li{x}}{0} * \cell{\li{y}}{0} |/ 
-			\cell{\li{x}}{1} * \cell{\li{y}}{0}
-		\end{array}
-	}{I_{\li y}}
-	* [\token a_{\li y}]\vspace*{-5pt}
+  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\small\li y}]
+  &\stackrel{(\shiftRule)}{\semimplies}
+  \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{\{a_{\small\li x}', a_{\small\li y}, a_{\small\li z}\}} *[\token a_{\small\li y} ] \vspace*{-5pt}\\
+  &\stackrel{(\forgetRule)}{=>}
+  \shared{\li{x}|-> 0 * \li{y}|->0 }{\{a_{\small\li x}', a_{\small\li y}, a_{\small\li z}\}} *[\token a_{\small\li y}]\\
+  &\stackrel{(\shiftRule)}{\semimplies}
+  \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'} *[\token a_{\small\li y}] \\
+  &\stackrel{(\weakenRule)}{=>}
+  \shared{
+    \begin{array}{@{}l<{\null}@{}l<{\null}@{}}
+      \cell{\li{x}}{0} * \cell{\li{y}}{0} |/ 
+      \cell{\li{x}}{1} * \cell{\li{y}}{0}
+    \end{array}
+  }{I_{\small\li y}'}
+  * [\token a_{\small\li y}]\vspace*{-5pt}
 \end{align*}
 %
-This implication involves subtle interaction between the assertion and the interference relation of the subjective view. 
-Consider the action of $[\token a_{\li x}]$ in $I$ and the initial state with value $0$ in all the cells. This action can be replaced by \vspace*{-5pt}
-%
-\[
-	[\token a_{\li x}] : 
-		\exsts{v} \;\cell{\li{x}}{v} * \cell{\li{y}}{v} * \cell{\li{z}}{v}
-		\swap
-		\cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v}\vspace*{-5pt}
-\]
-%
-This is possible  because, as the programmer knows, whenever \li{x} and \li{z} have the same value then \li{y} also has the same value which, under these conditions, is not changed by the actions in $I$. 
-This amended action reflects stronger knowledge about when \li{x} can be incremented and how its value is related to \li{y} and \li{z}.
+This implication involves subtle interaction between the assertion and
+the interference relation of the subjective view.  Consider the action
+of $a_{\small\li x}$ and the initial state with value $0$ in all the
+cells. This action can be replaced by $a_{\small\li x}'$ because, as the
+programmer knows, whenever \li{x} and \li{z} have the same value then
+\li{y} also has the same value which, under these conditions, is not
+changed by the actions in $I$.  This amended action reflects stronger
+knowledge about when \li{x} can be incremented and how its value is
+related to \li{y} and \li{z}.
 %This amended action gives full information about how the resource of the subjective view changes as \li{x} is being updated.
-Let  $I_{\li y}' $ be  $I_{\li y}$ with action of $[\token a_{\li x}]$ rewritten as above.
-As we justify in \S~\ref{sec:todo}, by using the judgement $I\weakenI{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'$, we can use the \shiftRule principle to replace $I_{\li y}$ by $I'_{\li y}$. 
+As we justify in \S\ref{sec:colosl}, by using the judgement
+$I\weakenI{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}}
+I_{\small\li y}'$, we can use the \shiftRule principle to replace
+$I\setminus a_{\small\li y}$ by $I'_{\small\li y}$. 
 %%
 %\[
-%I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\li y}'
+%I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\small\li y}
 %\]
 %%
-Using \forgetRule, it is now safe to lose the \li{z} assertion to obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I'_{\li y}}$, as the new action of $[\token a_{\li x}]$ in $I'_{\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
-Since the action of $[\token a_{\li z}]$ only affects the \li{z} cell, which has been forgotten, leaving  the cells \li{x} and \li{y} unaltered, we can use the \shiftRule\ principle again to change the interference relation to $I_{\li y} = I'_{\li y} \backslash \token a_{\li z}$. The interference relation is now as simple as it can get, whilst retaining enough information about the connection between \li{x}, \li{y} and \li{z}. Finally, we stabilise the subjective view with respect to $I_{\li y}$ and obtain our final precondition of $\mathbb{P}_{\li y}$.
+Only then do we use \forgetRule to lose the \li{z} assertion and obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'}$, as the new action $a_{\small\li x}'$ in $I'_{\small\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
+The interference relation is now as simple as it can get, whilst retaining enough information about the connection between \li{x}, \li{y} and \li{z}. Finally, we stabilise the subjective view with respect to $I_{\small\li y}'$ and obtain our final precondition of $\mathbb{P}_{\small\li y}$.
 %, which retains much more information about the values of \li{x} and \li{y}. %
 
-There is one more subtlety to mention about this precondition. The thread has the capability $[\token a_{\li y}]$ to perform its action which only requires the resources described by the subjective view. However, the action of $[\token a_{\li x}]$ depends on \li{z}, which is no longer a part of the subjective view of the thread. Since another thread in the environment may own the $[\token{a_{\li x}}]$ capability, it may perform its action whenever its subjective view is {\em compatible} with the pre-condition of the action.
-When that is the case, the piece of the state corresponding to the overlap between the state and the
-precondition of the action is removed, and the entire postcondition of the action is added in its place.
-%Diagrammatically, a subjective state (represented by the circle) is affected as follows by an action $P\swap Q$:\vspace*{-8pt}
-%%
-%\[
-% \begin{tikzpicture}[baseline]
-% \draw[thick] (0,0) circle (.4cm);
-% \draw[densely dotted] (0,0) rectangle (.4cm,.6cm);
-% \end{tikzpicture}
-% \quad\swap\quad
-% \begin{tikzpicture}[baseline]
-% \draw[thick] (0,0) circle (.4cm);
-% \draw[thick,fill=white] (0,0) rectangle (.6cm,.4cm);
-% \end{tikzpicture}
-% \qquad
-% \left(\text{where }
-% \begin{tikzpicture}[baseline,yshift=-.25cm]
-% \draw[thick] (0,0) rectangle (.4cm,.6cm);
-% \draw[densely dotted] (.4cm,0) arc (0:90:.4cm);
-% \end{tikzpicture}|= P
-% \text{ and }
-% \begin{tikzpicture}[baseline]
-% \draw[thick,yshift=-.1cm] (0,0) rectangle (.6cm,.4cm);
-% \end{tikzpicture}|= Q\right)\vspace*{-5pt}
-%\]
-%%
-This is due to the fact that the subjective view describes the thread's partial knowledge about the shared state, while the environment may have some additional knowledge to what the thread knows. In this case, while the thread does not have the capability to do the action of $[\token a_{\li x}]$, the environment might.
+%% There is one more subtlety to mention about this precondition. The thread has the capability $[\token a_{\small\li y}]$ to perform its action which only requires the resources described by the subjective view. However, the action $a_{\small\li x}$ depends on \li{z}, which is no longer a part of the subjective view of the thread. Since another thread in the environment may own the $[\token{a_{\small\li x}}]$ capability, it may perform its action whenever its subjective view is {\em compatible} with the pre-condition of the action.
+%% When that is the case, the piece of the state corresponding to the overlap between the state and the
+%% precondition of the action is removed, and the entire postcondition of the action is added in its place.
+%% %Diagrammatically, a subjective state (represented by the circle) is affected as follows by an action $P\swap Q$:\vspace*{-8pt}
+%% %%
+%% %\[
+%% % \begin{tikzpicture}[baseline]
+%% % \draw[thick] (0,0) circle (.4cm);
+%% % \draw[densely dotted] (0,0) rectangle (.4cm,.6cm);
+%% % \end{tikzpicture}
+%% % \quad\swap\quad
+%% % \begin{tikzpicture}[baseline]
+%% % \draw[thick] (0,0) circle (.4cm);
+%% % \draw[thick,fill=white] (0,0) rectangle (.6cm,.4cm);
+%% % \end{tikzpicture}
+%% % \qquad
+%% % \left(\text{where }
+%% % \begin{tikzpicture}[baseline,yshift=-.25cm]
+%% % \draw[thick] (0,0) rectangle (.4cm,.6cm);
+%% % \draw[densely dotted] (.4cm,0) arc (0:90:.4cm);
+%% % \end{tikzpicture}|= P
+%% % \text{ and }
+%% % \begin{tikzpicture}[baseline]
+%% % \draw[thick,yshift=-.1cm] (0,0) rectangle (.6cm,.4cm);
+%% % \end{tikzpicture}|= Q\right)\vspace*{-5pt}
+%% %\]
+%% %%
+%% This is due to the fact that the subjective view describes the thread's partial knowledge about the shared state, while the environment may have some additional knowledge to what the thread knows. In this case, while the thread does not have the capability to do the action of $[\token a_{\small\li x}]$, the environment might.
 
-The proof of the specification of the thread $\mathbb{P}_{\li y}$ is now relatively straightforward. By inspection, the invariant of the while loop is stable with respect to $I_{\li y}$. The atomic section allows safe manipulation of the contents of the subjective view.
-The final postcondition of $\mathbb{P}_{\li y}$ follows from the invariant and the boolean expression of the while. We join up the postconditions of the threads using the \mergeRule\ principle. Since $|/$
-distributes over $**$, the subjective view simplifies to $\shared{\li{x}|->10 * \li{y}|->10 * \li{z}|->10}{I_{\li x}\cup I_{\li y}\cup I_{\li z}} $.
-Finally, since
-$
-I_{\li x}\cup I_{\li y}\cup I_{\li z}$ $\weakenI{\li{x}|->10 * \li{y}|->10 * \li{z}|->10} I
-$,
-by the \shiftRule principle, we get the postcondition of $\mathbb{INC}$. 
+The proof of the specification of the thread $\mathbb{P}_{\small\li y}$ is
+now relatively straightforward. By inspection (or using the rules of
+\S\ref{sec:prules}), the invariant of the while loop is stable with
+respect to $I_{\small\li y}'$. The atomic section allows safe manipulation
+of the contents of the subjective view.  The final postcondition of
+$\mathbb{P}_{\small\li y}$ follows from the invariant and the boolean
+expression of the while. We join up the postconditions of the threads
+using \mergeRule, which embodies a crucial feature of \colosl:
+different subjective views \emph{overlap}. Since $|/$ distributes over
+$**$, the subjective view simplifies to $\shared{\li{x}|->10 *
+  \li{y}|->10 * \li{z}|->10}{I_{\small\li x}'\cup I_{\small\li y}'\cup I_{\small\li z}'}
+$.  Finally, since $ I_{\small\li x}'\cup I_{\small\li y}'\cup I_{\small\li z}'$
+$\weakenI{\li{x}|->10 * \li{y}|->10 * \li{z}|->10} I $, by the
+\shiftRule principle, we get the postcondition of $\mathbb{INC}$.
 
 
 %\paragraph{Comparison with other formalisms}
-This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and contraction of subjective
-views, in particular with shifting of interference assertions in key places, enables us to confine the specification and verification of each thread to just the resources they need. This  is not possible in existing frameworks.
-%
+This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and
+contraction of subjective views, in particular with shifting of
+interference assertions in key places, enables us to confine the
+specification and verification of each thread to just the resources
+they need. This is not possible in existing frameworks.
+
 \paragraph{\textbf{Further \colosl reasoning}}
 We complete our semi-formal overview with a brief description of features of \colosl not
 showcased by the proof above. First, we note that an action $P\swap Q$
@@ -461,7 +403,7 @@ described above.
 
 
 %% In the case of the less local predicate $G$, whenever the
-%% pre-condition of the action associated with $\token a_{\li z}$ is satisfied
+%% pre-condition of the action associated with $\token a_{\small\li z}$ is satisfied
 %% (third disjunct), it is also the case that $\cell{\li{x}}{v+1}$. In other
 %% words, in all the cases where the shared state satisfies
 %% $\cell{\li{y}}{v+1} * \cell{\li{z}}{v}$, it also satisfies $\cell{\li{x}}{v+1} *
@@ -487,54 +429,54 @@ described above.
 %% 	\end{array}
 %% \]
 %% %as well as the action associated with its update
-%% Given the above invariant, we can now \emph{shift} the action associated with $\token a_{\li z}$ in $I$ and arrive at $I'$ where
+%% Given the above invariant, we can now \emph{shift} the action associated with $\token a_{\small\li z}$ in $I$ and arrive at $I'$ where
 %% \[
 %% 	I' \eqdef \left\{
 %% 		\begin{array}{@{}l@{}}
-%% 			\token a_{\li x}:\, \exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{z}}{v}\\
-%% 			\token a_{\li y}:\, \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\\
-%% 			\token a_{\li z}:\, \exsts{v} \cell{\li{x}}{v+1} *
+%% 			\token a_{\small\li x}:\, \exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{z}}{v}\\
+%% 			\token a_{\small\li y}:\, \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\\
+%% 			\token a_{\small\li z}:\, \exsts{v} \cell{\li{x}}{v+1} *
 %%                         \cell{\li{y}}{v+1} * \cell{\li{z}}{v} \swap\null\\
 %% 			\hspace*{2cm} \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1}\\
 %% 		\end{array}			
 %% 	\right.
 %% \]
-%% Note that in doing so we have neither restricted nor relaxed the action of $\token a_{\li z}$ in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \shiftRule\ rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
+%% Note that in doing so we have neither restricted nor relaxed the action of $\token a_{\small\li z}$ in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \shiftRule\ rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
 %% \[
 %% 	\text{if}\hspace*{0.25cm} \fence{} \fences (P, I) 
 %% 	\hspace*{0.25cm}\text{and}\hspace*{0.25cm} I \weakenI{\fence{}} I'
 %% 	\hspace*{0.25cm}\text{then}\hspace*{0.25cm}
 %% 	\shared{P}{I} ===> \shared{P}{I'} \hspace*{0.5cm} \shiftRule
 %% \]
-%% Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \forgetRule\ rule to forget variable \li{y} and obtain $\shared{a_{\li x}}{I'}$.
+%% Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \forgetRule\ rule to forget variable \li{y} and obtain $\shared{a_{\small\li x}}{I'}$.
 %% %%
 %% %\[
 %% %	X' \eqdef \shared{\exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v} \lor \cell{\li{x}}{v+1} * \cell{\li{z}}{v}}{I'} 
 %% %\]
 %% %%
-%% We have almost arrived at a local specification for $\mathbb{P}_{\li x}$. However, the action of $\token a_{\li y}$ is still visible in $I'$ even though it does not affect the values of \li{x} or \li{z}. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{\li{x}} = \left\{\cell{\li{x}}{v} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{\li{x}}{v+1} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of $\token a_{\li y}$, given any state $p$ in the action pre-condition (e.g. $p = \cell{\li{x}}{1} * \cell{\li{y}}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{\li{x}}{1} * \cell{\li{z}}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{\li{x}}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
+%% We have almost arrived at a local specification for $\mathbb{P}_{\small\li x}$. However, the action of $\token a_{\small\li y}$ is still visible in $I'$ even though it does not affect the values of \li{x} or \li{z}. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{\li{x}} = \left\{\cell{\li{x}}{v} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{\li{x}}{v+1} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of $\token a_{\small\li y}$, given any state $p$ in the action pre-condition (e.g. $p = \cell{\li{x}}{1} * \cell{\li{y}}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{\li{x}}{1} * \cell{\li{z}}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{\li{x}}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
 
-%% Given $I'$ and $\fence{X}$ we can again apply the \textsc{Shift} rule in order to forget about the action of $\token a_{\li y}$ and obtain $I_{\li x}$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec}. We can take analogous steps in order to obtain subjective views $S_{\li y}$ and $S_{\li z}$ for threads $\tau_{\li y}$ and $\tau_{\li z}$. We then pass the $\token a_{\li x}$, $\token a_{\li y}$ and $\token a_{\li z}$ capabilities to $\tau_{\li x}$, $\tau_{\li y}$ and $\tau_{\li z}$ and verify $\mathbb{INC}$ as follows:
+%% Given $I'$ and $\fence{X}$ we can again apply the \textsc{Shift} rule in order to forget about the action of $\token a_{\small\li y}$ and obtain $I_{\small\li x}'$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec}. We can take analogous steps in order to obtain subjective views $S_{\small\li y}$ and $S_{\small\li z}$ for threads $\tau_{\small\li y}$ and $\tau_{\small\li z}$. We then pass the $\token a_{\small\li x}$, $\token a_{\small\li y}$ and $\token a_{\small\li z}$ capabilities to $\tau_{\small\li x}$, $\tau_{\small\li y}$ and $\tau_{\small\li z}$ and verify $\mathbb{INC}$ as follows:
 %% \[
 %% \hspace*{-0.2cm}
 %% \begin{array}{c}
-%% 	\color{blue}{\left\{\token a_{\li x} * \token a_{\li y} *  \token a_{\li z} *  S_{\li x} * S_{\li y} * S_{\li z} \right\}}\vspace*{2pt}\\
+%% 	\color{blue}{\left\{\token a_{\small\li x} * \token a_{\small\li y} *  \token a_{\small\li z} *  S_{\small\li x} * S_{\small\li y} * S_{\small\li z} \right\}}\vspace*{2pt}\\
 	
 %% 	\begin{array}{c || c || c}
-%% 		\color{blue}{\left\{\token a_{\li x} * S_{\li x} \right\}} & \color{blue}{\left\{\token a_{\li y} * S_{\li y} \right\}} & \color{blue}{\left\{\token a_{\li z} * S_{\li z} \right\}}\\
+%% 		\color{blue}{\left\{\token a_{\small\li x} * S_{\small\li x} \right\}} & \color{blue}{\left\{\token a_{\small\li y} * S_{\small\li y} \right\}} & \color{blue}{\left\{\token a_{\small\li z} * S_{\small\li z} \right\}}\\
 %% 		&&\vspace*{-7pt}\\
-%% 		\mathbb{P}_{\li x} & \mathbb{P}_{\li y} & \mathbb{P}_{\li z}\\
+%% 		\mathbb{P}_{\small\li x} & \mathbb{P}_{\small\li y} & \mathbb{P}_{\small\li z}\\
 %% 		&&\vspace*{-5pt}\\
 
 %% 		\color{blue}{
 %% 			\left\{
-%% 					\token a_{\li x} * S'_{\li x}
+%% 					\token a_{\small\li x} * S'_{\small\li x}
 %% 			\right\}
 %% 		} 
 %% 		& 
 %% 		\color{blue}{
 %% 			\left\{
-%% 				\token a_{\li y} * S'_{\li y}
+%% 				\token a_{\small\li y} * S'_{\small\li y}
 %% 			\right\}
 %% 		} 
 
@@ -542,20 +484,20 @@ described above.
 		
 %% 		\color{blue}{
 %% 			\left\{
-%% 				\token a_{\li z} * S'_{\li z}
+%% 				\token a_{\small\li z} * S'_{\small\li z}
 %% 			\right\}
 %% 		} 		
 %% 		\vspace*{3pt}
 %% 	\end{array}\\
-%% 	\color{blue}{\left\{\token a_{\li x} * \token a_{\li y} *  \token a_{\li z} *  S'_{\li x} * S'_{\li y} * S'_{\li z} \right\}}\\
+%% 	\color{blue}{\left\{\token a_{\small\li x} * \token a_{\small\li y} *  \token a_{\small\li z} *  S'_{\small\li x} * S'_{\small\li y} * S'_{\small\li z} \right\}}\\
 %% \end{array}
 %% \]
 %% with
 %% \[
 %% \begin{array}{l l}
-%% 	S'_{\li x} \eqdef & \shared{\cell{\li{x}}{10} * \cell{\li{z}}{10} \lor \cell{\li{x}}{10} * \cell{\li{z}}{9} }{I_{\li x}}\\
-%% 	S'_{\li y} \eqdef & \shared{\cell{\li{x}}{11} * \cell{\li{y}}{10} \lor \cell{\li{x}}{10} * \cell{\li{y}}{10} }{I_{\li y}}\\
-%% 	S'_{\li z} \eqdef & \shared{\cell{\li{y}}{11} * \cell{\li{z}}{10} \lor \cell{\li{y}}{10} * \cell{\li{z}}{10} }{I_{\li z}}
+%% 	S'_{\small\li x} \eqdef & \shared{\cell{\li{x}}{10} * \cell{\li{z}}{10} \lor \cell{\li{x}}{10} * \cell{\li{z}}{9} }{I_{\small\li x}'}\\
+%% 	S'_{\small\li y} \eqdef & \shared{\cell{\li{x}}{11} * \cell{\li{y}}{10} \lor \cell{\li{x}}{10} * \cell{\li{y}}{10} }{I_{\small\li y}'}\\
+%% 	S'_{\small\li z} \eqdef & \shared{\cell{\li{y}}{11} * \cell{\li{z}}{10} \lor \cell{\li{y}}{10} * \cell{\li{z}}{10} }{I_{\small\li z}'}
 %% \end{array}
 %% \]
 
