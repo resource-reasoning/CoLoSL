@@ -185,61 +185,84 @@ Contribs?
 
 
 \paragraph{Related work}
-Rely-guarantee (RG) reasoning~\cite{rg}, is a well-known technique for verifying shared-memory concurrent programs. In this method, each thread specifies its expectations (the rely condition or $R$) of the transitions made by the environment as well as the transitions made by the thread itself (the guarantee condition or $G$) where $R;G$ constitute the overall \emph{interference}. However, in practice formulating the rely and guarantee conditions is difficult: the \emph{entire} program state is treated as a shared resource (accessible by all threads) where rely and guarantee conditions \emph{globally} specify the behaviour of threads over the whole shared state and need to be checked throughout the execution of the thread. We proceed with a brief overview of the shortcomings of RG reasoning and how the existing approaches tackle \emph{some} of these limitations. 
-%
-The global nature of RG reasoning limits its compositionality and practicality in the following ways:\vspace{-3pt}
-%
-\begin{enumerate}%\setlength{\itemindent}{-5pt}
-	\item Even when parts of the state are owned by a single thread, they are exposed to all other threads in the $R;G$ conditions. Simply put, the boundary between private (thread-local) and shared resources is blurred.
-	
-	\item Since the shared resources are globally known, sharing of \emph{dynamically} allocated resources is difficult. That is, \emph{extending} the shared state is not easy.
-	
-	\item When parts of the shared state are accessible by only a subset of threads, it is not possible to hide \emph{either} the resources \emph{or} their associated interference ($R;G$ conditions) from the unconcerned threads. In short, reasoning \emph{locally} about threads with \emph{disjoint} footprints is not possible.
-	
-	\item Similarly, when different threads access different but \emph{overlapping} parts of the shared state, it is not possible to hide \emph{either} the resources \emph{or} their associated interference from the unconcerned threads. In brief, reasoning \emph{locally} about threads with \emph{overlapping} footprints is not possible. As we will demonstrate, this issue is particularly pertinent when reasoning about concurrent operations on data structures with \emph{unspecified} sharing such as graphs. 
-	
-	\item When describing the specification of a program module, the $R;G$ conditions need to reflect the entire shared state even when the module accesses only parts of it. This limits the \emph{modularity} of verification since the module specification becomes context-dependent and it may not always be reusable.
-%	 in different applications even if the module specification is disjoint from that of its context. This is particularly difficult when the specification of the module client overlaps module specification overlaps 
-	
-	\item Since the $R;G$ conditions are defined statically and cannot evolve, in order to temporarily disable/enable certain operations by certain threads (e.g. allowing a lock to be released only by the thread who has acquired it) one must appeal to complex (unscalable) techniques such as auxiliary states. 
-	
-	\item As a program executes, its footprint grows/shrinks in tandem with the resources it accesses. It is thus valuable for the reasoning to mimic the programmer's intuition by reflecting the changes in the footprint. This calls for appropriate (de)composition of the shared state as well as its associated interference which cannot be achieved with a global view of the shared state. \vspace{-5pt}
-\end{enumerate}
-%
-%
-%Separation logic reasoning~\cite{seplog,csl-tcs} has been used to demonstrate the importance of reasoning  only about the portions of the state (resources) actually accessed by programs.
-%
-%RGSep
-Recent work on RGSep~\cite{viktor-marriage} has combined the compositionality of separation logic~\cite{seplog,csl-tcs} with the concurrent techniques of RG reasoning. In RGSep reasoning, the program state is split into private (thread-local) and shared parts ensuring that the private resources of each thread are untouched by others and the $R;G$ conditions are specified only over the shared state. However, since the shared state itself remains globally specified and is visible to all threads in its entirety, this separation only addresses the first problem outlined above.
+\colosl stems from a long lineage of program logics for shared-memory
+concurrency, dating back to the Owicki-Gries logic~\cite{og}, each of
+which made substantial advances in fine-grained compositional
+reasoning about more and more complex concurrent programs. As noted by
+Jones and motivating his definition of rely-guarantee~\cite{rg},
+Owicki-Gries's system is fundamentally non-compositional as assertions
+at each program point in each thread has to be checked against every
+instruction of every other threads. While rely-guarantee addresses
+this concern by summarising potential interferences in terms of rely
+and guarantee conditions, its model of the shared state is global,
+even encompassing the threads' private state. Later techniques
+combined rely-guarantee with separation logic, starting with
+RGSep~\cite{viktor-marriage}, which separates private (or local) and
+shared state, allowing further compositionality. However, the view of
+the shared state and interference on it is still globally-shared
+across threads. The next breakthrough as far as compositionality is
+concerned came from LRG~\cite{lrg}, wherein the shared state may be
+split into completely independent pieces, thus partially solving the
+first problem outlined above. This provides a way to frame off parts
+of the shared state, but, as noted by its author, the strong
+disjointness restrictions make this applicable only at the level of
+disjoint modules in the code. Independently from LRG, the reasoning
+framework of Concurrent Abstract Predicates (CAP)~\cite{cap-ecoop10}
+and its extended variants~\cite{icap,tada} introduced the notion
+of \emph{regions} of shared state. Much like LRG, the division into
+regions is only possible for entirely disjoint pieces of state, with
+fixed and disjoint interference relations.
 
-%
-%LRG
-Set out to overcome the limitations of both RG and RGSep reasoning, Feng introduced Local Rely-Guarantee (LRG) reasoning in~\cite{lrg}. As in RG and unlike RGSep, in LRG reasoning the program state is treated as a single shared resource accessible by all threads. Moreover, the compositionality afforded by the separating conjunction of separation logic $*$ is applied to both resources of the shared state \emph{and} the $R;G$ conditions. This way, threads can hide (frame off) irrelevant parts of the shared state and their interference (resolving 1-3, 5 above) allowing for more local reasoning provided that they operate on completely \emph{disjoint} resources. However, when reasoning about data structures with intricate and unspecified sharing (e.g. graphs), since decomposition of overlapping resources is not possible in a disjoint manner, LRG reasoning enforces a global treatment of the shared state, thus betraying its very objective of locality (issue 4; and 5 in the presence of overlapping module specifications). Furthermore, as with RG reasoning, the $R;G$ conditions are specified statically (albeit decomposable); hence temporary (un)blocking of certain actions by certain threads is not easy (issue 6). Finally, while LRG succeeds to capture the programmer's intuition of the program state by dynamically growing/shrinking the footprint when dealing with disjoint resources, it fails to achieve this level of fine-grained locality when dealing with overlapping (entangled) resources (issue 7).\\
-%
-% CAP Family
-\indent Much like LRG reasoning, the reasoning framework of Concurrent Abstract Predicates (CAP)~\cite{cap-ecoop10} and its extended variants~\cite{icap,tada} apply the compositionality of separation logic to concurrent reasoning. In these techniques, the state is split into private (exclusive to each thread) and shared parts where the shared state itself is divided into an arbitrary number of \emph{regions} disjoint from one another. Each region is governed by an \emph{interference} relation $I$ that encompasses both the $R$ and $G$ conditions: the transitions in $I$ are enabled by \emph{capabilities} and a thread holding the relevant capability locally (in its private state) may perform the associated transition. 
-% As such, the $R$ and $G$ conditions are indirectly implied form the transitions in $I$ and the distribution of capabilities amongst threads. 
-As with LRG, this fine-grained division of the shared state into regions, allows for more local reasoning with the constraint that the the regions are pairwise \emph{disjoint} (resolving 1, 3, 5). Dynamically allocated resources can be shared through creation of new regions (resolving 2). Moreover, since CAP is built on top of \emph{deny-guarantee} reasoning~\cite{dg} (an extension to rely-guarantee reasoning where \emph{deny} permissions are used to block certain behaviour over a period of time) dynamic manipulation of interference transitions is straightforward (resolving 6). However, since the contents of regions must be disjoint from one another, when tackling data structures with complex and unspecified patterns of sharing that do not lend themselves to a clean decomposition, the entire data structure along with its interference must be confined to a single region, forsaking the notion of locality once again (issue 4; and 5 in case of overlapping module specifications). Furthermore, since the capabilities and interference associated with each region are defined upon its creation and remain unchanged throughout its lifetime, it is often necessary to foresee all possible extensions to the region (including dynamically allocated resources and their interference). As we will show, this not only limits the locality of reasoning, but also gives way to unnatural specifications that contrast with the program footprint (issue 7).\\
-%
-%Recently, several techniques have been built on top of separation logic, such as those related to CAP reasoning~\cite{cap-ecoop10,icap,tada}, which have made substantial advances in fine-grained compositional reasoning about complex algorithms which access the global shared state.  However, the rigidity of existing techniques forces us to work with {\em static} global shared state, such as a shared data structure for representing sets, even though a thread might only access just a small part of it.  This global state must be robust with respect to all possible interferences from the environment, {even on parts of the shared state not actually accessed by the current thread}. Intuitively, compositionality calls for reasoning that only refers to the part of the global shared state actually accessed by each thread.  Existing reasoning techniques are too rigid to achieve this. 
-%
-%
+TODO: rewrite a bit.
+There are many interesting ideas present in the CAP literature:
+e.g. abstract states~\cite{caresl}; higher-order
+reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
+ideas require further investigation. Here, our aim was to simply
+introduce subjective views as a fundamental new way of underpinning of
+such reasoning.
 
-We conclude this section by noting that while \colosl enables reasoning about \emph{fine-grained} concurrency, the logic of subjective concurrent separation logic (SCSL)~\cite{SCSL} employs auxiliary states to reason about \emph{coarse-grained} concurrency. That is, although both techniques share the spirit of \emph{subjectivity}, their applications are completely orthogonal. As the authors note in~\cite{SCSL}, CAP (and by design \colosl) can be employed to reason about their case studies of coarse-grained concurrency. However, SCSL cannot be used to reason about the fine-grained concurrency scenarios that \colosl tackles, either when the resources are distributed disjointly amongst threads or when they are intricately entangled.\vspace{-10pt}
+TODO: CareSL
+
+TODO Turon et al.'s POPL'13 paper (which also espouses the idea of
+using "local protocols" to govern individual pieces of a shared data
+structure, albeit in a less rigorously enforced manner than in CoLoSL)
+
+(and probably his ICFP paper as well)
+
+\julescomment{The next paragraph about SCSL should be much shorter and to
+the point.}
+
+We conclude this section by noting that while \colosl enables
+reasoning about \emph{fine-grained} concurrency, the logic of
+subjective concurrent separation logic (SCSL)~\cite{SCSL} employs
+auxiliary states to reason about \emph{coarse-grained}
+concurrency. That is, although both techniques share the spirit
+of \emph{subjectivity}, their applications are completely
+orthogonal. As the authors note in~\cite{SCSL}, CAP (and by
+design \colosl) can be employed to reason about their case studies of
+coarse-grained concurrency. However, SCSL cannot be used to reason
+about the fine-grained concurrency scenarios that \colosl tackles,
+either when the resources are distributed disjointly amongst threads
+or when they are intricately entangled.
 
 \paragraph{Paper outline}
-In \S\ref{sec:intuition}, we exhibit the main principles of \colosl through a variant of the famous mutual exclusion algorithm~\cite{dijkstra74} introduced by Dijkstra to illustrate distributed, global knowledge between threads. In this scenario, as well as the local knowledge about how each thread behaves, the programmer also has global knowledge about how threads constrain one another. Pleasantly, our reasoning captures the spirit of local reasoning about individual threads while retaining global knowledge about the overall interactions between threads. 
+In \S\ref{sec:intuition}, we exhibit the main principles of \colosl
+through a variant of Dijkstra's token-ring mutual exclusion
+algorithm~\cite{dijkstra74}, which illustrates distributed, global
+knowledge between threads. In this scenario, as well as the local
+knowledge about how each thread behaves, the programmer also has
+global knowledge about how threads constrain one another. Pleasantly,
+our reasoning captures the spirit of local reasoning about individual
+threads while retaining global knowledge about the overall
+interactions between threads.
 %It is a good  introductory example, as it uses all the highlighted \colosl\ reasoning principles in a fundamental way. 
 
 \todo In \S\ref{sec:logic}, we interpret \colosl\ assertions over a particular domain which includes: thread-local state exclusively visible to the thread; {\em one} global shared state accessible by all thread (in contrast with the CAP approach); and {\em action models} describing how the global state can be updated. In \S\ref{sec:semantics}, we define the rely and guarantee conditions of each thread in terms of their action models, and provide a sketch of soundness. In particular, the reasoning principles highlighted above are simple semantic
 consequences of our generic model of program states.  
 %The full technical details can be found in the accompanying technical report~\cite{colosl-tr14}.
 
-
 In \S\ref{sec:examples}, we study further, more challenging examples. We verify a concurrent spanning tree algorithm for graphs. This algorithm uses threads spawned on arbitrary overlapping graphs. We demonstrate that the flexible, overlapping subjective views of \colosl are just what we need.  We also verify a concurrent set module implemented using a hand-over-hand list-locking algorithm.
 %
 The flexibility of \colosl's subjective views leads to a considerably simpler correctness proof compared to that of CAP. 
 %
 Finally, we demonstrate how the mutual exclusion ring of \S\ref{sec:intuition} can be generalised to synchronise access to a concurrent database.
-
-

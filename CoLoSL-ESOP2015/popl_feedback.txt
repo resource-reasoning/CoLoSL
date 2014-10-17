@@ -49,19 +49,3 @@ are the by-products of atomic sections in program, which are also kept
 small."  This needs to be expanded upon!  How do you check these semantic
 conditions?  Please make this clear.  Also, it is funny to talk about
 what happens "in practice" concerning a brand new logic!
-
-
-
-Related work
-------------
-
-
-- Related work: Given the claims of the paper, more detailed
-comparison with (and citations of) related work is called for.  It
-would be particularly interesting to see a comparison with Turon et
-al.'s POPL'13 paper (which also espouses the idea of using "local
-protocols" to govern individual pieces of a shared data structure,
-albeit in a less rigorously enforced manner than in CoLoSL) and also
-with Nanevski et al.'s work on SCSL and derivatives (which introduced
-the terminology of "subjectivity", albeit with seemingly different
-technical meaning).

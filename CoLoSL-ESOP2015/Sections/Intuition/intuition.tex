@@ -1,9 +1,16 @@
-\section{Informal Development}\label{sec:intuition}
-We illustrate our \colosl reasoning principles  by
-sketching a proof of a variation of Dijkstra's token ring mutual
-exclusion algorithm~\cite{dijkstra74}. 
+\section{Informal Development}
+\label{sec:intuition}
+
+We illustrate our \colosl reasoning principles by sketching a proof of
+a variation of Dijkstra's token ring mutual exclusion
+algorithm~\cite{dijkstra74}.  These principles are laid out in
+\fig\ref{fig:principles}, together with the usual concurrency rule of
+separation logic~\cite{csl-tcs}. We will explain them as needed during
+the proof of our example.
 
 \begin{figure}
+\centering
+\noindent\hrule
 \begin{align*}
   (P => Q)
   &=>
@@ -31,7 +38,7 @@ exclusion algorithm~\cite{dijkstra74}.
   \tag{\extendRule}
 \end{align*}
 
-
+\vspace{-15pt}
 \[
 \infer[\parRule]
 	{
@@ -45,11 +52,24 @@ exclusion algorithm~\cite{dijkstra74}.
 \]
 
 
+\hrule
 \caption{\colosl main reasoning principles.}
 \label{fig:principles}
 \end{figure}
 
-A subjective view $\shared{P} I$ comprises an  assertion $P$ which describes {\em parts} of the global shared state; and an interference assertion $I$ which characterises how this partial shared state may be changed by the thread or the environment. Similar to interference assertions of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$, where a thread in possession of the $[\token a]$ capability (in its private state) may carry out its transition and update parts of the shared state that satisfy $Q$ to those described by $R$. Assertions of subjective views must be {\em stable}; that is, robust with respect to interferences from the environment (as prescribed in $I$).
+\colosl introduces a new assertion $\shared{P} I$ called a
+\emph{subjective view}, which comprises an assertion $P$ describing
+\emph{parts} of the global shared state and an interference assertion
+$I$ which characterises how this partial shared state may be changed
+by the thread or the environment. Similar to interference assertions
+of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$,
+where a thread in possession of the $[\token a]$ capability (in its
+private state) may carry out its transition and update parts of the
+shared state that satisfy $Q$ to those described by $R$. Assertions of
+subjective views must be {\em stable}; that is, robust with respect to
+interferences from the environment (as prescribed in $I$).
+
+
 
  Subjective views can always be duplicated using the \copyRule principle:\vspace*{-17pt}
 %
