@@ -71,9 +71,9 @@ the $i$th thread requires access to two successive nodes at indices
 $i-1$ and $n$, no such splitting is possible as each node of the
 linked list will be shared between two neighbouring threads, hence the
 shared state must contain the entire linked list. Similarly, when data
-structures with intricate (unspecified) patterns of sharing are
-accessed concurrently, one cannot reason about subgraphs in isolation
-due to arbitrary sharing between them.
+structures with intrinsic sharing such as graphs are accessed
+concurrently, one cannot reason about their sub-parts in isolation due
+to arbitrary sharing between them.
 
 Second, the interference associated with each region is defined when it is created and cannot change. As such, upon its creation, provision has to be made for
 all future extensions of it and it is generally not possible to
