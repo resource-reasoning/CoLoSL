@@ -222,28 +222,29 @@ for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
 \end{definition}
 
 As in, e.g., RGSep~\cite{viktor-marriage}, we distinguish between
-\emph{local assertions} in $\LAssertions$ and general assertions in
-$\Assertions$. For simplicity, general assertions do not include
-negation or magic-wand. The syntax of assertions follows from standard
-separation logic with variables as resource~\cite{variablesAsResource}
-(note that expressions $E$ do not allow program variables), with the
-exception of the subjective views $\shared P I$.  Machine state and
-capability assertions are interpreted over a world's local state:
-$\li{x}|-> E$ (resp.\ $E_1|->E_2$) is true of the singleton stack
-(resp.\ heap) where only \li{x} (resp.\ address $E_1$) is allocated
-and has value $E$ (resp.\ points to $E_2$); the capability assertion
-$[E]$ is true of the singleton capability $\{\token{a}\}$ if $E$
-evaluates to $\token a$.  $\emp$ is true of worlds with empty local
-state (the units of $\composeW$);  $P * Q$ is true of worlds that can
-be split into two according to $\composeW$ such that one state
-satisfies $P$ and the other satisfies $Q$; $P**Q$ is the
-\emph{overlapping conjunction}, true of worlds can be split three-way
-according to $\composeW$, such that the $\composeW$-composition of the
-first two worlds satisfies $P$ and the $\composeW$-composition of the
-last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and
-connectives have their standard classical meaning. Interference
-assertions $I$ describe actions enabled by a given capability, in the
-form of a pre- and post-condition.
+\emph{local assertions} in $\LAssertions$ and assertions in
+$\Assertions$. For simplicity, assertions do not include negation or
+magic-wand; these are reserved to local assertions. The syntax of
+assertions follows from standard separation logic with variables as
+resource~\cite{variablesAsResource} (note that expressions $E$ do not
+allow program variables), with the exception of the subjective views
+$\shared P I$.  Machine state and capability assertions are
+interpreted over a world's local state: $\li{x}|-> E$
+(resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
+where only \li{x} (resp.\ address $E_1$) is allocated and has value
+$E$ (resp.\ points to $E_2$); the capability assertion $[E]$ is true
+of the singleton capability $\{\token{a}\}$ if $E$ evaluates to
+$\token a$.  $\emp$ is true of worlds with empty local state (the
+units of $\composeW$); $P * Q$ is true of worlds that can be split
+into two according to $\composeW$ such that one state satisfies $P$
+and the other satisfies $Q$; $P**Q$ is the \emph{overlapping
+  conjunction}, true of worlds can be split three-way according to
+$\composeW$, such that the $\composeW$-composition of the first two
+worlds satisfies $P$ and the $\composeW$-composition of the last two
+satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
+have their standard classical meaning. Interference assertions $I$
+describe actions enabled by a given capability, in the form of a pre-
+and post-condition.
 
 A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective view} $s$ can be found in the global
@@ -434,23 +435,21 @@ lifted, since it turns out that one can always \emph{flatten}
 assertions with nested boxes into logically equivalent assertions with
 no nesting. Similarly, interference assertions that mention other
 subjective views in their actions may be rewritten (shifted) into ones
-that do not. For lack of space, we omit these transformations from the
-paper; they may be found in \S XXX.
+that do not. For lack of space, we omit these transformations; they
+may be found in \S XXX.
 
 Moreover, in the restricted case where actions and fences (see below)
 can be expressed in a fragment extending the usual \emph{symbolic
-  heaps} used in automatic tools based on separation
-logic~\cite{smallfoot,smallfoot-rg,spaceinvader,abductor}, without
-inductive predicates but including the $**$ connective (this
-corresponds to replacing $p$ with $A$ in the grammar of assertions),
-the separation logic entailments that need to be discharged once the
-rules of this section have been applied can be verified
-automatically. Indeed, for this fragment, we can extend the
-$--o$-elimination procedure of Calcagno et al. in~\cite{vv07msc} to
-deal with $**$ as well. We leave the details of this adaptation to \S
-XXX.
-
-In what follows, we will use the following standard terminology.
+  heaps} used in automatic tools based on separation logic, starting
+with Smallfoot~\cite{smallfoot}, without inductive predicates but
+including the $**$ connective (this corresponds to replacing $p$ with
+$A$ in the grammar of assertions), the separation logic entailments
+that need to be discharged once the rules of this section have been
+applied can be verified automatically. Indeed, for this fragment, we
+can extend the $--o$-elimination procedure of Calcagno et
+al. in~\cite{vv07msc} to deal with $**$ as well. We leave the details
+of this adaptation to \S XXX. The following standard definition will
+be needed in the remainder of this section.
 
 \begin{definition}[Precision, exactness]
   $p\in\LAssertions$ is \emph{precise} (resp.\ \emph{exact}) if it is
@@ -502,7 +501,7 @@ modified cells 10 and 12 are fully contained in $l_1$ but not in
 $l_3$; $p$ is not compatible with $l_2$, hence $a$ has no effect on
 $l_2$ and is automatically confined to $l_2$.
 %
-Moreover, in general we require not only that all actions in $\lmod'$
+Moreover, we require not only that all actions in $\lmod'$
 are confined to $l'$ in this sense, but also that all states resulting
 from the successive application of actions in $\lmod'$ themselves confine
 all actions in $\lmod'$. This is achieved by first finding a set that
@@ -1177,7 +1176,7 @@ Soundness of \colosl has been established parametrically in the
 underlying models $\Heaps$ of machine states and $\Caps$ of
 capabilities, as an instance of the Views framework~\cite{views}. The
 details may be found in the accompanying technical
-report~\cite{colosl-tr}. The main part of the proof is to establish
+report~\cite{colosl-tr14}. The main part of the proof is to establish
 the soundness of the following rule for atomic commands, where
 $\entails_{\textsf{SL}}$ represents standard sequential separation
 logic:
@@ -1221,8 +1220,8 @@ a concrete state in \Heaps.
 \begin{definition}[Valid triple]
   A triple is \emph{valid}, written $|= \{P\}\ \mathbb{C}\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
   \[
-    \left(w, \lenv |= P  \land \h{} \in \reifyW{w} \land \mathbb{C}, \h{} \rightarrow^{\text{*}} \li{skip}, \h{}'\right)
-    \text{ implies } \exsts{w'} w', \lenv |= Q \land \h{}' \in \reifyW{w'}
+    \left(w, \lenv |= P  \land \mathbb{C}, \reifyW{w} \rightarrow^{\text{*}} \li{skip}, \h{}'\right)
+    \text{ implies } \exsts{w'} w', \lenv |= Q \land \h{}' = \reifyW{w'}
   \]
 \end{definition}
 

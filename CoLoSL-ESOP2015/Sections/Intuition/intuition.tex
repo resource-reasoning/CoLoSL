@@ -85,8 +85,10 @@ Hoare triples must be {\em stable}; that is, robust with respect to
 interferences from the environment (as prescribed in the interference
 relations attached to that assertion's subjective views). The $*$
 (resp.\ $**$) connective is that of separation logic and means that
-each sub-formula describes disjoint resources (resp.\ potentially
-overlapping resources~\cite{rey-slnotes,js-popl12,ramification}).
+the current state is a disjoint (resp.\ potentially overlapping)
+composition of two states satisfying each sub-formula. The overlapping
+conjunction $**$ has been used in the past to reason about sharing in
+data structures~\cite{rey-slnotes,js-popl12,ramification}.
 
 \begin{figure}
 \centering
