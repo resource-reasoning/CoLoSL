@@ -1,8 +1,8 @@
 \section{\colosl Model and Assertion Semantics (Continued)}\label{chapter:logic}
-\todo introductory text to give an overview
+In this section, we present the additional components of the \colosl model that were left out of \S\ref{sec:model}. In \S\ref{subsec:confinement} we provide the semantic definition of action model confinement and formalise the notion of world well-formedness. In \S\ref{subsec:closure} we present the formal definition of action model closure and show that the logical implications of \copyRule, \forgetRule and \mergeRule principles are sound. Finally, in \S\ref{subsec:shifting} we provide the semantic definition of action shifting. 
 %
 %
-\subsection{Action confinement}
+\subsection{Action confinement}\label{subsec:confinement}
 Given a world $(l, g, \lmod)$, since $g$ represents the \emph{entire} shared state, as part of the well-formedness condition of worlds we require that the actions in $\lmod$ are \emph{confined} to $g$.  
 %We write $g \containI \lmod$ to denote that those parts of the shared state mutated by actions in $\lmod$ are fully contained in $g$. 
 Let us elaborate on the necessity of the confinement condition.
@@ -140,7 +140,7 @@ A triple $(l, g, \lmod)$ is \emph{well-formed}, written $\wf{l, g, \lmod}$, iff
 \end{definition}
 %
 %
-\subsection{Action Model Closure}
+\subsection{Action Model Closure}\label{subsec:closure}
 Let us now turn to the definition of action model closure, as informally introduced in \S\ref{sec:model}. First, we need to revisit the effect of actions to take into account the splitting of the global shared state into a subjective state $s$ and a context $r$.
 %
 %
@@ -287,7 +287,7 @@ Note that, the version of \forgetRule\ where predicates are conjoined using $**$
 %
 %
 %
-\subsection{Action Shifting}
+\subsection{Action Shifting}\label{subsec:shifting}
 Recall from \S\ref{sec:intuition} that given a subjective view $\shared{P}{I}$, a thread may rewrite the actions in $I$, or forget about those actions that are not relevant to the current subjective view ($P$) as well as any evolution of it according to potential actions, both from the thread and the environment. To capture this set of possible futures, we refine our notion of local fences (\defin~\ref{def:localFence}), which was defined in the context of the global shared state, to the case where we consider only a subjective state within the global shared state.
 For this, we need to also refine a second time our notion of action application to ignore the context of a subjective state, which as far as a subjective view is concerned could be anything.
 %
