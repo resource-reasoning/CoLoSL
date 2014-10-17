@@ -80,9 +80,13 @@ by the thread or the environment. Similar to interference assertions
 of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$,
 where a thread in possession of the $[\token a]$ capability (in its
 private state) may carry out its transition and update parts of the
-shared state that satisfy $Q$ to those described by $R$. Assertions of
-subjective views must be {\em stable}; that is, robust with respect to
-interferences from the environment (as prescribed in $I$).
+shared state that satisfy $Q$ to those described by $R$. Assertions in
+Hoare triples must be {\em stable}; that is, robust with respect to
+interferences from the environment (as prescribed in the interference
+relations attached to that assertion's subjective views). The $*$
+(resp.\ $**$) connective is that of separation logic and means that
+each sub-formula describes disjoint resources (resp.\ potentially
+overlapping resources~\cite{rey-slnotes,js-popl12,ramification}).
 
 \begin{figure}
 \centering

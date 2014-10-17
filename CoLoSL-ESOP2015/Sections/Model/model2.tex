@@ -1,19 +1,30 @@
 \section{\colosl}
 \label{sec:colosl}
 
-\subsection{\colosl Model}\label{sec:model}
+We now give a more formal overview of how to use \colosl for program
+verification, eluding some details of the semantics for lack of space,
+while still providing enough ingredients to carry program proofs. We
+describe the underlying model of \colosl, give the semantics of
+\colosl assertions, then present proof rules to reduce the various
+checks one has to perform in the course of \colosl program proofs
+(namely, the side-conditions of \shiftRule and \extendRule, and
+stability checks) to classical separation logic entailments that, in
+particular, do not mention subjective views.
 
-We informally describe the underlying model of \colosl and present the
-various ingredients necessary to prove programs using \colosl, in
-particular the \extendRule and \shiftRule rules.
 
-\paragraph{Worlds overview}
+\subsection{\colosl worlds}
+\label{sec:model}
+
 A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
 \emph{local logical state}, or simply local state $l$ represents the
 locally owned resources of a thread, in the standard separation logic
-sense. Logical states have two components: one describes machine
-states (e.g. stacks and heaps); the other represents
+sense, while the \emph{global logical state}, or simply global state
+$g$ represents shared resources. An action model records all the
+possible interference on the shared state.
+
+Logical states have two components: one describes machine states
+(e.g.\ stacks and heaps); the other represents
 \emph{capabilities}. The latter are inspired by the capabilities in
 deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
 capability is allowed to perform the associated actions (as prescribed
@@ -28,37 +39,35 @@ corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between threads and the
 environment just like any other resource. See the presentation of
-deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap} for further
-details and motivation.
+deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap} for further details
+and motivation.
 
 In general, each component of a logical state is taken from an
-arbitrary \emph{separation algebra}~\cite{asl} (i.e. a cancellative,
+arbitrary \emph{separation algebra}~\cite{asl} (i.e.\ a cancellative,
 partial commutative monoid~\cite{asl}) that satisfies the
 \emph{cross-split} property\footnote{ A separation algebra
   $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
   for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
-  exists $\mathit{ac}, \mathit{ad}, \mathit{bc}, \mathit{bd} \in
-  \mathbb{B}$ s.t.\ $a = \m{ac} + \m{ad}$, $b = \m{bc} + \m{bd}$, $c =
-  \m{ac} + \m{bc}$, and $d = \m{ad} + \m{bd}$.}  As we demonstrate in
-the examples of \S\ref{sec:examples}, our programs often call for a
-more complex model of machine states and capabilities. For instance,
-we may need our capabilities to be fractionally owned, where ownership
-of a \emph{fraction} of a capability grants the right to perform the
-action to both the thread and the environment, while a fully-owned
-capability by the thread \emph{denies} the right to the environment to
-perform the associated action.  For ease of presentation, the focus of
-this paper is on the standdard stack and heap model for machine
-states, and finite sets of \emph{tokens} (which are simple names) for
+  exists $x, y, z, z \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
+  $c = x + z$, and $d = y + w$.}  As we demonstrate in the examples of
+\S\ref{sec:examples}, our programs often call for a more complex model
+of machine states and capabilities. For instance, we may need our
+capabilities to be fractionally owned, where ownership of a
+\emph{fraction} of a capability grants the right to perform the action
+to both the thread and the environment, while a fully-owned capability
+by the thread \emph{denies} the right to the environment to perform
+the associated action.  For ease of presentation, the focus of this
+paper is on the standdard stack and heap model for machine states, and
+finite sets of \emph{tokens} (which are simple names) for
 capabilities.
 
 \begin{definition}[Logical states]
   A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
-  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in\set{Stack}$
-  associating program variables with values, a heap $h \in \set{Heap}$
-  associating heap locations with values, and a capability
-  $\ca{}\in\Caps$. We assume infinite disjoint sets $\set{PVar}$,
-  $\set{LVar}$, and $\set{Token}$ of program variables, logical
-  variables, and tokens, respectively.
+  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s$ associating
+  program variables with values, a \emph{heap} $h$ associating heap
+  locations with values, and a \emph{capability} $\ca{}$. We assume
+  infinite disjoint sets $\set{PVar}$, $\set{Loc}$, and $\set{Token}$
+  of program variables, memory locations, and tokens, respectively.
   \begin{mathpar}
     \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
     
@@ -72,13 +81,10 @@ capabilities.
   \end{mathpar}
 \end{definition}
 
-The \emph{shared logical state}, or shared state $g$ represents the
-\emph{entire} and unique shared state, accessible to all threads,
-subject to interferences as described by the action model $\lmod$. It
-is also represented as a logical state, which has to be
-\emph{compatible} with the current local logical state (capturing the
-intuition that privately-owned resources are disjoint from shared
-resources).
+The local and global logical states of a world are always
+\emph{compatible}, capturing the intuition that privately-owned
+resources are disjoint from shared resources. Compatibility means that
+they may composed as follows.
 
 \begin{definition}[Logical state composition]
   The \emph{composition of logical states} $ \composeL : \LStates
@@ -86,17 +92,16 @@ resources).
   component-wise:
   \[
   (@s, h,\ca{}) \composeL (@s', h', \ca{}') \eqdef
-  (@s\uplus @s', h\composeH h', \ca{}\composeCap \ca{}')
+  (@s\uplus @s', h\uplus h', \ca{}\uplus \ca{}')
   \]
-  The \emph{separation algebra of logical states} is given by
-  $(\LStates, \composeL, \unitL)$.
+  %% The \emph{separation algebra of logical states} is given by
+  %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l, l_1, \cdots, l_n$ to range over either arbitrary logical
-states or those representing the local logical state. Similarly, we
-write $g, g_1, \cdots, g_n$ to range over logical states when
-representing the shared (global) state. The empty logical state
-$(\emptyset, \unitH, \unitCap)$ is written $\unitL$. We write $l_1
+We write $l$ to range over either arbitrary logical states or those
+representing the local logical state, and $g$ to range over logical
+states representing the shared (global) state. The empty logical state
+$(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
 $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
 exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
@@ -111,16 +116,16 @@ $I$. Although worlds do not put further constraints on the
 relationship between $\lmod$ and $g$, they are linked more tightly in
 the semantics of assertions (\S\ref{sec:assertions}).
 
-\begin{definition}[Actions, action models]
-  The set of \emph{actions} $\set{Action}$, ranged over by $a, a_1,
-  \cdots, a_n$, and the set of \emph{action models} $\AMods$, ranged
-  over by $\lmod, \lmod_1, \cdots, \lmod_n$ are defined as follows.
+\begin{definition}[Action models]
+  The set of \emph{actions} $\set{Action}$, ranged over by $a$, and
+  the set of \emph{action models} $\AMods$, ranged over by $\lmod$ are
+  defined as follows.
   \begin{mathpar}
     \set{Action} == \LStates \times \LStates
     
     \AMods == \Caps \rightharpoonup \pset{\set{Action}}
   \end{mathpar}
-  We write $\unitAM$ for an action model with empty domain.
+%  We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 
 \paragraph{Well-formed worlds}
@@ -129,11 +134,12 @@ $(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy a
 well-formedness condition: 1) the local and shared states are always
 disjoint ($l\compatL g$), 2) the capabilities owned by $l$ and $g$ are
 in the domain of $\lmod$, and 3) actions in $\lmod$ are
-\emph{confined} to $g$ (written $g\containI\lmod$), i.e.
-whenever they are enabled (in that their pre-state is compatible with
-$g$), the part of the state that they mutate is a sub-part of $g$. For
-ease of presentation, we postpone the formal definition of
-$g\containI\lmod$ to \S\ref{sec:assertions}.
+\emph{confined} to $g$ (written $g\containI\lmod$), i.e.  whenever
+they are enabled (in that their pre-state is compatible with $g$), the
+part of the state that they mutate is a sub-part of $g$. The
+definition of $g\containI\lmod$ is similar to the confinement between
+an assertion and an interference assertion, which we describe in
+\S\ref{sec:prules}.
 
 \begin{definition}[Well-formedness]
   \label{def:wf}
@@ -183,43 +189,70 @@ components and the resulting tuple is a well-formed world.
 \]
 \end{definition}
 
-The set of well-formed worlds with composition $\composeW$ forms a
-separation algebra with multiple units: all well-formed worlds of the
-form $(\unitL,g,\lmod)$.
+%% The set of well-formed worlds with composition $\composeW$ forms a
+%% separation algebra with multiple units: all well-formed worlds of the
+%% form $(\unitL,g,\lmod)$.
 
-\subsection{\colosl Assertions}\label{sec:assertions}
-We describe the \emph{assertions} of \colosl and provide their semantics by relating them to sets of worlds. We establish the validity of \copyRule, \forgetRule and \mergeRule principles introduced in the preceding sections by establishing their truth for all possible worlds and interpretations.
+\subsection{\colosl Assertions}
+\label{sec:assertions}
 
-Our assertions extend standard assertions from separation logic with \emph{subjective views} and \emph{capability assertions}. 
-We assume an infinite set, $\set{PVar}$, of program variables; an infinite set, $\set{LVar}$, of \emph{logical variables}; and a set of \emph{logical environments} $\lenv \in \LEnv: \pset{\set{LVar} --> \set{Val}}$ that associate logical variables with their values.
+Our assertion language extends separation logic with \emph{subjective
+  views} and \emph{capability assertions}.  We assume an extra
+infinite set $\set{LVar}$ of \emph{logical variables}, disjoint from
+$\set{PVar}$.
 
-\colosl is parametric in the assertions of machine states and capabilities and can be instantiated with any assertion language over machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions as machine state assertions; and instantiate capability assertions with tokens.
-%We thus assume an infinite set, $\set{Token}$, of tokens.
-%
-%
+\colosl is parametric in the assertions of machine states and
+capabilities and can be instantiated with any assertion language over
+machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
+use standard heap and stack assertions, and single-token assertions.
+
 \begin{definition}[Assertion syntax]\label{def:assertions}
-The assertions of \colosl are elements of $\Assertions$ described by the grammar below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
-%
+The assertions of \colosl are elements of $\Assertions$ described by
+the grammars below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$,
+and $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand
+for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
 \begin{align*}	 
-  A &::=\m{false} \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [\token{a}] \mid [x]
-  \quad
-  E ::= x \!\mid\! E_1 + E_2 \!\mid\! \cdots \\
-%
-	\LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
-%	
-  \Assertions \ni P,Q & ::= \lass{P} \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
-%
+  A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [E]\\
+  \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
+  \Assertions \ni P,Q & ::= \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P ** Q \mid \shared{P}{I}  \\
   I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{y}}{P}{Q}\} \cup I
+  \qquad\qquad
+  E ::= x \mid \token a \mid E_1 + E_2 \!\mid\! \cdots
 \end{align*}
 \end{definition}
-%
-This syntax follows from standard separation logic with variables as resource~\cite{variablesAsResource} (where expressions $E$ do not allow program variables), with the exception of the subjective views $\shared P I$. 
-Machine state and capability assertions are interpreted over a world's local state: $\li{x}|-> E$ (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap) where only \li{x} (resp.\ address $E_1$) is allocated and has value $E$ (resp.\ points to $E_2$); the capability assertion $[\token{a}]$ is true of the capability $\{\token{a}\}$. 
-$\emp$ is true of states where the the units of $\composeW$. 
-$P * Q$ is true of worlds that can be split into two according to $\composeW$ such that one state satisfies $P$ and the other satisfies $Q$; $P**Q$ is the \emph{overlapping conjunction}, true of worlds can be split three-way according to $\composeW$, such that the $\composeW$-composition of the first two worlds satisfies $P$ and the $\composeW$-composition of the last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives have their standard classical meaning. Interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition.
 
-A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l = \unitL$ and a \emph{subjective view} $s$ can be found in the global shared state $g$ (i.e. $g = s\composeL r$ for some \emph{context} $r$), such that $s$ satisfies $P$ in the standard separation logic sense, and $I$ and $\lmod$ \emph{agree} given the
-decomposition $s$, $r$, in the following sense:
+As in, e.g., RGSep~\cite{viktor-marriage}, we distinguish between
+\emph{local assertions} in $\LAssertions$ and general assertions in
+$\Assertions$. For simplicity, general assertions do not include
+negation or magic-wand. The syntax of assertions follows from standard
+separation logic with variables as resource~\cite{variablesAsResource}
+(note that expressions $E$ do not allow program variables), with the
+exception of the subjective views $\shared P I$.  Machine state and
+capability assertions are interpreted over a world's local state:
+$\li{x}|-> E$ (resp.\ $E_1|->E_2$) is true of the singleton stack
+(resp.\ heap) where only \li{x} (resp.\ address $E_1$) is allocated
+and has value $E$ (resp.\ points to $E_2$); the capability assertion
+$[E]$ is true of the singleton capability $\{\token{a}\}$ if $E$
+evaluates to $\token a$.  $\emp$ is true of worlds with empty local
+state (the units of $\composeW$);  $P * Q$ is true of worlds that can
+be split into two according to $\composeW$ such that one state
+satisfies $P$ and the other satisfies $Q$; $P**Q$ is the
+\emph{overlapping conjunction}, true of worlds can be split three-way
+according to $\composeW$, such that the $\composeW$-composition of the
+first two worlds satisfies $P$ and the $\composeW$-composition of the
+last two satisfy $Q$~\cite{rey-slnotes}; classical predicates and
+connectives have their standard classical meaning. Interference
+assertions $I$ describe actions enabled by a given capability, in the
+form of a pre- and post-condition.
+
+A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
+\unitL$ and a \emph{subjective view} $s$ can be found in the global
+shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
+$r$), such that $s$ satisfies $P$ in the standard separation logic
+sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
+$r$, in the following sense, which we write
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
+of space; it may be found in \S XXX):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
 	
@@ -229,16 +262,39 @@ decomposition $s$, $r$, in the following sense:
 %	\item the above is true for any state resulting from any number of actions of $\lmod$ applied to $g$.
 %	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
-These conditions will be captured by the \emph{action model closure} relation $\extendsAM{\lmod}{s}{r}{\semI{I}}$ given by the upcoming \defin~\ref{def:actclos} in \S\ref{} (where $\semI{I}$ is the interpretation of $I$ given a logical environment $\lenv$).
 
-The semantics of \colosl assertions is given by a forcing relation $w,\lenv|= P$ between a world $w$, a logical environment $\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing relations. The first one $l,\lenv\slsat P$ interprets formulas $P$ in the usual separation
-logic sense over a logical state $l$ (and ignores shared state assertions). The second one $s,\lenv|=_{g,\lmod} P$ interprets assertions over a \emph{subjective view} $s$ that is part of the global shared state $g$, subject to action model $\lmod$. This third form of satisfaction is needed to deal with nesting of subjective views\footnote{This presentation with several forcing relations differs from the usual CAP presentation~\cite{cap-ecoop10}, where formulas are first interpreted over worlds that are not necessarily well-formed, and then cut down to well-formed ones. The CAP presentation strays from separation logic models in some respects; e.g. in CAP, $*$ is not the adjoint of $--*$, the ``magic wand'' connective of separation logic. Although we have omitted this connective from our presentation, its definition in \colosl would be standard and satisfy the adjunction with $*$.}.
-%
-Moreover, since logical connectives are interpreted uniformly in all cases, we write $|=_\dagger$ for either of the three satisfaction relations, and then write $u$ for elements of either $\Worlds$ or $\LStates$, and $\grey$ for either $\composeW$ or $\composeL$, depending on whether the satisfaction relation is $|=$, or either $\slsat$ or $|=_{l,\lmod}$, respectively.
-%
-%
+The semantics of \colosl assertions is given by a forcing relation
+$w,\lenv|= P$ between a world $w$, a logical environment
+$\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing
+relations. The first one $l,\lenv\slsat p$ interprets local assertions
+$p\in\LAssertions$ in the usual separation logic sense over a logical
+state $l$. The second one $s,\lenv|=_{g,\lmod} P$ interprets
+assertions over a \emph{subjective state} $s$ that is part of the
+global shared state $g$, subject to action model $\lmod$. This third
+form of satisfaction is needed to deal with nesting of subjective
+views.
+%% \footnote{This presentation with
+%%   several forcing relations differs from the usual CAP
+%%   presentation~\cite{cap-ecoop10}, where formulas are first
+%%   interpreted over worlds that are not necessarily well-formed, and
+%%   then cut down to well-formed ones. The CAP presentation strays from
+%%   separation logic models in some respects; e.g.\ in CAP, $*$ is not
+%%   the adjoint of $--*$, the ``magic wand'' connective of separation
+%%   logic. Although we have omitted this connective from our
+%%   presentation, its definition in \colosl would be standard and
+%%   satisfy the adjunction with $*$.}.
+Since logical connectives are interpreted uniformly in all cases, we
+write $|=_\dagger$ for either of the three satisfaction relations, and
+then write $u$ for elements of either $\Worlds$ or $\LStates$, and
+$\grey$ for either $\composeW$ or $\composeL$, depending on whether
+the satisfaction relation is $|=$, or either $\slsat$ or
+$|=_{l,\lmod}$, respectively.
+
 \begin{definition}[Assertion semantics]\label{def:assertion-semantics}
-Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertions is as follows, where $\semI[(.)]{.}: \LEnv \rightarrow \AMods$ denotes the semantics of interference assertions and $\extendsAM{\lmod}{s}{r}{\semI{I}}$ is formalised in \defin~\ref{def:actclos}.
+Given a logical environment $\lenv: \set{LVar} --> \set{Val}$, the
+semantics of \colosl assertions is as follows, where $\semI[(.)]{.}:
+\LEnv \rightarrow \AMods$ denotes the semantics of interference
+assertions.
 \vspace{-1ex}
 %
 \[
@@ -251,18 +307,15 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   g = s\composeL r\text{ and }
   s, \lenv |=_{g,\lmod} P\text{ and }
   \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}
-  \vspace{-1ex}
 \end{array}
 \]
+\vspace{-3.3ex}
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   s, \lenv &|=_{g,\lmod} \lass{P} &\text{iff}& s, \lenv \slsat \lass{P}\\
   
   s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
   (s,g,\lmod), \lenv |= \shared P I\\
-  
-  u,\lenv &|=_\dagger \neg P
-  &\text{iff}& u,\lenv \not{|=_\dagger} P\\
   
   u,\lenv &|=_\dagger \exsts x P
   &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
@@ -281,49 +334,41 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   \exsts{u',u_1,u_2} u = u'\grey u_1\grey u_2\text{ and}\\
   &&&
   u' \grey u_1, \lenv |=_\dagger P_1 \text{ and }
-  u' \grey u_2, \lenv |=_\dagger P_2\\
-  
-
- 	u, \lenv &|=_\dagger P \septraction Q &\text{iff}&
-	\exsts{u'} u', \lenv |=_\dagger P \text{ and }
-	u \sharp u'
-	\text{ implies }u \grey u', \lenv |=_\dagger Q \vspace{5pt}\\
-	
+  u' \grey u_2, \lenv |=_\dagger P_2\\	
   
 %  l, \lenv &\slsat [E]
 %  &\text{iff}&
-%  l = (\emptyset,\unitH, \{[|E|]_{\lenv}\})\\
+%  l = (\emptyset,\emptyset, \{[|E|]_{\lenv}\})\\
 %  &&\cdots\\
 
+  l,\lenv &\slsat \m{false}  && \text{never}\\
 
-		
-  l,\lenv &\slsat \m{false}
-  && \text{never}\\
-  
-  
   l, \lenv &\slsat \emp &\text{iff}&l = \unitL\\
   
-  
-  %  l,\lenv &\slsat E_1 = E_2
-%  &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
-
+  l,\lenv &\slsat E_1 = E_2
+  &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
 
   l, \lenv &\slsat \li{x}|->E
   &\text{iff}&
   l = ([\li x: [|E|]_{\lenv}], \emptyset, \emptyset)\\
-  
   
   l, \lenv &\slsat E_1|->E_2 
   &\text{iff}&
   l =
   (\emptyset, [[|E_1|]_{\lenv}: [|E_2|]_{\lenv}], \emptyset)\\
   
-  
-  l, \lenv & \slsat [\token{a}]
+  l, \lenv & \slsat [E]
   & \text{iff} &
-  l = (\emptyset, \emptyset, \{\token{a}\})\\
+  l = (\emptyset, \emptyset, \{[|E|]_{\lenv}\})\\
   
+  l,\lenv &\slsat \neg P
+  &\text{iff}& l,\lenv \not\slsat P\\
   
+  l, \lenv &|=_\dagger P \septraction Q &\text{iff}&
+  \exsts{l'} l', \lenv |=_\dagger P \text{ and }
+  l \sharp l'
+  \text{ implies }l \composeL l', \lenv |=_\dagger Q
+
 %  l, \lenv &\slsat \lass{P} \septraction \lass{Q} &\text{iff}&
 %	\exsts{l'} l', \lenv \slsat \lass{P} \text{ and }
 %	l \sharp l'\text{ implies }l \composeL l', \lenv \slsat \lass{Q} 
@@ -352,75 +397,44 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
 \end{align*}
 \end{definition}
 
+The following facts are easily derived from the semantics.
 
-
-
-
-\begin{lemma}\label{lem:assertion-facts}
-The following entailments are valid.
-%
-%
-%\begin{figure}
-%\hrule\vspace{5pt}
-\begin{mathpar}
-	%% \infer{
-	%% 	P <=> \un{P}
-	%% }
-	%% {}
-	%% 
-	%% \infer{
-	%% 	P \entails \erase{P}
-	%% }
-	%% {}
-        %% 
-	\infer{
-		\shared{P}{I} \entails \shared{Q}{I}
-	}
-	{
-		P \entails Q
-	}
-	
-	\infer{
-		\shared{P}{I} * \shared{Q}{I'} \entails \m{false}
-	}
-	{
-		P \sepish Q \entails \m{false}
-	}
-	
-	\infer{
-		\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
-	}
-	{
-		R \entails P
-		&
-		P \sepish Q \entails R \sepish Q
-	}
-\end{mathpar}
-%\hrule
-%\caption{Useful entailments where we write $P <=> Q$ for $P \entails Q \land Q \entails P$.}
-%\label{fig:assertion-facts}
-%\end{figure}
-%
-%\begin{mathpar}
-%	P => \erase{P} %\shared{P}{I} \implies \emp
-%	
-%	P <=> \un{P}
-%\end{mathpar}
-%%
-\begin{proof}
-%% The proof follows immediately from the semantics of \colosl assertions and is provided in~\cite{colosl-tr14}.
-\end{proof}
-%
+\begin{lemma}
+  \label{lem:assertion-facts}
+  \forgetRule, \mergeRule, \weakenRule, and \copyRule are valid.
+  %% \begin{mathpar}
+  %%       \infer{
+  %%       	\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
+  %%       }
+  %%       {
+  %%       	R \entails P
+  %%       	&
+  %%       	P \sepish Q \entails R \sepish Q
+  %%       }
+  %% \end{mathpar}
 \end{lemma}
-
+\begin{proof}
+  The cases of \weakenRule and \copyRule are
+  straightforward. \forgetRule and \mergeRule are valid because action
+  model closure is preserved under picking a sub-subjective state and
+  under taking the union of subjective states and their interference
+  relations, respectively (see \S XXX).
+\end{proof}
 
 
 \subsection{Reducing \colosl principles to separation logic entailments}
+\label{sec:prules}
 
 \paragraph{Flattening}
-The only restriction being that
-negation is not allowed to occur on non-pure formulas, but
-conjunction, etc.\ are allowed.
+restrictions in this section:
+
+- no nested boxes
+
+- no boxes in interference assertions
+
+no nested boxes can be lifted (ie give an equivalent formula w/o
+nesting) provided no box in negative position.
+
 
 Moreover, if actions and
 frames can be expressed in the symbolic heap fragment used in
@@ -477,7 +491,7 @@ the interference $I$ via the \extendRule principle, which requires
 that $P\containI I$. We postpone the semantic definition of $P \confines I$ until \S XXX and instead provide a set of syntactic rules in \fig~\ref{fig:local-fencing-rules} that are easier to understand.
 These rules assume that actions in
 $I$ are of the form $\lass{P} \swap \lass{Q}$ where
-$P,Q\in\LAssertions$, i.e. the action assertions do not
+$P,Q\in\LAssertions$, i.e.\ the action assertions do not
 mention subjective views since it is always possible to weaken
 interference assertions mentioning subjective views into ones that do not (see \S
 XXX). As expressed by the first rule of
@@ -495,7 +509,7 @@ state denoted by $R$ is uniquely determined and left unchanged by the
 action. The last rule finally reduces local fencing to entailment
 checking, provided the fence $F$ can be expressed as a disjunction of
 precise formulas. The first premise states that $F$ is invariant under
-the action $P\swap Q$, in a similar fashion as i.e. RGSep
+the action $P\swap Q$, in a similar fashion as i.e.\ RGSep
 encodes stability checks as separation logic entailments. The third
 premise checks the confinement condition: if a sub-part of an
 extension of a state in $F_i$ satisfies $P$ ($l_1\composeL l_2|= F_i$
