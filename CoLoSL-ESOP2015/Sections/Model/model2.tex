@@ -450,6 +450,22 @@ $--o$-elimination procedure of Calcagno et al. in~\cite{vv07msc} to
 deal with $**$ as well. We leave the details of this adaptation to \S
 XXX.
 
+In what follows, we will use the following standard terminology.
+
+\begin{definition}[Precision, exactness]
+  $p\in\LAssertions$ is \emph{precise} (resp.\ \emph{exact}) if it is
+  satisfied by at most one sub-state of each state (resp.\ at most one
+  state).
+  \begin{align*}
+    \exact{p} &==
+    \for{\lenv, l_1, l_2} l_1, \lenv \slsat p\text{ and }l_2, \lenv
+    \slsat p\text{ implies } l_1 = l_2\\
+    \precise{p} &==
+    \for{\lenv, l, l_1, l_2} l_1\leq l\text{ and }l_2\leq l\text{ and }l_1, \lenv \slsat p\text{ and }l_2, \lenv
+    \slsat p\\
+    &\qquad\text{ implies } l_1 = l_2
+  \end{align*}
+\end{definition}
 
 \paragraph{Confinement}
 \colosl models the shared state as a single ``region'' of memory and a
@@ -493,36 +509,39 @@ all actions in $\lmod'$. This is achieved by first finding a set that
 is invariant under all actions in $\lmod'$ (called a \emph{fence}),
 then checking the confinement condition for each action.
 
-In the logic, the shared state is extended by the resources in $\lass{P}$
-under the interference $I$ via the \extendRule principle, which
-requires that $\lass{P}\containI I$. \fig~\ref{fig:local-fencing-rules}
-presents a set of rules to establish $\lass{P}\containI I$. As expressed by
-the first rule of \fig~\ref{fig:local-fencing-rules}, $\lass{P}\containI I$
-holds if there is a weaker assertion $\lass{F}$ that acts as a \emph{local
-  fence} for $I$, denoted by $\lass{F}\strictfences I$. This fencing
-condition is checked for each action in $I$ (as expressed by the
-second rule). For each action $\lass{P}\swap \lass{Q}$, the three remaining rules of
-the figure may apply. In the first of these rules, the action cannot
-possibly fire, because its precondition is incompatible with $\lass{F}$: no
-state satisfying $\lass{F}$ may be extended such that a sub-part satisfies
-$\lass{P}$. The second of these rules allows one to trim neutral parts $\lass{R}$ of
-an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$ appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is
-exact, then the part of the state denoted by $\lass{R}$ is uniquely
+In the logic, the shared state is extended by the resources in
+$\lass{P}$ under the interference $I$ via the \extendRule principle,
+which requires that $\lass{P}\containI I$ be
+established. \fig~\ref{fig:local-fencing-rules} presents a set of
+rules to reduce $\lass{P}\containI I$ to a series of entailments in
+ordinary separation logic. As expressed by the first rule,
+$\lass{P}\containI I$ holds if there is a weaker assertion $\lass{F}$
+that acts as a \emph{local fence} for $I$, denoted by
+$\lass{F}\strictfences I$; in particular, this means that $\lass{F}$
+must be invariant under all actions of $I$. This fencing condition is
+checked for each action in $I$ (see the second rule). For each action
+$\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
+apply. In the first of these rules, the action cannot possibly fire,
+because its precondition is incompatible with $\lass{F}$: no state
+satisfying $\lass{F}$ may be extended such that a sub-part satisfies
+$\lass{P}$. The second of these rules allows one to trim neutral parts
+$\lass{R}$ of an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$
+appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
+then the part of the state denoted by $\lass{R}$ is uniquely
 determined and left unchanged by the action. The last rule finally
-reduces local fencing to entailment checking, provided the fence $\lass{F}$
-can be expressed as a disjunction of precise formulas. The first
-premise states that $\lass{F}$ is invariant under the action $\lass{P}\swap \lass{Q}$, in a
-similar fashion as i.e.\ RGSep encodes stability checks as separation
-logic entailments. The third premise checks the confinement condition:
-if a sub-part of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
-($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$), then that it
-is also a sub-part of that state ($l_1\composeL l_2\composeL
-l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL l_3\leq
-l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
-
-The rules of \fig~\ref{fig:local-fencing-rules} can be used to reduce
-the checking of confinement conditions in \colosl to familiar
-entailment checking in separation logic.
+reduces local fencing to entailment checking, provided the fence
+$\lass{F}$ can be expressed as a disjunction of precise formulas. The
+first premise states that $\lass{F}$ is invariant under the action
+$\lass{P}\swap \lass{Q}$, in a similar fashion as e.g.\ RGSep encodes
+stability checks as separation logic entailments. Informally, it
+reads: for any state in $f$, remove a part satisfying $p$ and add a
+state satisfying $q$; the result should still be in $f$. The third
+premise checks the confinement condition: if a sub-part of an
+extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
+($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
+then it is also a sub-part of that state ($l_1\composeL l_2\composeL
+l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
+l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 
 \begin{figure}
 \hrule\vspace{5pt}
@@ -603,32 +622,28 @@ entailment checking in separation logic.
 %	
 \end{mathpar}
 \hrule
-\caption{Confinement and local fencing rules, where all assertions are
-  in $\LAssertions$.}
+\caption{Confinement and local fencing rules.}
 \label{fig:local-fencing-rules}
 \end{figure}
 
 
 Just like all newly-created shared states are confined, any world
-should also be confined. The formal definition to
-$\wf{l,g,\lmod}$ used in \defin~\ref{def:wf} in terms of its logical
-equivalent (a semantic, direct definition is also possible, see XXX):
-\julescomment{Actually, we'd need to define an inverse of
-  $\semI{\cdot}$. Perhaps leave the formal def of $g\containI \lmod$ out.}
+should also be confined, hence the confinement condition in the
+well-formedness of worlds, which repeats the definition of confinement
+for assertions at the model level.
 
 
 \paragraph{Shifting/fencing judgements}
 \fig\ref{fig:shifting-rules} presents an axiomatisation of the main
 shifting principles, our mechanism to rewrite interference assertions
-in subjective views via the \shiftRule view shift. As with
-confinement, we omit the direct semantic definition, which can be
-found in XXX.  The pseudo-entailment $\separate{\lass{P}}{\lass{Q}}$
-asserts that states described by $\lass{P}$ and $\lass{Q}$ have
-\emph{empty intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and
-$l_2, \lenv \slsat \lass{Q}$, $l_1$ and $l_2$ do not have any
-non-trivial common sub-state ($\for{l \in \LStates} l \leq l_1 \land l
-\leq l_2 \implies l = \unitL$). This is expressible using standard
-connectives as follows:
+in subjective views via \shiftRule. As with confinement, we omit the
+direct semantic definition, which can be found in XXX.  The
+pseudo-entailment $\separate{\lass{P}}{\lass{Q}}$ asserts that states
+described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
+  intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and $l_2,
+\lenv \slsat \lass{Q}$, $l_1$ and $l_2$ do not have any non-trivial
+common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
+\unitL$). This is expressible using standard connectives as follows:
 \[
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
 \]
@@ -752,18 +767,19 @@ non-intersection for a restricted fragment of formulas.
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Action shifting judgements; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
+\caption{Action shifting rules; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
 \label{fig:shifting-rules}
 \end{figure}
 
 The first three rules of \fig\ref{fig:shifting-rules} allow one to
 check shifting piecewise: one may weaken the assertion $\lass{P}$ into
-another $\lass{F}$, which if it \emph{fences} for $I_1\cup I_2$, can be used
-to reduce a shifting judgement $I \cup I_1 \weakenI{\fenceAss{}} I
-\cup I_2$ to $I_1 \weakenI{\fenceAss{}} I_2$. To check whether an
-assertion $\lass{F}$ fences an interference assertion $I$, written $\lass{F}\fences
-I$, the last three rules of the figure provide rules to apply to each
-action of $I$, which are similar to those for local fencing.
+$\lass{F}$ which, if it \emph{fences} $I_1\cup I_2$, can be used to
+reduce a shifting judgement $I \cup I_1 \weakenI{\fenceAss{}} I \cup
+I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. To check whether
+an assertion $\lass{F}$ fences an interference assertion $I$, written
+$\lass{F}\fences I$, the last three rules of the figure provide rules
+to apply to each action of $I$, which are similar to those for local
+fencing.
 \begin{enumerate}
 \item
   As for local fencing, neutral parts in actions may be ignored.
@@ -773,80 +789,65 @@ action of $I$, which are similar to those for local fencing.
   with the fence, then its effect is entirely outside the fence and
   the action may be ignored.
 \item
-  When $\lass{P}$ and $\lass{Q}$ do not intersect in an action $\lass{P}\swap \lass{Q}$, for
-  instance because their common part has been removed according to 1.,
-  then the application of the action must preserve the fence
-  $\lass{F}$. Because the action is allowed to act partly outside of $\lass{F}$, the
-  state that is mutated has to be $\lass{F} ** \lass{P}$, unlike local fencing where
-  $\lass{P}$ would be contained in $\lass{F}$. The reason why $\lass{P}$ and $\lass{Q}$ must not
-  interesect is precisely that we consider action on $\lass{F} ** \lass{P}$ and not
-  just $\lass{F}$; if $\lass{P}$ and $\lass{Q}$ have a non-empty intersection $l$ then it might
-  be that $l$ is not part of $\lass{F}$ and is added together with $\lass{Q}$ by $*$
-  on the left-hand side of the sequent. But there is no guarantee that
-  $I$ accounts for all possible actions on that piece of state $l$
-  since it was not part of $\lass{F}$, hence we could end up with an
-  assertion $\shared{\lass{F}}{I}$ that does not satisfy the action closure
-  property anymore.
+  When $\lass{P}$ and $\lass{Q}$ do not intersect in an action
+  $\lass{P}\swap \lass{Q}$, for instance because their common part has
+  been removed according to 1., then the application of the action
+  must preserve the fence $\lass{F}$. Because the action is allowed to
+  act partly outside of $\lass{F}$, the state on which the action is
+  applied is $\lass{F} ** \lass{P}$, unlike local fencing where
+  $\lass{P}$ would be contained in $\lass{F}$. The reason why
+  $\lass{P}$ and $\lass{Q}$ must not interesect is precisely that we
+  consider action on $\lass{F} ** \lass{P}$ and not just $\lass{F}$;
+  if $\lass{P}$ and $\lass{Q}$ have a non-empty intersection $l$ then
+  it might be that $l$ is not part of $\lass{F}$ and is added together
+  with $\lass{Q}$ by $*$ on the left-hand side of the sequent. But
+  there is no guarantee that $I$ accounts for all possible actions on
+  that piece of state $l$ since it was not part of $\lass{F}$, hence
+  we could end up with an assertion $\shared{\lass{F}}{I}$ that does
+  not satisfy the action closure property.
 \end{enumerate}
 The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
-shifting is possible when the actions in $I\cup I_1$ and $I\cup I_2$
+shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
 have the same effect on $\lass{F}$ after an arbitrary number of action
 applications. In particular, this is the case when $\lass{F}\fences I\cup
 I_1$, \textit{i.e.} $\lass{F}$ is an \emph{invariant} of the shared region
-under interferences in $I\cup I_1$, while $I_1 \weakenI{\fenceAss{}}
+under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
 I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
 view of $\lass{F}$.
 
 The next two rules describe situations where an action is irrelevant
-to a particular assertion $\lass{F}$: if the effect of the action is entirely
-outside of $\lass{F}$, or if it is impossible to apply the action to $\lass{F}$. The
-next rule is an equivalence that use the knowledge of the possible
-states $\lass{F}$ of the shared region to rewrite an action into an
-equivalent one. More precisely, if whenever the precondition $\lass{P}$ of
-the action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is also
-true, then it is safe to add $\lass{R}_i$ as a neutral part of the action
-(the fact that $\lass{R}_i$ is exact guarantees that no piece of state in
-$\lass{R}_i$ is mutated by the action) without changing the set of states in
-which the action can be applied. The last equivalence is
-straightforward. Note that $\m{true}$ fences any interference
-assertion.
+to a particular assertion $\lass{F}$: when the effect of the action is
+entirely outside of $\lass{F}$, or when it is impossible to apply the
+action to $\lass{F}$. The next rule is an equivalence that uses the
+knowledge embodied by $\lass{F}$ of all the possible states that the
+shared region may be in to rewrite an action into an equivalent
+one. More precisely, if whenever the precondition $\lass{P}$ of the
+action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
+also true, then it is safe to add $\lass{R}_i$ as a neutral part of
+the action (the fact that $\lass{R}_i$ is exact guarantees that no
+piece of state in $\lass{R}_i$ is mutated by the ``larger'' action)
+without changing the set of states in which the action can be
+applied. The last shifting equivalence is straightforward. Note that
+$\m{true}$ fences any interference assertion.
 
 
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} presents rules to show that an assertion
-of the form $\exsts{\bar x}\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ is
-stable, where $\lass{P}$, $\lass{Q}_i$ and assertions in $I_i$ are local for all
-$i$. As in the rest of this section, a more elaborate set of rules
-exists for a larger fragment of \colosl formulas. The first two rules
-state that local assertions are always stable and existentials can be
-eliminated. Then, checking the stability of $\lass{P} * \bigstar_{i\in
-  I}\shared{\lass{Q}_i}{I_i}$ boils down to establishing, for each subjective
-view $\shared{\lass{Q}_i}{I_i}$, the four-place $\mathsf{Stable}$ predicate
-which, in this case, means that $\lass{Q}_i$ is stable under the interference
-assertion $I_i$, a local context $\lass{P}$, and a shared context made of the
-$**$-combination of all the subjective assertions (including $\lass{Q}_i$).
-In turn, checking this fact boils down to checking stability for each
-action of $I_i$. The last three rules deal with checking stability for
-a single action, in a similar way than for fencing above.
-
-The first of these is new: unlike fencing, stability only has to be
-checked against actions for which the environment may hold enough
-capabilities. If the capabilities required by the action cannot exist
-separately from those held by the whole formula, which may be summed
-up by $\lass{P} * \lass{R}$, then the environment cannot perform the
-action. Similarly, an action whose precondition is incompatible with
-the current knowledge about the state cannot possibly fire. This is
-what the premise expresses; the local context is $*$'d with the shared
-context, itself overlapped with the precondition of the action, since
-that precondition must hold somewhere in the shared state, separately
-from any private state (but possibly partially outside of the current
-combined subjective view of the shared state). We are thus left with
-the last rule, which checks that a particular subjective assertion $\lass{Q}$
-is preserved by the effect of an action. Again, there is a crucial
-difference with the corresponding check for fencing: the action is
-applied to the whole state, but part of the result can be discarded to
-re-establish $\lass{Q}$.
-
+of the form $\exsts{\bar x}\lass{P} * \bigstar_{i\in
+  I}\shared{\lass{Q}_i}{I_i}$ is stable. This is a more restricted
+form of assertions than our two previous axiomatisations, but a more
+elaborate set of rules exists for the general case (see \S XXX). The
+first two rules state that local assertions are always stable and
+existentials can be eliminated. Then, checking the stability of
+$\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
+establishing, for each subjective view $\shared{\lass{Q}_i}{I_i}$, the
+four-place $\mathsf{Stable}$ predicate which, in this case, means that
+$\lass{Q}_i$ is stable under the interference assertion $I_i$, a local
+context $\lass{P}$, and a shared context made of the $**$-combination
+of all the subjective assertions (including $\lass{Q}_i$).  In turn,
+checking this fact boils down to checking stability for each action of
+$I_i$. The last three rules deal with checking stability for a single
+action, in a similar way than for fencing above.
 
 \begin{figure*}
 \hrule\vspace*{5pt}
@@ -925,20 +926,47 @@ re-establish $\lass{Q}$.
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements where all assertions meta-variables are
-  in $\LAssertions$ from the third rule from the top onwards.}
+\caption{Rules for checking stability (excerpt).}
 \label{fig:stability-rules}
 \end{figure*}
+
+The first of these is new: unlike fencing, stability only has to be
+checked against actions for which the environment may hold enough
+capabilities. If the capabilities required by the action cannot exist
+separately from those held by the whole formula, which may be summed
+up by $\lass{P} * \lass{R}$, then the environment cannot perform the
+action. Similarly, an action whose precondition is incompatible with
+the current knowledge about the state cannot possibly fire. This is
+what the premise of the next rule expresses: the local context is
+$*$'d with the shared context, itself overlapped with the precondition
+of the action, since that precondition must hold somewhere in the
+shared state, separately from any private state (but possibly
+partially outside of the current combined subjective view of the
+shared state). The last rule checks that a particular subjective
+assertion $\lass{Q}$ is preserved by the effect of an action. Again,
+there is a crucial difference with the corresponding check for
+fencing: the action is applied to the whole state, but part of the
+result can be discarded to re-establish $\lass{Q}$.
 
 
 
 \paragraph{Proof reuse}
-
+Finally, we note that, once a strict fencing judgement
+$F\strictfences I$ has been established, it automatically
+establishes a fencing judgement $F\fences I$, and in turn
+$F\fences I$ implies that $F$ is stable under
+$I$. The other directions are not valid in general: stability of $P$
+under $I$ may omit part of the state resulting from an action
+application to re-establish $P$, which is not allowed in fencing, and
+fencing lacks the confinement condition required by local
+fencing. Additionally, a fence $F$ for an interference
+assertion $I$ is also a fence for any $I'$ that is a shifting of $I$ under
+$F$.
 \begin{mathpar}
 	\infer{
-		\fenceAss{} \fences I	
+		F \fences I	
 	}{
-		\fenceAss{} \strictfences I	
+		F \strictfences I	
 	}
 
 	\infer{
@@ -948,12 +976,12 @@ re-establish $\lass{Q}$.
 	}
 
 	\infer={
-		\fenceAss{} \fences I
+		F \fences I
 	}
 	{
-		\fenceAss{} \fences I'
+		F \fences I'
 		&
-		I' \weakenI{\fenceAss{}} I	
+		I' \weakenI{F} I	
 	}
 \end{mathpar}
 	
@@ -1145,3 +1173,59 @@ re-establish $\lass{Q}$.
 
 \subsection{Soundness}
 
+Soundness of \colosl has been established parametrically in the
+underlying models $\Heaps$ of machine states and $\Caps$ of
+capabilities, as an instance of the Views framework~\cite{views}. The
+details may be found in the accompanying technical
+report~\cite{colosl-tr}. The main part of the proof is to establish
+the soundness of the following rule for atomic commands, where
+$\entails_{\textsf{SL}}$ represents standard sequential separation
+logic:
+\[
+\infer[\proofRule{Atom}]{
+  \hoare{P}{\atomic {\mathbb{C}}}{Q}
+}{
+  \entails_{\textsf{SL}} \{\lass{P}\}\;{\mathbb{C}}\;\{\lass{Q}\} &
+  \repartitions{P}{Q}{\lass{P}}{\lass{Q}}
+}
+\]
+
+The \emph{repartitioning} $\repartitions{P}{Q}{\lass{P}}{\lass{Q}}$
+holds whenever, from any world $(l,g,\lmod)$ satisfying $P$, if
+whenever a part of the composition of its local and shared states that
+satisfies $\lass{P}$ is exchanged for one satisfying $\lass{Q}$, there
+is $\lmod'$ and a splitting of the resulting logical state into a
+local $l'$ and shared part $g'$ such that $(l',g',\lmod')$ satisfies
+$Q$. Moreover, going from $(l,g,\lmod)$ to $(l',g',\lmod')$ can be
+achieved via a succession of 1) updates in accordance with $\lmod$, 2)
+valid extension steps and 3) valid shifting steps. A similar semantic
+condition for atomic commands is required in the frameworks from the
+CAP family~\cite{cap-ecoop10,icap,tada}. Formal definitions can be
+found in \S\ref{sec:semantics}.
+
+Semantic validity of Hoare triples depends on the definition of an
+operational semantics $\mathbb{C}, m \rightarrow^{\text{*}}
+\mathbb{C}', m'$, where $m, m' \in \Heaps$. We first define a
+reification function that relates a \colosl world $w \in \Worlds$ to
+a concrete state in \Heaps.
+
+\begin{definition}[Reification]\label{def:reification}
+  The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
+  defined as follows, where \heapPart{l'} denotes the first projection
+  of the pair $l'$:
+  \[
+  \reifyW{(l, g, \lmod)} \eqdef \heapPart{(l \composeL g)}
+  \]
+\end{definition}
+
+\begin{definition}[Valid triple]
+  A triple is \emph{valid}, written $|= \{P\}\ \mathbb{C}\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+  \[
+    \left(w, \lenv |= P  \land \h{} \in \reifyW{w} \land \mathbb{C}, \h{} \rightarrow^{\text{*}} \li{skip}, \h{}'\right)
+    \text{ implies } \exsts{w'} w', \lenv |= Q \land \h{}' \in \reifyW{w'}
+  \]
+\end{definition}
+
+\begin{theorem}[Soundness]
+  If $|-\!\{P\}\ \mathbb{C}\ \{Q\}$ then $|=\!\{P\}\ \mathbb{C}\ \{Q\}$.
+\end{theorem}
