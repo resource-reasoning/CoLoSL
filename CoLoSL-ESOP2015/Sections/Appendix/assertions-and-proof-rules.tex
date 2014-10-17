@@ -140,10 +140,55 @@ The following entailments are valid.
 
 When despatching proof obligations involving interference assertions such as local fencing ($\fenceAss{} \strictfences I$), fencing ($\fenceAss{} \fences I$) and shifting ($I \weakenI{P} I'$) conditions, it is often easier to do so with respect to interference assertions with actions whose pre- and post-conditions are local assertions. We thus provide a few judgements for weakening the actions of interference assertions to those with local action footprints. 
 
-The intuitive interpretation of an action of the form $\lass{p} * \shared{\lass{q}}{I} \swap \lass{p'} * \shared{\lass{q}}{I}$ is: whenever parts of the shared state satisfies $\lass{P}$ and parts of it satisfies $\lass{Q}$, update the subpart captured by $\lass{P}$ to one described by $\lass{P'}$. As such, given the semantics of interference assertions, the interpretation of this action is contained in that of the action of the form $\lass{P} ** \lass{Q} \swap \lass{P'} ** \lass{Q}$. We define a \emph{merging} operator on standard assertions for removing boxes and combining their contents using the ($**$) connective. We then appeal to this operator for weakening interference assertions.
+The intuitive interpretation of an action of the form $\lass{p} * \shared{\lass{q}}{I} \swap \lass{p'} * \shared{\lass{q}}{I}$ is: whenever parts of the shared state satisfies $\lass{P}$ and parts of it satisfies $\lass{Q}$, update the subpart captured by $\lass{P}$ to one described by $\lass{P'}$. As such, given the semantics of interference assertions, the interpretation of this action is contained in that of the action of the form $\lass{P} ** \lass{Q} \swap \lass{P'} ** \lass{Q}$. We define a \emph{merging} operator ($\sumA{}$) on standard assertions for removing boxes and combining their contents using the ($**$) connective. We then appeal to this operator for weakening interference assertions. When defining the merging operator for an assertion $P$, we assume that $P$ is in the \emph{prenex normal form}, i.e. all its existential quantifiers are stringed at the front of the assertion such that $P \equiv \exsts{\bar{x}} P'$ where there are no bound variables in $P'$. We thus provide a procedure for rewriting standard \colosl assertions in the prenex normal form.
 
+%
+\begin{definition}[Prenex normal form]
+Given a standard assertion $P \in \SAssertions$, the \emph{prenex normal form} function, $\promote{.}: \SAssertions \rightarrow \SAssertions$, is defined as follows:
+%
+\begin{mathpar}
+	\promote{P} \eqdef \exists{\bar{x}^{\in S}}.\; P'
+	
+	\text{where } (S, P') = \ep{P}
+\end{mathpar}
+%
+%
+with the auxiliary function $\ep{.}: \Assertions \rightarrow (\pset{\textsf{LVar}} \times \Assertions)$ defined inductively over the structure of assertions as follows where $\odot \in \{\lor, *, \sepish\}$.
+We assume that the bound logical variables of $P$ are pairwise distinct; and that the bound variables of $P$ in $\shared{P}{I}$ do not appear free in $I$\footnote{Note that it is always possible to achieve these stipulations by renaming the bound variables in a capture-avoiding manner.}.
+In what follows, $\ep{P} = (S_1, P')$ and $\ep{Q} = (S_2, Q')$ where applicable.
+%
+\begin{mathpar}
+	\ep{A} \!\!\eqdef\! (\emptyset, A) 
+	
+	\ep{\shared{P}{I}} \!\!\eqdef\!  (S_1, \shared{P'}{I})
+	
+	\ep{P \odot Q} \!\!\eqdef\! \left(S_1 \uplus S_2, P' \odot Q' \right)
+
+	\ep{\exsts{x}P} \!\!\eqdef\! \left({x} \uplus S_1, P'\right)
+\end{mathpar}
+%
+\end{definition}
+%
+%
+\begin{lemma}
+Given any assertion $P \in \SAssertions$, the following entailment is valid.
+%
+\[
+\infer{
+	P <=> \promote{P}
+}
+{}
+\]
+%
+\begin{proof}
+The proof is by induction over the structure of \colosl assertions and follows from their semantics. 
+%The full proof is provided in~\cite{colosl-tr14}.
+\end{proof}
+\end{lemma}
+%
+%
 \begin{definition}[Merge]\label{def:assertion-merge}
-Given a standard assertion $P \in \SAssertions$ in the prenex normal form (an assertion where all its quantifiers are stringed at the front) such that $P <=> \exsts{\bar{x}} P'$ with no bound variables in $P'$, the \emph{merge}, $\sumA{(.)}: \SAssertions \rightarrow \LAssertions$, operation is defined as follows:
+Given a standard assertion $P \equiv \exsts{\bar{x}} P'$ in the prenex normal form where there with no bound variables in $P'$, the \emph{merge} operation, $\sumA{(.)}: \SAssertions \rightarrow \LAssertions$, is defined as follows:
 %
 \begin{mathpar}
 	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
@@ -168,20 +213,7 @@ with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \tim
 %
 %
 \end{definition}
-%\begin{definition}[Gather/merge]
-%Given a standard assertion $P \in \SAssertions$ in the prenex normal form (an assertion where all its quantifiers are stringed at the front of the assertion) such that $P <=> \exsts{\bar{x}} P'$ with no bound variables in $P'$, the \emph{gather}, $\prodA{(.)}: \SAssertions \rightarrow \LAssertions$, operation is defined as follows:
-%%
-%\begin{mathpar}
-%	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
-%	
-%	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
-%	
-%	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
-%\end{mathpar}
-%%
-%%
-%with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined as in definition~\ref{def:assertion-merge}
-%\end{definition}
+%
 %
 \begin{definition}[Interference entailment]
 An interference assertion $I$ \emph{entails} interference assertion $I'$, written $I \entailsI I'$, if
@@ -235,6 +267,239 @@ Note that, since for any given standard assertion $P$, we have $P |- \erase{P}$ 
 %
 %
 \subsection{Extended Judgements}
+%
+\fig~\ref{fig:additional-judgements} presents additional judgements for local fencing, fencing and shifting. \todo complete this.
+%
+%
+\begin{figure}
+\hrule\vspace{5pt}
+\todo\\
+\hrule
+\caption{Additional judgements for local fencing, fencing and shifting.}
+\label{fig:additional-judgements}
+\end{figure}
+%
+%
+
+When establishing the stability of a subjective view $\shared{P}{I}$, we need to ascertain that the assertion is robust with respect to the actions in $I$ that may be carried out by the environment. An action $a$ in $I$ may only be executed by the environment if it holds the associated capability \emph{and} $a$'s pre-condition is compatible with the shared state. Consequently, if the capability associated with $a$ is unavailable to the environment (either because it is in the shared state or is held locally by the thread), \emph{or} the pre-condition of $a$ is not compatible with the shared state, the action cannot be performed by the environment and thus the subjective view is stable against $a$. As such, when establishing the stability of an assertion $P$, we often take into account the \emph{context} of the assertion. That is, we combine our knowledge of the thread's local state and other parts of the shared state to rule out those actions that cannot be performed by the environment. For instance, given the assertion $\shared{P}{I} * [\token{a}] * R$ where $I \eqdef \left\{[\token{a}]: P \swap P'\right\}$, we can determine that given the context $[\token{a}] * R$, the subjective view is stable against the action of $[\token{a}]$ since it is held locally and thus cannot be utilised by the environment. Similarly, given the assertion $\shared{P}{I} * \shared{\cell{\li x}{1}}{I'}$ where $I \eqdef \left\{[\token{a}]: P * \cell{\li x}{2}\swap P' \cell{\li x}{2} \right\}$, we can infer that given the context $\shared{\cell{\li x}{1}}{I'}$, the subjective view is stable against the action of $[\token{a}]$ since the value $\cell{\li x}{2}$ is incompatible with $\cell{\li x}{1}$. 
+
+Similar to the merging operator of \defin~\ref{def:assertion-merge}, given a standard assertion $R$ that describes the context within which stability is determined, we define a \emph{gathering} operator ($\prodA{}$) that weakens $R$ into a local assertion. We then define a combination operator $\combine{.}{.}$ that combines the stability context with the action pre-condition. 
+%
+%
+\begin{definition}[Gather]
+Given a standard assertion $P \equiv \exsts{\bar{x}} P'$ in the prenex normal form where there with no bound variables in $P'$, the \emph{gather} operation, $\prodA{(.)}: \SAssertions \rightarrow \LAssertions$, is defined as follows:
+%
+\begin{mathpar}
+	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
+	
+	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
+\end{mathpar}
+%
+%
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined as in \defin~\ref{def:assertion-merge},
+\end{definition}
+%
+%
+%
+\begin{definition}[Combination]
+Given a standard assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current state, and a standard assertion $Q \eqdef \exsts{\bar{y}}Q'$ describing an action precondition, their \emph{combination} $\combine{.}{.}: \SAssertions \times \SAssertions \rightarrow \LAssertions$, is defined as follows. We assume that $P$ and $Q$ are in their prenex normal form and $P'$ and $Q'$ have no bound variables.
+%
+\[
+\begin{array}{l l}
+	\combine{P}{Q} \eqdef & \exsts{\bar{x}, \bar{y}} \lass{P} * (\lass{P}' \sepish \lass{Q} \sepish \lass{Q}')\\
+	& \quad \text{where } (\lass{P}, \lass{P}') = \ub{\un{P'}} \text{ and }  (\lass{Q}, \lass{Q}') = \ub{\un{Q'}} 
+\end{array}
+\]
+%
+\end{definition}
+%
+%
+\fig~\ref{fig:stability-rules} presents a number of judgements that reduce stability checks to logical entailments. These judgements are defined for flat assertions. However, as shown in \lem~\ref{lem:flattening-and-erasure}, given any standard assertion $P$, it is always possible to rewrite it as an equivalent flat assertion. 
+%
+\begin{figure*}
+\hrule\vspace*{5pt}
+\begin{mathpar}
+	\infer{
+		\stable{\lass{p}}	
+	}{}
+	
+%	\infer{
+%		\stable{P}	
+%	}
+%	{
+%		\stable{\un{P}}	
+%	}
+%
+	\infer{
+		\stable{P \odot Q}	
+	}
+	{
+		\stable{P}
+		&
+		\stable{Q}	
+	}
+
+	\infer{
+		\stable{\exsts{x} P}	
+	}
+	{
+		\stable{P}
+	}
+
+%	\infer{
+%		\stable{\shared{\lass{P}}{I}}	
+%	}
+%	{
+%		\lass{P} \fences I	
+%	}	
+%	
+%	\infer[?]{
+%		\stable{\shared{\lass{P}}{I}}	
+%	}
+%	{
+%		\stable{\shared{\lass{P}}{I'}} 
+%		&
+%		I' \weakenI{\lass{P}} I
+%	}
+%	
+%	
+	\infer{
+		\stable{P * Q}	
+	}
+	{
+		\stableTo{P}{Q}
+		&
+		\stableTo{Q}{P}	
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableTo{P}{R}	
+	}
+	{
+		\stable{P}
+	}	
+	
+	\infer{
+		\stableTo{P * Q}{R}
+	}
+	{
+		\stableTo{P}{Q * R}
+		&
+		\stableTo{Q}{P * R}
+	}	
+	
+	\infer{
+		\stableTo{P}{R * R'}
+	}
+	{
+		\stableTo{P}{R}
+	}	
+		
+	\infer{
+		\stableTo{P \odot Q}{R}
+	}
+	{
+		\stableTo{P}{R}
+		&
+		\stableTo{Q}{R}
+	}	
+	
+	\infer{
+		\stableTo{\exsts{x} P}{R}
+	}
+	{
+		\stableTo{P}{R}
+	}
+	
+	\infer{
+		\stableTo{\shared{\lass{P}}{I}}{R}
+	}
+	{
+		\stableTo{\shared{\lass{P}}{I'}}{R}
+		&
+		I' \weakenI{\lass{P}} I
+	}
+	
+	
+	\infer{
+		\stableTo{\shared{\lass{P}}{I}}{R}
+	}
+	{
+		\stableIn{\lass{P}}{I}{R * \shared{\lass{P}}{I}}
+	}
+\end{mathpar}\vspace{5pt}\\
+%
+%
+\begin{mathpar}
+	\infer{
+		\stableIn{\lass{P}}{I}{R * Q}
+	}
+	{
+		\stableIn{\lass{P}}{I}{R}
+	}
+%	
+%	
+%	\infer{
+%		\stableIn{\lass{P}}{I}{\fass{R}}	
+%	}
+%	{
+%		\stableIn{\lass{P}}{I'}{\fass{R}}
+%		&
+%		I' \weakenI{\lass{P}} I
+%	}	
+	
+	\infer{
+		\stableIn{\lass{P}}{I_1 \cup I_2}{R}	
+	}
+	{
+		\stableIn{\lass{P}}{I_1}{R}
+		&
+		\stableIn{\lass{P}}{I_2}{R}
+	}	
+	
+	\infer{
+		\stableIn{\lass{P}}{I}{R}	
+	}
+	{
+		I \entailsI I'
+		&
+		\stableIn{\lass{P}}{I'}{R}	
+	}	
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{[\token{A}]: \lass{Q}_1 \swap \lass{Q}_2 \right\}} {R}	
+	}
+	{
+		\combine{R}{\lass{Q}_1} \slentails \m{false}
+	}
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{\interAss{[\token{A}]}{\bar{y}}{\lass{Q}_1}{\lass{Q}_2}\right\}}{R}	
+	}
+	{
+		[\token{A}] * \prodA{R} \slentails \m{false}
+	}
+	
+	\infer{
+		\stableIn{\lass{P}}{\left\{[\token{A}]: \lass{Q}_1 \swap \lass{Q}_2 \right\}}{R}	
+	}
+	{
+		\left(\lass{Q}_1 \septraction \combine{R}{\lass{Q}_1} \,\right) * \lass{Q}_2 \slentails \lass{P} * \m{true}
+	}
+%	
+%	
+%	
+\end{mathpar}
+\hrule
+%\vspace*{5pt}
+\caption{Stability judgements where $P, Q, Q_1, Q_2, R, R' \in \FAssertions$; $\lass{P}, \lass{Q}_1, \lass{Q}_2 \in \LAssertions$ and $\odot \in \{\lor, *, **\}$.}
+\label{fig:stability-rules}
+\end{figure*}
+%
+
 \subsection{Elimination Judgements}\label{sec:elimination-judgements}
 \fig~\ref{fig:sepish-rules} presents a number of judgements for eliminating the overlapping conjunction ($**$) connective in standard assertions. 
 %
