@@ -48,7 +48,7 @@ $, is defined as follows.
 %
 \end{definition}
 %
-Given our choice of logical states in this paper, $l_1\meetL l_2$ yields at most one element for any given $l_1$ and $l_2$; we thus usually omit the set notation\footnote{In general, separation algebras may lack the \emph{disjointness} property and thus intersection between two states may yield more than one state. Hence, in our general definitions we use the set notation.}.
+Given our choice of logical states in this paper, $l_1\meetL l_2$ yields at most one element for any given $l_1$ and $l_2$; we thus usually omit the set notation\footnote{In general, separation algebras may lack the \emph{disjointness} property and thus intersection between two states may yield more than one state. Hence, in our general definitions we use the set notation~\cite{colosl-tr14}.}.
 
 An action pre-state $p$ and a shared state $g$ then agree if their intersection is non-empty, i.e. $p \meetL g \not= \emptyset$. We can now define action confinement.
 %
@@ -276,7 +276,7 @@ provided in~\cite{colosl-tr14}.
 Note that, the version of \forgetRule\ where predicates are conjoined using $**$ is also valid for all $P$, $Q$, and $I$, as shown by the following derivation, where the first implication follows from the properties of $**$.
 %
 \[
-\shared{P ** Q}{I} \stackrel{\text{weaken}}{=> }
+\shared{P ** Q}{I} \stackrel{\weakenRule}{=> }
 \shared{P * \m{true}}{I} \stackrel{\forgetRule}{=> }
 \shared{P}{I}
 \]

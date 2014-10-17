@@ -500,21 +500,30 @@ Given a standard assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current s
 \end{figure*}
 %
 
-\subsection{Elimination Judgements}\label{sec:elimination-judgements}
-\fig~\ref{fig:sepish-rules} presents a number of judgements for eliminating the overlapping conjunction ($**$) connective in standard assertions. 
+\subsection{Reasoning about $**$ and $\separate{}{}$ for standard assertions}
+\label{sec:elimination-judgements}
+
+\emph{Pure} assertions are those which describe empty heaps.
+
+\begin{definition}[Pure assertions]
+  The \emph{pure} local assertions are those given by the following
+  grammar:
+  \[
+  \PAssertions \ni p,q ::= emp \mid \m{false}\mid E_1 = E_2 \mid \exsts{x} p \mid p \lor q \mid  p * q \mid p \sepish q
+  \]
+\end{definition}
+
+
+\fig~\ref{fig:sepish-rules} presents a number of rules for eliminating the overlapping conjunction ($**$) connective in standard assertions. 
 %
 \begin{figure}[h!]
 \hrule\vspace{5pt}
 \begin{mathpar}
 	\infer{
-		\emp ** \lass{P} <=> \lass{P}
+		p ** \lass{Q} <=> p * \lass{Q}
 	}
-	{}
+	{p\in\PAssertions}
 		
-	\infer{
-		\m{false} ** \lass{P} <=> \m{false}
-	}
-	{}
 	
 	\infer{
 		\cell{x}{v} ** [y] <=> \cell{x}{v} * [y]
@@ -532,7 +541,7 @@ Given a standard assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current s
 	{}
 					
 	\infer{
-		(\lass{P} \lor \lass{Q}) ** \lass{R} <=> (\lass{P} \sepish \lass{R}) \lor (\lass{Q} \lor \lass{R})
+		(\lass{P} \lor \lass{Q}) ** \lass{R} <=> (\lass{P} \sepish \lass{R}) \lor (\lass{Q} ** \lass{R})
 	}
 	{}
 	
@@ -546,7 +555,7 @@ Given a standard assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current s
 %	
 \end{mathpar}
 \hrule
-\caption{Judgements for eliminating the overlapping conjunction ($**$) connective where $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
+\caption{Rules for eliminating the overlapping conjunction ($**$) connective where $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
 \label{fig:sepish-rules}
 \end{figure}
 %
@@ -626,7 +635,7 @@ Given a standard assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current s
 %	
 \end{mathpar}
 \hrule
-\caption{Intersection judgements where $\odot \in \{\lor, *, ** \}$ and $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
+\caption{Rules for empty intersection judgements where $\odot \in \{\lor, *, ** \}$ and $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
 \label{fig:intersection-rules}
 \end{figure}
 %
