@@ -1,0 +1,368 @@
+\section{Assertions and Judgements (Continued)}
+In this section, we present a number of judgements for the elimination of ($**$) connective as well as rewriting non-intersection judgements of the form $\separate{P}{Q}$. We provide a mechanism for \emph{flattening} assertions with nested subjective views such as $\shared{P * \shared{Q}{I'}}{I}$ into an equivalent assertions with no nested subjective views. Moreover, as some of the judgements presented in \S\ref{sec:logic} are limited to local assertions, we provide a method for localising assertions (weakening assertions to local assertions where subjective views are removed) and weakening interference assertions to contain actions with whose pre- and post conditions are local assertions. However, since manipulating assertions including negation is not straightforward (as is typical), we limit the techniques introduced in this section to \emph{standard} assertions: the fragment of \colosl assertions with standard connectives of separation logic excluding negation ($\neg P$) and septraction ($P \septraction Q$). We proceed with the grammar of standard assertions. 
+%
+%
+\begin{definition}[Standard assertions]
+The \emph{standard \colosl assertions}, $\SAssertions$, is the fragment of assertions that excludes negation and septraction defined by the following grammar. 
+%
+\[
+	\SAssertions \ni P, Q ::= A \mid \exsts{x} P \mid P \lor Q \mid  P * Q \mid P \sepish Q \mid \shared{P}{I}
+\]
+%
+\end{definition}
+\subsection{Assertion Rewriting and Weakening}
+Although \colosl allows for nested subjective views (e.g. $\shared{P * \shared{Q}{I'}}{I}$), it is often useful to \emph{flatten} them into equivalent assertions with no nested boxes. 
+We introduce 
+%\emph{local assertions}, $\LAssertions \subset \Assertions$, a subset of assertions that do not contain any subjective views; as well as \emph{flat assertions}, 
+\emph{flat assertions}, $\FAssertions \subset \Assertions$, to capture a subset of assertions with no nested subjected views and provide a \emph{flattening mechanism} to rewrite standard \colosl assertions as equivalent flat assertions. 
+%
+%
+\begin{definition}[Flattening]
+%The set of \emph{local assertions} $\LAssertions$, and 
+The set of \emph{flat assertions} $\FAssertions$ is defined by the following grammar where $\lass{p} \in \LAssertions$.
+%
+\begin{align*}
+%	\LAssertions \ni \lass{P}, \lass{Q} & ::= A \mid \exsts{x} P \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} \sepish \lass{Q}\\
+%
+	\FAssertions \ni \fass{P}, \fass{Q} & ::= \lass{p} \mid \shared{\lass{p}}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q}\vspace*{-5pt}
+\end{align*}
+%
+The \emph{flattening} function $\un{.} : \SAssertions \rightarrow \FAssertions$ is defined inductively as follows where $x$ does not appear free in $I$, $\odot \in \{\lor, *, **\}$ and $\lass{p} \in \LAssertions$. 
+%
+\begin{align*}
+	& \un{\lass{p}} \eqdef  \lass{p} \quad &&  
+	\un{P \odot Q} \eqdef  \un{P} \odot \un{Q}  \\%\quad \text{for } \odot \in \{\land, \lor, *, \sepish\}\\
+%
+%
+	& \un{\exsts{x} P} \eqdef  \exsts{x} \un{P} &&
+	\un{\shared{\shared{P}{I} * Q}{I'}} \eqdef  \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+%
+	& \un{\shared{\lass{p}}{I}} \eqdef  \shared{\lass{p}}{I} \quad &&
+	\un{\shared{\shared{P}{I} \sepish Q}{I'}} \eqdef  \un{\shared{P}{I}} * \un{\shared{Q}{I'}}\\
+%
+%
+	& \un{\shared{\exsts{x} P}{I}} \eqdef  \exsts{x} \un{\shared{P}{I}} &&
+	\un{\shared{P \lor Q}{I}} \eqdef \un{\shared{P}{I}} \lor \un{\shared{Q}{I}}
+%
+%
+%	& \un{\shared{\shared{P}{I} \land L}{I'}} \eqdef \m{false} &&
+%	\un{\shared{\shared{P}{I} \land ((L \lor Q) \odot R)}{I'}} \eqdef 
+%	\un{\shared{\shared{P}{I} \land (Q \odot R)}{I'}}\\
+%%
+%%
+%	&&&
+%	\un{\shared{\shared{P}{I} \land B}{I'}} \eqdef
+%	\un{\shared{P}{I}} * \un{\shared{B}{I'}} \vspace*{-30pt}
+\end{align*}
+%
+%
+%
+%\begin{mathpar}
+%	B ::= \emp|\, \shared{P}{I}|\, B \odot B
+%	
+%	L ::= \m{false} \mid \cell{x}{v} \mid [\token{a}] \mid L \ominus Q \quad \text{ for }\ominus \in \{\land, *, \sepish\}
+%\end{mathpar}
+%
+\end{definition}
+%
+%
+
+It is often useful to weaken an assertion into a local assertion where the resultant assertion contains no subjective views. We thus introduce an \emph{erasure} mechanism for weakening standard \colosl assertions to local ones. 
+%
+%
+\begin{definition}[Erasure]
+The \emph{erasure} of an assertion $\erase{(.)}: \SAssertions \rightarrow \LAssertions$ is defined inductively over the structure of standard assertions as follows with $\odot\in\{\lor, *, \sepish \}$\vspace*{-5pt}
+%
+\begin{mathpar}
+	\erase{A} \eqdef A  
+
+	\erase{(\exsts{x} P)} \eqdef \exsts{x}\erase{P} 
+
+	\erase{(P \odot Q)} \eqdef  \erase{P} \odot \erase{Q}
+	
+		\erase{\left(\shared{P}{I}\right)} \eqdef \emp 
+\end{mathpar}
+%
+%Observe that $P \implies \erase{P}$ holds for any assertion $P$.
+%
+\end{definition}
+%
+%
+%%
+%\begin{definition}[Interference semantics]\label{def:interference-semantics}
+%The \emph{semantics of interference assertions}, $\semI[(.)]{.}: \LEnv --> \AMods$, is defined as follows for $\set{A} \in \pset{\set{Token}}$.
+%\begin{align*}
+%  \semI[\lenv]{I}(\token{A}) &==
+%  \left\{
+%  \begin{array}{@{}l@{\ }|@{\ }r@{}}
+%    (p \composeL r, q \composeL r)&
+%    \begin{array}{@{}l@{}}
+%      \interAss{\overline{[\token{a}]}^{\token{A}}}{\bar{y}}{P}{Q} \in I /|  \exsts{\bar{v}, \lmod} \lenv' = [\lenv|||\bar y:\bar v] \\
+%      /| (p \composeL r), \lenv'\slsat \sumA{P} 
+%      /| (q \composeL r), \lenv' \slsat \sumA{Q} \\
+%      /|\ p, \lenv' |=_{p \composeL r, \lmod} P 
+%      /| q, \lenv' |=_{q \composeL r, \lmod} Q 
+%    \end{array}
+%  \end{array}
+%  \right\}
+%  \end{align*}
+%\end{definition}
+%%
+%
+\begin{lemma}\label{lem:flattening-and-erasure}
+The following entailments are valid.
+%
+\begin{mathpar}
+	\infer{
+		P <=> \un{P}
+	}
+	{}
+	
+	\infer{
+		P \entails \erase{P}
+	}
+	{}	
+%	
+%	\infer{
+%		\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
+%	}
+%	{
+%		R \entails P
+%		&
+%		P \sepish Q \entails R \sepish Q
+%	}
+\end{mathpar}
+%\hrule
+\end{lemma}
+%
+%
+
+When despatching proof obligations involving interference assertions such as local fencing ($\fenceAss{} \strictfences I$), fencing ($\fenceAss{} \fences I$) and shifting ($I \weakenI{P} I'$) conditions, it is often easier to do so with respect to interference assertions with actions whose pre- and post-conditions are local assertions. We thus provide a few judgements for weakening the actions of interference assertions to those with local action footprints. 
+
+The intuitive interpretation of an action of the form $\lass{p} * \shared{\lass{q}}{I} \swap \lass{p'} * \shared{\lass{q}}{I}$ is: whenever parts of the shared state satisfies $\lass{P}$ and parts of it satisfies $\lass{Q}$, update the subpart captured by $\lass{P}$ to one described by $\lass{P'}$. As such, given the semantics of interference assertions, the interpretation of this action is contained in that of the action of the form $\lass{P} ** \lass{Q} \swap \lass{P'} ** \lass{Q}$. We define a \emph{merging} operator on standard assertions for removing boxes and combining their contents using the ($**$) connective. We then appeal to this operator for weakening interference assertions.
+
+\begin{definition}[Merge]\label{def:assertion-merge}
+Given a standard assertion $P \in \SAssertions$ in the prenex normal form (an assertion where all its quantifiers are stringed at the front) such that $P <=> \exsts{\bar{x}} P'$ with no bound variables in $P'$, the \emph{merge}, $\sumA{(.)}: \SAssertions \rightarrow \LAssertions$, operation is defined as follows:
+%
+\begin{mathpar}
+	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
+	
+	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
+\end{mathpar}
+%
+%
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\lass{p}, \lass{q}, \lass{p'}, \lass{q'} \in \LAssertions$ and $\odot \in \{*, \sepish\}$.
+% We assume that the bound logical variables of the left-hand assertion are pairwise distinct (and are otherwise renamed to be distinct in a capture-avoiding manner). 
+ In what follows, $\ub{\fass{P}} = (\lass{p}, \lass{p'})$ and $\ub{\fass{Q}} = (\lass{q}, \lass{q'})$ where applicable.
+%
+\begin{mathpar}
+	\ub{\lass{p}} \!\!\eqdef\! (\lass{p}, \emp) 
+	
+	\ub{\shared{\lass{p}}{I}} \!\!\eqdef\!  (\emp, \lass{p})
+	
+	\ub{\fass{P} \odot \fass{Q}} \!\!\eqdef\! \left(\lass{p} \odot \lass{q}, \lass{p'} \sepish \lass{q'} \right)
+
+	\ub{\fass{P} \lor \fass{Q}} \!\!\eqdef\! \left(\lass{p} \lor \lass{q}, \lass{p'} \lor \lass{q'} \right)
+\end{mathpar}
+%
+%
+\end{definition}
+%\begin{definition}[Gather/merge]
+%Given a standard assertion $P \in \SAssertions$ in the prenex normal form (an assertion where all its quantifiers are stringed at the front of the assertion) such that $P <=> \exsts{\bar{x}} P'$ with no bound variables in $P'$, the \emph{gather}, $\prodA{(.)}: \SAssertions \rightarrow \LAssertions$, operation is defined as follows:
+%%
+%\begin{mathpar}
+%	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
+%	
+%	\sumA{P} \eqdef  \exists{\bar{x}}.\; \lass{P} \sepish \lass{Q}
+%	
+%	\text{where } (\lass{P}, \lass{Q}) = \ub{\un{P'}} 
+%\end{mathpar}
+%%
+%%
+%with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined as in definition~\ref{def:assertion-merge}
+%\end{definition}
+%
+\begin{definition}[Interference entailment]
+An interference assertion $I$ \emph{entails} interference assertion $I'$, written $I \entailsI I'$, if
+%
+\[
+	\for{\lenv \in \LEnv} \semI[\lenv]{I} \subseteq \semI[\lenv]{I'}
+\]
+%
+\end{definition}
+\begin{lemma}[Interference weakening]
+The following entailments are valid.
+%
+\begin{mathpar}
+%	\infer{
+%		P \confines I	
+%	}
+%	{
+%		\erase{P} \strictfences I	
+%	}
+	\infer{
+		I \cup I_1 \entailsI I \cup I_2
+	}
+	{
+		I_1 \entailsI I_2
+	}	
+	
+	\infer{
+		\left\{ \interAss{[\token{A}]}{\bar{y}}{P}{Q} \right\}	
+		\entailsI
+		\left\{ \interAss{[\token{A}]}{\bar{y}}{\sumA{P}}{\sumA{Q}} \right\}	
+	}{}
+		
+	\infer{
+		\left\{ \interAss{[\token{A}]}{\bar{y}}{P}{Q} \right\}	
+		\entailsI
+		\left\{ \interAss{[\token{A}]}{\bar{y}}{P'}{Q'} \right\}	
+	}
+	{
+		P \entails\! P'
+		&
+		Q \entails Q'	
+	}
+%	
+\end{mathpar}
+%
+\end{lemma}
+%
+Note that, since for any given standard assertion $P$, we have $P |- \erase{P}$ (\lem~\ref{lem:flattening-and-erasure}), it is always possible to weaken interference assertions such that its actions are expressed in terms of local assertions using the last judgement. 
+
+
+%
+%
+\subsection{Extended Judgements}
+\subsection{Elimination Judgements}\label{sec:elimination-judgements}
+\fig~\ref{fig:sepish-rules} presents a number of judgements for eliminating the overlapping conjunction ($**$) connective in standard assertions. 
+%
+\begin{figure}[h!]
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+		\emp ** \lass{P} <=> \lass{P}
+	}
+	{}
+		
+	\infer{
+		\m{false} ** \lass{P} <=> \m{false}
+	}
+	{}
+	
+	\infer{
+		\cell{x}{v} ** [y] <=> \cell{x}{v} * [y]
+	}
+	{}
+
+	\infer{
+		\cell{x}{v} ** \cell{y}{v'} <=> \left(x \not= y \land \cell{x}{v} * \cell{y}{v'}\right) \lor \left(x = y \land v = v' \land \cell{x}{v}\right)
+	}
+	{}
+	
+	\infer{
+		[x] ** [y] <=> \left( x \not= y \land [x] * [y]\right) \lor \left( x = y \land [x]\right)
+	}
+	{}
+					
+	\infer{
+		(\lass{P} \lor \lass{Q}) ** \lass{R} <=> (\lass{P} \sepish \lass{R}) \lor (\lass{Q} \lor \lass{R})
+	}
+	{}
+	
+	\infer{
+		(\exsts{x} \lass{P} 	) ** \lass{Q} <=> \exsts{x} \lass{P} ** \lass{Q}
+	}
+	{
+		\m{fv}(\lass{Q}) \cap \{x\} = \emptyset	
+	}
+%
+%	
+\end{mathpar}
+\hrule
+\caption{Judgements for eliminating the overlapping conjunction ($**$) connective where $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
+\label{fig:sepish-rules}
+\end{figure}
+%
+% 
+
+\noindent\fig~\ref{fig:intersection-rules} presents a number of judgements for establishing that the states described by two standard assertions do not intersect.
+%
+\begin{figure}[h!]
+\hrule\vspace{5pt}
+\begin{mathpar}
+	\infer{
+		\separate{\emp}{\lass{P}}
+	}
+	{}
+		
+	\infer{
+		\separate{\m{false}}{\lass{P}}
+	}
+	{}
+	
+	\infer{
+		\separate{[y]}{\cell{x}{v}}
+	}
+	{}	
+
+	\infer={
+		\separate{\lass{P}}{\lass{Q}}
+	}
+	{
+		\separate{\lass{Q}}{\lass{P}}
+	}
+	
+	\infer{
+		\separate{[x]}{[y]} <=> x \not= y
+	}
+	{}
+		
+	\infer{
+		\separate{\cell{x}{v}}{\cell{y}{v'}} <=> \left( x \not= y \lor (x = y \land v \not= v') \right)
+	}
+	{
+	}
+
+%	\infer{
+%		\separate{(\lass{p} \septraction \lass{q})}{\lass{r}}
+%	}
+%	{
+%		\separate{\lass{q}}{\lass{r}}
+%	}
+	\infer{
+		\separate{(\lass{P} \odot \lass{Q})}{R}
+	}
+	{	
+		\separate{\lass{P}}{\lass{R}}
+		&
+		\separate{\lass{Q}}{\lass{R}}
+	}
+	
+	\infer={
+		\separate{(\exsts{x} \lass{P})}{R}		
+	}
+	{
+		\separate{(\lass{P}[v/x])}{R}
+		&
+		\text{for }v \in \set{Val}
+	}
+%	
+%	\infer={
+%		\separate{(\for{x} \lass{P})}{R}		
+%	}
+%	{
+%		\separate{(\lass{P}[v/x])}{R}
+%		&
+%		\text{for }v \in \set{Val}
+%	}
+%
+%	
+\end{mathpar}
+\hrule
+\caption{Intersection judgements where $\odot \in \{\lor, *, ** \}$ and $\lass{P}, \lass{Q}, \lass{R} \in \LAssertions$.}
+\label{fig:intersection-rules}
+\end{figure}
+%
+

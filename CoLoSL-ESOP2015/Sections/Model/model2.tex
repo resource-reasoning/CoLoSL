@@ -204,7 +204,9 @@ The assertions of \colosl are elements of $\Assertions$ described by the grammar
   \quad
   E ::= x \!\mid\! E_1 + E_2 \!\mid\! \cdots \\
 %
-  P,Q & ::= A \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
+	\LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
+%	
+  \Assertions \ni P,Q & ::= \lass{P} \mid \neg P \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid P \septraction Q \mid \shared{P}{I}  \\
 %
   I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{y}}{P}{Q}\} \cup I
 \end{align*}
@@ -240,7 +242,7 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
 %
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  (l,g,\lmod), \lenv &|= A &\text{iff}& l,\lenv \slsat A\\
+  (l,g,\lmod), \lenv &|= \lass{P}  &\text{iff}& l,\lenv \slsat \lass{P}\\
   
   (l,g,\lmod), \lenv &|= \shared P I &\text{iff}&
   l = \unitL \text{ and }
@@ -253,7 +255,7 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
 \]
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
-  s, \lenv &|=_{g,\lmod} A &\text{iff}& s, \lenv \slsat A\\
+  s, \lenv &|=_{g,\lmod} \lass{P} &\text{iff}& s, \lenv \slsat \lass{P}\\
   
   s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
   (s,g,\lmod), \lenv |= \shared P I\\
@@ -281,10 +283,10 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   u' \grey u_2, \lenv |=_\dagger P_2\\
   
 
-% 	u, \lenv &|=_\dagger \lass{P} \septraction \lass{Q} &\text{iff}&
-%	\exsts{u'} u', \lenv |=_\dagger \lass{P} \text{ and }
-%	u \sharp u'\\
-%	&&&\text{ implies }u \grey u', \lenv |=_\dagger \lass{Q} \\
+ 	u, \lenv &|=_\dagger P \septraction Q &\text{iff}&
+	\exsts{u'} u', \lenv |=_\dagger P \text{ and }
+	u \sharp u'
+	\text{ implies }u \grey u', \lenv |=_\dagger Q \vspace{5pt}\\
 	
   
 %  l, \lenv &\slsat [E]
@@ -321,9 +323,9 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   l = (\emptyset, \emptyset, \{\token{a}\})\\
   
   
-  l, \lenv &\slsat \lass{P} \septraction \lass{Q} &\text{iff}&
-	\exsts{l'} l', \lenv \slsat \lass{P} \text{ and }
-	l \sharp l'\text{ implies }l \composeL l', \lenv \slsat \lass{Q} 
+%  l, \lenv &\slsat \lass{P} \septraction \lass{Q} &\text{iff}&
+%	\exsts{l'} l', \lenv \slsat \lass{P} \text{ and }
+%	l \sharp l'\text{ implies }l \composeL l', \lenv \slsat \lass{Q} 
 	
 %  l, \lenv &\slsat \shared P I&
 %  \text{ iff }& l = \unitL
@@ -513,8 +515,8 @@ entailment checking in separation logic.
 	  P \confines I	
 	}
 	{
-	  P \entails F\\
-	  F \strictfences I	
+	  P \entails \fenceAss{}\\
+	  \fenceAss{} \strictfences I	
 	}
 	
 	\infer{
@@ -535,8 +537,8 @@ entailment checking in separation logic.
 		\fenceAss{} \strictfences \left\{[\token{A}]: \lass{P} \swap \lass{Q} \right\}	
 	}
 	{
-          P \slentails P' * R\\
-          Q \slentails Q' * R\\
+          \lass{P} \slentails \lass{P'} * \lass{R}\\
+          \lass{Q} \slentails \lass{Q'} * \lass{R}\\
 	  \exact{\lass{R}}\\
 	  \fenceAss{} \strictfences \left\{[\token{A}]\!\!:\! \lass{P'} \swap \lass{Q'} \right\}
 	}	
@@ -625,12 +627,12 @@ non-intersection for a restricted fragment of formulas.
 		I \weakenI{P} I'	
 	}
 	{
-		P \entails F\\
-		I \weakenI{F} I'
+		P \entails \fenceAss{}\\
+		I \weakenI{\fenceAss{}} I'
 	}	
 	
 	\infer{
-	  I\weakenI{F} I
+	  I\weakenI{\fenceAss{}} I
 	}{}
 	
 	\infer{
@@ -644,12 +646,12 @@ non-intersection for a restricted fragment of formulas.
 
 
 	\infer{
-		\left\{ [\token{A}]: \lass{P}  \swap \lass{Q} \right\} \weakenI{F}
+		\left\{ [\token{A}]: \lass{P}  \swap \lass{Q} \right\} \weakenI{\fenceAss{}}
 		\emptyset
 	}
 	{
-          P \slentails P' * R\\
-          Q \slentails Q' * R\\
+          \lass{P} \slentails \lass{P'} * \lass{R}\\
+          \lass{Q} \slentails \lass{Q'} * \lass{R}\\
 	  \exact{\lass{R}}\\
 	  \separate{\fenceAss{}}{\lass{P'}}
 	}	
