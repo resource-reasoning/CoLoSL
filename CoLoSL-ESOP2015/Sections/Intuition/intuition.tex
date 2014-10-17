@@ -5,8 +5,8 @@ We illustrate our \colosl reasoning principles by sketching a proof of
 a variation of Dijkstra's token ring mutual exclusion
 algorithm~\cite{dijkstra74}.  These principles are laid out in
 \fig\ref{fig:principles}, together with the usual concurrency rule of
-separation logic~\cite{csl-tcs}, and the view shift rule from
-Views~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
+separation logic~\cite{csl-tcs}, and the rule of consequence from the 
+views framework~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
 introduce them informally as needed during the proof of our example,
 and present them in more details in \S\ref{sec:colosl}.
 
@@ -55,7 +55,7 @@ and present them in more details in \S\ref{sec:colosl}.
 		\{P_2\} \;\mathbb{C}_2\; \{Q_2\}
 	}
 
-\infer[\weakRule]
+\infer[\conseqRule]
 	{
 	  \hoare{P}{\mathbb{C}}{Q}
 	}
@@ -190,39 +190,37 @@ Consider the \colosl assertions accompanying  $\mathbb{INC}$.
 After initialisation, line~3 of $\mathbb{INC}$ provides a standard
 assertion from separation logic~\cite{seplog} with variables as
 resource~\cite{variablesAsResource}. The assertion  declares  that the
-variable cells addressed by \li{x}, \li{y} and \li{z}  have the same
-value  $0$. This variable resource in the thread-local state is fully
+variable cells addressed by \li{x}, \li{y} and \li{z}  have value $0$. This variable resource in the thread-local state is fully
 owned by  the thread. Using the \extendRule\ principle, the thread is
 able to give up  this local resource and transfer it  to the global
 shared state.
 
-In its general form, the \extendRule adds locally-help resources
-described by $P$ to the shared state, under the new interference
-relation $I$, and creates fresh tokens $\token A$, $\token A'$, some
+In its general form, the \extendRule adds locally-held resources
+described by $P$ to the shared state, subject to the new interference
+relation $I$, and creates fresh sets of tokens $\token A$, $\token A'$, some
 kept locally and some shared. The side-condition $P\containI I$
-ensures that $I$ cannot modify resource outside of the new region
+ensures that $I$ cannot modify resource outside of the new extension
 delimited by $P$, in particular preserving any pre-existing subjective
 view of the shared state which otherwise would need to suddenly
 account for new interference in $I$. As will be crucial for the set
 example in \S\ref{sec:examples} (but unimportant here), a novel
 feature of this rule is that actions in $I$ may refer to existing
 shared resources, unlike e.g.\ CAP where all possible futures of the
-region must be accounted for upon its creation.  The \weakRule rule is
+region must be accounted for upon its creation.  The \conseqRule rule is
 then applied to start using the resulting assertion in Hoare triples.
 
 Line~4 demonstrates the creation of a subjective view
 $\shared{\li{x}|-> 0 * \li{y}|-> 0 * \li{z}|-> 0}I$ under three
 similar actions. For instance, $a_{\li y}$ can increment \li{y} under
 the condition that the value of \li{x} is one more than \li{y}.  This
-update is only possible when the local state of a thread has the {
-  capability} $[\token a_{\li y}]$. For this particular example, the
+update can only be carried out by the thread that holds $[\token a_{\li y}]$ \emph{capability} in its local state. For this particular example, the
 assertion in line~4 simply has all the capabilities $[\token a_{\li
     x}] * [\token a_{\li y}] * [\token a_{\li z}]$ of the actions of
 $I$ in the local state; in general, capabilities can be buried inside
 boxes, only to emerge as a consequence of an action (see
 \S\ref{sec:examples}).
 
-This subjective view may them be freely duplicated using the \copyRule
+This subjective view may then be freely duplicated using the \copyRule
 principle and each thread is given a copy together with the
 appropriate capability using the \parRule rule. For instance, thread
 $\mathbb{P}_{\li y}$ gets
@@ -241,13 +239,13 @@ variable cells with their associated interferences which are of no
 interest to the particular thread.  Fundamentally, for large systems,
 the burden of carrying the whole shared state around to analyse all
 threads, can lead to intractable proofs. In our example, this would be
-acceptable since the each thread is small, but in general needlessly
+acceptable since the footprint of each thread is small, but in general needlessly
 verbose state requires extraneous stability checks at every program
 point.
 
-Because subjective views only describe \emph{part} of the shared
-state, we can use \forgetRule to obtain a weaker view of the shared
-state that omits cell \li{z}. The \shiftRule principle allows us to
+Because subjective views only describe \emph{parts} of the shared
+state, we can use the \forgetRule principle to obtain a weaker view of the shared
+state that ignores cell \li{z}. The \shiftRule principle allows us to
 replace $I$ with any interference relation $I'$ that has the same
 observable effect on the subjective assertion $P$ (written $I
 \weakenI{P} I'$). Without the \li{z} cell, action $a_{\li z}$ does not
@@ -266,7 +264,7 @@ get:
 %it is invariant under all possible actions by the environment.. 
 Finally, we stabilise (weaken) the resulting subjective view such that it is invariant under all possible actions by the environment.
 %Since the thread owns $[\token{a}_{\li{y}}]$ locally, the environment can't perform its action and thus the subjective view is stable against it. On the other hand, as the environment may hold $[\token{a}_{\li{x}}]$, we should stabilise with respect to its action. 
-Since we no longer know the value of \li{z}, after stabilising against the action of $[\token{a}_{\li{x}}]$, the resulting assertion is too weak. Intuitively, we know that \li{x} can only be incremented when its value is equal to \li{z} and \li{y}. However, this is not reflected in he action of $[\token{a}_{\li{x}}]$; since we have forgotten \li{z}, there is nothing to constrain the increment on \li{x}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
+Since we no longer know the value of \li{z}, after stabilising against $a_{small\li{x}}$, the resulting assertion is too weak. Intuitively, we know that \li{x} can only be incremented when its value is equal to \li{z} and \li{y}. However, this is not reflected in $a_{small\li{x}}$; since we have forgotten \li{z}, there is nothing to constrain the increment on \li{x}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
 %
 It is however possible to give a stronger specification, as follows: \vspace*{-8pt} 
 %
@@ -289,8 +287,7 @@ It is however possible to give a stronger specification, as follows: \vspace*{-8
 \end{align*}
 %
 This implication involves subtle interaction between the assertion and
-the interference relation of the subjective view.  Consider the action
-of $a_{\small\li x}$ and the initial state with value $0$ in all the
+the interference relation of the subjective view.  Consider the $a_{\small\li x}$ action and the initial state with value $0$ in all the
 cells. This action can be replaced by $a_{\small\li x}'$ because, as the
 programmer knows, whenever \li{x} and \li{z} have the same value then
 \li{y} also has the same value which, under these conditions, is not
@@ -301,13 +298,13 @@ related to \li{y} and \li{z}.
 As we justify in \S\ref{sec:colosl}, by using the judgement
 $I\weakenI{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}}
 I_{\small\li y}'$, we can use the \shiftRule principle to replace
-$I\setminus a_{\small\li y}$ by $I'_{\small\li y}$. 
+$I$ by $\{a'_{\small\li x}, a_{\small\li y}, a_{\small\li z}\}$. 
 %%
 %\[
 %I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\small\li y}
 %\]
 %%
-Only then do we use \forgetRule to lose the \li{z} assertion and obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'}$, as the new action $a_{\small\li x}'$ in $I'_{\small\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
+Only then do we use \forgetRule to lose the \li{z} cell and obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'}$, as the new action $a_{\small\li x}'$ in $I'_{\small\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
 The interference relation is now as simple as it can get, whilst retaining enough information about the connection between \li{x}, \li{y} and \li{z}. Finally, we stabilise the subjective view with respect to $I_{\small\li y}'$ and obtain our final precondition of $\mathbb{P}_{\small\li y}$.
 %, which retains much more information about the values of \li{x} and \li{y}. %
 
@@ -363,31 +360,13 @@ interference assertions in key places, enables us to confine the
 specification and verification of each thread to just the resources
 they need. This is not possible in existing frameworks.
 
-\paragraph{\textbf{Further \colosl reasoning}}
-We complete our semi-formal overview with a brief description of features of \colosl not
-showcased by the proof above. First, we note that an action $P\swap Q$
-may in general perform three types of actions: (1)
-%% \begin{enumerate}
-%% \item
-  \emph{modify} resources: $P$ and $Q$ contain the same amount of
-  resource with different values, (e.g. action of $[\token{a}_{\tx{x}}]$ in $I$);
-%%\item
-  (2)
-  \emph{remove} resources from the shared state and transfer them into
-  the local state of the thread performing the action, (e.g. when $P = Q * R$ for some resource $R$ to be removed);
-%%\item
-  (3)
-  conversely, \emph{add} resources from the local state of the thread
-  into the shared state, (e.g. when $Q = P * R$).
-%%\end{enumerate}   
-We demonstrate the latter two behaviours through our examples in
-\S\ref{sec:examples}. These three behaviours are not mutually
-exclusive and an action may exhibit any combination of them.  Unlike
+
+We complete our semi-formal overview by noting that unlike
 CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
 an explicit \emph{unsharing} mechanism to claim shared
 resources and render them thread-local. Instead, this behaviour can
 be simply encoded as an additional action with the second behaviour
-described above.
+described above. For instance, in o
 %
 %We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
 %cannot ensure that proved programs do not leak memory. Indeed, one may

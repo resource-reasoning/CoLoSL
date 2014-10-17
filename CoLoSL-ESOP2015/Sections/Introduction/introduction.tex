@@ -13,12 +13,12 @@ A key difficulty in verifying properties of shared-memory concurrent
 programs is to be able to reason compositionally about each thread in
 isolation, even though in reality the correctness of the whole system
 is the collaborative result of intricately intertwined actions of the
-threads. Such compositional reasoning is essential for verifying large
+threads. Such compositional reasoning is essential for 1) verifying large
 concurrent systems since it allows them to be verified component-wise
-(usually the level of granularity is that of functions), library code
+(usually the level of granularity is that of functions); 2) library code
 and incomplete programs since it avoids the need to know about the
 context of execution and the precise implementation of functions
-called in the code, and for replicating a programmer's intuition about
+called in the code; and 3) replicating a programmer's intuition about
 why their implementations are correct since informal arguments are
 usually made at a local level without having to remember the details
 of the whole system.
@@ -40,9 +40,9 @@ The $*$ connective between assertions means that they
 describe \emph{disjoint} sets of resources. By making the
 specification $\hoare{P}{\mathbb{C}}{Q}$ as tight as possible, we can
 ensure that it can be reused in a large set of possible contexts via
-the frame rule. Spec reuse is paramount to achieve compositional
-reasoning: if the spec of a piece of code can be reused in any valid
-context, one only has to prove this spec once and for all. In
+the frame rule. Specification reuse is paramount to achieve compositional
+reasoning: if the specification of a piece of code can be reused in any valid
+context, one only has to prove it once and for all. In
 non-compositional approaches, one very often needs to reprove the
 piece of code itself under different specifications.
 
@@ -63,42 +63,30 @@ these threads. Thus, a crucial ingredient of compositionality is
 missing: one cannot give small specifications to programs manipulating
 shared data, nor can one use the frame rule inside the shared
 state. Some formalisms can mitigate this issue, most notably
-concurrent abstract predicates (CAP)~\cite{cap-ecoop10} and local
-rely-guarantee (LRG)~\cite{lrg}, but only when a subset of threads
-manipulate resource that is entirely disjoint from their context, or
-when the shared state is composed of entirely disjoint pieces with no
-common action. For instance, if threads need to access two successive
-nodes in a linked list, then no such splitting is possible as each
-cell of the linked list will be shared between two neighbouring
+Concurrent Abstract Predicates (CAP)~\cite{cap-ecoop10} and Local
+Rely-Guarantee reasoning (LRG)~\cite{lrg}, but only when a subset of threads
+manipulate resources that are entirely disjoint from their context, or
+when the shared state is divided into entirely disjoint regions with no
+common actions. For instance, given a linked list of $n+1$ nodes accessed concurrently by $n$ threads (numbered $1, \cdots, n$) where the $i$th thread requires access to two successive nodes at indices $i-1$ and $n$, no such splitting is possible as each
+node of the linked list will be shared between two neighbouring
 threads, hence the shared state must contain the entire linked
-list. Similarly, one cannot reason about subgraphs of a shared graph
-in isolation due to arbitrary sharing between them.
+list. Similarly, when data structures with intricate (unspecified) patterns of sharing are accessed concurrently, one cannot reason about subgraphs
+\emph{in isolation} due to arbitrary sharing between them.
 
-Second, when a shared region is created, provision has to be made for
-all future extensions of it. It is generally not possible to
+Second, the interference associated with each region is defined when it is created and cannot change. As such, upon its creation, provision has to be made for
+all future extensions of it and it is generally not possible to
 arbitrarily grow it with extra state under new interference rules.
-TODO: Set example.
+As we discuss in \S\ref{sec:examples}, this results in unnatural specifications such as the concurrent set module example in~\cite{cap-ecoop10}. 
 
-Finally, the description of the interference on a shared region is
-fixed for the entire lifetime of the region. Even if some actions
-become irrelevant due to the resource they act on having been
-deallocated or to extra knowledge gained about the state that
-falsifies their requirements, they have to be kept around. This incurs
+Finally, the description of the interference on the shared state is
+fixed throughout its entire lifetime: even if a transition on the shared state 
+becomes irrelevant (either because the resources it acts on have been
+deallocated or extra knowledge gained about the shared state
+falsifies their requirements), it still has to be kept around and accounted for. This incurs
 a burden in the proof effort, as stability against these irrelevant
 actions still has to be checked at every point.
 
-
-\julescomment{Need to write something here to insist that
-compositionality rules all. Not sure whether to use the paragraph
-below or not.}
-
-suppose the code you want to prove uses one library for which you have
-a spec, then you need to adapt to that spec because the shared state
-has to match the scope of the spec of the library.  Now if you have
-two libraries used by your code, the scope of their specs will in all
-probability not match, and you cannot use existing program logics
-(except LRG in some cases).
-
+The restrictions imposed on the ways in which the shared state can be decomposed and accessed by different threads (the first issue discussed above) not only affects the locality of reasoning, but also impedes \emph{modularity} and proof reuse. When the implementation of a module $M_1$ is verified against its specification, its proof can only be reused from within another module $M_2$, if either the parts of the shared state accessed by $M_2$ are disjoint from those of $M_1$; or the shared state is partitioned identically for both modules, i.e. for common parts of the shared state, they view the same region boundaries, with same contents and interference descriptions. While the former restriction heavily limits specification reuse, the latter is unnatural: the divisions imposed on the shared state are merely instrumental and are utilised to promote locality; it is unrealistic to expect different module specifications to view the same repartitioning of shared resources. 
 
 This paper introduces the program logic \colosl, for Concurrent Local
 Subjective Logic, which addresses all three issues. \colosl models
@@ -117,7 +105,7 @@ with previous approaches that either mandate that all threads view the
 same entire shared state, or strictly disjoint parts of
 it. Nevertheless, we provide a framing mechanism both on shared
 resources as well as their interferences even in the presence of
-overlapping footprints and entangled resources.  This flexibility
+overlapping footprints and entangled resources. This flexibility
 provides truly compositional reasoning for shared-memory concurrency.
 
 Contribs?
@@ -199,7 +187,7 @@ even encompassing the threads' private state. Later techniques
 combined rely-guarantee with separation logic, starting with
 RGSep~\cite{viktor-marriage}, which separates private (or local) and
 shared state, allowing further compositionality. However, the view of
-the shared state and interference on it is still globally-shared
+the shared state and interference on it is still globally shared
 across threads. The next breakthrough as far as compositionality is
 concerned came from LRG~\cite{lrg}, wherein the shared state may be
 split into completely independent pieces, thus partially solving the
@@ -207,7 +195,7 @@ first problem outlined above. This provides a way to frame off parts
 of the shared state, but, as noted by its author, the strong
 disjointness restrictions make this applicable only at the level of
 disjoint modules in the code. Independently from LRG, the reasoning
-framework of Concurrent Abstract Predicates (CAP)~\cite{cap-ecoop10}
+framework of CAP~\cite{cap-ecoop10}
 and its extended variants~\cite{icap,tada} introduced the notion
 of \emph{regions} of shared state. Much like LRG, the division into
 regions is only possible for entirely disjoint pieces of state, with
@@ -225,25 +213,12 @@ TODO: CareSL
 
 TODO Turon et al.'s POPL'13 paper (which also espouses the idea of
 using "local protocols" to govern individual pieces of a shared data
-structure, albeit in a less rigorously enforced manner than in CoLoSL)
+structure, albeit in a less rigorously enforced manner than in \colosl)
 
 (and probably his ICFP paper as well)
 
-\julescomment{The next paragraph about SCSL should be much shorter and to
-the point.}
-
-We conclude this section by noting that while \colosl enables
-reasoning about \emph{fine-grained} concurrency, the logic of
-subjective concurrent separation logic (SCSL)~\cite{SCSL} employs
-auxiliary states to reason about \emph{coarse-grained}
-concurrency. That is, although both techniques share the spirit
-of \emph{subjectivity}, their applications are completely
-orthogonal. As the authors note in~\cite{SCSL}, CAP (and by
-design \colosl) can be employed to reason about their case studies of
-coarse-grained concurrency. However, SCSL cannot be used to reason
-about the fine-grained concurrency scenarios that \colosl tackles,
-either when the resources are distributed disjointly amongst threads
-or when they are intricately entangled.
+We conclude this section by noting that while \colosl appeals to \emph{subjective views} to reason about \emph{fine-grained} concurrency, Subjective Concurrent Separation Logic (SCSL)~\cite{SCSL} uses \emph{subjective auxiliary states} to reason about \emph{coarse-grained} concurrency. While as the authors note in~\cite{SCSL}, CAP (and by
+design \colosl) can be employed to reason about their studied examples, SCSL cannot be used to reason about scenarios involving fine-grained concurrency.
 
 \paragraph{Paper outline}
 In \S\ref{sec:intuition}, we exhibit the main principles of \colosl
