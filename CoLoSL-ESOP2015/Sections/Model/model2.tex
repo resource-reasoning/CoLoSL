@@ -616,7 +616,8 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 %	
 \end{mathpar}
 \hrule
-\caption{Confinement and local fencing rules.}
+\caption{Confinement and local fencing rules. We assume that variables in
+  $\bar x$ do not appear free in $\lass{F}$ and $\lass{F}_i$ for any $i$.}
 \label{fig:local-fencing-rules}
 \end{figure}
 
@@ -761,7 +762,10 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Selected action shifting rules; we write $I \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I' \weakenI{\fenceAss{}} I$.}
+\caption{Selected action shifting rules; we write $I
+  \approx^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I'
+  \weakenI{\fenceAss{}} I$,  and assume that variables in
+  $\bar x$ do not appear free in $\lass{F}$.}
 \label{fig:shifting-rules}
 \end{figure}
 
@@ -919,7 +923,9 @@ action, in a similar way to fencing rules above.
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Rules for checking stability (excerpt).}
+\caption{Rules for checking stability (excerpt).
+ We assume that variables in
+  $\bar x$ do not appear free in $\lass{P}$, $\lass{Q}$, and $\lass{R}$.}
 \label{fig:stability-rules}
 \end{figure*}
 
@@ -955,7 +961,9 @@ fencing lacks the confinement condition required by local
 fencing. Additionally, a fence $F$ for an interference
 assertion $I$ is also a fence for any $I'$ that is a shifting of $I$ under
 $F$.
+  \vspace{-10pt}
 \begin{mathpar}
+  \vspace{-10pt}
 	\infer{
 		F \fences I	
 	}{
@@ -1212,6 +1220,7 @@ a concrete state in \Heaps.
 
 \begin{definition}[Valid triple]
   A triple is \emph{valid}, written $|= \{P\}\ \mathbb{C}\ \{Q\}$, iff for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
+  \vspace{-10pt}
   \[
     \left(w, \lenv |= P  \land \mathbb{C}, \reifyW{w} \rightarrow^{\text{*}} \li{skip}, \h{}'\right)
     \text{ implies } \exsts{w'} w', \lenv |= Q \land \h{}' = \reifyW{w'}
