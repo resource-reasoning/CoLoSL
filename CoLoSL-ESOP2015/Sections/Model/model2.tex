@@ -1,6 +1,4 @@
-\section{\colosl}
-\label{sec:colosl}
-
+\section{\colosl}\label{sec:colosl}
 We now give a more formal overview of how to use \colosl for program
 verification, eluding some details of the semantics for lack of space,
 while still providing enough ingredients to carry program proofs. We
@@ -509,12 +507,12 @@ is invariant under all actions in $\lmod'$ (called a \emph{fence}),
 then checking the confinement condition for each action.
 
 In the logic, the shared state is extended by the resources in
-$\lass{P}$ under the interference $I$ via the \extendRule principle,
-which requires that $\lass{P}\containI I$ be
+$P$ under the interference $I$ via the \extendRule principle,
+which requires that $P\containI I$ be
 established. \fig~\ref{fig:local-fencing-rules} presents a set of
-rules to reduce $\lass{P}\containI I$ to a series of entailments in
+rules to reduce $P \containI I$ to a series of entailments in
 ordinary separation logic. As expressed by the first rule,
-$\lass{P}\containI I$ holds if there is a weaker assertion $\lass{F}$
+$P \containI I$ holds if there is a weaker local assertion $\lass{F}$
 that acts as a \emph{local fence} for $I$, denoted by
 $\lass{F}\strictfences I$; in particular, this means that $\lass{F}$
 must be invariant under all actions of $I$. This fencing condition is
@@ -546,10 +544,10 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 \hrule\vspace{5pt}
 \begin{mathpar}
 	\infer{
-	  \lass{P} \confines I	
+	  P \confines I	
 	}
 	{
-	  \lass{P} \entails \fenceAss{}&
+	  P \entails \fenceAss{}&
 	  \fenceAss{} \strictfences I
 	}
 	
@@ -654,10 +652,10 @@ non-intersection for a restricted fragment of formulas.
 \hrule\vspace{5pt}
 \begin{mathpar}
 	\infer{
-		I \weakenI{\lass{P}} I'	
+		I \weakenI{P} I'	
 	}
 	{
-		\lass{P} \entails \fenceAss{}\\
+		P \entails \fenceAss{}\\
 		I \weakenI{\fenceAss{}} I'
 	}	
 	
@@ -771,8 +769,8 @@ non-intersection for a restricted fragment of formulas.
 \end{figure}
 
 The first three rules of \fig\ref{fig:shifting-rules} allow one to
-check shifting piecewise: one may weaken the assertion $\lass{P}$ into
-$\lass{F}$ which, if it \emph{fences} $I_1\cup I_2$, can be used to
+check shifting piecewise: one may weaken the assertion $P$ into
+a local assertion $\lass{F}$ which, if it \emph{fences} $I_1\cup I_2$, can be used to
 reduce a shifting judgement $I \cup I_1 \weakenI{\fenceAss{}} I \cup
 I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. To check whether
 an assertion $\lass{F}$ fences an interference assertion $I$, written
