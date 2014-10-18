@@ -3,7 +3,7 @@
 
 We illustrate our \colosl reasoning principles by sketching a proof of
 a variation of Dijkstra's token ring mutual exclusion
-algorithm~\cite{dijkstra74}.  These principles are laid out in
+algorithm~\cite{dijkstra74}. These principles are laid out in
 \fig\ref{fig:principles}, together with the usual concurrency rule of
 separation logic~\cite{csl-tcs}, and the rule of consequence from the 
 Views framework~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
@@ -369,6 +369,8 @@ an explicit \emph{unsharing} mechanism to claim shared
 resources and render them thread-local. Instead, this behaviour can
 be simply encoded as an additional action with the second behaviour
 described above. For instance, in o
+
+In Appendix~\ref{sec:mutual-exclusion} we generalise the mutual exclusion ring presented in this section to $n$ threads and demonstrate how it can be used to synchronise access to an $n$-threaded concurrent database. 
 %
 %We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
 %cannot ensure that proved programs do not leak memory. Indeed, one may
