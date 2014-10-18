@@ -76,8 +76,8 @@ right pointers in the process. Such an action is allowed by a
 \emph{marking} capability of the form $\markT{n}{e}$ where $n$ denotes
 the vertex (address) and $e$ the edge via which vertex $n$ is visited.
 Thus owning an unmarked vertex grants the right to visit and mark its
-unmarked children, and the capabilities owned on a same node by
-multiple threads do not clash because they would have gotten to that
+unmarked children, and the capabilities owned on the same node by
+multiple threads do not clash since they would have gotten to that
 node via different paths which yield different capabilities. For
 instance, the capabilities associated with marking of vertex $z$ in
 \fig\ref{fig:graphAndTree} are $\markT{z}{y.r}$ and
@@ -235,7 +235,7 @@ local views, each attached to a vertex $n \in \gamma$. Moreover, the interferenc
 
 Similarly, the $\tr{x}{\gamma}$ predicate represents a \emph{tree}
 rooted at $x$, as is standard in separation logic~\cite{rey02}, and
-consists (once fully unfolded) of $|\gamma|$ subjective views one for each vertex in
+consists of $|\gamma|$ subjective views (once fully unfolded) one for each vertex in
 $\gamma$. The assertion of each subjective view reflects that the
 corresponding vertex ($x$) has been marked
 $\shared{\marked{x}}{I(x)}$. The resources associated with each node
