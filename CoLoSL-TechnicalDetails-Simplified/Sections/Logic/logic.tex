@@ -280,11 +280,37 @@ A capability $\ca{} \in \Caps$, is \emph{contained} in an action model $\lmod \i
 %
 %
 The above states that $\ca{}$ is contained in $\lmod$ iff $\ca{}$ is the composition of smaller capabilities $\ca{i} \in K$ where each constituent $\ca{i}$ is accounted for in the domain of $\lmod$.
+%
+%
 
-We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is well-formed if $l$ and $g$ are compatible, the capabilities found in $l\composeL g$ are contained in the action model $\lmod$ and $\lmod$ is confined to $g$. 
+In order to ensure indefinite extension of the shared state and  creation of fresh capabilities (through \extendRule principle), as part of the well-formedness condition we require that the domain of action models are well-defined. That is, one can always guarantee the existence of a capability that is fresh (disjoint from the domain of the action model; and that the domain remains well-defined after extension. This is captured by the following definition of well-defined capability sets. 
+%
+%
+\begin{definition}[Well-defined capability subsets]
+The set of \emph{well-defined capability sets}, $\ADoms$, is defined as follows:
+%
+\[
+	\ADoms \eqdef 
+	\left\{ 
+	\begin{array}{@{\hspace{2pt}}l | l @{\hspace{2pt}}}
+		K & 
+		\begin{array}{@{} l @{}}
+			K \in \pset{\Caps} \land \exsts{\ca{} \in \Caps} \ca{} \disjoint K \land \\
+			\for{K' \in \ADoms} K \cup K' \in \ADoms
+		\end{array}
+	\end{array}		
+	\right\}
+\]
+%
+where we write $\ca{} \disjoint K$ to denote $\for{\ca{}' \in K} \ca{} \disjoint \ca{}'$. 
+%
+\end{definition}
+
+We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is well-formed if $l$ and $g$ are compatible, the capabilities found in $l\composeL g$ are contained in the action model $\lmod$,$\lmod$ is confined to $g$, and the domain of $\lmod$ is well-defined. 
 %We proceed by defining what it means for capabilities to be contained in an action model and subsequently formalise the notion of well-formed states.
 %
 %
+
 \begin{definition}[Well-formedness]
   A 4-tuple $(l, g, \lmod)$ is \emph{well-formed},
   written $\wf{l, g, \lmod}$, iff
@@ -294,7 +320,7 @@ We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is w
     (\exsts{\h{},\ca{}}
     l \composeL g = (\h{},\ca{}) \land \ca{} \containedIn \lmod)
     /|
-		g \containI \lmod
+		g \containI \lmod \land \dom{\lmod} \in \ADoms
   \end{array}
   \vspace{-1ex}
   \]
@@ -366,9 +392,9 @@ The assertions of \colosl are elements of $\Assertions$ described by the grammar
 %	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
 %	\Assertions \ni P, Q  &::=  A \mid P \Rightarrow Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
 	A &::=\m{false} \mid  \emp \mid \heapAss{} \mid \capAss{}\\
-	\LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \lass{P} \land \lass{Q} \mid \lass{P} \lor \lass{Q} \mid \exsts{x} \lass{P} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{p} \septraction \lass{q}\\
+	\LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{p} \septraction \lass{q}\\
 %
-	\Assertions \ni P, Q  &::=  \lass{P} \mid P \land Q \mid P \lor Q \mid \exsts{x} P \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
+	\Assertions \ni P, Q  &::=  \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P \sepish Q \mid \shared{P}{I} \\
 	\IAssertions \ni I &::= \emptyset \mid \{\interAss{\capAss{}}{\bar{y}}{P}{Q}\} \cup I
 \end{align*}
 \end{definition}
@@ -408,7 +434,7 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
 %
 %\[
 \begin{align*}
-  (l,g,\lmod), \lenv &|= A &&\text{iff  }&& l,\lenv \slsat A\\
+  (l,g,\lmod), \lenv &|= \lass{P} &&\text{iff  }&& l,\lenv \slsat \lass{P}\\
 %  
   (l,g,\lmod), \lenv &|= \shared P I &&\text{iff}&&
   l = \unitH\text{ and }
@@ -417,18 +443,12 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   \text{ and}\\
   &&&&&s, \lenv |=_{g,\lmod} P\text{ and }
   \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}\\
-%  
-%  w, \lenv &|= P => Q
-%  &\text{iff}& w,\lenv |= P \text{ implies } w,\lenv |= Q\\
-%
-	w, \lenv &|= P \land Q
-  &&\text{iff}&& w,\lenv |= P \text{ and } w,\lenv |= Q\\
+%	
+	w, \lenv &|= \exsts x P
+  &&\text{iff}&& \exsts v w, [\lenv|||x:v] |= P\\
 %  
   w, \lenv &|= P \lor Q
   &&\text{iff}&& w,\lenv |= P \text{ or } w,\lenv |= Q\\
-%  
-  w, \lenv &|= \exsts x P
-  &&\text{iff}&& \exsts v w, [\lenv|||x:v] |= P\\
 %  
   w, \lenv &|= P_1 * P_2 &&\text{iff}&&
   \exsts{w_1, w_2} w = w_1 \composeW w_2\text{ and}\\
@@ -439,35 +459,24 @@ Given a logical environment $\lenv \in \LEnv$, the semantics of \colosl assertio
   \exsts{w',w_1, w_2} w = w' \composeW w_1 \composeW w_2\text{ and}\\
   &&&&&
   w' \composeW w_1, \lenv |= P_1 \text{ and }
-  w' \composeW w_2, \lenv |= P_2\\
-%  
-%  w, \lenv &|= P \septraction Q &&\text{iff}&&
-%   \exsts{w'} w', \lenv |= P \text{ and }  w \compatible w'\\
-%   &&&&&\text{ implies }w \composeW w', \lenv |= Q\\
-%  
+  w' \composeW w_2, \lenv |= P_2 
 \end{align*}
 %\]
 %
 where 
 %
 \begin{align*}
-  s, \lenv &|=_{g,\lmod} A &&\text{iff}&& s, \lenv \slsat A\\
+  s, \lenv &|=_{g,\lmod} \lass{P} &&\text{iff}&& s, \lenv \slsat \lass{P}\\
 %  
   s, \lenv &|=_{g,\lmod} \shared P I &&\text{iff}&&
   (s,g,\lmod), \lenv |= \shared P I\\
-%
-%  s, \lenv &|=_\dagger P => Q
-%  &\text{iff}& s, \lenv |=_\dagger P\text{ implies } s, \lenv |=_\dagger Q\\
 %  
-  s, \lenv &|=_\dagger P \land Q
-  &&\text{iff}&& s, \lenv |=_\dagger P\text{ and } s, \lenv |=_\dagger Q\\
+	s, \lenv &|=_\dagger \exsts x P
+  &&\text{iff}&& \exsts{v} s, [\lenv|||x:v] |=_\dagger P\\
 %  
   s, \lenv &|=_\dagger P \lor Q
   &&\text{iff}&& s, \lenv |=_\dagger P\text{ or } s, \lenv |=_\dagger Q\\
-%  
-  s, \lenv &|=_\dagger \exsts x P
-  &&\text{iff}&& \exsts{v} s, [\lenv|||x:v] |=_\dagger P\\
-%  
+%    
   s, \lenv &|=_\dagger P_1 * P_2 &&\text{iff}&&
   \exsts{s_1, s_2} s = s_1 \composeL s_2 \text{ and}\\
   &&&&& s_1, \lenv |=_\dagger P_1 \text{ and } s_2, \lenv |=_\dagger P_2\\
@@ -478,13 +487,6 @@ where
   s' \composeL s_1, \lenv |=_\dagger P_1 \text{ and }
   s' \composeL s_2, \lenv |=_\dagger P_2\\\\
 %  
-%  s, \lenv &|=_\dagger P \septraction Q &&\text{iff}&&
-%  \exsts{s'} s', \lenv |=_\dagger P \text{ and }
-%  s \compatible s'\\
-%  &&&&&\text{ implies } s \composeL s', \lenv |=_\dagger Q\\\\
-%
-%
-%
 %
 %
 %
@@ -495,39 +497,30 @@ where
   l, \lenv &\slsat \heapAss{} && \text{iff} && \exsts{\h{}} l = (\h{}, \unitCap) \text{ and } \h{} \in \semH[\lenv]{\heapAss{}} \\
 %  
   l, \lenv &\slsat \capAss{} && \text{iff} && \exsts{\ca{}} l = (\unitH, \ca{}) \text{ and } \ca{} \in \semK[\lenv]{\capAss{}} \\
-%  
-  l, \lenv &\slsat \shared P I && \text{ iff } && l = \unitL\\
-%
-%  
-%  l, \lenv & \slsat P => Q
-%  &\text{iff}& l, \lenv \slsat P\text{ implies } l, \lenv \slsat Q\\
-%
 % 
-  l, \lenv & \slsat P \land Q
-  &&\text{iff}&& l, \lenv \slsat P\text{ and } l, \lenv \slsat Q\\
+  l, \lenv & \slsat \neg\lass{P} 
+  &&\text{iff}&& l, \lenv \not\slsat \lass{P}\\
 %
+	l, \lenv & \slsat \lass{P} \septraction \lass{Q} &&\text{iff}&&
+  \exsts{l'} l', \lenv \slsat \lass{P} \text{ and }
+  l \compatible l'\\
+  &&&&&\text{ implies } l \composeL l', \lenv \slsat \lass{Q}\\
+%  
+	l, \lenv &\slsat P_1 * P_2 &&\text{iff}&&
+  \exsts{l_1, l_2} l = l_1 \composeL l_2 \text{ and}\\
+  &&&&& l_1, \lenv \slsat P_1 \text{ and } l_2, \lenv \slsat P_2\\
+%  
   l, \lenv & \slsat P \lor Q
   &&\text{iff}&& l, \lenv \slsat P\text{ or } l, \lenv \slsat Q\\
 %
   l, \lenv & \slsat \exsts x P
   &&\text{iff}&& \exsts{v} l, [\lenv|||x:v] \slsat P\\
-%  
-  l, \lenv &\slsat P_1 * P_2 &&\text{iff}&&
-  \exsts{l_1, l_2} l = l_1 \composeL l_2 \text{ and}\\
-  &&&&& l_1, \lenv \slsat P_1 \text{ and } l_2, \lenv \slsat P_2\\
-%  
-%  
+%    
   l, \lenv &\slsat P_1 ** P_2 &&\text{iff}&&
   \exsts{l', l_1, l_2} l = l' \composeL l_1 \composeL l_2\text{ and}\\
   &&&&&
   l' \composeL l_1, \lenv \slsat P_1 \text{ and }
   l' \composeL l_2, \lenv \slsat P_2
-%  
-%  
-%  l, \lenv & \slsat P \septraction Q &&\text{iff}&&
-%  \exsts{l'} l', \lenv \slsat P \text{ and }
-%  l \compatible l'\\
-%  &&&&&\text{ implies } l \composeL l', \lenv \slsat Q
 \end{align*}
 %
 and
@@ -571,14 +564,14 @@ We introduce
 The set of \emph{flat assertions} $\FAssertions$ is defined by the following grammar. \vspace*{-5pt}
 %
 \begin{align*}
-	\FAssertions \ni \fass{P}, \fass{Q} & ::= \lass{P} \mid \shared{\lass{P}}{I} \mid \fass{P} \land \fass{Q} \mid \fass{P} \lor \fass{Q} \mid \exsts{x} \fass{P} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q}
+	\FAssertions \ni \fass{P}, \fass{Q} & ::= \lass{P} \mid \shared{\lass{P}}{I} \mid \exsts{x} \fass{P} \mid \fass{P} \lor \fass{Q} \mid \fass{P} * \fass{Q} \mid \fass{P} \sepish \fass{Q}
 \end{align*}
 %
-The \emph{flattening} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows where $x$ does not appear free in $I$ and $\odot \in \{\land, \lor, *, **\}$. 
+The \emph{flattening} function $\un{.} : \Assertions \rightarrow \FAssertions$ is defined inductively as follows where $x$ does not appear free in $I$ and $\odot \in \{\lor, *, **\}$. 
 %
 \begin{align*}
 	& \un{\lass{p}} \eqdef  \lass{p} \quad &&  
-	\un{P \odot Q} \eqdef  \un{P} \odot \un{Q}  \\%\quad \text{for } \odot \in \{\land, \lor, *, \sepish\}\\
+	\un{P \odot Q} \eqdef  \un{P} \odot \un{Q}  \\
 %
 %
 	& \un{\exsts{x} P} \eqdef  \exsts{x} \un{P} &&
@@ -593,27 +586,27 @@ The \emph{flattening} function $\un{.} : \Assertions \rightarrow \FAssertions$ i
 	\un{\shared{P \lor Q}{I}} \eqdef \un{\shared{P}{I}} \lor \un{\shared{Q}{I}}\\
 %
 %
-	& \un{\shared{\shared{P}{I} \land L}{I'}} \eqdef \m{false} &&
-	\un{\shared{\shared{P}{I} \!\land\! ((L \!\lor\! Q) \!\odot\! R)}{I'}} \!\eqdef\! 
-	\un{\shared{\shared{P}{I} \!\land\! (Q \!\odot\! R)}{I'}}\\
-%
-%
-	&&&
-	\un{\shared{\shared{P}{I} \land B}{I'}} \eqdef
-	\un{\shared{P}{I}} * \un{\shared{B}{I'}} \vspace*{-30pt}
+%	& \un{\shared{\shared{P}{I} \land L}{I'}} \eqdef \m{false} &&
+%	\un{\shared{\shared{P}{I} \!\land\! ((L \!\lor\! Q) \!\odot\! R)}{I'}} \!\eqdef\! 
+%	\un{\shared{\shared{P}{I} \!\land\! (Q \!\odot\! R)}{I'}}\\
+%%
+%%
+%	&&&
+%	\un{\shared{\shared{P}{I} \land B}{I'}} \eqdef
+%	\un{\shared{P}{I}} * \un{\shared{B}{I'}} \vspace*{-30pt}
 \end{align*}\vspace{-10pt}
-%
-\begin{mathpar}
-	B ::= \emp|\, \shared{P}{I}|\, B \odot B
-	
-	L ::= \m{false} \mid \cell{x}{v} \mid [\token{a}] \mid L \ominus Q \quad \text{for }\ominus \in \{\land, *, \sepish\}
-\end{mathpar}
-%
+%%
+%\begin{mathpar}
+%	B ::= \emp|\, \shared{P}{I}|\, B \odot B
+%	
+%	L ::= \m{false} \mid \cell{x}{v} \mid [\token{a}] \mid L \ominus Q \quad \text{for }\ominus \in \{\land, *, \sepish\}
+%\end{mathpar}
+%%
 \end{definition}
 %
 %
 \begin{definition}[Erasure]
-The \emph{erasure} of an assertion $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively over the structure of assertions as follows with $\odot\in\{\land, \lor, *, \sepish \}$
+The \emph{erasure} of an assertion $\erase{(.)}: \Assertions \rightarrow \LAssertions$ is defined inductively over the structure of assertions as follows with $\odot\in\{\lor, *, \sepish \}$
 %
 \begin{mathpar}
 	\erase{A} \eqdef A  
@@ -630,36 +623,36 @@ The \emph{erasure} of an assertion $\erase{(.)}: \Assertions \rightarrow \LAsser
 %
 %
 %
-\begin{definition}[Existential promotion]
-Given an assertion $P \in \Assertions$, the \emph{existential promotion} function, $\promote{.}: \Assertions \rightarrow \LAssertions$, is defined as follows:
+%\begin{definition}[Existential promotion]
+%Given an assertion $P \in \Assertions$, the \emph{existential promotion} function, $\promote{.}: \Assertions \rightarrow \LAssertions$, is defined as follows:
+%%
+%\begin{mathpar}
+%	\promote{P} \eqdef \exists{\bar{x}^{\in S}}.\; P'
+%	
+%	\text{where } (S, P') = \ep{P}
+%\end{mathpar}
+%%
+%%
+%with the auxiliary function $\ep{.}: \Assertions \rightarrow (\pset{\textsf{LVar}} \times \Assertions)$ defined inductively over the structure of assertions as follows where $\odot \in \{\land, \lor, *, \sepish\}$.
+%We assume that the bound logical variables of $P$ are pairwise distinct; and that the bound variables of $P$ in $\shared{P}{I}$ do not appear free in $I$\footnote{Note that it is always possible to achieve these stipulations by renaming the bound variables in a capture-avoiding manner.}.
+%In what follows, $\ep{P} = (S_1, P')$ and $\ep{Q} = (S_2, Q')$ where applicable.
+%%
+%\begin{mathpar}
+%	\ep{A} \!\!\eqdef\! (\emptyset, A) 
+%	
+%	\ep{\shared{P}{I}} \!\!\eqdef\!  (S_1, \shared{P'}{I})
+%	
+%	\ep{P \odot Q} \!\!\eqdef\! \left(S_1 \uplus S_2, P' \odot Q' \right)
 %
-\begin{mathpar}
-	\promote{P} \eqdef \exists{\bar{x}^{\in S}}.\; P'
-	
-	\text{where } (S, P') = \ep{P}
-\end{mathpar}
-%
-%
-with the auxiliary function $\ep{.}: \Assertions \rightarrow (\pset{\textsf{LVar}} \times \Assertions)$ defined inductively over the structure of assertions as follows where $\odot \in \{\land, \lor, *, \sepish\}$.
-We assume that the bound logical variables of $P$ are pairwise distinct; and that the bound variables of $P$ in $\shared{P}{I}$ do not appear free in $I$\footnote{Note that it is always possible to achieve these stipulations by renaming the bound variables in a capture-avoiding manner.}.
-In what follows, $\ep{P} = (S_1, P')$ and $\ep{Q} = (S_2, Q')$ where applicable.
-%
-\begin{mathpar}
-	\ep{A} \!\!\eqdef\! (\emptyset, A) 
-	
-	\ep{\shared{P}{I}} \!\!\eqdef\!  (S_1, \shared{P'}{I})
-	
-	\ep{P \odot Q} \!\!\eqdef\! \left(S_1 \uplus S_2, P' \odot Q' \right)
-
-	\ep{\exsts{x}P} \!\!\eqdef\! \left({x} \uplus S_1, P'\right)
-\end{mathpar}
-%
-\end{definition}
-%
-As we demonstrate in Appendix~\ref{app:lemmata} (\lem~\ref{lem:existential-promotion}), given any assertion $P$, it is always possible to rewrite it into an equivalent assertion where all the existential quantifications are promoted to the front of the assertion; that is, $P <=> \promote{P}$. 
-%
+%	\ep{\exsts{x}P} \!\!\eqdef\! \left({x} \uplus S_1, P'\right)
+%\end{mathpar}
+%%
+%\end{definition}
+%%
+%As we demonstrate in Appendix~\ref{app:lemmata} (\lem~\ref{lem:existential-promotion}), given any assertion $P$, it is always possible to rewrite it into an equivalent assertion where all the existential quantifications are promoted to the front of the assertion; that is, $P <=> \promote{P}$. 
+%%
 \begin{definition}[Gather/merge]
-Given an assertion $P \eqdef \exsts{\bar{x}} P' \in \Assertions$ (where there are no bound variables in $P'$), the \emph{gather}, $\prodA{(.)}: \Assertions \rightarrow \LAssertions$, and \emph{merge}, $\sumA{(.)}: \Assertions \rightarrow \LAssertions$, operations are defined as follows:
+Given an assertion $P \eqdef \exsts{\bar{x}} P' \in \Assertions$, where $P$ is in the prenex normal form with no bound variables in $P'$,the \emph{gather}, $\prodA{(.)}: \Assertions \rightarrow \LAssertions$, and \emph{merge}, $\sumA{(.)}: \Assertions \rightarrow \LAssertions$, operations are defined as follows:
 %
 \begin{mathpar}
 	\prodA{P} \eqdef \exists{\bar{x}}.\; \lass{P} * \lass{Q}
@@ -670,7 +663,7 @@ Given an assertion $P \eqdef \exsts{\bar{x}} P' \in \Assertions$ (where there ar
 \end{mathpar}
 %
 %
-with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\odot \in \{\land, *, \sepish\}$. In what follows, $\ub{\fass{P}} = (\lass{P}, \lass{P}')$ and $\ub{\fass{Q}} = (\lass{Q}, \lass{Q}')$ where applicable.
+with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \times \LAssertions)$ defined inductively over the structure of local assertions as follows where $\odot \in \{*, \sepish\}$. In what follows, $\ub{\fass{P}} = (\lass{P}, \lass{P}')$ and $\ub{\fass{Q}} = (\lass{Q}, \lass{Q}')$ where applicable.
 %
 \begin{mathpar}
 	\ub{\lass{P}} \!\!\eqdef\! (\lass{P}, \emp) 
@@ -682,6 +675,16 @@ with the auxiliary function $\ub{.}: \FAssertions \rightarrow (\LAssertions \tim
 	\ub{\fass{P} \lor \fass{Q}} \!\!\eqdef\! \left(\lass{P} \lor \lass{Q}, \lass{P}' \lor \lass{Q}' \right)
 \end{mathpar}
 %
+%
+\end{definition}
+%
+%
+\begin{definition}[Interference entailment]
+An interference assertion $I$ \emph{entails} interference assertion $I'$, written $I \entailsI I'$, if
+%
+\[
+	\for{\lenv \in \LEnv} \semI[\lenv]{I} \subseteq \semI[\lenv]{I'}
+\]
 %
 \end{definition}
 %
@@ -748,11 +751,11 @@ The following judgements are valid.
 	}
 \end{mathpar}
 %
-\begin{proof}
-\todo
-%
-\end{proof}
-%
+%\begin{proof}
+%\todo
+%%
+%\end{proof}
+%%
 \end{lemma}
 %
 %

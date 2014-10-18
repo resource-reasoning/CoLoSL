@@ -305,7 +305,7 @@ as required.
 We provide a number of syntactic judgements in \fig~\ref{fig:stability-rules} that allows us to ascertain the stability of an assertion without performing the necessary semantic checks. These judgements reduce stability checks to logical entailments. We appeal to the following auxiliary definition in our stability judgements.
 %
 \begin{definition}[Combination]
-The \emph{combination} of an assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current state, and an assertion $Q \eqdef \exsts{\bar{y}}Q'$ describing an action precondition, $\combine{.}{.}: \Assertions \times \Assertions \rightarrow \LAssertions$, is defined as follows. We assume that the bound variables of  $P$ and $Q$ have been promoted to the top as described above such that $P'$ and $Q'$ have no bound variables.
+The \emph{combination} of an assertion $P \eqdef \exsts{\bar{x}}P'$ describing the current state, and an assertion $Q \eqdef \exsts{\bar{y}}Q'$ describing an action precondition, $\combine{.}{.}: \Assertions \times \Assertions \rightarrow \LAssertions$, is defined as follows. We assume that $P$ and $Q$ are in the prenex normal form with no bound variables in $P'$ and $Q'$. 
 %
 \[
 \begin{array}{l l}
@@ -400,7 +400,7 @@ The \emph{combination} of an assertion $P \eqdef \exsts{\bar{x}}P'$ describing t
 	}	
 		
 	\infer{
-		\stableTo{P \ominus Q}{R}
+		\stableTo{P \odot Q}{R}
 	}
 	{
 		\stableTo{P}{R}
@@ -494,7 +494,7 @@ The \emph{combination} of an assertion $P \eqdef \exsts{\bar{x}}P'$ describing t
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$; $\dot \in \{\land, \lor, *, **\}$ and $\ominus \in \{\land, \lor, **\}$.}
+\caption{Stability judgements where $P, Q, Q_1, Q_2, R \in \FAssertions$; $\lass{P}, \lass{q}_1, \lass{q}_2 \in \LAssertions$ and $\dot \in \{\lor, *, **\}$.}
 \label{fig:stability-rules}
 \end{figure*}
 %
@@ -794,7 +794,7 @@ Pleasantly, since our local assertions do not contain subjective (boxed) asserti
 %
 %
 \begin{definition}[Freshness]
-The capability assertion $\capAss{}$ with logical variables $\bar{x}$ is \emph{fresh}, written $\fresh{\bar{x}, \capAss{}}$, iff for all $\lenv \in \LEnv$ and $K \subseteq \Caps$, there exists $\ca{} \in \Caps$ such that
+The capability assertion $\capAss{}$ with logical variables $\bar{x}$ is \emph{fresh}, written $\fresh{\bar{x}, \capAss{}}$, iff for all $\lenv \in \LEnv$ and $K \in \ADoms$, there exists $\ca{} \in \Caps$ such that
 %
 \[
 	(\unitH, \ca{}), \lenv \slsat \exsts{\bar{x}} \capAss{} /|  \ca{} \disjoint K

@@ -36,7 +36,7 @@
 \usepackage{at}
 %\usepackage[style=2]{mdframed}
 \usepackage[most]{tcolorbox}
-
+\usepackage{wasysym}
 \input mathlig
 \usepackage{proof}
 
@@ -621,7 +621,7 @@
 \newcommand{\fst}[1]{\m{fst}\left(#1\right)}
 \newcommand{\snd}[1]{\m{snd}\left(#1\right)}
 \newcommand{\fresh}[1]{\m{fresh}\left(#1\right)}
-\newcommand{\happy}{\includegraphics[scale=0.09]{Sections/OdeToQ/happy.png}}
+%\newcommand{\happy}{\includegraphics[scale=0.09]{Sections/OdeToQ/happy.png}}
 %\newcommand{\sad}{\includegraphics[scale=0.07]{Sections/OdeToQ/sad}}
 \newcommand{\hrpoonyatom}[1]{\vcenter{\offinterlineskip\hbox{$#1\rightharpoonup$}\vskip-.45ex\hbox{$#1\rightharpoondown$}}}
 
@@ -663,3 +663,6 @@
 \addtolength{\textfloatsep}{-10pt}
 \addtolength{\dbltextfloatsep}{-10pt}
 \addtolength{\floatsep}{-17pt}
+
+\newcommand{\happy}{\scalebox{1.6}{\smiley}}
+\newcommand{\sad}{\scalebox{1.6}{\frownie}}
