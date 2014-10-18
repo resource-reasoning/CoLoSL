@@ -17,7 +17,7 @@ A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
 \emph{local logical state} (local state) $l$ represents the
 locally owned resources of a thread, in the standard separation logic
-sense while \emph{global logical state} (shared state)
+sense while the \emph{global logical state} (shared state)
 $g$ represents shared resources. An action model records all possible interferences on the shared state.
 
 Logical states have two components: one describes machine states
@@ -25,7 +25,7 @@ Logical states have two components: one describes machine states
 \emph{capabilities}. The latter are inspired by the capabilities in
 deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
 capability is allowed to perform the associated actions (as prescribed
-by the \emph{action model} components of each world, defined below),
+by the \emph{action model} component of each world, defined below),
 while any capability \emph{not} owned by a thread means that the
 environment can perform the action. This can be seen as a unified
 treatment of the rely and guarantee relations in rely-guarantee
@@ -36,7 +36,7 @@ corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between threads and the
 environment just like any other resource. See the presentation of
-deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap-ecoop10} for further details
+deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
 and motivation.
 
 In general, each component of a logical state is taken from an
@@ -81,7 +81,7 @@ capabilities.
 The local and global logical states of a world are always
 \emph{compatible}, capturing the intuition that privately-owned
 resources are disjoint from shared resources. Compatibility means that
-they may composed as follows.
+they may be composed as follows.
 
 \begin{definition}[Logical state composition]
   The \emph{composition of logical states} $ \composeL : \LStates

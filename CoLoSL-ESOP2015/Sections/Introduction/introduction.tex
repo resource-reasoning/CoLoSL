@@ -65,8 +65,7 @@ this issue, most notably Concurrent Abstract Predicates
 state into entirely disjoint regions without cross-region
 interferences. For instance, given a linked list of $n+1$ nodes
 accessed concurrently by $n$ threads (numbered $1$ to $n$) where
-the $i$th thread requires access to two successive nodes at indices
-$i$ and $i+1$, no such splitting is possible as each node of the
+the $i$th thread requires access to the $i$th and $(i+1)$st nodes, no such splitting is possible as each node of the
 linked list will be shared between two neighbouring threads, hence the
 shared state must contain the entire linked list. Similarly, when data
 structures with intrinsic sharing such as graphs are accessed
