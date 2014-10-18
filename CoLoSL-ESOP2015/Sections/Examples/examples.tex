@@ -19,9 +19,9 @@ given subjective view.
 
 Our example, presented in \fig\ref{fig:conSpanningTree}, operates on a
 \emph{directed binary graph} (henceforth simply \emph{graph}),
-i.e. a directed graph where each node has at most two
+i.e.\ a directed graph where each node has at most two
 successors, called its left and right children. The program concurrently computes an
-in-place spanning tree of the graph (i.e. a tree that covers
+in-place spanning tree of the graph (i.e.\ a tree that covers
 all nodes of the graphs from a given root), as follows:
 each time a new node is encountered, two new threads are created that
 each prune the edges of the left and right children recursively. A
@@ -44,7 +44,7 @@ already reachable via some other path in the graph since it was marked by anothe
 %% from the root; \emph{mutatis mutandis} for the right subgraph.
 
 We will prove that, given a shared graph as input, the program always
-returns a tree, i.e. all sharing and cycles have been
+returns a tree, i.e.\ all sharing and cycles have been
 appropriately removed. Pleasingly, the \colosl specification achieves
 maximal locality and allows us to reason only on the current subgraph
 manipulated by a thread, instead of the whole graph. Because of
@@ -63,29 +63,34 @@ associating each vertex with at most two successors, where \li{null}
 denotes the absence of a child.  We write $n \in \gamma$
 for $n \in V$, $\gamma(n)$ for $E(n)$ and $|\gamma|$ for $|V|$.
 
-Mathematical graphs are connected to a second, in-memory
-representation by an inductive predicate $\graph{x}{\gamma}$, denoting
-a spatial (in-heap) graph rooted at address $x$ corresponding to the
-mathematical graph $\gamma$. The predicate defined in \fig~\ref{fig:globalCST} uses the
-overlapping conjunction to account for the sharing between the left
-and right children and for potential cycles in the graph, as shown in
-\fig\ref{fig:globalCST}.  The basic action we allow on spatial graphs
-is to \emph{mark} a node, changing its mark field from $0$ to $1$ and
-claiming ownership of its left and right pointers in the process. Such
-an action is allowed by a \emph{marking} capability of the form
-$\markT{n}{e}$ where $n$ denotes the vertex (address) and $e$ the edge
-via which vertex $n$ is visited. For instance, the capabilities
-associated with marking of vertex $z$ in \fig\ref{fig:graphAndTree}
-are $\markT{z}{y.r}$ and $\markT{z}{w.l}$. Note that the
-parameterisation of our actions are merely a notational convenience
-and can be substituted for their full definitions. Given a graph at
-root address $x$, in order to account for the ability to mark the root
-vertex $x$, we introduce a logical (virtual) root edge $\rootEdge$
-into $x$ as depicted in \fig\ref{fig:graphAndTree} together with its
-associated marking capability $\markT{x}{\rootEdge}$. The shared state
-contains node $x$ which can be either unmarked ($\unmarked{x}{l}{r}$)
-or marked ($\marked{x}$); as well as the left and right subgraphs
-captured recursively by $\G{l}{\gamma}$ and $\G{r}{\gamma}$.
+Mathematical graphs are connected to their in-memory representations
+by an inductive predicate $\graph{x}{\gamma}$, denoting a spatial
+(in-heap) graph rooted at address $x$ corresponding to the
+mathematical graph $\gamma$. The predicate defined in
+\fig~\ref{fig:globalCST} uses the overlapping conjunction to account
+for the sharing between the left and right children and for potential
+cycles in the graph.  The basic
+action we allow on spatial graphs is to \emph{mark} a node, changing
+its mark field from $0$ to $1$ and claiming ownership of its left and
+right pointers in the process. Such an action is allowed by a
+\emph{marking} capability of the form $\markT{n}{e}$ where $n$ denotes
+the vertex (address) and $e$ the edge via which vertex $n$ is visited.
+Thus owning an unmarked vertex grants the right to visit and mark its
+unmarked children, and the capabilities owned on a same node by
+multiple threads do not clash because they would have gotten to that
+node via different paths which yield different capabilities. For
+instance, the capabilities associated with marking of vertex $z$ in
+\fig\ref{fig:graphAndTree} are $\markT{z}{y.r}$ and
+$\markT{z}{w.l}$. Note that the parameterisation of our actions are
+merely a notational convenience and can be substituted for their full
+definitions. In order to account for the ability to mark the root
+vertex $x$ of a graph, we introduce a logical (virtual) root edge
+$\rootEdge$ into $x$ as depicted in \fig\ref{fig:graphAndTree}
+together with its associated marking capability
+$\markT{x}{\rootEdge}$. The shared state contains node $x$ which can
+be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as
+well as the left and right subgraphs represented recursively by
+$\G{l}{\gamma}$ and $\G{r}{\gamma}$.
 %% Note that the two subgraphs and vertex $x$ are combined by
 %% the overlapping conjunction $\sepish$ since the graph can be cyclic
 %% and each node may be reachable via more than one path.
@@ -103,7 +108,7 @@ captured recursively by $\G{l}{\gamma}$ and $\G{r}{\gamma}$.
 %%%
 Each vertex is represented as three consecutive cells in the heap
 tracking the mark bit and the addresses of the left ($l$) and right
-($r$) subgraphs. For brevity, we write $\cell{x}{m, l, r}$ for
+($r$) subgraphs. We write $\cell{x}{m, l, r}$ for
 $\cell{x}{m} * \cell{x+1}{l} * \cell{x+2}{r}$, and $x.m$, $x.l$, and
 $x.r$ for $x$, $x+1$, and $x+2$, respectively. When vertex $x$ is in
 the unmarked state, the whole cell $\cell{x}{0,l,r}$ and the
@@ -112,7 +117,7 @@ marked state, the shared state only contains $\cell{x.m}{1}$: the left
 and right subgraphs (pointers and capabilities) have been claimed by
 the thread who marked the node, while other threads need not access
 the children of $x$ once they see that $x$ is already marked. The
-atomic \li{CAS} instruction prevents several threads to concurrently
+atomic \li{CAS} (compare-and-swap) instruction prevents several threads to concurrently
 mark the same node and claim ownership of the same resource.
 
 The interference associated with the graph is described as the union
@@ -124,12 +129,12 @@ anonymous quantification $-$ is yet another notational shorthand and
 can be substituted for the following more verbose definition.\vspace*{-7pt}
 %
 \[
-\vspace{-7pt}
-I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
-  p.r, \rootEdge\}}\!\!\! \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n} \right)
+I(n) \eqdef
+\{ \markT{n}{e} : \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n}
+\mid e \in \{p.l,
+  p.r, \rootEdge\} /| p \in \gamma\}
 \]
-%
-%
+
 \begin{figure}
  %\centering
 %  \hspace*{0.2cm}
@@ -169,8 +174,6 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 \caption{A binary graph (left); global specification of the graph predicate (right).}
 \end{figure}
 
-\fig\ref{fig:conSpanningTree} shows an in-place concurrent algorithm for calculating a spanning tree of a graph. 
-
 \begin{figure}
 %\hrule
 \[
@@ -179,7 +182,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 	& \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma}\\
 	
 	\tr{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor (x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land \exsts{l' \in \{l, \li{null}\}} \exsts{r' \in \{r, \li{null}\}}\\
-	& \shared{\marked{x}}{I(x)} 
+	& \shared{\marked{x}}{I(x)} *
 	\left[\markT{l}{x.l}\right] * \cell{x.l}{l'} * \tr{l'}{\gamma} * 
 	\left[\markT{r}{x.r}\right] * \cell{x.r}{r'} * \tr{r'}{\gamma})
 \end{array}
@@ -188,8 +191,14 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 \caption{Local specification of the graph predicate.}
 \label{fig:localCST}
 \end{figure}
-%
-The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{global} account of the graph in that it captures all vertices and the interference associated with them. However, our spanning tree algorithm operates \emph{locally} as it is called upon recursively for each node. That is, for each \li{span(n)} call (where $\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is limited to node $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$.\vspace{-7pt}
+
+The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST}
+is a \emph{global} account of the graph in that it captures all
+vertices and the interference associated with them. However, our
+spanning tree algorithm operates \emph{locally} as it is called upon
+recursively for each node. That is, for each \li{span(n)} call (where
+$\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is
+limited to the subgraph rooted at $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $n, p \in \gamma$ and $e \in \{p.l, p.r, \rootEdge \}$.\vspace{-7pt}
 %
 \[
 \begin{array}{@{} c @{} }
@@ -218,18 +227,22 @@ The $\graph{x}{\gamma}$ predicate defined in \fig\ref{fig:globalCST} is a \emph{
 \end{array}\vspace*{-7pt}
 \]
 %
-The definition of the $\g{x}{\gamma}$ predicate is similar to that of $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the global view $\shared{\G{x}{\gamma}}{I_{\gamma}}$ that describes the resources associated with all $|\gamma|$ vertices has been replaced by $|\gamma|$ $*$-composed more local views, each describing the resources of a vertex $n \in \gamma$. Moreover, the interference of each local view concerning a vertex $n \in \gamma$ has been shifted from $I_{\gamma}$ to $I(n)$ as to reflect only those actions that affect $n$.  
+The definition of the $\g{x}{\gamma}$ predicate is similar to that of
+$\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the global view
+$\shared{\G{x}{\gamma}}{I_{\gamma}}$ that describes the resources
+associated with all $|\gamma|$ vertices has been broken down into more
+local views, each attached to a vertex $n \in \gamma$. Moreover, the interference of each local view concerning a vertex $n \in \gamma$ has been shifted from $I_{\gamma}$ to $I(n)$ as to reflect only those actions that affect $n$.  
 
 Similarly, the $\tr{x}{\gamma}$ predicate represents a \emph{tree}
 rooted at $x$, as is standard in separation logic~\cite{rey02}, and
-consists of $|\gamma|$ subjective views one for each vertex in
+consists (once fully unfolded) of $|\gamma|$ subjective views one for each vertex in
 $\gamma$. The assertion of each subjective view reflects that the
 corresponding vertex ($x$) has been marked
 $\shared{\marked{x}}{I(x)}$. The resources associated with each node
 $x$, namely the left and right pointers and the corresponding marking
 capabilities, have been claimed by the marking thread and moved into
-the local state. The vertex addressed by the left pointer of $x$
-(i.e. $l'$) corresponds to either the initial value prior to
+its local state. The vertex addressed by the left pointer of $x$
+(i.e.\ $l'$) corresponds to either the initial value prior to
 marking ($l$ where $\gamma(x) = (l, r)$) or \li{null}\ when $l$ has
 more than one predecessors and has been marked by another thread,
 making the whole predicate stable against actions of the program and
@@ -381,7 +394,7 @@ Each node at a given address $x$ is associated with a set of update capabilities
 In order to modify a node, a thread can acquire the lock associated with the node and subsequently claim the relevant update capability.
 % 
 
-Since in CAP the capabilities associated with a region can only be generated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{U}(x, y, v)]$ associated with all addresses $x$ (including those not currently in the domain of the list), all addresses $y$ and all values $v$. At any one point, given $\node{x}{v}{y}$, the only update capability that can be claimed by a thread (through locking) is the one that reflects its current status, namely $[\text{U}(x, y, v)]$. As a result, an auxiliary mathematical set $S$ is used to track those nodes of the list that are currently locked and thus infer which $[\text{U}]$ capabilities have been claimed. The distribution of update capabilities is captured by the two assertions written as the \emph{infinite multiplicative star operator} $\iterStar$. The first part of the assertion states that given any node at address $x$ with successor $y$, if it is not locked, i.e. $(x, y) \not\in S$, then \emph{all} of its update capabilities of the form $[\text{U}(x, y, v)]$ lie in the shared region for \emph{all} values $v$. Dually, if it is locked, i.e. $(x, y) \in S$, then the update capabilities for \emph{all} values $v$ \emph{but one} ($w \not= v$) are in the shared region.
+Since in CAP the capabilities associated with a region can only be generated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{U}(x, y, v)]$ associated with all addresses $x$ (including those not currently in the domain of the list), all addresses $y$ and all values $v$. At any one point, given $\node{x}{v}{y}$, the only update capability that can be claimed by a thread (through locking) is the one that reflects its current status, namely $[\text{U}(x, y, v)]$. As a result, an auxiliary mathematical set $S$ is used to track those nodes of the list that are currently locked and thus infer which $[\text{U}]$ capabilities have been claimed. The distribution of update capabilities is captured by the two assertions written as the \emph{infinite multiplicative star operator} $\iterStar$. The first part of the assertion states that given any node at address $x$ with successor $y$, if it is not locked, i.e.\ $(x, y) \not\in S$, then \emph{all} of its update capabilities of the form $[\text{U}(x, y, v)]$ lie in the shared region for \emph{all} values $v$. Dually, if it is locked, i.e.\ $(x, y) \in S$, then the update capabilities for \emph{all} values $v$ \emph{but one} ($w \not= v$) are in the shared region.
 
 This specification is unnecessarily complicated. It is rather counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, it is overly verbose to consider all combinations of values and successor addresses. Lastly, each thread is required to ``know'' of the resources associated with all nodes in the list and account for their associated interference. 
 
