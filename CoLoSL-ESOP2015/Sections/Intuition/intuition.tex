@@ -406,10 +406,8 @@ That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in posse
 
 In Appendix~\ref{sec:mutual-exclusion} we generalise the mutual
 exclusion ring presented in this section to $n$ threads and
-demonstrate how it can be used to synchronise access to an
-$n$-threaded concurrent database. In particular, since at each point
-in time only one thread may perform an action, that thread can be
-granted extra resource (similarly to holding a lock).
+demonstrate how it can be used to guard a shared resource accessed concurrently. In particular, since at each point in time only one thread may perform an action, that thread can be
+granted the guarded resource exclusively (similarly to holding a lock).
 
 
 %
