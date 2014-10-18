@@ -168,13 +168,11 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
   \end{minipage}
 \caption{A binary graph (left); global specification of the graph predicate (right).}
 \end{figure}
-%
-%
+
 \fig\ref{fig:conSpanningTree} shows an in-place concurrent algorithm for calculating a spanning tree of a graph. 
-%
+
 \begin{figure}
-%
-\hrule
+%\hrule
 \[
 \begin{array}{r @{\hspace*{2pt}} l}
 	\g{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\\

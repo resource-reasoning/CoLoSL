@@ -244,11 +244,11 @@ and post-condition.
 
 A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective view} $s$ can be found in the global
-shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
+shared state $g$ (i.e.\ $g = s\composeL r$ for some context
 $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
-$r$, in the following sense, which we write as
-$\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
+$r$, in the sense that $I$ accounts for all possible interference on $s$, which we write
+as $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit the definition of $\downarrow$ for lack
 of space; it can be found in Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
