@@ -442,13 +442,13 @@ Using the guarantee relation, we introduce the notion of \emph{repartitioning} $
 %
 %
 \begin{definition}[Repartitioning] \label{def:repartitioning}
-We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in \LEnv$, and world $w_1 = (l_1, g_1, \lmod_1)$ such that $w_1, \lenv |= P$, there exists states $m_1, m' \in \Heaps$ such that $(m_1, \emptyset), \lenv \slsat R_1$ and
+We write $\repartitions{P}{Q}{R_1}{R_2}$ if, for every $\lenv \in \LEnv$, and world $w_1$ such that $w_1, \lenv |= P$, there exists states $m_1, m' \in \Heaps$ such that $(m_1, \emptyset), \lenv \slsat R_1$ and
 \begin{itemize} 
-\item $m_1 \uplus m' = \heapPart{\left(l_1 \composeL g_1\right)}$; and
+\item $m_1 \uplus m' = \reifyW{w_1}$; and
 \item for every $m_2$ where $(m_2, \emptyset), \lenv \slsat R_2$,
-  there exists a world $w_2 = (l_2, g_2, \lmod_2)$ such that $w_2, \lenv |= Q$; and
+  there exists a world $w_2$ such that $w_2, \lenv |= Q$; and
   \begin{itemize}
-  	\item $m_2 \uplus m' = \heapPart{\left(l_2 \composeL g_2\right)}$; and
+  	\item $m_2 \uplus m' = \reifyW{w_2}$; and
   	\item $(w_1, w_2) \in \guarantee$
   \end{itemize}
 \end{itemize}
