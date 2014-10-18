@@ -16,11 +16,10 @@ is the collaborative result of intricately intertwined actions of the
 threads. Such compositional reasoning is essential for 1) verifying
 large concurrent systems, since it allows them to be verified
 component-wise; 2) verifying library code and incomplete programs,
-since it avoids the need to know about the context of execution and
-the precise implementation of functions called in the code; and 3)
+since one does not need to know about the context of execution; and 3)
 replicating a programmer's intuition about why their implementations
-are correct, since informal arguments are usually kept local and do not
-involve details about the whole system.
+are correct, since informal arguments are usually kept local and do
+not bring the whole system into the reasoning.
 
 In the sequential case, separation logic~\cite{rey02,seplog} achieves compositional reasoning for heap-manipulating
 programs. There, compositionality rests on two powerful mechanisms: a
@@ -63,21 +62,25 @@ use the frame rule over shared state. Some formalisms can mitigate
 this issue, most notably Concurrent Abstract Predicates
 (CAP)~\cite{cap-ecoop10} and Local Rely-Guarantee reasoning
 (LRG)~\cite{lrg}, but only when it is possible to decompose the shared
-state into entirely disjoint regions without cross-regions
-interference. For instance, given a linked list of $n+1$ nodes
-accessed concurrently by $n$ threads (numbered $1, \cdots, n$) where
+state into entirely disjoint regions without cross-region
+interferences. For instance, given a linked list of $n+1$ nodes
+accessed concurrently by $n$ threads (numbered $1$ to $n$) where
 the $i$th thread requires access to two successive nodes at indices
-$i-1$ and $i$, no such splitting is possible as each node of the
+$i$ and $i+1$, no such splitting is possible as each node of the
 linked list will be shared between two neighbouring threads, hence the
 shared state must contain the entire linked list. Similarly, when data
 structures with intrinsic sharing such as graphs are accessed
 concurrently, one cannot reason about their sub-parts in isolation due
 to arbitrary sharing between them.
 
-Second, the interference associated with each region is defined when it is created and cannot change. As such, upon its creation, provision has to be made for
-all future extensions of it and it is generally not possible to
-arbitrarily grow it with extra state under new interference rules.
-As we discuss in \S\ref{sec:examples}, this results in unnatural specifications such as the concurrent set module example in~\cite{cap-ecoop10}. 
+Second, the interference associated with each region is defined when
+it is created and cannot change. As such, upon its creation, provision
+has to be made for all future extensions of it and it is generally not
+possible to arbitrarily grow it with extra state under new
+interference rules.  As we discuss in \S\ref{sec:examples}, this
+results in unnatural specifications when dynamically-allocated
+resources become shared during execution, such as in the concurrent
+set module example of~\cite{cap-ecoop10}.
 
 Finally, the description of the interference on the shared state is
 fixed throughout its entire lifetime, even if a transition on the shared state 
@@ -94,53 +97,57 @@ its specification, its proof can only be reused from within another
 module $M_2$ if either the parts of the shared state accessed by $M_2$
 are disjoint from those of $M_1$, or the shared state is partitioned
 identically for both modules. The probability that several modules
-agree on the exact repartitioning of the shared resources is slim.
+agree on the exact partition and shape of the shared resources is slim.
 
-This paper introduces the program logic \colosl, \underline{Co}ncurrent \underline{Lo}cal
-\underline{S}ubjective \underline{L}ogic, which addresses all three issues. \colosl models
+This paper introduces the program logic \colosl,
+\underline{Co}ncurrent \underline{Lo}cal \underline{S}ubjective
+\underline{L}ogic, which addresses all three issues. \colosl models
 shared resources as a single state, with a twist: the assertion
 language allows threads to hold their own \emph{subjective views} of
 this state. Each subjective (personalised) view is an assertion which
 describes of \emph{parts} of the shared state, and how the thread and
-the environment may affect these shared resources. Subjective views
-expand and contract to the natural resources and the interference
-required by the current thread. Moreover, the subjective views of
-different threads represent potentially \emph{overlapping} parts of
-the shared state, in contrast with previous approaches that either
-mandate that all threads view the same entire shared state, or
+the environment may affect these shared resources.  The subjective
+views of different threads represent potentially \emph{overlapping}
+parts of the shared state, in contrast with previous approaches that
+either mandate that all threads view the same entire shared state, or
 strictly disjoint parts of it. This allows us to provide a framing
 mechanism both on shared resources as well as their interferences even
-in the presence of overlapping footprints and entangled
-resources. This flexibility provides truly compositional reasoning for
-shared-memory concurrency.
+in the presence of overlapping footprints and entangled resources, and
+resolve the first issue outlined above. Subjective views expand and
+contract to the natural resources and the interference required by the
+current thread, solving the second issue. Finally, the description of
+the interference affecting a subjective view can be rewritten based on
+the current knowledge of a thread, allowing one to forget once and for
+all about irrelevant interference to address the third issue. These
+features provide truly compositional reasoning for shared-memory
+concurrency.
 
 \paragraph{Contributions and outline} 
 We give the main ideas behind the semantic model and the soundness of
 \colosl in \S\ref{sec:colosl}. In this section, we also provide proof
-rules to discharge \colosl-specific proof obligations and turn them
-into regular separation logic validity checks. This enables one to use
-\colosl without having to reason directly in the model. We demonstrate
-how \colosl allows local reasoning about the shared state on a range
-of examples.  The first example \S\ref{sec:intuition}, serves to exhibit the main principles of \colosl through a variant of
-Dijkstra's token-ring mutual exclusion
-algorithm~\cite{dijkstra74}. This example illustrates distributed,
-global knowledge between threads. As well as the local knowledge about
-how each thread behaves, the programmer also has global knowledge
-about how threads constrain one another. Pleasantly, our reasoning
-captures the spirit of local reasoning about individual threads while
-retaining global knowledge about the overall interactions between
-threads. In \S\ref{sec:examples}, we study further, more challenging
-examples. We verify a concurrent spanning tree algorithm for
-graphs. This algorithm uses threads spawned on arbitrary overlapping
-graphs. We demonstrate that the flexible, overlapping subjective views
-of \colosl are just what we need.  We also verify a concurrent set
-module implemented using a hand-over-hand list-locking algorithm that
-significantly improves over the existing proof~\cite{cap-ecoop10}.
+rules to discharge \colosl-specific proof obligations by reducing them
+to regular separation logic validity checks. Thus one can use \colosl
+without having to reason directly in the model. We demonstrate how
+\colosl allows local reasoning about the shared state on a range of
+examples.  The first example in \S\ref{sec:intuition} admittedly
+serves as a showroom for \colosl's main reasoning principles. It is a
+variant of Dijkstra's token-ring mutual exclusion
+algorithm~\cite{dijkstra74}. As well as the local knowledge about how
+each thread behaves, the programmer also has global knowledge about
+how threads constrain one another. Pleasantly, our reasoning captures
+just that. In \S\ref{sec:examples}, we study two further, more
+challenging examples. The first is a concurrent spanning tree
+algorithm for graphs, where threads are recursively spawned on each
+(potentially overlapping) sub-graph. We demonstrate that the flexible,
+overlapping subjective views of \colosl are just what we need.  We
+also verify a concurrent set module implemented using a hand-over-hand
+list-locking algorithm that significantly improves over the existing
+proof~\cite{cap-ecoop10}.
 %
 %Finally, we demonstrate how the mutual exclusion ring of \S\ref{sec:intuition} can be generalised to synchronise access to a concurrent database.
 
 Most of the technical details have been left out due to space
-constraints, and are provided in appendices as well as in an
+constraints, and are provided in the appendix as well as in an
 accompanying technical report~\cite{colosl-tr14}.
 
 %This paper presents the program logic \colosl, which achieves
