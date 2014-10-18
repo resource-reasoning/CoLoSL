@@ -247,7 +247,7 @@ A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
 shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
 $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
-$r$, in the following sense, which we write
+$r$, in the following sense, which we write as
 $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
 of space; it can be found in Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
@@ -430,7 +430,7 @@ assertions cannot mention subjective views. This restriction is easily
 lifted, since it turns out that one can always \emph{flatten}
 assertions with nested boxes into logically equivalent assertions with
 no nesting. Similarly, interference assertions that mention other
-subjective views in their actions may be rewritten (shifted) into ones
+subjective views in their actions may be rewritten into ones
 that do not. For lack of space, we omit these transformations; they
 can be found in Appendix~\ref{sec:assertions-continued}.
 
@@ -474,7 +474,7 @@ fact that the action model $\lmod$ of a world contains all the actions
 that could possibly affect the shared state $g$. (Similarly, the
 action model closure ensures that subjective views in assertions have
 to account for all actions potentially affecting their piece of the shared
-state.) At the same time, the pieces of the local state delimited by $l'$ can migrate to
+state.) Moreover, the pieces of the local state delimited by $l'$ can migrate to
 the shared state at any time under a new set of actions $\lmod'$,
 yielding a new shared state $g\composeL l'$ and action model $\lmod
 \cup \lmod'$.
@@ -484,8 +484,7 @@ shared state, in the situation above we require that the actions in
 $\lmod'$ are \emph{confined} to $l'$: whenever an action $(p,q)$ of
 $\lmod'$ is enabled, the part of $g\bullet l'$ modified by the action
 must be a substate of $l'$.  However, new actions are allowed to
-require the presence of some neutral resource outside of $l'$ provided
-they are conserved by the action (i.e.\ are present in $q$).
+require the presence of some neutral resource outside of $l'$ provided that they are conserved by the action (i.e.\ are also present in $q$).
 %
 For instance, abusing notations temporarily to ignore empty stack and
 capability components in logical states, the action $a = ([10:0, 12:0,
@@ -513,7 +512,7 @@ ordinary separation logic. As expressed by the first rule,
 $P \containI I$ holds if there is a weaker local assertion $\lass{F}$
 that acts as a \emph{local fence} for $I$, denoted by
 $\lass{F}\strictfences I$; in particular, this means that $\lass{F}$
-must be invariant under all actions of $I$. This fencing condition is
+must be invariant under all actions of $I$. In Appendix~\ref{sec:assertions-continued} we show that it is always possible to weaken an assertion into a local assertion. This fencing condition is
 checked for each action in $I$ (see the second rule). For each action
 $\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
 apply. In the first of these rules, the action cannot possibly fire,
@@ -642,9 +641,9 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \[
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
 \]
-In Appendix~\ref{sec:assertions-continued} we also axiomatise
-non-intersection directly, which provides an alternative way to check
-non-intersection for a restricted fragment of formulas.
+%In Appendix~\ref{sec:assertions-continued} we also axiomatise
+%non-intersection directly, which provides an alternative way to check
+%non-intersection for a restricted fragment of formulas.
 
 \begin{figure}
 \hrule\vspace{5pt}
