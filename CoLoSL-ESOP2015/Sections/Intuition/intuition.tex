@@ -6,7 +6,7 @@ a variation of Dijkstra's token ring mutual exclusion
 algorithm~\cite{dijkstra74}.  These principles are laid out in
 \fig\ref{fig:principles}, together with the usual concurrency rule of
 separation logic~\cite{csl-tcs}, and the rule of consequence from the 
-views framework~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
+Views framework~\cite{views}. Note that $(P => Q) => (P ===> Q)$.  We will
 introduce them informally as needed during the proof of our example,
 and present them in more details in \S\ref{sec:colosl}.
 
@@ -185,7 +185,7 @@ $\mathbb{P}_{\li y}$; and finally $\mathbb{P}_{\li z}$. This process
 repeats until $\li{x} = \li{y} = \li{z} = 10$.  This example code is
 interesting because the threads are intricately intertwined. In the case of the $\mathbb{P}_{\li y}$ thread, the programmer knows that the code depends on the values of variables
 \li{x} and \li{y}  and that it can increment  \li{y} as long as its value is less than that of \li{x}.
-However, he also knows a much more complex behaviour of the thread: given the initial setting where all variables have value $0$, then the thread can only increase the value of \li{y} by $1$ if \li{x} is one more than \li{y},  and the environment can only increase \li{x} by one if \li{x} and \li{z} (and in fact \li{y}) have the same value. Finally, the programmer knows that at the end all the variables will have value $10$. 
+However, she also knows a much more complex behaviour of the thread: given the initial setting where all variables have value $0$, then the thread can only increase the value of \li{y} by $1$ if \li{x} is one more than \li{y},  and the environment can only increase \li{x} by one if \li{x} and \li{z} (and in fact \li{y}) have the same value. Finally, the programmer knows that at the end all the variables will have value $10$. 
 
 \colosl can simply specify this complex behaviour of the resources associated with thread $\mathbb{P}_{\li y}$.
 Consider the \colosl assertions accompanying  $\mathbb{INC}$.
@@ -207,7 +207,7 @@ view of the shared state which otherwise would need to suddenly
 account for new interference in $I$. As will be crucial for the set
 example in \S\ref{sec:examples} (but unimportant here), a novel
 feature of this rule is that actions in $I$ may refer to existing
-shared resources, unlike e.g.\ CAP where all possible futures of the
+shared resources, unlike CAP for example, where all possible futures of the
 region must be accounted for upon its creation.  The \conseqRule rule is
 then applied to start using the resulting assertion in Hoare triples.
 
@@ -236,13 +236,13 @@ the variable resource relevant to that thread, and need only consider
 actions that affect that resource. In this example, the extraneous
 piece of state is the variable cell \li{z}. This additional resource
 might seem an acceptable price to pay, but straightforward
-generalisations to $n$ participants yields extra state of $n-2$
+generalisations to $n$ participants yields extra state of $n\!-\!2$
 variable cells with their associated interferences which are of no
 interest to the particular thread.  Fundamentally, for large systems,
 the burden of carrying the whole shared state around to analyse all
-threads, can lead to intractable proofs. In our example, this would be
+threads can lead to intractable proofs. In our example this would be
 acceptable since the footprint of each thread is small, but in general needlessly
-verbose state requires extraneous stability checks at every program
+verbose states require extraneous stability checks at every program
 point.
 
 Because subjective views only describe \emph{parts} of the shared
@@ -266,7 +266,7 @@ get:
 %it is invariant under all possible actions by the environment.. 
 Finally, we stabilise (weaken) the resulting subjective view such that it is invariant under all possible actions by the environment.
 %Since the thread owns $[\token{a}_{\li{y}}]$ locally, the environment can't perform its action and thus the subjective view is stable against it. On the other hand, as the environment may hold $[\token{a}_{\li{x}}]$, we should stabilise with respect to its action. 
-Since we no longer know the value of \li{z}, after stabilising against $a_{small\li{x}}$, the resulting assertion is too weak. Intuitively, we know that \li{x} can only be incremented when its value is equal to \li{z} and \li{y}. However, this is not reflected in $a_{small\li{x}}$; since we have forgotten \li{z}, there is nothing to constrain the increment on \li{x}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
+Since we no longer know the value of \li{z}, after stabilising against $a_{\small\li{x}}$, the resulting assertion is too weak. Intuitively, we know that \li{x} can only be incremented when its value is equal to \li{z} and \li{y}. However, this is not reflected in $a_{\small\li{x}}$. Since we have forgotten \li{z}, there is nothing to constrain the increment on \li{x}. Hence, we can only stabilise in a general way as given, losing information about how the values of \li{x} and \li{y} are connected together through \li{z}.
 %
 It is however possible to give a stronger specification, as follows: \vspace*{-8pt} 
 %
@@ -306,7 +306,7 @@ $I$ by $\{a'_{\small\li x}, a_{\small\li y}, a_{\small\li z}\}$.
 %I\weakenIb{\cell{\li{x}}{0} * \cell{\li{y}}{0} * \cell{\li{z}}{0}} I_{\small\li y}
 %\]
 %%
-Only then do we use \forgetRule to lose the \li{z} cell and obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'}$, as the new action $a_{\small\li x}'$ in $I'_{\small\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
+Only then do we use \forgetRule to lose the \li{z} cell and obtain the subjective view  $\shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'}$ as the new action $a_{\small\li x}'$ in $I'_{\small\li y}$ retains enough information about how \li{x}, \li{y} and \li{z} are related.
 The interference relation is now as simple as it can get, whilst retaining enough information about the connection between \li{x}, \li{y} and \li{z}. Finally, we stabilise the subjective view with respect to $I_{\small\li y}'$ and obtain our final precondition of $\mathbb{P}_{\small\li y}$.
 %, which retains much more information about the values of \li{x} and \li{y}. %
 

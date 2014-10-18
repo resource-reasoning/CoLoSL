@@ -1,6 +1,6 @@
 \section{\colosl}\label{sec:colosl}
 We now give a more formal overview of how to use \colosl for program
-verification, eluding some details of the semantics for lack of space,
+verification, eschewing some details of the semantics for lack of space,
 while still providing enough ingredients to carry program proofs. We
 describe the underlying model of \colosl, give the semantics of
 \colosl assertions, then present proof rules to reduce the various
@@ -15,11 +15,10 @@ particular, do not mention subjective views.
 
 A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
-\emph{local logical state}, or simply local state $l$ represents the
+\emph{local logical state} (local state) $l$ represents the
 locally owned resources of a thread, in the standard separation logic
-sense, while the \emph{global logical state}, or simply global state
-$g$ represents shared resources. An action model records all the
-possible interference on the shared state.
+sense while \emph{global logical state} (shared state)
+$g$ represents shared resources. An action model records all possible interferences on the shared state.
 
 Logical states have two components: one describes machine states
 (e.g.\ stacks and heaps); the other represents
@@ -29,15 +28,15 @@ capability is allowed to perform the associated actions (as prescribed
 by the \emph{action model} components of each world, defined below),
 while any capability \emph{not} owned by a thread means that the
 environment can perform the action. This can be seen as a unified
-treatment of rely and guarantee relations in rely-guarantee
-reasoning~\cite{rg}: a capability fully owned (reps.\ fully not owned)
+treatment of the rely and guarantee relations in rely-guarantee
+reasoning~\cite{rg}: a capability fully owned (resp.\ fully not owned)
 during the entire lifetime of a thread represents its guarantee
 (resp.\ its rely), while a partially-owned capability means that the
 corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between threads and the
 environment just like any other resource. See the presentation of
-deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap} for further details
+deny-guarantee~\cite{dg} or, e.g., CAP~\cite{cap-ecoop10} for further details
 and motivation.
 
 In general, each component of a logical state is taken from an
@@ -47,7 +46,7 @@ partial commutative monoid~\cite{asl}) that satisfies the
   $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
   for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
   exists $x, y, z, z \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
-  $c = x + z$, and $d = y + w$.}  As we demonstrate in the examples of
+  $c = x + z$, and $d = y + w$.}.  As we demonstrate in the examples of
 \S\ref{sec:examples}, our programs often call for a more complex model
 of machine states and capabilities. For instance, we may need our
 capabilities to be fractionally owned, where ownership of a
@@ -55,7 +54,7 @@ capabilities to be fractionally owned, where ownership of a
 to both the thread and the environment, while a fully-owned capability
 by the thread \emph{denies} the right to the environment to perform
 the associated action.  For ease of presentation, the focus of this
-paper is on the standdard stack and heap model for machine states, and
+paper is on the standard stack and heap model for machine states, and
 finite sets of \emph{tokens} (which are simple names) for
 capabilities.
 
@@ -101,7 +100,7 @@ representing the local logical state, and $g$ to range over logical
 states representing the shared (global) state. The empty logical state
 $(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
-$l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
+write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
 exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
@@ -219,12 +218,11 @@ for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
 \end{align*}
 \end{definition}
 
-As in, e.g., RGSep~\cite{viktor-marriage}, we distinguish between
+As in RGSep~\cite{viktor-marriage}, we distinguish between
 \emph{local assertions} in $\LAssertions$ and assertions in
 $\Assertions$. For simplicity, assertions do not include negation or
 magic-wand; these are reserved to local assertions. The syntax of
-assertions follows from standard separation logic with variables as
-resource~\cite{variablesAsResource} (note that expressions $E$ do not
+assertions follows from standard separation logic with variables-as-resource~\cite{variablesAsResource} (note that expressions $E$ do not
 allow program variables), with the exception of the subjective views
 $\shared P I$.  Machine state and capability assertions are
 interpreted over a world's local state: $\li{x}|-> E$
@@ -236,7 +234,7 @@ $\token a$.  $\emp$ is true of worlds with empty local state (the
 units of $\composeW$); $P * Q$ is true of worlds that can be split
 into two according to $\composeW$ such that one state satisfies $P$
 and the other satisfies $Q$; $P**Q$ is the \emph{overlapping
-  conjunction}, true of worlds can be split three-way according to
+  conjunction}, true of worlds can be split three-ways according to
 $\composeW$, such that the $\composeW$-composition of the first two
 worlds satisfies $P$ and the $\composeW$-composition of the last two
 satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
@@ -251,7 +249,7 @@ $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write
 $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
-of space; it may be found in \S XXX):
+of space; it can be found in Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
 	
@@ -283,7 +281,7 @@ views.
 %%   presentation, its definition in \colosl would be standard and
 %%   satisfy the adjunction with $*$.}.
 Since logical connectives are interpreted uniformly in all cases, we
-write $|=_\dagger$ for either of the three satisfaction relations, and
+write $|=_\dagger$ for any of the three satisfaction relations, and
 then write $u$ for elements of either $\Worlds$ or $\LStates$, and
 $\grey$ for either $\composeW$ or $\composeL$, depending on whether
 the satisfaction relation is $|=$, or either $\slsat$ or
@@ -408,10 +406,10 @@ consequences of the semantics.
 \end{lemma}
 \begin{proof}[sketch]
   The cases of \weakenRule and \copyRule are
-  straightforward. \forgetRule and \mergeRule are valid because action
-  model closure is preserved under picking a sub-subjective state and
-  under taking the union of subjective states and their interference
-  relations, respectively (see \S XXX).
+  straightforward. \forgetRule and \mergeRule principles are valid as action
+  model closure is preserved when picking a smaller subjective state or
+  when taking the union of subjective states and their interference
+  relations, respectively (see Appendix~\ref{sec:model-continued}).
   \qed
 \end{proof}
 
@@ -434,7 +432,7 @@ assertions with nested boxes into logically equivalent assertions with
 no nesting. Similarly, interference assertions that mention other
 subjective views in their actions may be rewritten (shifted) into ones
 that do not. For lack of space, we omit these transformations; they
-may be found in \S XXX.
+can be found in Appendix~\ref{sec:assertions-continued}.
 
 Moreover, in the restricted case where actions and fences (see below)
 can be expressed in a fragment extending the usual \emph{symbolic
@@ -446,7 +444,7 @@ that need to be discharged once the rules of this section have been
 applied can be verified automatically. Indeed, for this fragment, we
 can extend the $--o$-elimination procedure of Calcagno et
 al. in~\cite{vv07msc} to deal with $**$ as well. We leave the details
-of this adaptation to \S XXX. The following standard definition will
+of this adaptation to Appendix~\ref{sec:assertions-continued}. The following standard definition will
 be needed in the remainder of this section.
 
 \begin{definition}[Precision, exactness]
@@ -467,7 +465,7 @@ be needed in the remainder of this section.
 \paragraph{Confinement}
 \colosl models the shared state as a single ``region'' of memory and a
 set of potential actions on that region, represented by the last two
-components of each world $(l,g,\lmod)$. \colosl reasoning's most
+components of each world $(l,g,\lmod)$. \colosl's most
 distinguishing features are the ability to focus on a sub-part of this
 shared region, to extend the shared state, and to exchange an
 interference relation for an other that is equivalent as far as the
@@ -475,8 +473,8 @@ subjective view is concerned. The soundness of \colosl hinges on the
 fact that the action model $\lmod$ of a world contains all the actions
 that could possibly affect the shared state $g$. (Similarly, the
 action model closure ensures that subjective views in assertions have
-to account for all actions potentially affecting their piece of shared
-state.) At the same time, pieces $l'$ of local state can migrate to
+to account for all actions potentially affecting their piece of the shared
+state.) At the same time, the pieces of the local state delimited by $l'$ can migrate to
 the shared state at any time under a new set of actions $\lmod'$,
 yielding a new shared state $g\composeL l'$ and action model $\lmod
 \cup \lmod'$.
@@ -529,7 +527,7 @@ determined and left unchanged by the action. The last rule finally
 reduces local fencing to entailment checking, provided the fence
 $\lass{F}$ can be expressed as a disjunction of precise formulas. The
 first premise states that $\lass{F}$ is invariant under the action
-$\lass{P}\swap \lass{Q}$, in a similar fashion as e.g.\ RGSep encodes
+$\lass{P}\swap \lass{Q}$, similar to the way that RGSep encodes
 stability checks as separation logic entailments. Informally, it
 reads: for any state in $f$, remove a part satisfying $p$ and add a
 state satisfying $q$; the result should still be in $f$. The third
@@ -624,8 +622,8 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 \end{figure}
 
 
-Just like all newly-created shared states are confined, any world
-should also be confined, hence the confinement condition in the
+In the same way that all new extensions to the shared states are confined, any world
+must also be confined, hence the confinement condition in the
 well-formedness of worlds, which repeats the definition of confinement
 for assertions at the model level.
 
@@ -634,7 +632,7 @@ for assertions at the model level.
 \fig\ref{fig:shifting-rules} presents an axiomatisation of the main
 shifting principles, our mechanism to rewrite interference assertions
 in subjective views via \shiftRule. As with confinement, we omit the
-direct semantic definition, which can be found in XXX.  The
+direct semantic definition, which can be found in Appendix~\ref{sec:model-continued}.  The
 pseudo-entailment $\separate{\lass{P}}{\lass{Q}}$ asserts that states
 described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
   intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and $l_2,
@@ -644,7 +642,7 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \[
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
 \]
-In Appendix~\ref{sec:intersection-judgements} we also axiomatise
+In Appendix~\ref{sec:assertions-continued} we also axiomatise
 non-intersection directly, which provides an alternative way to check
 non-intersection for a restricted fragment of formulas.
 
@@ -781,20 +779,20 @@ fencing.
 \item
   As for local fencing, neutral parts in actions may be ignored.
 \item
-  Contrarily to local fencing, actions are allowed to have effect
+  Contrarily to local fencing, actions are allowed to have effects
   outside of the fence. If the action precondition does not intersect
   with the fence, then its effect is entirely outside the fence and
   the action may be ignored.
 \item
   When $\lass{P}$ and $\lass{Q}$ do not intersect in an action
-  $\lass{P}\swap \lass{Q}$, for instance because their common part has
-  been removed according to 1., then the application of the action
+  $\lass{P}\swap \lass{Q}$ (e.g.\ when their common parts have
+  been removed according to 1.), then the application of the action
   must preserve the fence $\lass{F}$. Because the action is allowed to
   act partly outside of $\lass{F}$, the state on which the action is
   applied is $\lass{F} ** \lass{P}$, unlike local fencing where
   $\lass{P}$ would be contained in $\lass{F}$. The reason why
-  $\lass{P}$ and $\lass{Q}$ must not interesect is precisely that we
-  consider action on $\lass{F} ** \lass{P}$ and not just $\lass{F}$;
+  $\lass{P}$ and $\lass{Q}$ must not intersect is precisely that we
+  consider the action on $\lass{F} ** \lass{P}$ and not just $\lass{F}$;
   if $\lass{P}$ and $\lass{Q}$ have a non-empty intersection $l$ then
   it might be that $l$ is not part of $\lass{F}$ and is added together
   with $\lass{Q}$ by $*$ on the left-hand side of the sequent. But
@@ -833,12 +831,12 @@ $\m{true}$ fences any interference assertion.
 of the form $\exsts{\bar x}\lass{P} * \bigstar_{i\in
   I}\shared{\lass{Q}_i}{I_i}$ is stable. This is a more restricted
 form of assertions than our two previous axiomatisations, but a more
-elaborate set of rules exists for the general case (see \S XXX). The
+elaborate set of rules exists for the general case (see Appendix~\ref{sec:assertions-continued}). The
 first two rules state that local assertions are always stable and
 existentials can be eliminated. Then, checking the stability of
 $\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
 establishing, for each subjective view $\shared{\lass{Q}_i}{I_i}$, the
-four-place $\mathsf{Stable}$ predicate which, in this case, means that
+four-place $\mathsf{Stable}$ predicate which in this case means that
 $\lass{Q}_i$ is stable under the interference assertion $I_i$, a local
 context $\lass{P}$, and a shared context made of the $**$-combination
 of all the subjective assertions (including $\lass{Q}_i$).  In turn,
@@ -935,7 +933,7 @@ up by $\lass{P} * \lass{R}$, then the environment cannot perform the
 action. Similarly, an action whose precondition is incompatible with
 the current knowledge about the state cannot possibly fire. This is
 what the premise of the next rule expresses: the local context is
-$*$'d with the shared context, itself overlapped with the precondition
+composed (using $*$) with the shared context, itself overlapped with the precondition
 of the action, since that precondition must hold somewhere in the
 shared state, separately from any private state (but possibly
 partially outside of the current combined subjective view of the

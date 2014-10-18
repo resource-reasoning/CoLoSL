@@ -25,7 +25,7 @@ reasoning about static global shared resource, impeding compositionality.  This
 paper introduces the program logic of \colosl, where each thread is
 verified with respect to its subjective view of the global
 shared state.
-This subjective view  just describes  that part of the global shared resource accessed by the
+This subjective view describes only that part of the global shared resource accessed by the
 thread. Subjective views may arbitrarily overlap with each other, and
 expand and contract depending on the resource required by the thread.
 This flexibility provides truly compositional proofs for shared-memory

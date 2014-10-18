@@ -170,7 +170,7 @@ I(n) \eqdef \bigcup\limits_{p \in \gamma} \left(\bigcup_{e \in \{p.l,
 \end{figure}
 %
 %
-\fig\ref{fig:conSpanningTree} shows an in place concurrent algorithm for calculating a spanning tree of a graph. 
+\fig\ref{fig:conSpanningTree} shows an in-place concurrent algorithm for calculating a spanning tree of a graph. 
 %
 \begin{figure}
 %
@@ -229,7 +229,7 @@ $\gamma$. The assertion of each subjective view reflects that the
 corresponding vertex ($x$) has been marked
 $\shared{\marked{x}}{I(x)}$. The resources associated with each node
 $x$, namely the left and right pointers and the corresponding marking
-capabilities have been claimed by the marking thread and moved into
+capabilities, have been claimed by the marking thread and moved into
 the local state. The vertex addressed by the left pointer of $x$
 (i.e. $l'$) corresponds to either the initial value prior to
 marking ($l$ where $\gamma(x) = (l, r)$) or \li{null}\ when $l$ has
@@ -375,10 +375,10 @@ The following diagram illustrates the set predicate in CAP as described in~\cite
 {\centering \includegraphics[scale=0.232]{Sections/Examples/Images/capSet.pdf}\\}
 %
 %
-The elements of the list are represented as a singly-linked list with no duplicat elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. In the remainder of this section, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
+The elements of the list are represented as a singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. In the remainder of this section, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
 
 All nodes of the list reside in a single shared region labelled $s$ and the interference on the list is the combined interference associated with each constituent node. 
-Each node at a given address $x$, is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. 
+Each node at a given address $x$ is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. 
 %For instance, since the value $v_{1}$ may be contained in the list at address $x$ before address $y$, there must exist an update capability $[\text{U}(x, y, v_1)]$ to accommodate possible modifications of value $v_{1}$ with respect to $x$ and $y$. 
 In order to modify a node, a thread can acquire the lock associated with the node and subsequently claim the relevant update capability.
 % 
@@ -388,9 +388,9 @@ Since in CAP the capabilities associated with a region can only be generated upo
 This specification is unnecessarily complicated. It is rather counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, it is overly verbose to consider all combinations of values and successor addresses. Lastly, each thread is required to ``know'' of the resources associated with all nodes in the list and account for their associated interference. 
 
 %
-We proceed with the \colosl\ specification of the set module. Recall from \S\ref{sec:logic} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise specification.  
+We proceed with the \colosl\ specification of the set module. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise specification.  
 
-We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$, is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for \emph{dynamic} extension of the shared state, we do not need to account for capabilities associated with \emph{all} possible addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method. 
+We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for \emph{dynamic} extension of the shared state, we do not need to account for capabilities associated with \emph{all} possible addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method. 
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/coloslSet.pdf}\\}
