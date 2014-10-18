@@ -244,11 +244,11 @@ and post-condition.
 
 A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective view} $s$ can be found in the global
-shared state $g$ (i.e.\ $g = s\composeL r$ for some context
+shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
 $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
-$r$, in the sense that $I$ accounts for all possible interference on $s$, which we write
-as $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit the definition of $\downarrow$ for lack
+$r$, in the following sense, which we write as
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
 of space; it can be found in Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -803,7 +803,7 @@ The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
 shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
 have the same effect on $\lass{F}$ after an arbitrary number of action
 applications. In particular, this is the case when $\lass{F}\fences I\cup
-I_1$, \textit{i.e.} $\lass{F}$ is an \emph{invariant} of the shared region
+I_1$, i.e.\ $\lass{F}$ is an \emph{invariant} of the shared region
 under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
 I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
 view of $\lass{F}$.
@@ -813,7 +813,7 @@ to a particular assertion $\lass{F}$: when the effect of the action is
 entirely outside of $\lass{F}$, or when it is impossible to apply the
 action to $\lass{F}$. The next rule is an equivalence that uses the
 knowledge embodied by $\lass{F}$ of all the possible states that the
-shared region may be in to rewrite an action into an equivalent
+subjective shared state may be in to rewrite an action into an equivalent
 one. More precisely, if whenever the precondition $\lass{P}$ of the
 action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
 also true, then it is safe to add $\lass{R}_i$ as a neutral part of
@@ -838,9 +838,9 @@ four-place $\mathsf{Stable}$ predicate which in this case means that
 $\lass{Q}_i$ is stable under the interference assertion $I_i$, a local
 context $\lass{P}$, and a shared context made of the $**$-combination
 of all the subjective assertions (including $\lass{Q}_i$).  In turn,
-checking this fact boils down to checking stability for each action of
+checking this fact reduces to checking stability for each action of
 $I_i$. The last three rules deal with checking stability for a single
-action, in a similar way than for fencing above.
+action, in a similar way to fencing rules above.
 
 \begin{figure*}
 \hrule\vspace*{5pt}
