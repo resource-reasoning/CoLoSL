@@ -1,0 +1,224 @@
+===========================================================================
+                            ESOP15 Review #11A
+                     Updated 7 Nov 2014 6:38:31am EST
+---------------------------------------------------------------------------
+           Paper #11: CoLoSL: Concurrent Local Subjective Logic
+---------------------------------------------------------------------------
+
+                      Overall merit: 4. Strong accept -- I will champion
+                                        this paper
+                 Reviewer expertise: 4. Expert
+
+                      ===== Comments for author =====
+
+The paper proposes a separation logic for verifying fine-grained concurrent
+programs. Following recent work in this area, the logic is modular, with
+threads' interference delimited by an inteference assertion: a set of actions,
+which are relations showing how a thread can change the shared portion of the
+state. The main novel insight of the paper is that the interference assertion
+can be changed while doing the proofs.
+
+First, often an assertion in the code of a thread does not describe the shared
+data structure fully, because the thread operates only on some of its parts -
+the thread has a "subjective" view of the data structure. In such cases, a lot
+of information in the interference assertion will be irrelevant to the
+subjective view and can be discarded. The authors' logic provides a way to do
+this (the Shift rule). This is particularly relevant for data structures with
+deep sharing, such as graphs, where a thread would typically operate on a part
+of the graph that, however, cannot be easily separated from the rest. In the
+authors' proofs in the limit one gets assertions that talk about a single node. 
+
+Second, a node that was in the local state of a thread can be moved to the
+shared state. The authors' interference assertion can be extended in this case
+to accommodate actions affecting the new node (the Extend and Merge rules).
+
+The authors' proposal goes beyond existing CAP-style separation logics. In
+these, interference assertions cannot be changed without destroying a shared
+region; the latter requires gathering access permissions from all threads, which
+is restrictive. Thus, one is forced to check the stability of assertions under
+actions that are really irrelevant to them. So the authors' proposal can be
+viewed as an optimisation of the stability check.
+
+Similarly, extending the shared state with new nodes requires baking
+corresponding actions into the interference assertion. As the authors argue in
+Section 4.2, this results in awkward proofs, with the shared state being forced
+to store "precomputed" permissions for all nodes that could possibly be inserted
+into the data structure. The way the authors handle this is more elegant.
+
+The authors have fleshed out the logic, including syntactic approximations of
+various semantic obligations needed to shift and extend inteference
+assertions. They have applied the logic to give concise proofs to a graph
+algorithm and a lock-coupling list.
+
+Given that the insight is interesting, and the technical development solid, I
+favour acceptance.
+
+Additional comments:
+
+- I don't think you explained anywhere concisely why the Extend rule is
+  sound. You're changing the interference environment, so one might ask if other
+  threads are going to be unhappy about it. It looks like everything is fine,
+  given your "fencing" constraints relating P and I and the fact that the shared
+  state is treated intuitionistically. But I think this should be explained
+  better. 
+
+- You might want to compare with [20] in more detail: even though the technical
+  mechanisms you use are different, the resulting style of proofs seems similar
+  to [20], with descriptions of the interference essentially talking about a
+  single node. On a related note, the paper definitely solves a problem in CAP,
+  but it would be nice to see an argument about whether its insights concerning
+  the way proofs should be structured can be carried over to logics in other
+  styles, such as those that use transition systems ([20] and [Nanevski et al.,
+  ESOP'14]).
+
+- I must admit I got bored by the introductory example and stopped reading it,
+  because I couldn't get an intuition for all these counters. The example with
+  the graph was much more illuminating and is not that complex, so you might
+  want to use it as the running example.
+
+- Fig 1: shouldn't you have some restrictions in A and A'? Just anything would
+  do?
+
+- Def 3: AMod seems to map *sets* of tokens to sets of actions. Why sets of
+  tokens, shouldn't it be a single one? 
+
+- Fig 3 and 4: the difference between shaded and white triangles was initially
+  confusing, because you started using them before saying anything about it.
+
+- "More precisely, if whenever the precondition p of the action is compatible
+  with f then one of the ri's is also true, then..." - ?
+
+- Section 4.1. Why do you need the global graph predicate at all? Is there any
+  value in using it, or can I just use your local predicate for everything?
+
+- Fig 6: should you have a usual * in between (U \/ M) and G(l,gamma) in
+  G(x,gamma)? 
+
+- Section 4.2 is too compressed. You might want to consider ditching the
+  introductory example in Section 2 and using the space to expand this
+  section. You didn't advertise that you're verifying a lock-coupling list, so
+  locks come out of the blue. The explanation of U and => capabilities is too
+  cursory.
+
+===========================================================================
+                            ESOP15 Review #11B
+                     Updated 20 Nov 2014 1:50:04pm EST
+---------------------------------------------------------------------------
+           Paper #11: CoLoSL: Concurrent Local Subjective Logic
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 3. Knowledgeable
+
+                      ===== Comments for author =====
+
+This paper improves on the design of dialects of concurrent separation
+logic that aim at allowing thread-local specifications and flexible
+control of other threads interference.  The paper starts by nicely
+reviewing the state of the art and commenting its drawbacks when it
+comes to modularity and proof reuse.
+
+As far as I understand, the proposed logic, called Colosl, can be
+described as a fine-grained marriage of rely-guarantee and separation
+logic: each thread can specify its view of the state of the
+environment by an assertion and a transition that describes how the
+view of shared state can change.  To account for future extensions due
+to dynamically-allocated resources, transitions are guarded by
+capabilities, owned or not by the main thread.  The authors give a
+model to the logic in terms of "worlds": these are combinations of two
+logical states, that account for the local and global view of the
+thread, and an action model, that accounts for the set of capabilities
+owned by the thread.  The logic is put at work to show the correctness
+of a concurrent spanning tree algorithm.
+
+The paper has merits, the proposed logic features a remarkable mix of
+ingredients for thread local specifications and the final proof
+tackles a difficult problem (event sequential proofs about graphs
+algorithms are tricky).
+
+However I am skeptical about the overall approach.  On the one hand
+the sample example of Sec 2 suggests that the concise thread-local
+specifications can be written only using a global understanding of the
+behaviour of the system.  On the other hand the Colosl logic is so
+complex that not only checking the proof steps but also reading
+specifications requires a deep familiarity with it.  I understand the
+argument that Colosl avoids the repetitive task to validate "inactive"
+stability conditions as required by a more standard RGSep-like logic,
+but I am not sure that there is a clear win here.
+
+Question for the authors
+************************
+
+- I like Sec 4.2 that compares the specification of a concurrent set
+  module between CAP and Colosl.  Can something similar be done for
+  the proof of Sec 4.1?  This might provide evidence of the benefits
+  of working with Colosl.
+
+- The introduction mentions "modularity of specifications" and "reuse
+  of proofs" as motivating goals for Colosl, but it seems to me that
+  the examples in the paper do not provide evidence for this.  Are
+  there other examples (possibly in a technical report or even on a
+  whiteboard) that justify the above?
+
+- The model that gives semantics to Colosl is abstract and unrelated
+  to a reasonable model for a concurrent operational semantics.  Is it
+  possible to relate your logic to a more "real machine", and derive a
+  "real-world safety" from your Theorem 1?
+
+===========================================================================
+                            ESOP15 Review #11C
+                     Updated 20 Nov 2014 3:47:44pm EST
+---------------------------------------------------------------------------
+           Paper #11: CoLoSL: Concurrent Local Subjective Logic
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                 Reviewer expertise: 2. Some familiarity
+
+                      ===== Comments for author =====
+
+This paper presents CoLoSL, a program logic for the verification of
+concurrent programs with shared state. The logic extends separation
+logic with capabilities to describe views on shared state. These views
+are subjective in the sense that different threads can have different
+views on the same thread. A view also comes with an assertion and a
+set of transitions that describe the state changes the thread or its
+environment may perform on the shared state. The paper illustrates the
+expressiveness of subjective views with several challenging examples,
+formalizes the program logic, and shows how verification can partially
+be reduced to checking entailment in a standard separation logic.
+
+
+Points in favor:
+
+* Verifying racy shared-memory programs is a challenging problem.
+  There have been several proposals for program logic, mostly
+  variations of combining separation logic with rely-guarantee
+  reasoning. The logic proposed in this paper is in a similar style,
+  but improves on earlier work, especially by allowing a thread to
+  reason only about portions of the shared state. This improvement
+  leads to more concise proofs.
+
+* (Partially) reducing EXTEND, SHIFT, and stability to checking
+  entailment in standard separation logic is an elegant way of
+  applying the logic.
+
+* The examples considered in this paper are very challenging and
+  convincingly demonstrate the expressiveness of the presented logic.
+
+* The technical exposition in the paper is complemented by a
+  substantial appendix with further details and examples.
+
+
+Points against:
+
+* The presented logic is enormously complicated. Even a relatively
+  simple example such as INC requires a number of different assertions
+  and several non-trivial proof steps. This is surprising, given how
+  simple the informal (operational) correctness argument for the
+  program is. As a result, it is not clear to me what the practical
+  benefit of such a logic is. It seems much to complicated to be
+  applied manually to a substantial amount of code. On the other hand,
+  it is unclear how one could automate reasoning in CoLoSL (and the
+  paper does not discuss automation).
+

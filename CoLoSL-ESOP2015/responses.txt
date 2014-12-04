@@ -1,0 +1,102 @@
+﻿We thank the reviewers for their time and feedback. We'd like to address the comments and questions raised by the reviewers in turn.
+
+
++++++++ Reviewer 1 Comments +++++++
+
+
+1) Indeed as the reviewer points out the soundness of the Extend principle is achieved by the fencing constraint relating P to I. We will take the reviewer’s advice and explain this more clearly.
+
+
+2) We agree with the reviewer. We will expand our related work section to compare CoLoSL with [20] and other style of logics that use transition systems [Nanevski et al, ESOP'14].
+
+
+3) The reason for using the token ring algorithm as the running example was to showcase **all** CoLoSL principles in a simple way (including rewriting of actions through SHIFT). We will provide a more intuitive description of the algorithm and the various counters. 
+
+
+4) The only restriction necessary on A and A' is that they are **fresh** with respect to the already existing capabilities.  In our exposition the capabilities are represented as finite token sets K = \powerset_fin(token), and we assume an infinite number of tokens (think of tokens as natural numbers). Thus K itself is infinite and we can therefore always guarantee the existence of **some** fresh token sets A and A'. This is reflected by the existential quantification of A and A'.
+
+
+5) Indeed in our examples we only ever use single token sets. The reason for sets of tokens was to allow a larger number of actions being expressed through fewer tokens since for an action to be possible the thread must hold **all** the  capabilities in the set. For instance, given 3 tokens S = {a, b, c}, using tokens as the domain of AMod it is possible to describe 3 distinct actions. On the other hand, with token sets as the domain of AMod we can group them in 8 different ways (the size of \pset(S)). This is indeed a trivial difference and we are willing to take the reviewer's suggestion for clarity.
+
+
+6) We agree. In the final version we will elaborate on the intuitive meaning of both judgements, compare the two operators and hone out their differences. 
+Intuitively, the fencing (white triangle) judgement (f |> I) says that (f) is invariant under all actions (p ~~> q) of (I) where the precondition (p) overlaps with f (when f and p have common resources). The local fencing (shaded triangle) judgement (f  |>>  I) is slightly stronger: not only (f) is invariant under I (as in f |>I ) but for all actions (p ~~> q) of I when the precondition (p) is compatible with (f), then (p) is contained in (f);  i.e. p <= f.
+
+
+7) We will rewrite this rather long sentence.
+
+
+8) The local predicate is indeed sufficient for the proof. We presented the global predicate to demonstrate that it is possible to derive a local specification from the global one using the CoLoSL principles. 
+
+
+9) No, since graphs allow loops/cycles, G(x, gamma) and its left subgraph G(l, gamma) may overlap. For instance, in the graph of Fig 6a. had we used * rather than \*/ we would have 
+
+
+G(y, gamma) = y |-> - ... * G(y, gamma) * G(z, gamma) = false
+
+
+and thus
+
+
+graph(x, gamma) = \box{... * false} = false
+
+
+This is no longer the problem in the local definition g(x, gamma) since the star separated subgraphs (g(x, gamma) and g(l, gamma)) are boxed assertions. 
+
+
+In a nutshell, the contents of *-separated boxed assertions may overlap since by the (MERGE) principle
+
+
+\box{P}_I * \box{Q}_I' =>  \box{P \*/Q}_{I \cup I'} 
+
+
+But *-separated unboxed assertions amount to false when overlapping (as in ordinary separation logic): P * P => false (when P =/=> emp)
+
+
+10) In the final version we will expand the lock-coupling example section by promoting some of the detailed proofs and description available in the appendix to the main text. 
+
+
+
+
++++++++ Reviewer 2 Comment +++++++
+
+
+>>>> "However I am skeptical about the overall approach. On the one hand..."
+
+
+To Do: The discussion we had with Jules, the comparison of logics and their framing mechanisms.
+
+
++++++++ Reviewer 2 Questions +++++++
+ 
+1) Indeed as the reviewer points out even **sequential** proofs about graph algorithms are rather tricky as demonstrated in [10]. We have spent a long time - with no luck - trying to prove the graph algorithm in existing logics such as CAP. As such, we cannot compare the CoLoSL proof with that of existing approaches. 
+Judging by our attempts, we do believe that should one manage to prove these algorithms in existing logics, the proofs will be much more complicated and messy compared to CoLoSL since none of the existing approaches allow for arbitrary unknown sharing (overlaps) over concurrently accessed resources (as is the case in the graph algorithm). 
+
+
+2) We demonstrate the modularity of specifications and proof reuse through our examples. In particular, we show that in CoLoSL it is possible to **localise** the proofs and assertions by means of shrinking/expanding subjective views to closely match the footprint of the algorithms and the intuition of the programmer. 
+For instance, in the graph example (section 4.1) we *localise* the footprint of span(x) to g(x, gamma) and *re-use* the same specification at the recursive call points. 
+Similarly, in the INC example of section 2, in the general case of n threads and n variables in the token ring, the proof of each thread is *localised* to the nth and (n-1)st variable matching the footprint of the algorithm. On the other hand, in existing approaches the proof of each thread has to account for **all** variables and their interference - despite the local behaviour of each thread. Moreover, in CoLoSL the proof of each thread is independent of the value of n while in the existing approaches one has to prove the specifications for all possible values of n. Even though proving the spec for all values of n is not difficult, the fact remains that the CoLoSL proof is more modular in that it is independent of the value of n.
+
+
+3) We build CoLoSL as an instantiation of the Views framework [5] with the appropriate parameters (details are provided in [16]). That is, we instantiate Views with
+
+
+     a) "real-machine" or concrete machine states in the form of standard heaps 
+     b) a **reification** function that relates abstract logical states to concrete machine states. 
+     c) Few other parameters for abstract logical states, etc.
+
+
+The "real-world safety" property is then guaranteed by the Views framework ensuring the soundness of the logic. 
+
+
+
+
++++++++ Reviewer 3 Comments +++++++
+
+
+>>>> "Points against ..." 
+
+
+We believe that a lot of the perceived complexity of CoLoSL can be attributed to the difficulty associated with reasoning about fine-grained concurrent programs as is the case in existing logics such as CAP, etc. On the other hand, in the case of novel proof steps of CoLoSL such as SHIFT, etc. we have tried to minimise the complexity of proof obligations by reducing them to separation logic entailments. 
+In the case of the INC example, the proof steps used were merely a story telling mechanism to showcase the CoLoSL principles as well as demonstrate that unlike existing approaches it is possible to derive a more local specification for each thread given a global spec. Indeed, one can start with the local spec for each thread and forgo the proof steps in the middle. 
+Finally, the research into tools (automated or otherwise) for reasoning about programs using separation logic is far behind the available program logics (both in sequential and concurrent settings). Automated reasoning in CoLoSL is indeed an interesting research question; however, much research remains to be done to facilitate automated reasoning about concurrent programs in simpler logics such as rely-guarantee before we tackle the more complex logics such as CAP and CoLoSL.
