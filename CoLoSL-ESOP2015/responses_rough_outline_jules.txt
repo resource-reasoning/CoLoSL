@@ -1,0 +1,95 @@
+﻿We thank the reviewers for their time and feedback and will take their
+comments into account in future versions of the paper.
+
+In particular, we will compare more carefully with related work
+mentioned by reviewers, and include more material on 1) justifying the
+need for compositionality for larger systems, 2) going towards
+automation, 3) link to the real machine semantics as provided by
+Views.
+
+
+## Compositionality and complexity
+
+Reviewer 2 and 3 comment and question the relative complexity of our
+proof system, in particular the complications it induces for small
+programs.
+
+For large systems, it is necessary to work in a truly compositional
+setting, or face unreasonable proof burdens where you have to account
+for everything in the shared state (and imagine what that everything
+might look like in Apache or Linux!).
+
+We demonstrate how to attack this general problem on a simple toy
+example, where arguably it is not needed: the program INC. In existing
+approaches the proof of each thread has to account for all variables
+and their interference - despite the local behaviour of each
+thread. In CoLoSL, the proof of each thread is local and independent
+of the value of n while in the existing approaches one has to prove
+the specifications for all possible values of n. Even though proving
+the spec for all values of n is not difficult, the fact remains that
+the CoLoSL proof is more modular in that it is independent of the
+value of n.
+
+The "simple" global proof of INC is *also* doable in CoLoSL but
+obviously we haven't presented it. We took the hard road of local
+specs and proofs to demonstrate the power of CoLoSL, not because we
+had to.
+
+Finally, we believe that a lot of the perceived complexity of CoLoSL
+can be attributed to the difficulty associated with reasoning about
+fine-grained concurrent programs as is the case in existing logics
+such as CAP, etc. On the other hand, in the case of novel proof steps
+of CoLoSL such as SHIFT, etc. we have tried to minimise the complexity
+of proof obligations by reducing them to separation logic entailments.
+In the case of the INC example, the proof steps used were merely a
+story telling mechanism to showcase the CoLoSL principles as well as
+demonstrate that unlike existing approaches it is possible to derive a
+more local specification for each thread given a global spec. Indeed,
+one can start with the local spec for each thread and forgo the proof
+steps in the middle.
+
+
+
+## Automation
+
+Reviewer 3 asks about automation prospects.  The research into tools
+(automated or otherwise) for reasoning about programs using separation
+logic is far behind the available program logics (both in sequential
+and concurrent settings). Automated reasoning in CoLoSL is indeed an
+interesting research question; however, much research remains to be
+done to facilitate automated reasoning about concurrent programs in
+simpler logics such as rely-guarantee before we tackle the more
+complex logics such as CAP and CoLoSL.
+
+mention our early results into eliminating \*/ and --(*).
+
+
+
+## Misc.
+
+Reviewer 1 asks about the proof of concurrent spanning tree.
+1)
+ Indeed as the reviewer points out even **sequential** proofs about
+ graph algorithms are rather tricky as demonstrated in [10]. We have
+ spent a long time - with no luck - trying to prove the graph
+ algorithm in existing logics such as CAP. As such, we cannot compare
+ the CoLoSL proof with that of existing approaches.  Judging by our
+ attempts, we do believe that should one manage to prove these
+ algorithms in existing logics, the proofs will be much more
+ complicated and messy compared to CoLoSL since none of the existing
+ approaches allow for arbitrary unknown sharing (overlaps) over
+ concurrently accessed resources (as is the case in the graph
+ algorithm).
+
+
+
+3) We build CoLoSL as an instantiation of the Views framework [5] with the appropriate parameters (details are provided in [16]). That is, we instantiate Views with
+
+
+     a) "real-machine" or concrete machine states in the form of standard heaps 
+     b) a **reification** function that relates abstract logical states to concrete machine states. 
+     c) Few other parameters for abstract logical states, etc.
+
+
+The "real-world safety" property is then guaranteed by the Views
+framework ensuring the soundness of the logic.
