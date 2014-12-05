@@ -14,30 +14,27 @@ Local reasoning is more difficult to achieve than global proofs, but
 provides compositional reasoning. We hope to follow the same path as
 sequential separation logic, which improved on Hoare logic by
 providing a way to frame off unnecessary resource, thus enabling local
-specifications of programs. CoLoSL provides framing inside of shared
-regions in what we believe is the finest-grained manner
-possible. Framing inside shared regions is only possible in very
-limited ways, if at all, in existing logics.
+specifications of programs, and eventually scaling to large
+programs. CoLoSL provides, for the first time, arbitrary framing
+inside the shared state and inside interference relations in what we
+believe is the most fined-grained manner possible. Framing inside
+shared regions is only possible in very limited ways, if at all, in
+existing logics.
 
 The benefits of compositional reasoning are manifest when several
-program proofs are put together. When verifying a large system, to the
-order of hundreds of thousands of lines of code or more, distinct
-portions of the code will care about distinct shared data structures,
-and some of the code will care about several such reginons at the same
-time. Moreover, these regions can overlap, for instance the sub-graphs
-of a larger graph (as in the spanning tree example), or even
-collections of discrete memory cells (as in INC). Without a truly
-compositional framework, the verification has to resort to being
-non-compositional and verify all procedures with the whole shared
-state. Worse, this shared state can only be found by analysing the
-whole code. Clearly the proof burden would become unmanageable at
-scale.
-
-We demonstrate how to attack this general problem on simple examples,
-where this flexibility comes at a price that may seem higher than
-necessary. Clearly, we have not yet verified such large systems, but
-we believe that only by laying these solid foundations can this goal
-become attainable.  
+program proofs are put together. When verifying a large (100,000+
+lines of code) system, distinct portions of the code will care about
+different sets of shared data structures. Moreover, these data
+structures can overlap, for instance the sub-graphs of a larger graph
+(as in the spanning tree example), or even collections of discrete
+memory cells (as in INC). In existing work, the verification often has
+to resort to being non-compositional and verify all procedures with
+the whole shared state. Worse, this shared state can only be found by
+analysing the whole code. Clearly the proof burden becomes
+unmanageable at scale. While we have not yet verified such large
+systems, we believe that we have laid solid foundations to make this
+goal attainable, and have demonstrated how to attack this general
+problem on simpler examples.
 
 Moreover, as noted by all reviewers, this flexible approach already
 yields benefit for the examples of our paper, where we are able to
@@ -97,8 +94,6 @@ lays some solid foundations for automation. Our semantic conditions
 are already reducible to separation logic entailment checks. However,
 these entailments involve reasoning about \*/ and --(*), which are not
 always part of automatic tools for reasoning about separation logic
-assertions. Several recent work, e.g. by Park and Lee, attack the
-complete fragment of separation logic, which is ground for cautious
 optimism. Moreover, we have obtained encouraging preliminary results
 about reducing entailments with \*/ and --(*) to entailments without
 these connectives, in the style of how RGSep eliminates
