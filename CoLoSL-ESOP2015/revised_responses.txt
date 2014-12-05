@@ -1,4 +1,4 @@
-﻿We thank the reviewers for their time and feedback. We would like to
+We thank the reviewers for their time and feedback. We would like to
 address the comments and questions raised by the reviewers.
 
 ## Reviewers 2 and 3 comment on the complexity of CoLoSL.
@@ -74,16 +74,20 @@ not only, because we do not prove functional correctness); indeed, the
 reviewer points out that `even sequential proofs about graph
 algorithms are rather tricky'. We can make this comparison clearer.
 
-2) We hope our general comment above addresses this concern.
+2) “The introduction mentions `modularity of specifications’… ?”
 
-3) There has been some confusion. The concrete model is the standard
+We hope our general comment above addresses this concern.
+
+3) “The model that gives semantics to Colosl is abstract … ?”
+
+There has been some confusion. The concrete model is the standard
 heap and the concurrent operational semantics is the one used in
 Views [5]. Views provides a general soundness result (a real-world
 safety property) based on some initial parameters (including a
 reification function that relates abstract logical states to concrete
 machine states) and some lemmas. We give these parameters and prove
 these lemmas, thus obtaining a real-world safety property from
-Theorem_1. We will clarify this point in future versions.
+Theorem 1 in [16]. We will clarify this point in future versions.
 
 
 ## Reviewer 3 asks about automation prospects.
@@ -93,7 +97,7 @@ lays some solid foundations for automation. Our semantic conditions
 are already reducible to separation logic entailment checks. However,
 these entailments involve reasoning about \*/ and --(*), which are not
 always part of automatic tools for reasoning about separation logic
-assertions. Several recent work, eg by Park and Lee, attack the
+assertions. Several recent work, e.g. by Park and Lee, attack the
 complete fragment of separation logic, which is ground for cautious
 optimism. Moreover, we have obtained encouraging preliminary results
 about reducing entailments with \*/ and --(*) to entailments without
@@ -117,7 +121,7 @@ et al, ESOP’14] as well and we believe that our insights about proof
 structure can be carried over to these logics too, although the
 precise mechanism as to how is a matter for future work as of now.
 
-The soundness of the Extend principle is indeed achieved by the
+The soundness of the EXTEND principle is indeed achieved by the
 fencing constraint relating P to I. We will take the reviewer’s advice
 and explain this more clearly. We will also elaborate on the intuitive
 meaning of both fencing judgements (white and shaded triangles) and
@@ -130,7 +134,7 @@ appendix to the main text.
 In the case of sets of tokens, no further restrictions are needed. In
 general, there is a requirement that A and A' can always be picked
 "fresh" w.r.t. pre-existing capabilities. This is detailed in the
-Appendix ????? OR IS IT IN THE TECH REP????
+technical report [16].
 
 >>>> ”AMod seems to map sets of tokens to sets of actions...” 
 
