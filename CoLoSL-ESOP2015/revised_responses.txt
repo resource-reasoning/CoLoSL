@@ -93,8 +93,8 @@ lays some solid foundations for automation. Our semantic conditions
 are already reducible to separation logic entailment checks. However,
 these entailments involve reasoning about \*/ and --(*), which are not
 always part of automatic tools for reasoning about separation logic
-assertions. Several recent work, eg by Park and Lee, attack the
-complete fragment of separation logic, which is ground for cautious
+assertions. Several recent work, eg by Park and Lee (POPL'14), attack
+separation logic with --*, which is ground for cautious
 optimism. Moreover, we have obtained encouraging preliminary results
 about reducing entailments with \*/ and --(*) to entailments without
 these connectives, in the style of how RGSep eliminates
