@@ -50,10 +50,10 @@ even collections of discrete memory cells (as in INC). In existing
 work, the verification often has to resort to being non-compositional,
 verifying all procedures with respect to the whole shared
 state. Worse, this shared state can only be found by analysing the
-whole code. We believe that CoLoSL lays the foundations to make this goal
-of verifying large concurrent programs attainable, by allowing local
-proofs to be stitched together regardless of the part of the shared
-state they consider individually.
+whole code. We believe that CoLoSL lays the foundations to make the
+goal of verifying large concurrent programs attainable, by allowing
+local proofs to be stitched together regardless of the part of the
+shared state they consider individually.
 
 
 ## Reviewer B highlights three more questions.
