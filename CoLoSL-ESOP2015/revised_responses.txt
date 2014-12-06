@@ -74,7 +74,7 @@ graph algorithm.
 Surprisingly, our proof of the concurrent spanning tree example is
 simpler than the sequential spanning tree example of [10]. ([10]
 proves functional correctness which is not the focus of this paper,
-but a direct comparison of comparable proofs makes our reasoning
+but a direct comparison of comparable proofs demonstrates that  our reasoning
 simpler).  Indeed, reviewer B points out that `even sequential proofs
 about graph algorithms are rather tricky'. We can make this comparison
 clearer.
@@ -156,7 +156,7 @@ al., ESOP'14]. Our arguments in favour of the strengths and novelty of
 CoLoSL in comparison to CAP (and its variants) apply to [20, Nanevski
 et al., ESOP’14] as well and we believe that our insights about proof
 structure can be carried over to these logics too, although the
-precise mechanism as to how is a matter for future work as of now.
+precise mechanism as to how is a matter for future work.
 The soundness of the EXTEND principle is indeed achieved by the
 fencing constraint relating P to I. We will take the reviewer’s advice
 and explain this more clearly. We will also elaborate on the intuitive
