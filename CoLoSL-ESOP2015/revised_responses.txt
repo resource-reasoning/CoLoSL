@@ -3,25 +3,25 @@ address the comments and questions raised by the reviewers.
 
 ## Reviewer 2 is concerned about the overall approach
 
-Our main contribution is to provide a flexible framing mechanism on
-the the shared resource and its interference. In the same way that
-(sequential) separation logic improved on Hoare logic by providing a
-way to frame off unnecessary resource, recent concurrent program
-logics such as CAP (and its variants) provided a framing mechanism on
-the shared resource. However this framing on the shared resource is
-restrictive: one can frame off whole regions at a time but not
-arbitrary parts of each region. This notion of framing is rather
-static in that it forces one to predetermine the regions before the
-reasoning has started. As reviewer 1 points out, this results in
-awkward proofs as in the CAP proof of the set example (section 4.2).
-In contrast, in CoLoSL one can *frame off arbitrary (overlapping)
-parts of the shared resource*.  Moreover, CoLoSL is the first logic to
-provide a *framing/rewriting* mechanism on the interference. Framing
-off irrelevant actions simplifies the stability checks; rewriting
-actions allows one to combine the knowledge of global invariants with
-actions and thus obtain a stronger subjective view. Perhaps more
-fundamentally, these mechanisms allow for fully compositional
-reasoning (see next section).
+Our main contribution is to provide a flexible framing mechanism for
+ the shared resource and its interference. In the same way that
+ sequential separation logic improved on Hoare logic by providing a
+ way to frame off unnecessary resource, recent concurrent program
+ logics such as CAP and its variants provided a framing mechanism on
+ the shared resource. However, this framing on the shared resource is
+ restrictive: we can frame off whole regions at a time but not
+ arbitrary parts of each region. This framing is also too static: we
+ must predetermine the regions before the reasoning has started. As
+ reviewer 1 points out, this results in awkward proofs as in the CAP
+ proof of the set example (section 4.2).  In contrast, with  CoLoSL we
+ can frame off arbitrary overlapping parts of the shared resource.  In
+ addition, CoLoSL is the first logic to provide a *framing/rewriting*
+ mechanism on the interference: framing off irrelevant actions
+ simplifies the stability checks; rewriting actions allows the
+ combination of the knowledge of global invariants with actions and
+ thus obtain a stronger subjective view. Perhaps more fundamentally,
+ these mechanisms allow for fully compositional reasoning (see next
+ section).
 
 
 ## Reviewers 2 and 3 comment on the complexity of CoLoSL
