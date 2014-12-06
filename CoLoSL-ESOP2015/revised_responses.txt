@@ -31,17 +31,17 @@ that a lot of the perceived complexity of CoLoSL can be attributed to
 the difficulty associated with reasoning about fine-grained concurrent
 programs in general. Existing logics such as CAP, CaReSL and iCAP are
 also quite complex, although getting significantly better over time.
-CAP-style reasoning can be achieved in CoLoSL just as simply, with
-many of the modern improvements. However, we can give more
-compositional specifications using our unrestricted framing on shared
-state. In particular, CoLoSL can be used to prove the simple, global
-spec of INC; the novel contribution is in the tight local spec of INC
-and its proof.  We have introduced new reasoning principles such as
-SHIFT and EXTEND, which we believe are conceptually natural but we do
-agree are difficult to describe formally. We have tried to minimise
-the complexity of proof obligations by reducing them to separation
-logic entailments. We will think carefully about how to do a better
-job in the final draft.
+With CoLoSL, we can achieve CAP-style reasoning with the same level of
+complexity as the modern simplified CAP-style logics. However, we can
+also give more compositional specifications using our unrestricted
+framing on shared state. In particular, CoLoSL can be used to prove
+the simple, global spec of INC; the novel contribution is in the tight
+local spec of INC and its proof.  We have introduced new reasoning
+principles such as SHIFT and EXTEND, which we believe are conceptually
+natural but we do agree are difficult to describe formally. We have
+tried to minimise the complexity of proof obligations by reducing them
+to separation logic entailments. We will think about this carefully
+for a  final draft.
 
 Concurrent reasoning about overlapping data structures is even harder.
 When verifying a large system (100,000+ lines of code), distinct
