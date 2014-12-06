@@ -191,9 +191,8 @@ since the star-separated subgraphs (g(x, gamma) and g(l, gamma)) are
 boxed assertions. Similar to above, we would have:
 
   g(y, gamma) = \box{y |-> - ... * g(y, gamma) * g(z, gamma)} = 
-  \box{y |-> - …} * \box{g(y, gamma)} * \box{g(z, gamma)} =>
-  \box{y |-> … \*/ g(y, gamma) \*/ g(z, gamma)} =>
-  \box{y -> … \*/ g(z, gamma)}
+  \box{y |-> - ...} * \box{g(y, gamma)} * \box{g(z, gamma)} =>
+  \box{y |-> - ... \*/ g(y, gamma) \*/ g(z, gamma)}
 
 In a nutshell, the contents of *-separated boxed assertions may
 overlap since by the (MERGE) principle
