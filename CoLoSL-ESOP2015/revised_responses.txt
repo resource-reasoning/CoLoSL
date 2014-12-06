@@ -65,17 +65,19 @@ shared state they consider individually, as demonstrated on our small
 
 We do not know how to do the concurrent spanning tree in e.g. CAP, so
 cannot make an analogous strong comparison as with the set example. We
-did try.  It probably is possible to do something with CAP. However,
-our initial explorations show that this would be very complicated,
-since none of the existing approaches allow for arbitrary unknown
-sharing (overlaps) over concurrently accessed resources (as is the
-case in the graph algorithm).
+did try.  It probably is possible to do something in CAP.  However,
+our initial explorations show that this would be very complicated.
+None of the existing approaches allow for arbitrary unknown sharing
+(overlaps) over concurrently accessed resources, as is the case in the
+graph algorithm.
 
 Surprisingly, our proof of the concurrent spanning tree example is
-simpler than the sequential spanning tree example of [10] (partly, but
-not only, because we do not prove functional correctness); indeed, the
-reviewer points out that `even sequential proofs about graph
-algorithms are rather tricky'. We can make this comparison clearer.
+simpler than the sequential spanning tree example of [10]. ([10]
+proves functional completeness which is not the focus of this paper,
+but a direct comparison of comparable proofs makes our reasoning
+simpler).  Indeed, reviewer B points out that `even sequential proofs
+about graph algorithms are rather tricky'. We can make this comparison
+clearer.
 
 2) “The introduction mentions `modularity of specifications’… ?”
 
@@ -92,33 +94,36 @@ re-use of reasoning is natural for recursive functions. Such reasoning
 is possible with CoLoSL, due to the flexible framing for the dynamic
 overlapping shared resource. Such reasoning is not possible with
 e.g. CAP, due to the limited framing for the pre-determined static
-shared regions.  With the INC example of Section 2, consider the
-general case of n threads and variables x_1, ..., x_n in the token
-ring. With CoLoSL, the assertion of a subjective view (the
-pre-condition) of thread i can be localised to the variables x_i and
+shared regions.  
+
+We also demonstrate modularity with the INC example of section 2.
+Consider the general case of n threads and variables x_1, ..., x_n in
+the token ring. With CoLoSL, the assertion of a subjective view of
+thread i (the pre-condition) can be localised to the variables x_i and
 x_(i-1). The interference of the subjective view can be localised to
 the variables x_i, x_(i-1) and x_(i-2): the interference of the thread
 just uses x_i and x_(i-1); the interference of the environment
-requires the x_(i-2). With this localised view of the thread,
-stability checks are much simpler. Moreover, reasoning about the
-thread is independent of the value of n.  In contrast, with existing
-approaches (e.g.  CAP), the assertions and interference associated
-with each thread depends on all the n variables, and the
-specifications must be parameterised by this n. Proving a CAP
-specification for all values of n is possible. However, the CoLoSL
-approach is more modular in that it is independent of the value of n.
+requires the x_(i-2). With this localised view of the thread, the
+stability checks for the assertion are much simpler. Moreover,
+reasoning about the thread is independent of the value of n.  With
+existing approaches (e.g.  CAP), we have emphasised that the
+individual thread specifications must be weaker. In addition, the
+specifications must be parameterised by this thread count n. Proving a
+CAP specification for arbitrary values of n is possible. However, the
+CoLoSL approach is more modular in that it is independent of the value
+of n. We can make this point clearer.
 
+3) “The model that gives semantics to CoLoSL  is abstract … ?”
 
-3) “The model that gives semantics to Colosl is abstract … ?”
-
-There has been some confusion. The concrete model is the standard
-heap and the concurrent operational semantics is the one used in
-Views [5]. Views provides a general soundness result (a real-world
-safety property) based on some initial parameters (including a
-reification function that relates abstract logical states to concrete
-machine states) and some lemmas. We give these parameters and prove
-these lemmas, thus obtaining a real-world safety property from
-Theorem 1 in [16]. We will clarify this point in future versions.
+There has been some confusion. The concrete model is the standard heap
+and the concurrent operational semantics is the one used in the views
+framework[5]. This paper provides a general soundness result (a
+real-world safety property) based on some initial parameters
+(including a reification function that relates abstract logical states
+to concrete machine states) and some lemmas. We give these parameters,
+including the reification function, and prove these lemmas, thus
+obtaining a real-world safety property from Theorem 1 in [16]. We will
+clarify this point. 
 
 
 ## Reviewer C asks about automation prospects.
