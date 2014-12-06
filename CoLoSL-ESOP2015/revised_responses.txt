@@ -140,7 +140,8 @@ compositional. Our semantic conditions already reduce to separation
 logic entailment checks. Moreover, although it is too early to include
 in the paper, we have obtained encouraging preliminary results about
 reducing entailments with \*/ and --(*) to entailments without these
-connectives, in the style of how RGSep eliminates --(*).
+connectives. This is in the style of how RGSep eliminates --(*), which
+has been used in the Smallfoot-RG automatic prover for RGSep.
 
 
 
