@@ -106,7 +106,7 @@ just uses x_i and x_(i-1); the interference of the environment
 requires the x_(i-2). With this localised view of the thread, the
 stability checks for the assertion are much simpler. Moreover,
 reasoning about the thread is independent of the value of n.  With
-existing approaches (e.g.  CAP), we have emphasised that the
+existing approaches (e.g. CAP), we have emphasised that the
 individual thread specifications must be weaker. In addition, the
 specifications must be parameterised by this thread count n. Proving a
 CAP specification for arbitrary values of n is possible. However, the
