@@ -127,16 +127,16 @@ clarify this point.
 
 In this paper we are challenging the basic assumptions of several
 existing concurrent program logics. Automated reasoning in CoLoSL is
-an interesting, if premature, research topic. Program logic of CAP was
-published in 2010 and currently there is no automated tool, although
-we know of two groups actively working on this. More generally,
-tractable automatic verification of concurrent programs is still a
-largely open problem.  We believe our work lays some solid foundations
-for automation, in particular because it's compositional. Our semantic
-conditions already reduce to separation logic entailment
-checks. Moreover, although it is too early to include in the paper, we
-have obtained encouraging preliminary results about reducing
-entailments with \*/ and --(*) to entailments without these
+an interesting, if premature, research topic. The CAP program logic
+was published in 2010 and currently there is no automated tool,
+although we know of two groups actively working on this. More
+generally, tractable automatic verification of concurrent programs is
+still a largely open problem.  We believe our work lays some solid
+foundations for automation, in particular because it's
+compositional. Our semantic conditions already reduce to separation
+logic entailment checks. Moreover, although it is too early to include
+in the paper, we have obtained encouraging preliminary results about
+reducing entailments with \*/ and --(*) to entailments without these
 connectives, in the style of how RGSep eliminates --(*).
 
 
