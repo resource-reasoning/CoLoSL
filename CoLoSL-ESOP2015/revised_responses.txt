@@ -1,22 +1,56 @@
-We thank the reviewers for their time and feedback. We would like to address the comments and questions raised by the reviewers.
+We thank the reviewers for their time and feedback. We would like to
+address the comments and questions raised by the reviewers.
 
-## Reviewer 2 comments on contribution of CoLoSL
+## Reviewer 2 comments on the overall approach
 
-Existing concurrent program logics provide rather limited framing mechanisms on shared resource.
-Our main contribution is to provide a flexible framing mechanism on the the shared resource and its interference.  
-In the same way that (sequential) separation logic improved on Hoare logic by providing a way to frame off unnecessary resource, recent concurrent program logics such as CAP (and its variants) provided a framing mechanism on the shared resource. However this framing on the shared resource is restrictive: one can frame off whole regions at a time but not arbitrary parts of each region. This notion of framing is rather static in that it forces one to predetermine the regions before the reasoning has started. As reviewer 1 points out, this results in awkward proofs as in the CAP proof of the set example (section 4.2). 
-In contrast, in CoLoSL one can **frame off arbitrary (overlapping) parts of the shared resource**.
-Moreover, CoLoSL is the first logic to provide a **framing/rewriting** mechanism on the interference. Framing off irrelevant actions simplifies the stability checks; rewriting actions allows one to combine the knowledge of global invariants with actions and thus obtain a stronger subjective view.
+Existing concurrent program logics provide rather limited framing
+mechanisms on shared resource.  Our main contribution is to provide a
+flexible framing mechanism on the the shared resource and its
+interference.  In the same way that (sequential) separation logic
+improved on Hoare logic by providing a way to frame off unnecessary
+resource, recent concurrent program logics such as CAP (and its
+variants) provided a framing mechanism on the shared resource. However
+this framing on the shared resource is restrictive: one can frame off
+whole regions at a time but not arbitrary parts of each region. This
+notion of framing is rather static in that it forces one to
+predetermine the regions before the reasoning has started. As reviewer
+1 points out, this results in awkward proofs as in the CAP proof of
+the set example (section 4.2).  In contrast, in CoLoSL one can *frame
+off arbitrary (overlapping) parts of the shared resource*.  Moreover,
+CoLoSL is the first logic to provide a *framing/rewriting* mechanism
+on the interference. Framing off irrelevant actions simplifies the
+stability checks; rewriting actions allows one to combine the
+knowledge of global invariants with actions and thus obtain a stronger
+subjective view. Perhaps more fundamentally, these mechanisms allow
+for fully compositional reasoning (see next section).
 
 
 ## Reviewers 2 and 3 comment on the complexity of CoLoSL
 
+Reasoning about fine-grained concurrent programs is hard.  We believe
+that a lot of the perceived complexity of CoLoSL can be attributed to
+the difficulty associated with reasoning about fine-grained concurrent
+programs as is the case in existing logics such as CAP, CaReSL,
+etc.. CAP-style reasoning can be achieved in CoLoSL as simply without
+appealing to its novel principles. We have introduced new reasoning
+principles such as SHIFT and EXTEND, which we believe are conceptually
+natural but we do agree are difficult to describe formally. We have
+tried to minimise the complexity of proof obligations by reducing them
+to separation logic entailments.
 
-Reasoning about fine-grained concurrent programs is hard. 
-We believe that a lot of the perceived complexity of CoLoSL can be attributed to the difficulty associated with reasoning about fine-grained concurrent programs as is the case in existing logics such as CAP, etc. CAP-style reasoning can be achieved in CoLoSL as simply without appealing to its novel principles. We have introduced new reasoning principles such as SHIFT and EXTEND, which we believe are conceptually natural but we do agree are difficult to describe formally. We have tried to minimise the complexity of proof obligations by reducing them to separation logic entailments.
-
-Concurrent reasoning about overlapping data structures is hard.
-When verifying a large (100,000+ lines of code) system, distinct portions of the code will care about different sets of shared data structures. Moreover, these data structures can overlap, for instance the sub-graphs of a larger graph (as in the spanning tree example), or even collections of discrete memory cells (as in INC). In existing work, the verification often has to resort to being non-compositional and verify all procedures with the whole shared state. Worse, this shared state can only be found by analysing the whole code. 
+Moreover, concurrent reasoning about overlapping data structures is
+even harder.  When verifying a large (100,000+ lines of code) system,
+distinct portions of the code will care about different sets of shared
+data structures. Moreover, these data structures can overlap, for
+instance the sub-graphs of a larger graph (as in the spanning tree
+example), or even collections of discrete memory cells (as in INC). In
+existing work, the verification often has to resort to being
+non-compositional and verify all procedures with the whole shared
+state. Worse, this shared state can only be found by analysing the
+whole code. We believe that CoLoSL lays foundations to make this goal
+of verifying large concurrent programs attainable, by allowing local
+proofs to be stitched together regardless of the part of the shared
+state they consider individually.
 
 
 ## Reviewer 2 highlights three more questions.
@@ -39,11 +73,34 @@ algorithms are rather tricky'. We can make this comparison clearer.
 
 2) “The introduction mentions `modularity of specifications’… ?”
 
-We do demonstrate the modularity of specifications and proof reuse through our examples. 
+We do demonstrate the modularity of specifications and proof reuse
+through our examples.
 
-We achieve modularity in CoLoSL by **localising** the assertions and proofs by means of shrinking/expanding subjective views to closely match the footprint of the algorithms and the intuition of the programmer. For instance, in the concurrent spanning tree example (section 4.1), we localise the footprint of span(x) to g(x, gamma) and **re-use** the same specification at the recursive call points. Such re-use of reasoning is natural for recursive functions. Such reasoning is possible with CoLoSL, due to the flexible framing for the dynamic overlapping shared resource. Such reasoning is not possible with e.g. CAP, due to the limited framing for the pre-determined static shared regions.
-With the INC example of section 2, consider the general case of n threads and variables x_1, ..., x_n in the token ring. With CoLoSL, the assertion of a subjective view (the pre-condition) of thread i can be localised to the variables x_i and x_(i-1). The interference of the subjective view can be localised to the variables x_i, x_(i-1) and x_(i-2): the interference of the thread just uses x_i and x_(i-1); the interference of the environment requires the x_(i-2). With this localised view of the thread, stability checks are much simpler. Moreover, reasoning about the thread is independent of the value of  n. 
-In contrast, with existing approaches (e.g.  CAP), the assertions and interference associated with each thread depends on all the n variables, and the specifications must be parameterised by this n. Proving a CAP specification for all values of n is possible. However, the CoLoSL approach is more modular in that it is independent of the value of n.
+We achieve modularity in CoLoSL by *localising* the assertions and
+proofs by means of shrinking/expanding subjective views to closely
+match the footprint of the algorithms and the intuition of the
+programmer. For instance, in the concurrent spanning tree example
+(section 4.1), we localise the footprint of span(x) to g(x, gamma) and
+*re-use* the same specification at the recursive call points. Such
+re-use of reasoning is natural for recursive functions. Such reasoning
+is possible with CoLoSL, due to the flexible framing for the dynamic
+overlapping shared resource. Such reasoning is not possible with
+e.g. CAP, due to the limited framing for the pre-determined static
+shared regions.  With the INC example of section 2, consider the
+general case of n threads and variables x_1, ..., x_n in the token
+ring. With CoLoSL, the assertion of a subjective view (the
+pre-condition) of thread i can be localised to the variables x_i and
+x_(i-1). The interference of the subjective view can be localised to
+the variables x_i, x_(i-1) and x_(i-2): the interference of the thread
+just uses x_i and x_(i-1); the interference of the environment
+requires the x_(i-2). With this localised view of the thread,
+stability checks are much simpler. Moreover, reasoning about the
+thread is independent of the value of n.  In contrast, with existing
+approaches (e.g.  CAP), the assertions and interference associated
+with each thread depends on all the n variables, and the
+specifications must be parameterised by this n. Proving a CAP
+specification for all values of n is possible. However, the CoLoSL
+approach is more modular in that it is independent of the value of n.
 
 
 3) “The model that gives semantics to Colosl is abstract … ?”
@@ -60,50 +117,68 @@ Theorem 1 in [16]. We will clarify this point in future versions.
 
 ## Reviewer 3 asks about automation prospects.
 
-In this paper we are challenging the basic assumptions of several existing concurrent program logics. Automated reasoning in CoLoSL is an interesting but premature, research topic. Program logic of CAP was published in 2010 and currently there is no automated tool, although we know of two groups actively working on this.
-
->>>>>Jules’ comment re \*/ , —(*) elimination
-As for the case of verifying large code-bases, we believe our work
-lays some solid foundations for automation. Our semantic conditions
-are already reducible to separation logic entailment checks. However,
-these entailments involve reasoning about \*/ and --(*), which are not
-always part of automatic tools for reasoning about separation logic
-optimism. Moreover, we have obtained encouraging preliminary results
-about reducing entailments with \*/ and --(*) to entailments without
-these connectives, in the style of how RGSep eliminates
---(*). Finally, because CoLoSL reasoning is compositional, we believe
-it is a solid theoretical starting points for tools attacking
-concurrent programs. These are interesting research directions for
-future work indeed, as very few automatic tools exist to verify
-concurrent programs of any size at all!
+In this paper we are challenging the basic assumptions of several
+existing concurrent program logics. Automated reasoning in CoLoSL is
+an interesting, if premature, research topic. Program logic of CAP was
+published in 2010 and currently there is no automated tool, although
+we know of two groups actively working on this, and tractable
+automatic verification of concurrent programs is still a largely open
+problem in general.  We believe our work lays some solid foundations
+for automation, in particular because it's compositional. Our semantic
+conditions are already reducible to separation logic entailment
+checks. We have obtained encouraging preliminary results about
+reducing entailments with \*/ and --(*) to entailments without these
+connectives, in the style of how RGSep eliminates --(*).
 
 
 
-
-We thank reviewer 1 for their positive feedback. We would like to address the comments/questions for completeness.
+We thank reviewer 1 for their positive feedback. We would like to
+address their comments/questions for completeness.
 
 ## Reviewer 1 comments about related work and technical points.
 
-We will expand our related work section to compare CoLoSL with [20] and other style of logics that use transition systems [Nanevski et al, ESOP'14]. Our arguments in favour of the strengths and novelty of CoLoSL in comparison to CAP (and its variants) apply to [20, Nanevski et al, ESOP’14] as well and we believe that our insights about proof structure can be carried over to these logics too, although the precise mechanism as to how is a matter for future work as of now.
-The soundness of the EXTEND principle is indeed achieved by the fencing constraint relating P to I. We will take the reviewer’s advice and explain this more clearly. We will also elaborate on the intuitive meaning of both fencing judgements (white and shaded triangles) and compare them. We will expand the lock-coupling example section by promoting some of the detailed proofs and description available in the appendix to the main text.
+We will expand our related work section to compare CoLoSL with [20]
+and other style of logics that use transition systems [Nanevski et al,
+ESOP'14]. Our arguments in favour of the strengths and novelty of
+CoLoSL in comparison to CAP (and its variants) apply to [20, Nanevski
+et al, ESOP’14] as well and we believe that our insights about proof
+structure can be carried over to these logics too, although the
+precise mechanism as to how is a matter for future work as of now.
+The soundness of the EXTEND principle is indeed achieved by the
+fencing constraint relating P to I. We will take the reviewer’s advice
+and explain this more clearly. We will also elaborate on the intuitive
+meaning of both fencing judgements (white and shaded triangles) and
+compare them. We will expand the lock-coupling example section by
+promoting some of the detailed proofs and description available in the
+appendix to the main text.
 
 >>>> “Fig 1: shouldn’t you have some restrictions on A and A’? ...”
 
-In the case of sets of tokens, no further restrictions are needed. In general, there is a requirement that A and A' can always be picked "fresh" w.r.t. pre-existing capabilities. This is detailed in the technical report [16].
+In the case of sets of tokens, no further restrictions are needed. In
+general, there is a requirement that A and A' can always be picked
+"fresh" w.r.t. pre-existing capabilities. This is detailed in the
+technical report [16].
 
 >>>> ”AMod seems to map sets of tokens to sets of actions...” 
 
-The INC example features the a_rem action, which requires all three tokens {a_x, a_y, a_z} at once. At a higher level, the reason why we consider sets of tokens is because this generalises to other capability domains easily.
+The INC example features the a_rem action, which requires all three
+tokens {a_x, a_y, a_z} at once. At a higher level, the reason why we
+consider sets of tokens is because this generalises to other
+capability domains easily.
 
 
 >>>> “Section 4.1. Why do you need  the global graph predicate at all? ...”
 
-The local predicate is indeed sufficient for the proof. We presented the global predicate to demonstrate that it is possible to derive a local specification from the global one using the CoLoSL principles.
+The local predicate is indeed sufficient for the proof. We presented
+the global predicate to demonstrate that it is possible to derive a
+local specification from the global one using the CoLoSL principles.
 
 
 >>>>  “Fig 6: should you have a usual star in between (U \/ M) and G(l, gamma) in G(x, gamma)? ”
 
-No, since graphs allow loops/cycles, G(x, gamma) and its left subgraph G(l, gamma) may overlap. For instance, in the graph of Fig 6a. had we used * rather than \*/ we would have
+No, since graphs allow loops/cycles, G(x, gamma) and its left subgraph
+G(l, gamma) may overlap. For instance, in the graph of Fig 6a. had we
+used * rather than \*/ we would have
 
   G(y, gamma) = y |-> - ... * G(y, gamma) * G(z, gamma) = false
 
@@ -111,15 +186,19 @@ and thus
 
   graph(x, gamma) = \box{... * false} = false
 
-This is no longer the problem in the local definition g(x, gamma) since the star separated subgraphs (g(x, gamma) and g(l, gamma)) are boxed assertions. Similar to above, we would have:
+This is no longer the problem in the local definition g(x, gamma)
+since the star separated subgraphs (g(x, gamma) and g(l, gamma)) are
+boxed assertions. Similar to above, we would have:
 
   g(y, gamma) = \box{y |-> - ... * g(y, gamma) * g(z, gamma)} = 
   \box{y |-> - …} * \box{g(y, gamma)} * \box{g(z, gamma)} =>
   \box{y |-> … \*/ g(y, gamma) \*/ g(z, gamma)} =>
   \box{y -> … \*/ g(z, gamma)}
 
-In a nutshell, the contents of *-separated boxed assertions may overlap since by the (MERGE) principle
+In a nutshell, the contents of *-separated boxed assertions may
+overlap since by the (MERGE) principle
 
   \box{P}_I * \box{Q}_I' =>  \box{P \*/ Q}_{I \cup I'} 
 
-But *-separated unboxed assertions amount to false when overlapping (as in ordinary separation logic): y |-> - * y |-> - => false.
+But *-separated unboxed assertions amount to false when overlapping
+(as in ordinary separation logic): y |-> - * y |-> - => false.
