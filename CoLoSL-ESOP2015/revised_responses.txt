@@ -20,8 +20,8 @@ mechanism on the interference: framing off irrelevant actions
 simplifies the stability checks; rewriting actions allows the
 combination of the knowledge of global invariants with actions and
 thus obtain a stronger subjective view. Perhaps more fundamentally,
-these mechanisms allow for fully compositional reasoning (see two
-paragraphs down).
+these mechanisms allow for fully compositional reasoning, discussed
+below. 
 
 
 ## Reviewers B and C comment on the complexity of CoLoSL
@@ -48,7 +48,8 @@ When verifying a large system (100,000+ lines of code), distinct
 portions of the code will care about different sets of shared data
 structures. Moreover, these data structures can overlap, for instance
 the sub-graphs of a larger graph (as in the spanning tree example), or
-even collections of discrete memory cells (as in INC). In existing
+even collection
+s of discrete memory cells (as in INC). In existing
 work, the verification often has to resort to being non-compositional,
 verifying all procedures with respect to the whole shared
 state. Worse, this shared state can only be found by analysing the
