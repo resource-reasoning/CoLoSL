@@ -88,7 +88,7 @@ We achieve modularity in CoLoSL by *localising* the assertions and
 proofs by means of shrinking/expanding subjective views to closely
 match the footprint of the algorithms and the intuition of the
 programmer. For instance, in the concurrent spanning tree example
-(section 4.1), we localise the footprint of span(x) to g(x, gamma) and
+(Section 4.1), we localise the footprint of span(x) to g(x, gamma) and
 *re-use* the same specification at the recursive call points. Such
 re-use of reasoning is natural for recursive functions. Such reasoning
 is possible with CoLoSL, due to the flexible framing for the dynamic
@@ -113,11 +113,11 @@ CAP specification for arbitrary values of n is possible. However, the
 CoLoSL approach is more modular in that it is independent of the value
 of n. We can make this point clearer.
 
-3) “The model that gives semantics to CoLoSL  is abstract … ?”
+3) “The model that gives semantics to CoLoSL is abstract … ?”
 
 There has been some confusion. The concrete model is the standard heap
 and the concurrent operational semantics is the one used in the views
-framework[5]. This paper provides a general soundness result (a
+framework [5]. This paper provides a general soundness result (a
 real-world safety property) based on some initial parameters
 (including a reification function that relates abstract logical states
 to concrete machine states) and some lemmas. We give these parameters,
