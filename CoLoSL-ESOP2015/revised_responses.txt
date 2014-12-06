@@ -74,10 +74,10 @@ graph algorithm.
 Surprisingly, our proof of the concurrent spanning tree example is
 simpler than the sequential spanning tree example of [10]. ([10]
 proves functional correctness which is not the focus of this paper,
-but a direct comparison of comparable proofs demonstrates that  our reasoning
-simpler).  Indeed, reviewer B points out that `even sequential proofs
-about graph algorithms are rather tricky'. We can make this comparison
-clearer.
+but a direct comparison of comparable proofs demonstrates that our
+reasoning is simpler).  Indeed, reviewer B points out that `even
+sequential proofs about graph algorithms are rather tricky'. We can
+make this comparison clearer.
 
 2) “The introduction mentions `modularity of specifications’… ?”
 
