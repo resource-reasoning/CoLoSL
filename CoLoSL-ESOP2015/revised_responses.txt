@@ -1,30 +1,30 @@
 We thank the reviewers for their time and feedback. We would like to
 address the comments and questions raised by the reviewers.
 
-## Reviewer 2 is concerned about the overall approach
+## Reviewer B is concerned about the overall approach
 
 Our main contribution is to provide a flexible framing mechanism for
- the shared resource and its interference. In the same way that
- sequential separation logic improved on Hoare logic by providing a
- way to frame off unnecessary resource, recent concurrent program
- logics such as CAP and its variants provided a framing mechanism on
- the shared resource. However, this framing on the shared resource is
- restrictive: we can frame off whole regions at a time but not
- arbitrary parts of each region. This framing is also too static: we
- must predetermine the regions before the reasoning has started. As
- reviewer 1 points out, this results in awkward proofs as in the CAP
- proof of the set example (section 4.2).  In contrast, with  CoLoSL we
- can frame off arbitrary overlapping parts of the shared resource.  In
- addition, CoLoSL is the first logic to provide a *framing/rewriting*
- mechanism on the interference: framing off irrelevant actions
- simplifies the stability checks; rewriting actions allows the
- combination of the knowledge of global invariants with actions and
- thus obtain a stronger subjective view. Perhaps more fundamentally,
- these mechanisms allow for fully compositional reasoning (see next
- section).
+the shared resource and its interference. In the same way that
+sequential separation logic improved on Hoare logic by providing a way
+to frame off unnecessary resource, recent concurrent program logics
+such as CAP and its variants provided a framing mechanism on the
+shared resource. However, this framing on the shared resource is
+restrictive: we can frame off whole regions at a time but not
+arbitrary parts of each region. This framing is also too static: we
+must predetermine the regions before the reasoning has started. As
+Reviewer A points out, this results in awkward proofs as in the CAP
+proof of the set example (section 4.2).  In contrast, with CoLoSL we
+can frame off arbitrary overlapping parts of the shared resource.  In
+addition, CoLoSL is the first logic to provide a *framing/rewriting*
+mechanism on the interference: framing off irrelevant actions
+simplifies the stability checks; rewriting actions allows the
+combination of the knowledge of global invariants with actions and
+thus obtain a stronger subjective view. Perhaps more fundamentally,
+these mechanisms allow for fully compositional reasoning (see two
+paragraphs down).
 
 
-## Reviewers 2 and 3 comment on the complexity of CoLoSL
+## Reviewers B and C comment on the complexity of CoLoSL
 
 Reasoning about fine-grained concurrent programs is hard.  We believe
 that a lot of the perceived complexity of CoLoSL can be attributed to
@@ -50,13 +50,13 @@ even collections of discrete memory cells (as in INC). In existing
 work, the verification often has to resort to being non-compositional,
 verifying all procedures with respect to the whole shared
 state. Worse, this shared state can only be found by analysing the
-whole code. We believe that CoLoSL lays the foundations to make this goal
-of verifying large concurrent programs attainable, by allowing local
-proofs to be stitched together regardless of the part of the shared
-state they consider individually.
+whole code. We believe that CoLoSL lays the foundations to make the
+goal of verifying large concurrent programs attainable, by allowing
+local proofs to be stitched together regardless of the part of the
+shared state they consider individually.
 
 
-## Reviewer 2 highlights three more questions.
+## Reviewer B highlights three more questions.
 
 1) “Can something similar be done for the proof of Sec 4.1?”. 
 
@@ -123,7 +123,7 @@ obtaining a real-world safety property from Theorem 1 in [16]. We will
 clarify this point. 
 
 
-## Reviewer 3 asks about automation prospects.
+## Reviewer C asks about automation prospects.
 
 In this paper we are challenging the basic assumptions of several
 existing concurrent program logics. Automated reasoning in CoLoSL is
@@ -141,16 +141,16 @@ connectives, in the style of how RGSep eliminates --(*).
 
 
 
-We thank reviewer 1 for their positive feedback. We would like to
+We thank Reviewer A for their positive feedback. We would like to
 address their comments/questions for completeness.
 
-## Reviewer 1 comments about related work and technical points.
+## Reviewer A comments about related work and technical points.
 
 We will expand our related work section to compare CoLoSL with [20]
-and other style of logics that use transition systems [Nanevski et al,
-ESOP'14]. Our arguments in favour of the strengths and novelty of
+and other style of logics that use transition systems [Nanevski et
+al., ESOP'14]. Our arguments in favour of the strengths and novelty of
 CoLoSL in comparison to CAP (and its variants) apply to [20, Nanevski
-et al, ESOP’14] as well and we believe that our insights about proof
+et al., ESOP’14] as well and we believe that our insights about proof
 structure can be carried over to these logics too, although the
 precise mechanism as to how is a matter for future work as of now.
 The soundness of the EXTEND principle is indeed achieved by the
@@ -196,13 +196,12 @@ and thus
   graph(x, gamma) = \box{... * false} = false
 
 This is no longer the problem in the local definition g(x, gamma)
-since the star separated subgraphs (g(x, gamma) and g(l, gamma)) are
+since the star-separated subgraphs (g(x, gamma) and g(l, gamma)) are
 boxed assertions. Similar to above, we would have:
 
   g(y, gamma) = \box{y |-> - ... * g(y, gamma) * g(z, gamma)} = 
-  \box{y |-> - …} * \box{g(y, gamma)} * \box{g(z, gamma)} =>
-  \box{y |-> … \*/ g(y, gamma) \*/ g(z, gamma)} =>
-  \box{y -> … \*/ g(z, gamma)}
+  \box{y |-> - ...} * \box{g(y, gamma)} * \box{g(z, gamma)} =>
+  \box{y |-> - ... \*/ g(y, gamma) \*/ g(z, gamma)}
 
 In a nutshell, the contents of *-separated boxed assertions may
 overlap since by the (MERGE) principle
