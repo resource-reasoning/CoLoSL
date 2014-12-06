@@ -1,12 +1,9 @@
 We thank the reviewers for their time and feedback. We would like to
 address the comments and questions raised by the reviewers.
 
-## Reviewer 2 comments on the overall approach
+## Reviewer 2 comment: “I am skeptical about the overall approach…”
 
-Existing concurrent program logics provide rather limited framing
-mechanisms on shared resource.  Our main contribution is to provide a
-flexible framing mechanism on the the shared resource and its
-interference.  In the same way that (sequential) separation logic
+Our main contribution is to provide a flexible framing mechanism on the the shared resource and its interference. In the same way that (sequential) separation logic
 improved on Hoare logic by providing a way to frame off unnecessary
 resource, recent concurrent program logics such as CAP (and its
 variants) provided a framing mechanism on the shared resource. However
@@ -31,15 +28,15 @@ Reasoning about fine-grained concurrent programs is hard.  We believe
 that a lot of the perceived complexity of CoLoSL can be attributed to
 the difficulty associated with reasoning about fine-grained concurrent
 programs as is the case in existing logics such as CAP, CaReSL,
-etc.. CAP-style reasoning can be achieved in CoLoSL as simply without
+etc. CAP-style reasoning can be achieved in CoLoSL as simply without
 appealing to its novel principles. We have introduced new reasoning
 principles such as SHIFT and EXTEND, which we believe are conceptually
 natural but we do agree are difficult to describe formally. We have
 tried to minimise the complexity of proof obligations by reducing them
 to separation logic entailments.
 
-Moreover, concurrent reasoning about overlapping data structures is
-even harder.  When verifying a large (100,000+ lines of code) system,
+Concurrent reasoning about overlapping data structures is even harder.  
+When verifying a large (100,000+ lines of code) system,
 distinct portions of the code will care about different sets of shared
 data structures. Moreover, these data structures can overlap, for
 instance the sub-graphs of a larger graph (as in the spanning tree
