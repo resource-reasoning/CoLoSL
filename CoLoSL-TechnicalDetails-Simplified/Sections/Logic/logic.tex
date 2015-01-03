@@ -286,24 +286,59 @@ The above states that $\ca{}$ is contained in $\lmod$ iff $\ca{}$ is the composi
 In order to ensure indefinite extension of the shared state and  creation of fresh capabilities (through \extendRule principle), as part of the well-formedness condition we require that the domain of action models are well-defined. That is, one can always guarantee the existence of a capability that is fresh (disjoint from the domain of the action model; and that the domain remains well-defined after extension. This is captured by the following definition of well-defined capability sets. 
 %
 %
-\begin{definition}[Well-defined capability subsets]
-The set of \emph{well-defined capability sets}, $\ADoms$, is defined as follows:
+\begin{definition}[Well-defined capability sets]
+A capability set $K \in \pset{\Caps}$ is \emph{well defined}, written $\wdCapSet{K}$, if and only if there exists a set $\chi \in \pset{\pset{\Caps}}$ such that $K \in \chi$ and 
 %
 \[
-	\ADoms \eqdef 
-	\left\{ 
-	\begin{array}{@{\hspace{2pt}}l | l @{\hspace{2pt}}}
-		K & 
-		\begin{array}{@{} l @{}}
-			K \in \pset{\Caps} \land \exsts{\ca{} \in \Caps} \ca{} \disjoint K \land \\
-			\for{K' \in \ADoms} K \cup K' \in \ADoms
-		\end{array}
-	\end{array}		
-	\right\}
+\begin{array}{l @{\hspace{2pt}} l}
+	& \for{\ca{} \in \Caps} \{\ca{}\} \in \chi \\
+	\land &\for{K' \in \chi}\exsts{\ca{} \in \Caps} \ca{} \disjoint K'  \\
+	\land &\for{K_1, K_2 \in \chi} K_1 \cup K_2 \in \chi
+\end{array}		
 \]
 %
-where we write $\ca{} \disjoint K$ to denote $\for{\ca{}' \in K} \ca{} \disjoint \ca{}'$. 
+%A set of capability sets $\chi \in \pset{\pset{\Caps}}$ is \emph{well defined}, written $\wdCapSet{\chi}$, if and only if
+%%
+%\[
+%\begin{array}{l @{\hspace{2pt}} l}
+%	& \for{\ca{} \in \Caps} \{\ca{}\} \in \chi \\
+%	\land &\for{K \in \chi}\exsts{\ca{} \in \Caps} \ca{} \disjoint K \land \\
+%	\land &\for{K, K' \in \chi} K \cup K' \in \chi
+%\end{array}		
+%\]
+%%
 %
+%\[
+%\begin{array}{l @{} l}
+%	\for{\ca{} \in \Caps} \{\ca{}\} \in \chi \;\land\; & \for{K \in \chi}\\
+%	&\quad \exsts{\ca{} \in \Caps} \ca{} \disjoint K \land \\
+%	&\quad\for{K' \in \chi} K \cup K' \in \chi
+%\end{array}		
+%\]
+%%
+where we write $\ca{} \disjoint K'$ to denote $\for{\ca{}' \in K'} \ca{} \disjoint \ca{}'$. 
+%
+%The set of \emph{well-defined capability sets}, $\ADoms \in \pset{\Caps}$, is defined as follows:
+%%
+%\[
+%	\ADoms \eqdef 
+%	\Big\{
+%		\{\ca{}\} \;\Big|\; \ca{} \in \Caps	
+%	\Big\}
+%	\cup
+%	\left\{ 
+%	\begin{array}{@{\hspace{2pt}}l | l @{\hspace{2pt}}}
+%		K & 
+%		\begin{array}{@{} l @{}}
+%			K \in \pset{\Caps} \land \exsts{\ca{} \in \Caps} \ca{} \disjoint K \land \\
+%			\for{K' \in \ADoms} K \cup K' \in \ADoms
+%		\end{array}
+%	\end{array}		
+%	\right\}
+%\]
+%%
+%where we write $\ca{} \disjoint K$ to denote $\for{\ca{}' \in K} \ca{} \disjoint \ca{}'$. 
+%%
 \end{definition}
 
 We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is well-formed if $l$ and $g$ are compatible, the capabilities found in $l\composeL g$ are contained in the action model $\lmod$,$\lmod$ is confined to $g$, and the domain of $\lmod$ is well-defined. 
@@ -320,7 +355,8 @@ We can now formalise the notion of well-formedness. A world $(l ,g, \lmod)$ is w
     (\exsts{\h{},\ca{}}
     l \composeL g = (\h{},\ca{}) \land \ca{} \containedIn \lmod)
     /|
-		g \containI \lmod \land \dom{\lmod} \in \ADoms
+		g \containI \lmod \land 
+		\wdCapSet{(\dom{\lmod})}
   \end{array}
   \vspace{-1ex}
   \]

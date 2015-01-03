@@ -157,9 +157,9 @@ The new interference is simply the union of previous interferences. Using the \s
 Lastly, locally owned resources (described by $P$) can be shared using the \extendRule principle: 
 %
 \begin{align}\label{eq:extend}
-   &\hspace{45pt} P \containI I 
-%  \text{ and }
-%  \fresh{\vec{x}, \capAss{1} * \capAss{2}}
+   &\hspace{0pt} P \containI I 
+  \text{ and }
+  \fresh{\bar{x}, \capAss{1} * \capAss{2}}
   \text{ implies } 
   P ===>
   \exsts{\bar{x}} \capAss{1} * \shared{P * \capAss{2}}{I}

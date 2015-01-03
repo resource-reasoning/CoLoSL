@@ -794,7 +794,7 @@ Pleasantly, since our local assertions do not contain subjective (boxed) asserti
 %
 %
 \begin{definition}[Freshness]
-The capability assertion $\capAss{}$ with logical variables $\bar{x}$ is \emph{fresh}, written $\fresh{\bar{x}, \capAss{}}$, iff for all $\lenv \in \LEnv$ and $K \in \ADoms$, there exists $\ca{} \in \Caps$ such that
+The capability assertion $\capAss{}$ with logical variables $\bar{x}$ is \emph{fresh}, written $\fresh{\bar{x}, \capAss{}}$, iff for all $\lenv \in \LEnv$ and $K \in \pset{\Caps}$ where $\wdCapSet{K}$, there exists $\ca{} \in \Caps$ such that
 %
 \[
 	(\unitH, \ca{}), \lenv \slsat \exsts{\bar{x}} \capAss{} /|  \ca{} \disjoint K
