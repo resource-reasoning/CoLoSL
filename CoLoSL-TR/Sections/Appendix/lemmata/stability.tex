@@ -1,0 +1,357 @@
+%
+\begin{lemma}[]\label{lem:sub-stable-extend}
+for all $P \in \Assertions$, $\lenv \in \LEnv$, $w, w' \in \Worlds$, 
+% 
+\[
+\begin{array}{@{} l @{}}
+	w, \lenv |= P /| (w, w') \in \extendR 
+	\implies  w', \lenv |= P
+\end{array}
+\]
+%
+\begin{proof}
+From the definition of $\extendR$, it then suffices to show that for all $P \in \Assertions$, $\lenv \in \LEnv$, $l, g, g' \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
+% 
+\[
+\begin{array}{@{} l @{}}
+	(l, g, \lmod), \lenv |= P /| 
+	\expandsAM{\lmod'}{g'}{g}{\lmod}
+	 \implies  (l, g \composeL g', \lmod \cup \lmod'), \lenv |= P
+\end{array}
+\]
+%
+We proceed by induction on the structure of assertion $P$.	\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $l, g, g' \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	& (l, g, \lmod), \lenv |= P_1 \implies P_2 \label{sub-stable-extend:Ass1}\\
+%	
+	&\expandsAM{\lmod'}{g'}{g}{\lmod} \label{sub-stable-extend:Ass2}\\
+%	
+	& \for{l, g, g' \in \LStates} \for{\lmod', \lmod\in \AMods} \nonumber\\
+	\tag{I.H1} & 
+	\quad (l, g, \lmod), \lenv |= P_1 /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies (l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1 \label{sub-stable-extend:IH1}\\ 
+%
+	& \for{l, g, g' \in \LStates} \for{\lmod', \lmod \in \AMods} \nonumber\\
+	\tag{I.H2} & 
+	\quad (l, g, \lmod), \lenv |= P_2 /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies (l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_2 \label{sub-stable-extend:IH2}
+%	
+\end{align}
+%
+From (\ref{sub-stable-extend:Ass1}) and the definition of $|=$ we know $(l, g, \lmod), \lenv |= P_1$ \text{ implies } $(l, g, \lmod), \lenv |= P_2$; consequently, from (\ref{sub-stable-extend:Ass2}), (\ref{sub-stable-extend:IH1}) and (\ref{sub-stable-extend:IH2}) we have: $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1$ \text{ implies } $(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_2$. Thus, from the definition of $|=$ we have:
+%
+\begin{align*}
+	(l, g \composeL g', \lmod \cup \lmod'), \lenv |= P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	&(l, g, \lmod), \lenv |= \shared{P'}{I} \label{sub-stable-extend:Ass3}\\
+	& \expandsAM{\lmod'}{g'}{g}{\lmod} \label{sub-stable-extend:Ass4}\\
+	& \for{l, g , g'\in \LStates} \for{\lmod', \lmod \in \AMods} \nonumber\\
+	\tag{I.H} & 
+	\quad (l, g, \lmod), \lenv |= P' /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies (l, g \composeL g', \lmod \cup \lmod'), \lenv |= P' \label{sub-stable-extend:IH}
+\end{align}
+%
+From (\ref{sub-stable-extend:Ass3}) and the definition of $|=$ we have:
+%
+\begin{align*}
+	l = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod} P' /| \extendsAM{\lmod}{s'}{r'}{\semI[\lenv]{I}} 
+\end{align*}  
+%
+Thus from (\ref{sub-stable-extend:Ass4}) and \lem~\ref{lem:sub-stable-1} we have
+%
+\begin{align*}
+	& l = \unitL /| \exsts{s', r'} g \composeL g' = s' \composeL r' \composeL g' /| s', \lenv |=_{g \composeL g', \lmod \cup \lmod'} P' /|\\
+	& \extendsAM{\lmod}{s'}{r'}{\semI[\lenv]{I}}
+\end{align*}
+%
+and consequently from (\ref{sub-stable-extend:Ass4}) and (\ref{sub-stable-extend:IH}) we have
+%
+\begin{align*}
+	& l = \unitL /| \exsts{s', r'} g \composeL g' = s' \composeL r' /| s', \lenv |=_{g \composeL g', \lmod \cup \lmod'} P' /|\\
+	& \extendsAM{\lmod \cup \lmod'}{s'}{r'}{\semI[\lenv]{I}}
+\end{align*}
+%
+That is,
+%%
+%\begin{align*}
+%	(s, g, \lmod \cup \lmod', \gmod'), \lenv |= \shared{P'}{I}
+%\end{align*}
+%%
+%and consequently, from the semantics of $|=_{g, \lmod \cup \lmod', \gmod'}$
+%
+\begin{align}
+	(l, g \composeL g', \lmod \cup \lmod'), \lenv |= \shared{P'}{I} \label{sub-stable-extend:Ass5}
+\end{align}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:sub-stable-1}
+for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g, g' \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
+% 
+\[
+\begin{array}{@{} l @{}}
+	s, \lenv |=_{g, \lmod} P /| 
+	\expandsAM{\lmod'}{g'}{g}{\lmod}
+	 \implies  s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P
+\end{array}
+\]
+%
+\begin{proof}
+By induction on the structure of assertion $P$.	\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g, g' \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	& s, \lenv |=_{g, \lmod} P_1 \implies P_2 \label{subextend2:Ass1}\\
+%	
+	&\expandsAM{\lmod'}{g'}{g}{\lmod} \label{subextend2:Ass2}\\
+%	
+	& \for{s, g, g' \in \LStates} \for{\lmod', \lmod \in \AMods} \nonumber\\
+	\tag{I.H1} & 
+	\quad s, \lenv |=_{g, \lmod} P_1 /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P_1 \label{subextend2:IH1}\\ 
+%
+	& \for{s, g, g' \in \LStates} \for{\lmod', \lmod \in \AMods} \nonumber\\
+	\tag{I.H2} & 
+	\quad s, \lenv |=_{g, \lmod} P_2 /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P_2 \label{subextend2:IH2}
+%	
+\end{align}
+%
+From (\ref{subextend2:Ass1}) and the definition of $|=_{g, \lmod}$ we know $s, \lenv |=_{g, \lmod} P_1$ \text{ implies } $P_2 |=_{g, \lmod}$; consequently, from (\ref{subextend2:Ass2}), (\ref{subextend2:IH1}) and (\ref{subextend2:IH2}) we have: $s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P_1$ \text{ implies } $s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P_2$. Thus, from the definition of $|=_{g \composeL g', \lmod \cup \lmod'}$ we have:
+%
+\begin{align*}
+	s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	&s, \lenv |=_{g, \lmod} \shared{P'}{I} \label{subextend2:Ass3}\\
+	& \expandsAM{\lmod'}{g'}{g}{\lmod} \label{subextend2:Ass4}\\
+	& \for{s, g , g'\in \LStates} \for{\lmod', \lmod \in \AMods} \nonumber\\
+	\tag{I.H} & 
+	\quad s, \lenv |=_{g, \lmod} P' /| \expandsAM{\lmod'}{g'}{g}{\lmod} \implies s, \lenv |=_{g \composeL g', \lmod \cup \lmod'} P' \label{subextend2:IH}
+\end{align}
+%
+From (\ref{subextend2:Ass3}) and the definition of $|=_{g, \lmod}$ we have:
+%
+\begin{align*}
+	s = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod} P' /| \extendsAM{\lmod}{s'}{r'}{\semI[\lenv]{I}} 
+\end{align*}  
+%
+Thus from (\ref{subextend2:Ass4}) and (\ref{subextend2:IH}) we have
+%
+\begin{align*}
+	& s = \unitL /| \exsts{s', r'} g \composeL g' = s' \composeL r' /| s', \lenv |=_{g \composeL g', \lmod \cup \lmod'} P' /|\\
+	& \extendsAM{\lmod \cup \lmod'}{s'}{r'}{\semI[\lenv]{I}}
+\end{align*}
+%
+That is,
+%%
+%\begin{align*}
+%	(s, g, \lmod \cup \lmod', \gmod'), \lenv |= \shared{P'}{I}
+%\end{align*}
+%%
+%and consequently, from the semantics of $|=_{g, \lmod \cup \lmod', \gmod'}$
+%
+\begin{align*}
+	s, \lenv |=_{g, \lmod \cup \lmod'} \shared{P'}{I}
+\end{align*}
+%
+as required.
+\end{proof}
+%
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:sub-stable-shift}
+for all $P \in \Assertions$, $\lenv \in \LEnv$, $w, w' \in \Worlds$, 
+% 
+\[
+\begin{array}{@{} l @{}}
+	w, \lenv |= P /| (w, w') \in \shiftR 
+	\implies  w', \lenv |= P
+\end{array}
+\]
+%
+\begin{proof}
+From the definition of $\shiftR$, it then suffices to show that for all $P \in \Assertions$, $\lenv \in \LEnv$, $l, g, \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
+% 
+\[
+\begin{array}{@{} l @{}}
+	(l, g, \lmod), \lenv |= P /| 
+	\expandsAM{\lmod'}{\unitL}{g}{\lmod}
+	 \implies  (l, g, \lmod \cup \lmod'), \lenv |= P
+\end{array}
+\]
+%
+This follows immediately from the more general result established in \lem~\ref{lem:sub-stable-extend} from (\ref{sub-stable-extend:Ass1}) to (\ref{sub-stable-extend:Ass5}).
+\end{proof}
+%
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:extend1}
+for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
+% 
+\[
+\begin{array}{@{} l @{}}
+	(s, g, \lmod), \lenv |= P /| \expandsAM{\lmod'}{s}{g}{\lmod}
+	\implies  s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P
+\end{array}
+\]
+%
+\begin{proof}
+By induction on the structure of assertion $P$.	\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	& (s, g, \lmod), \lenv |= P_1 \implies P_2 \label{subextend:Ass1}\\
+%	
+	& \expandsAM{\lmod'}{s}{g}{\lmod} \label{subextend:Ass2}\\
+%	
+	& \for{s, g \in \LStates} \for{\lmod, \lmod' \in \AMods} \nonumber\\
+	\tag{I.H1} & \quad (s, g, \lmod), \lenv |= P_1 /| \expandsAM{\lmod'}{s}{g}{\lmod}
+	\implies s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P_1
+	\label{subextend:IH1}\\ 
+%
+	& \for{s, g \in \LStates} \for{\lmod, \lmod' \in \AMods} \nonumber\\
+	\tag{I.H2} & \quad (s, g, \lmod), \lenv |= P_2 /| \expandsAM{\lmod'}{s}{g}{\lmod}
+	\implies s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P_2
+	\label{subextend:IH2}
+%	
+\end{align}
+%
+From (\ref{subextend:Ass1}) and the definition of $|=$ we know $(s, g, \lmod), \lenv |= P_1$ \text{ implies } $(s, g, \lmod), \lenv |= P_2$; consequently, from (\ref{subextend:Ass2}), (\ref{subextend:IH1}) and (\ref{subextend:IH2}) we have: $s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P_1$ \text{ implies } $s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P_2$. Thus, from the definition of $|=_{g \composeL s, \lmod \cup \lmod'}$ we have:
+%
+\begin{align*}
+	s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$ such that
+%
+\begin{align}
+	& (s, g, \lmod), \lenv |= \shared{P'}{I} \label{subextend:Ass3}\\
+	& \expandsAM{\lmod'}{s}{g}{\lmod} \label{subextend:Ass4}
+%	\\
+%	& \for{s, g \in \LStates} \for{\lmod, \lmod', \gmod, \gmod' \in \AMods} \nonumber\\
+%	\tag{I.H} & \quad s, \lenv |=_{g, \lmod, \gmod} P' /| \expandsAM{\gmod'}{s}{\lmod'}{g}{\lmod}{\gmod} 
+%	\implies s, \lenv |=_{g \composeL s, \lmod \cup \lmod', \gmod'} P'
+%	\label{subextend:IH}
+\end{align}
+%
+From (\ref{subextend:Ass3}) and the definition of $|=$ we have:
+%
+\begin{align*}
+	s = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod} P' /| \extendsAM{\lmod}{s'}{r'}{\semI[\lenv]{I}} 
+\end{align*}  
+%
+Thus from (\ref{subextend:Ass4}) we have
+%
+\begin{align*}
+	s = \unitL /| \exsts{s', r'} g = s' \composeL r' /| s', \lenv |=_{g, \lmod} P' /| \extendsAM{\lmod \cup \lmod'}{s'}{r' \composeL s}{\semI[\lenv]{I}}
+\end{align*}
+%
+and consequently from (\ref{subextend:Ass4}), \lem~\ref{lem:sub-stable-1} and since $s = \unitL$
+%
+\begin{align*}
+	& s = \unitL /| \exsts{s', r'} g \composeL s = s' \composeL r' /| s', \lenv |=_{g \composeL s, \lmod \cup \lmod'} P'  \\
+	& /| \extendsAM{\lmod \cup \lmod'}{s'}{r' \composeL s}{\semI[\lenv]{I}}
+\end{align*}
+That is,
+%
+%\begin{align*}
+%	(s, g, \lmod \cup \lmod', \gmod), \lenv |= \shared{P'}{I}
+%\end{align*}
+%%
+%and consequently, from the semantics of $|=_{g, \lmod \cup \lmod', \gmod}$
+%
+\begin{align*}
+	s, \lenv |=_{g \composeL s, \lmod \cup \lmod'} \shared{P'}{I}
+\end{align*}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%%
+%\begin{lemma}[]
+%	for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$:  
+%		\[
+%			s, \lenv |=_{g, \lmod} P \implies s, \lenv \slsat P
+%		\]
+%%
+%\begin{proof}
+%By induction on the structure of assertion $P$.	Pick an arbitrary $\lenv \in \LEnv$, then\\
+%
+%\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+%\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+%Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$ such that
+%%
+%\begin{align}
+%	& s, \lenv |=_{g, \lmod} P_1 \implies P_2 \label{subshift:Ass1} \\
+%	\tag{I.H1} & \for{\lenv, s, g , \lmod} s, \lenv |=_{g, \lmod} P_1 \implies s, \lenv \slsat P_1 \label{subshift:IH1}\\ 
+%	\tag{I.H2} & \for{\lenv, s, g , \lmod} s, \lenv |=_{g, \lmod} P_2 \implies s, \lenv \slsat P_2 \label{subshift:IH2}
+%\end{align}
+%%
+%From (\ref{subshift:Ass1}) and the definition of $|=_{g, \lmod}$ we know $s, \lenv |=_{g, \lmod} P_1$ \text{ implies } $P_2 |=_{g, \lmod}$; consequently, from (\ref{subshift:IH1}) and (\ref{subshift:IH2}) we have: $s, \lenv \slsat P_1$ \text{ implies } $s, \lenv \slsat P_2$. Thus, from the definition of $\slsat$ we have:
+%%
+%\begin{align*}
+%	s, \lenv \slsat P_1 \implies P_2
+%\end{align*}
+%%
+%as required.\\
+%
+%\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+%These cases are analogous to the previous case and are omitted here. \\
+%
+%\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+%Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$ such that
+%%
+%\begin{align}
+%%	\tag{I.H} & \for{s, l \in \LStates} \for{\lmod, \gmod \in \AMods} s, \lenv |=_{g, \lmod, \gmod} P' \implies s, \lenv \slsat P' \label{subshift:IH}\\ 
+%	& s, \lenv |=_{g, \lmod} \shared{P'}{I} \label{subshift:Ass2}
+%\end{align}
+%%
+%From (\ref{subshift:Ass2}) and the definition of $|=_{g, \lmod}$ we know $s, g, \lmod |= \shared{P'}{I}$ and hence, from the definition of $|=$, we have $s = \unitL$. Consequently, from the definition of $\slsat$ we have: 
+%%
+%\begin{align*}
+%	s, \lenv \slsat \shared{P'}{I}
+%\end{align*}
+%%
+%as required.
+%\end{proof}
+%%
+%\end{lemma}
+%%

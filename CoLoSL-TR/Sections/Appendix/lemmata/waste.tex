@@ -1,0 +1,456 @@
+%\begin{lemma}[\extendRule-Confinement]\label{lem:extend-confinement}
+%For all $\lmod \in \AMods$, $s, r \in \LStates$, $\fence{} \in \pset{\LStates}$ and $a \in \m{rg}(\lmod)$:
+%%
+%\[
+%\begin{array}{l}
+%	\begin{array}{@{} l @{}}
+%		s \composeL r \in \fence{} /| \fence{} \strictfences  \lmod /|\\
+%		\m{potential}(a, s \composeL r) /|\\
+%		\left(\m{visible}(a, s) \lor \fst{\updateFP{a}} = \unitL \right) /|\\
+%		\left((s', r') \in a[s, r] \lor s' \composeL r' = a[s \composeL r] \right)
+%	\end{array}
+%	\implies s' \composeL r' \in \fence{}
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%Pick an arbitrary $\lmod \in \AMods$, $s, s', r, r' \in \LStates$, $\fence{} \in \pset{\LStates}$ and $a \in \m{rg}(\lmod)$ such that:
+%%
+%\begin{align}
+%	& s \composeL r \in \fence{} \label{LEF:Ass1}\\
+%	& \fence{} \strictfences \lmod \label{LEF:ass0}\\
+%	& \m{potential}(a, s \composeL r) \label{LEF:Ass2}\\
+%	& \m{visible}(a, s) \lor \fst{\updateFP{a}} = \unitL \label{LEF:Ass0}
+%\end{align}
+%%(\ref{LMS:Ass})
+%\textbf{RTS. } $s' \composeL r' \in \fence{} $.\\
+%There are two cases to consider:\\
+%\textbf{Case 1. }$[s' \composeL r'] = a[s \composeL r]$\\
+%From the definition of $\confines$ and (\ref{LEF:Ass1}) we know there exists a fence $\fence{}$ such that:
+%%
+%\begin{align}
+%	& s \composeL r \in \fence{} \label{LEF:Ass3}\\
+%	& \for{g \in \fence{}} \for{a \in \m{rg}(\lmod)} \nonumber\\
+%	& \quad \m{potential}(a, g) /|  (\m{visible}(a, g) \lor \fst{\updateFP{a}} = \unitL)  \implies a[g] \in \fence{} \label{LEF:Ass4}
+%\end{align}
+%%(\ref{LMS:Ass})
+%By definition of $\m{visible}$ and from (\ref{LEF:Ass2})-(\ref{LEF:Ass4}) and assumption of case 1. we have: 
+%%
+%\begin{align}
+%	& s' \composeL r' \in \fence{} \label{LEF:Ass5}
+%\end{align}
+%%
+%Finally by definition of $\confines$ and (\ref{LEF:Ass4})-(\ref{LEF:Ass5}) we have
+%%
+%\begin{align*}
+%	s' \composeL r' \confines \lmod
+%\end{align*}
+%%
+%as required.\\
+%
+%\noindent\textbf{Case 2. }$(s', r') \in a[s, r]$\\
+%From the definitions of $a[s, r]$, $a[s \composeL r]$ and from the assumption of case 2. we have $s' \composeL r' = a[s \composeL r]$. The rest of the proof is identical to that of case 1.
+%\end{proof}
+%\end{lemma}
+%%
+%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%SHIFT STUFF
+%
+%\begin{lemma}[]\label{lem:action-em}
+%For all $\lmod', \lmod, \gmod \in \AMods$,  $\ca{} \in \dom{\lmod}$, $a \in \lmod(\ca{})$, $s, r \in \LStates$ and $n \in \Nats^{+}$
+%%
+%\[
+%\begin{array}{@{} l @{\hspace{-5cm}} l @{}} 
+%	\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'} /| \m{potential}(a, s \composeL r) \implies &\\
+%	& \m{visible}(a, s) /| \exsts{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'} |/\\
+%	& \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'} 
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%Pick an arbitrary $\lmod', \lmod, \gmod \in \AMods$,  $\ca{} \in \dom{\lmod}$, $a \in \lmod(\ca{})$, $s, r \in \LStates$ and $n \in \Nats^{+}$ such that
+%%
+%\begin{align}
+%	\extendsAMUpto{\lmod, \gmod}{n}{s}{r}{\lmod'} /| \m{potential}(a, s \composeL r) \label{LVN:Ass1}
+%\end{align}
+%%(\ref{LVN:Ass})
+%Then since $a \in \lmod(\ca{})$, from (\ref{LVN:Ass1}) we have:
+%%
+%\begin{align*}
+%	& \m{reflected}(a, s \composeL r, \lmod'(\ca{})) |/ \\
+%	& \neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r] - s}{\lmod'} 
+%\end{align*}
+%%
+%If the second disjunct is the case then the desired result holds trivially. On the other hand, in the case of the first disjunct we have:
+%%
+%\begin{align}
+%	\m{reflected}(a, s \composeL r, \lmod'(\ca{})) \label{LVN:Ass2}
+%\end{align}	
+%%(\ref{LVN:Ass})
+%On the other hand from (\ref{LVN:Ass1}) and the definition of $\m{potential}$ and by \lem~\ref{lem:nonEmptyOverlap} we know there exists $l$ such that 
+%%
+%\begin{align*}
+%	& \fst{a} < s \composeL r \composeL l /| \null\\
+%	& \exsts{l'} \fst{\updateFP{a}} \composeL l' = s \composeL r /| \snd{\updateFP{a}} \compatible l'
+%\end{align*}
+%%
+%and thus from (\ref{LVN:Ass2}) we know there exists $a' \in \lmod_1(\ca{})$ such that: 
+%%
+%\begin{align*}
+%	& \updateFP{a'} = \updateFP{a} /|\\
+%	& \fst{a'} < s \composeL r \composeL l /| \null\\
+%	& \exsts{l'} \fst{\updateFP{a'}} \composeL l' = s \composeL r /| \snd{\updateFP{a'}} \compatible l'
+%\end{align*}
+%%
+%and consequently from the definition of $\m{potential}$ and \lem~\ref{lem:nonEmptyOverlap} we have: 
+%%
+%\begin{align}
+%	\updateFP{a'} = \updateFP{a} /| \m{potential}(a', s \composeL r) /| \fst{a'} \meetL s \composeL r \not= \emptyset \label{LVN:Ass3}
+%\end{align}
+%%(\ref{LVN:Ass})
+%There are now two cases to consider:\\
+%
+%\noindent\textbf{Case 1. }$\neg\m{visible}(a', s)$\\
+%Since $\updateFP{a'} = \updateFP{a}$, from the definition of $a[s \composeL r]$ we know $a[s \composeL r] = a'[s \composeL r]$. Thus, from (\ref{LVN:Ass1}), (\ref{LVN:Ass3}), the assumption of case 1. and the definition of $\m{visible}$ we have:
+%%
+%\begin{align*}
+%	\neg\m{visible}(a, s) /| \extendsAMUpto{\lmod, \gmod}{(n-1)}{s}{a[s \composeL r]-s}{\lmod'}
+%\end{align*}
+%%
+%as required.\\
+%
+%\noindent\textbf{Case 2. }$\m{visible}(a', s)$\\
+%Since $\updateFP{a'} = \updateFP{a}$, from the definition of $a[s, r]$ and (\ref{LVN:Ass3}) we know $a[s, r] = a'[s, r]$. Thus, from (\ref{LVN:Ass1}), (\ref{LVN:Ass3}), the assumption of case 2. and the definition of $\m{visible}$ we have:
+%%
+%\begin{align*}
+%	\m{visible}(a, s) /| \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}
+%\end{align*}
+%%
+%Finally from (\ref{LVN:Ass1}) and (\ref{LVN:Ass3}) we know that $a[s, r]$ is defined and non-empty. Thus from above we have:
+%%
+%\begin{align*}
+%	\m{visible}(a, s) /| \exsts{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod'}
+%\end{align*}
+%%
+%as required.
+%\end{proof}
+%\end{lemma}
+%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%EXTEND
+%%
+%\begin{lemma}[\extendRule-Closure-1]\label{lem:extend-closure}
+%%
+%For all $\lmod{}, \lmod_{e} \in \AMods$, $g, s_e \in \LStates$ and $\fence{}, \fence{e} \in \pset{\LStates}$,
+%\[
+%\begin{array}{l l}
+%	g \in \fence{} /| \fence{} \strictfences \lmod /| s_e \in \fence{e} /| \fence{e} \strictfences \lmod_e 
+%	\implies & \\
+%	& \hspace{-2cm} \extendsAM{\lmod \cup \lmod_{e}, (\lmod, \fence{}) + (\lmod_{e}, \fence{e}) }{s_{e}}{g}{\lmod_{e}}
+%\end{array}
+%\]
+%%
+%where
+%%
+%\[
+%\begin{array}{@{} l  l @{}}
+%	\left( (\lmod, \fence{}) + (\lmod_{e}, \fence{e}) \right)(\ca{}) \eqdef  & 
+%	\left\{
+%		(f', a[f']) \;\;\middle|
+%		\begin{array}{ l @{}}
+%			\left(a \in \lmod(\ca{}) |/ a \in \lmod_{e}(\ca{})  \right) /| \\
+%			f' \in \fence{} \composeL \fence{e} /| \m{enabled}(a, f')	
+%		\end{array}		  
+%	\right\}\\
+%\end{array}
+%\]
+%%
+%and
+%%
+%\[
+%\begin{array}{@{} l l @{}}
+%	\fence{} \composeL \fence{e} \eqdef & 
+%	\left\{
+%		f \composeL f_{e} \;\;\middle|\;\; 
+%		f \in \fence{} /| f_e \in \fence{e}
+%%		\begin{array}{l @{\hspace{5pt}} l @{}}
+%%			\exsts{\fence{}, \fence{e}} & g \in \fence{} /| f \in \fence{} /| \fence{} \strictfences \lmod /| \\
+%%			& s_{e} \in \fence{e} /| f_{e} \in \fence{e} /| \fence{e} \strictfences \lmod_{e} 
+%%		\end{array}
+%	\right\}
+%\end{array}
+%\]
+%%
+%\begin{proof} Pick an arbitrary $\lmod, \lmod_e \in \AMods$, $g, s_e \in \LStates$ and $\fence{}, \fence{e} \in \pset{\LStates}$ such that 
+%%
+%\begin{align}
+%	& g \in \fence{} /|  s_e \in \fence{e}   \label{EC:Ass1}\\
+%	& \fence{} \strictfences \lmod /| \fence{e} \strictfences \lmod_e \label{EC:Ass2}
+%\end{align} 
+%%
+%From the definition of $\downarrow$, it then suffices to show
+%%
+%\begin{align}
+%	& \lmod_e \subseteq \lmod \cup \lmod_e \label{EC:Goal1}\\
+%	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_e, (\lmod, \fence{}) + (\lmod_{e}, \fence{e})}{n}{s_e}{g}{\lmod_e} \label{EC:Goal2}
+%\end{align}
+%%
+%\noindent\textbf{RTS. (\ref{EC:Goal1})} \\
+%This holds trivially from the definition of $\lmod \cup \lmod_e$.\\
+%
+%\noindent\textbf{RTS. (\ref{EC:Goal2})} \\
+%Rather than proving (\ref{EC:Goal2}) directly, we first establish the following.
+%%
+%\begin{align}
+%	& \for {n \in \Nats} \for{g, s_e \in \LStates} \nonumber\\
+%	& \quad g \in \fence{} /| s_e \in \fence{e} \implies \extendsAMUpto{\lmod \cup \lmod_e, (\lmod, \fence{}) + (\lmod_{e}, \fence{e})}{n}{s_e}{g}{\lmod_e} \label{EC:Goal3}
+%\end{align}
+%%
+%We can then despatch (\ref{EC:Goal2}) from (\ref{EC:Ass1}) and (\ref{EC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{EC:Ass1}) and (\ref{EC:Goal3}) we have $\extendsAMUpto{\lmod \cup \lmod_e, (\lmod, g) + (\lmod_{e}, s_e)}{n}{s_e}{g}{\lmod_e}$ as required. \\
+%
+%\noindent\textbf{RTS. (\ref{EC:Goal3})} \\
+%Let $\gmod = (\lmod, \fence{}) + (\lmod_e, \fence{e})$. We proceed by induction on the number of steps $n$.\\
+%
+%%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+%\noindent\textbf{Base case }$n=0$\\
+%Pick an arbitrary $g, s_e \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_e, \gmod}{0}{s_e}{g}{\lmod_e}$ which follows trivially from the definition of $\downarrow_0$.\\
+%
+%
+%\noindent\textbf{Inductive case }\\
+%Pick an arbitrary $n \in \Nats$ and $g, s_e \in \LStates$ such that
+%%
+%\begin{align}
+%	& g \in  \fence{} \label{LEC:Ass1}\\
+%	& s_e \in \fence{e} \label{LEC:Ass2}\\
+%%	& \gmod = (\lmod, g) + (\lmod_{e}, s_e) \label{LEC:Ass3}\\
+%	& \tag{I.H} \for{g', s_e'}  g' \in \fence{} /| s'_e \in \fence{e} \implies \extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e'}{g'}{\lmod_{e}} \label{LEC:IH}
+%\end{align}
+%%
+%\textbf{RTS.}
+%%
+%\begin{align}
+%	& 
+%	\V{\ca{}}  \V{a\in \lmod_e(\ca{})} \nonumber \\
+%  &\quad (\m{potential}(a, s_e \composeL g) /| \m{visible}(a, s_e) => \nonumber\\
+%  & \quad\qquad\for{(s', r') \in a[s_e, g]} \extendsAMUpto{\lmod \cup \lmod_e, \gmod}{(n-1)}{s'}{r'}{\lmod_e}) \label{LEC:Goal0}\\
+%% 
+%	&\quad (\m{potential}(a, s_e \composeL g) /| \neg\m{visible}(a, s_e) => \nonumber\\
+%  & \quad\qquad \extendsAMUpto{\lmod \cup \lmod_e, \gmod}{(n-1)}{s_e}{a[s_e \composeL g] - s_e}{\lmod_e}) \label{LEC:Goal1}\\
+%%   
+%  &\quad \m{enabled}(a,s_e \composeL g)
+%  => (s_e \composeL g, a[s_e \composeL g])\in \gmod(\ca{})) \label{LEC:Goal2}\\
+%%  
+%  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_e \right) (\ca{})}
+%  \m{potential}(a,s_e \composeL g) =>\null \nonumber \\
+%  &\ \m{reflected}(a, s_e \composeL g,\lmod_e(\ca{})) |/\null \nonumber \\
+%%  
+%  &\ \neg\m{visible}(a, s_e) /| \extendsAMUpto{\lmod \cup \lmod_e, \gmod}{(n-1)}{s_e}{a[s_e \composeL g] - s_e}{\lmod_e}  \label{LEC:Goal3}
+%\end{align}
+%%
+%%
+%
+%\noindent\textbf{RTS. \ref{LEC:Goal0}}\\
+%Pick an arbitrary $\ca{}$, $a \in \lmod_e(\ca{})$ and $(s', r')$ such that
+%%
+%\begin{align}
+%	& \m{potential}(a, s_e \composeL g) /| \m{visible}(a, s_e) \label{LEC:Ass5}\\
+%	& (s', r') \in a[s_e, g] \label{LEC:Ass6}
+%\end{align}
+%%(\ref{LEC:Ass})
+%Since from (\ref{LEC:Ass5}) and the definition of $\m{potential}$ we have $s_e \composeL g \meetL \fst{a} \not= \emptyset$ and consequently, $s_e \meetL \fst{a} \not= \emptyset$, from (\ref{LEC:Ass2}) we have:
+%%
+%\begin{align}
+%	\fst{\updateFP{a}} \leq s_e /| \fst{\updateFP{a}} \disjoint g\label{LEC:Ass7}
+%\end{align}
+%% 
+%From (\ref{LEC:Ass5}), (\ref{LEC:Ass7}) and the definition of $\m{potential}$ we have:
+%%
+%\begin{align}
+%	\m{potential}(a, s_e) \label{LEC:Ass8}
+%\end{align}
+%%
+%On the other hand, from (\ref{LEC:Ass6}), (\ref{LEC:Ass7}) and the definitions of $a[s_e, g]$ and $\disjoint$, we have: 
+%%
+%\begin{align}
+%	& r' = g \label{LEC:Ass9}\\
+%	& a[s_e] = s' \label{LEC:Ass10}
+%\end{align}
+%%
+%Consequently, from (\ref{EC:Ass2}), (\ref{LEC:Ass2}), (\ref{LEC:Ass5}), (\ref{LEC:Ass8}), (\ref{LEC:Ass10}) and the definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	s' \in  \fence{e}  \label{LEC:Ass11}
+%\end{align}
+%%
+%Finally, from (\ref{LEC:Ass1}), (\ref{LEC:Ass11}) and (\ref{LEC:IH}) we have:
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s'}{g}{\lmod_e}
+%\end{align*}
+%%
+%and consequently from (\ref{LEC:Ass9})
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s'}{r'}{\lmod_e}
+%\end{align*}
+%%
+%as required.\\
+%%
+%%
+%%
+%
+%\noindent\textbf{RTS. \ref{LEC:Goal1}}\\
+%Pick an arbitrary $\ca{}$, $a \in \lmod_e(\ca{})$ such that
+%%
+%\begin{align}
+%	& \m{potential}(a, s_e \composeL g) /| \neg\m{visible}(a, s_e) \label{LEC:Ass15}
+%\end{align}
+%%(\ref{LEC:Ass})
+%Since from (\ref{LEC:Ass15}) and the definition of $\m{potential}$ we have $s_e \composeL g \meetL \fst{a} \not= \emptyset$ and consequently, $s_e \meetL \fst{a} \not= \emptyset$, from (\ref{LEC:Ass2}) we have:
+%%
+%\begin{align}
+%	\fst{\updateFP{a}} \leq s_e /| \fst{\updateFP{a}} \disjoint g \label{LEC:Ass16}
+%\end{align}
+%% 
+%There are now two cases to consider: either $\fst{\updateFP{a}} > \unitL$; or $\fst{\updateFP{a}} = \unitL$.
+%
+%If $\fst{\updateFP{a}} > \unitL$, then from (\ref{LEC:Ass16}) and the definition of $\m{visible}$ we have $\m{visible}(a, s_e)$. However, this contradicts our assumption in (\ref{LEC:Ass15}) and hence this is not a valid case.
+%
+%On the other hand, if $\fst{\updateFP{a}} = \unitL$, then from (\ref{LEC:Ass15}), (\ref{LEC:Ass16}) and the definition of $\m{potential}$ we have:
+%%
+%\begin{align}
+%	\m{potential}(a, s_e) \label{LEC:Ass18}
+%\end{align}
+%%
+%From (\ref{LEC:Ass16}), the definitions of $a[g]$ and $\disjoint$ and since $\fst{\updateFP{a}} = \unitL$, we have: 
+%%
+%\begin{align}
+%	& a[s_e] = s_e \composeL \snd{\updateFP{a}} \label{LEC:Ass19}\\
+%	& a[s_e \composeL g] = s_e \composeL g \composeL \snd{\updateFP{a}} \label{LEC:ass20}
+%\end{align}
+%%
+%Consequently, since $\fst{\updateFP{a}} = \unitL$, from (\ref{EC:Ass2}), (\ref{LEC:Ass2}), (\ref{LEC:Ass18}), (\ref{LEC:Ass19}) and the definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	s_e \composeL \snd{\updateFP{a}} \in \fence{e}  \label{LEC:ass21}
+%\end{align}
+%%
+%From (\ref{LEC:Ass1}), (\ref{LEC:ass21}) and (\ref{LEC:IH}) we have:
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e \composeL \snd{\updateFP{a}}}{g}{\lmod_e}
+%\end{align*}
+%%
+%and consequently, from \lem~\ref{lem:forget-closure}
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e} {g \composeL \snd{\updateFP{a}}}{\lmod_e}
+%\end{align*}
+%%
+%and finally from (\ref{LEC:ass20})
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e}{a[s_e  \composeL g] - s_e}{\lmod_e}
+%\end{align*}
+%%
+%as required.\\
+%%
+%%
+%%
+%
+%\noindent\textbf{RTS. \ref{LEC:Goal2}}\\
+%Pick an arbitrary $\ca{}$, $a \in \lmod_e(\ca{})$ such that
+%%
+%\begin{align}
+%	& \m{enabled}(a, s_e \composeL g) \label{LEC:Ass20}
+%\end{align}
+%% (\ref{LEC:Ass})
+%Then from (\ref{LEC:Ass1})-(\ref{LEC:Ass2}) and the definition of $(\lmod, \fence{}) + (\lmod_e, \fence{e})$ we have:
+%%
+%\begin{align*}
+%	(s_e \composeL g, a[s_e \composeL g]) \in \gmod
+%\end{align*}
+%%
+%as required.\\
+%%
+%%
+%%
+%
+%\noindent\textbf{RTS. \ref{LEC:Goal3}}\\
+%Pick an arbitrary $\ca{}$, $a \in \left(\lmod \cup \lmod_e\right)(\ca{})$ such that
+%%
+%\begin{align}
+%	& \m{potential}(a, s_e \composeL g)  \label{LEC:Ass25}
+%\end{align}
+%%(\ref{LEC:Ass})
+%Since $a \in \lmod_e(\ca{}) |/  a \in\lmod(\ca{})$, there are two cases to consider. 
+%
+%If the first disjunct is the case, the desired result holds trivially since from the definition of $\m{reflected}$ and (\ref{LEC:Ass25}) we have $\m{reflected}(a, s_e \composeL g, \lmod_e(\ca{})$ as required.
+%
+%On the other hand, if the second disjunct is the case, then since from (\ref{LEC:Ass25}) and the definition of $\m{potential}$ we have $s_e \composeL g \meetL \fst{a} \not= \emptyset$ and consequently, $g \meetL \fst{a} \not= \emptyset$, from (\ref{LEC:Ass1}) we have:
+%%
+%\begin{align}
+%	\fst{\updateFP{a}} \leq g /| \fst{\updateFP{a}} \disjoint s_e \label{LEC:Ass27}
+%\end{align}
+%% 
+%From (\ref{LEC:Ass25}), (\ref{LEC:Ass27}) and the definition of $\m{potential}$ we have:
+%%
+%\begin{align}
+%	\m{potential}(a, g) \label{LEC:Ass28}
+%\end{align}
+%%
+%Since either $\fst{\updateFP{a}} = \unitL$ or $\fst{\updateFP{a}} > \unitL$, from (\ref{LEC:Ass27}) and the definition of $\m{visible}$ we have:
+%%
+%\begin{align}
+%	\m{visible}(a, g) |/ \fst{\updateFP{a}} = \unitL \label{LEC:Ass29}
+%\end{align}
+%%
+%On the other hand, from (\ref{LEC:Ass27}) and the definitions of $a[s_e \composeL g]$ and $\disjoint$, we know there exists $g'$ such that: 
+%%
+%\begin{align}
+%	& a[s_e \composeL g] = s_e \composeL g' \label{LEC:Ass30}\\
+%	& a[g] = g'  \label{LEC:Ass31}
+%\end{align}
+%%
+%Consequently, from (\ref{EC:Ass2}), (\ref{LEC:Ass1}), (\ref{LEC:Ass28}), (\ref{LEC:Ass29}), (\ref{LEC:Ass30}) and the definition of $\strictfences$ we have:
+%%
+%\begin{align}
+%	g' \in \fence{}  \label{LEC:Ass32}
+%\end{align}
+%%
+%Finally, from (\ref{LEC:Ass2}), (\ref{LEC:Ass32}), (\ref{LEC:IH}) we have:
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e}{g'}{\lmod_e}
+%\end{align*}
+%%
+%and consequently from (\ref{LEC:Ass30})
+%%
+%\begin{align*}
+%	\extendsAMUpto{\lmod \cup \lmod_{e}, \gmod}{(n-1)}{s_e}{a[s_e \composeL g] - s_e}{\lmod_e}
+%\end{align*}
+%%
+%as required.
+%\end{proof}
+%\end{lemma}
+%%

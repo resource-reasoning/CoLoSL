@@ -1,0 +1,734 @@
+\begin{lemma}[\shiftRule-Fence]\label{lem:shift-fence}
+For all $\lmod_1, \lmod_2 \in \AMods$, $s, s', r \in \LStates$ and $a \in \m{rg}(\lmod_1)$:
+%
+\[
+	\lmod_1 \weakenI{\{s\}} \lmod_2 /| \left(s' \in a(s) \lor (s', -) \in a[s, r] \right) \implies \lmod_1 \weakenI{\{s'\}} \lmod_2
+\]
+%
+\begin{proof}
+Pick an arbitrary $\lmod_1, \lmod_2 \in \AMods$, $s, s', r \in \LStates$ and $a \in \m{rg}(\lmod_1)$ such that:
+%
+\begin{align}
+	\lmod_1 \weakenI{\{s\}} \lmod_2 \label{LMS:Ass1}
+\end{align}
+%(\ref{LMS:Ass})
+\textbf{RTS. } $\lmod_1 \weakenI{\{s'\}} \lmod_2$.\\
+There are two cases to consider:\\
+\textbf{Case 1. }$s' \in a(s)$\\
+From the definition of $\weakenI{\{s\}}$ and (\ref{LMS:Ass1}) we know there exists a fence $\fence{}$ such that:
+%
+\begin{align}
+	& s \in \fence{} \label{LMS:Ass3}\\
+	& \fence{} \fences \lmod_1 \label{LMS:Ass4}\\
+	\for{l \in \fence{}} \for{\ca{}}& \for{a \in \lmod_2(\ca{})} \m{reflected}(a, l, \lmod_1(\ca{})) /| \null \nonumber\\
+	& \for{a \in \lmod_1(\ca{})} a(l) \text{ is defined } /| \m{visible}(a, l) \implies \m{reflected}(a, l, \lmod_2(\ca{})) \label{LMS:Ass5}
+\end{align}
+%(\ref{LMS:Ass})
+By definition of $\fences$ and from (\ref{LMS:Ass3})-(\ref{LMS:Ass4}) and assumption of case 1. we have: 
+%
+\begin{align}
+	& s' \in \fence{} \label{LMS:Ass6}
+\end{align}
+%
+Finally by definition of $\weakenI{\{s'\}}$ and (\ref{LMS:Ass4})-(\ref{LMS:Ass6}) we have
+%
+\begin{align*}
+	\lmod_1 \weakenI{\{s'\}} \lmod_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Case 2. }$(s', -) \in a[s, r]$\\
+%From the definition of $a[s, r]$ we know :
+%\begin{align*}
+%	(s' = s ) |/ 
+%	\left(
+%	\begin{array}{@{}l l@{}}
+%		\exsts{p_s ? \unitL}\exsts{p_r, s'', r''} & s = p_s \composeL s''\\
+%		& r = p_r \composeL r'' \\
+%		& \fst{\updateFP{a}} = p_s \composeL p_r \\
+%		& s' = \snd{\updateFP{a}} \composeL s'' \\
+%		& s' \composeL r'' \text{ is defined}
+%	\end{array} 
+%	\right)	
+%\end{align*}
+%
+From the definitions of $a[s, r]$ and $a(s)$ and from the assumption of the case we know $s' \in a(s)$. The rest of the proof is identical to that of case 1.
+\end{proof}
+\end{lemma}
+%
+%
+%
+\begin{lemma}[\shiftRule-Closure-1]\label{lem:shift-closure}
+%
+For all $\lmod_1, \lmod_2, \lmod \in \AMods$ and $s, r \in \LStates$,
+%
+\[
+	\extendsAM{\lmod}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAM{\lmod \cup \lmod_2}{s}{r}{\lmod_2}
+\]
+%
+\begin{proof} Pick an arbitrary $\lmod_1, \lmod_2, \lmod \in \AMods$ and $s, r \in \LStates$ such that 
+%
+\begin{align}
+	& \extendsAM{\lmod}{s}{r}{\lmod_1} \label{SC:Ass1}\\
+	& \lmod_1 \weakenI{\{s\}} \lmod_2 \label{SC:Ass2}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_2 \subseteq \lmod \cup \lmod_2\label{SC:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_2}{n}{s}{r}{\lmod_2} \label{SC:Goal2}
+\end{align}
+%
+\noindent\textbf{RTS. (\ref{SC:Goal1})} \\
+This holds trivially from the definition of $\lmod \cup \lmod_2$.\\
+
+\noindent\textbf{RTS. (\ref{SC:Goal2})} \\
+Rather than proving (\ref{SC:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	& \for {n \in \Nats} \for{s, r \in \LStates} \nonumber\\
+	& \quad \extendsAMUpto{\lmod}{n}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2}{n}{s}{r}{\lmod_2} \label{SC:Goal3}
+\end{align}
+%
+We can then despatch (\ref{SC:Goal2}) from (\ref{SC:Ass1}), (\ref{SC:Ass2}) and (\ref{SC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{SC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod_1}$ and consequently from (\ref{SC:Ass2}) and (\ref{SC:Goal3}) we derive $\extendsAMUpto{\lmod \cup \lmod_2}{n}{s}{r}{\lmod_2} $ as required. \\
+
+\noindent\textbf{RTS. (\ref{SC:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s, r \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_2}{0}{s}{r}{\lmod_2} $ which follows trivially from the definition of $\downarrow_0$.\\
+
+
+\noindent\textbf{Inductive Case}\\
+Pick an arbitrary $s, r \in \LStates$ such that:
+\begin{align}
+	&\extendsAMUpto{\lmod}{n}{s}{r}{\lmod_1} \label{LSC:Ass1}\\
+	&\lmod_1 \weakenI{\{s\}} \lmod_2 \label{LSC:Ass2}\\
+%		
+	&	\for{s, r \in \LStates}  \nonumber\\
+	& \tag{I.H} 
+		\quad \extendsAMUpto{\lmod}{(n-1)}{s}{r}{\lmod_1} /| \lmod_1 \weakenI{\{s\}} \lmod_2 \implies \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s}{r}{\lmod_2} \label{LSC:IH}
+\end{align}
+%
+\textbf{RTS. } 
+%
+\begin{align}
+%	& 
+%	\V{\ca{}}  \V{a\in \lmod_2(\ca{})} \nonumber \\
+%  &\quad (\m{potential}(a,s \composeL r) => \nonumber\\
+%  & \quad\qquad\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{(n-1)}{s'}{r'}{\lmod_2}) \label{LSC:Goal1} /| \\
+%%   
+%  &\quad (\m{enabled}(a,s \composeL r)
+%  => (s\composeL r, a[s \composeL r])\in \gmod(\ca{}))
+%  /|\null \label{LSC:Goal2}\\
+%%  
+  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_2 \right) (\ca{})}
+  \m{potential}(a,s \composeL r) =>\null \nonumber \\
+  & \quad
+  \begin{array}{@{} l @{}}
+		\left(\m{reflected}(a,s \composeL r, \lmod_2(\ca{})) |/ \neg\m{visible}(a,s) \ \right) /| \\
+		\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+ 	\end{array} \label{LSC:Goal3}
+\end{align}
+%
+Pick an arbitrary $\ca{}$ and $a = (p, q, c) \in \left(\lmod \cup \lmod_2 \right)(\ca{})$ such that:
+%
+\begin{align}
+	\m{potential}(a, s \composeL r)\label{LSC:Ass8}
+\end{align}
+%
+Since either $a \in \lmod(\ca{})$ or $a \in \lmod_2(\ca{})$, there are two cases to consider:\\
+
+\noindent\textbf{Case 1. } $a \in \lmod(\ca{})$.\\
+%If $a \in \lmod_2 (\ca{})$, then it is trivially the case that $\m{reflected}(a, s \composeL r, \lmod_2(\ca{}))$. 
+From (\ref{LSC:Ass1}) and (\ref{LSC:Ass8}) we have:
+%
+\begin{align}
+	& \begin{array}{@{} l @{}}
+		\left(\m{reflected}(a, s \composeL r, \lmod_1(\ca{})) |/ \neg\m{visible}(a, s) \ \right) /| \\
+		\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\end{array}
+	\label{LSC:Ass20}
+\end{align}
+%
+Pick an arbitrary $(s', r')$ such that 
+%
+\begin{align}
+	(s', r') \in a[s, r] \label{LSC:Ass21}
+\end{align}
+%
+Then from (\ref{LSC:Ass20}) we have:
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\label{LSC:Ass22}
+\end{align}
+%
+On the other hand, from (\ref{LSC:Ass21}) and \lem~\ref{lem:shift-fence} we have:
+%
+\begin{align}
+	\lmod_1 \weakenI{\{s'\}} \lmod_2 
+	\label{LSC:Ass23}
+\end{align}
+%
+Consequently, from (\ref{LSC:Ass22}), (\ref{LSC:Ass23}) and (\ref{LSC:IH}) we have:
+%
+\begin{align*}
+	\extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+\end{align*}
+%
+and thus from (\ref{LSC:Ass21}) we have
+%
+\begin{align}
+	\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+	\label{LSC:Ass24}
+\end{align}
+%
+Since either $\m{visible}(a, s)$ or $\neg\m{visible}(a, s)$, there are two cases to consider:\\
+
+\noindent\textbf{Case 1.1. } $ \neg \m{visible}(a, s)$\\
+From the assumption of case 1.1. and (\ref{LSC:Ass24}) we then have
+%
+\begin{align*}
+	& \neg\m{visible}(a, s) /| \\
+	&\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+\end{align*}
+%
+as required.\\
+%
+%
+%
+%
+
+\noindent\textbf{Case 1.2. } $\m{visible}(a, s)$\\
+From (\ref{LSC:Ass20}) and the assumption of case 1.2. we then have
+%
+\begin{align}
+	\m{reflected}(a, s \composeL r, \lmod_1(\ca{}))
+	\label{LSC:Ass25}
+\end{align}
+%
+Pick an arbitrary $l \in \LStates$ such that:
+%
+\begin{align}
+	p \composeL c \leq s \composeL r \composeL l \label{LSC:Ass9}
+\end{align}
+%
+Then from (\ref{LSC:Ass25}) and the definition of $\m{reflected}$ we have:
+%(\ref{LSC:Ass})
+\begin{align}
+	\exsts{a', c'} a' = (p, q, c') \land a' \in \lmod_1(\ca{}) \land  p \composeL c' \leq s \composeL r \composeL l \label{LSC:Ass10}
+\end{align}
+%(\ref{LSC:Ass})
+From (\ref{LSC:Ass8}) and by definition of $\m{potential}$ we know $a[s \composeL r]$ is defined; from (\ref{LSC:Ass10}), and the definition of $a'[s \composeL r]$ we know that $a'[s \composeL r]$ is also defined. Consequently, from the definition of $a'(s)$, we know $a'(s)$ is also defined. Thus, from the definition of $\m{visible}$, (\ref{LSC:Ass10}) and the assumption of case 1.2 we have 
+%
+\begin{align}
+	\m{visible}(a', s)
+	\label{LSC:Ass26}
+\end{align}
+%
+Thus from (\ref{LSC:Ass2}), (\ref{LSC:Ass10}), (\ref{LSC:Ass26}) and from the definition of $\weakenI{\{s\}}$ we have 
+%
+\begin{align}
+	\exsts{a'', c''} a'' = (p, q, c'') \land a'' \in \lmod_2(\ca{}) \land  p \composeL c'' \leq s \composeL r \composeL l  \label{LSC:Ass11}
+\end{align} 
+%
+Finally, from (\ref{LSC:Ass9}), (\ref{LSC:Ass10}), (\ref{LSC:Ass11}) and by definition of $\m{reflected}$ we have:
+%
+\begin{align}
+	\m{reflected}(a, s \composeL r, \lmod_2(\ca{}))
+	\label{LSC:Ass27}
+\end{align} 
+%
+From (\ref{LSC:Ass24}) and (\ref{LSC:Ass27}) we have
+\begin{align*}
+	&\m{reflected}(a, s \composeL r, \lmod_2(\ca{})) /| \\
+	&\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+\end{align*}
+%
+as required.\\
+%(\ref{LSC:Ass})
+%
+%
+%
+%
+
+\noindent\textbf{Case 2. } $a \in \lmod_2(\ca{})$.\\
+From the assumption of the case we trivially have
+\begin{align}
+	\m{reflected}(a, s \composeL r, \lmod_2(\ca{}))
+	\label{LSC:Ass30}
+\end{align}
+%
+Pick an arbitrary $s', r' \in \LStates$ such that:
+\begin{align}
+	&(s', r') \in a[s, r] \label{LSC:Ass4}
+\end{align}
+%%
+From (\ref{LSC:Ass8}), the definition of $\m{potential}$ and by \lem~\ref{lem:nonEmptyOverlap} we know there exists $l$ such that 
+%
+\begin{align*}
+	& p \composeL c < s \composeL r \composeL l /| \null\\
+	& \exsts{l'} p \composeL l' = s \composeL r /| q \compatible l'
+\end{align*}
+%
+and thus from (\ref{LSC:Ass2}) we know there exists $c', a'$  such that:
+%
+\begin{align*}
+	& a' = (p, q, c') \in \lmod_1(\ca{}) /|\\
+	& p \composeL c' < s \composeL r \composeL l /| \null\\
+	& \exsts{l'} p \composeL l' = s \composeL r /| q \compatible l'
+\end{align*}
+%
+and consequently from the definition of $\m{potential}$ and \lem~\ref{lem:nonEmptyOverlap} we have: 
+%
+\begin{align}
+	\m{potential}(a', s \composeL r) \label{LSC:Ass4-1}
+\end{align}
+%(\ref{LMC:Ass})
+Since $a = (p, q, c)$ and $a' = (p, q, c')$ and from the definition of $a[s, r]$ we know $a[s, r] = a'[s, r]$. Thus, from (\ref{LSC:Ass1}), (\ref{LSC:Ass8}), (\ref{LSC:Ass4}) and (\ref{LSC:Ass4-1}) we have:
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1} \label{LSC:Ass5}
+\end{align}
+%
+From (\ref{LSC:Ass2}), (\ref{LSC:Ass4}), \lem~\ref{lem:shift-fence} and since $a[s, r] = a'[s, r]$, we have
+%
+\begin{align}
+	\lmod_1 \weakenI{\{s'\}} \lmod_2 \label{LSC:Ass6}
+\end{align}
+%
+Finally, from (\ref{LSC:Ass5}), (\ref{LSC:Ass6}) and (\ref{LSC:IH}) we have:
+%
+\begin{align*}
+	\extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+\end{align*}
+%
+Thus from (\ref{LSC:Ass4}) we have
+%
+\begin{align}
+	\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+	\label{LSC:Ass31}
+\end{align}
+%
+and consequently, from (\ref{LSC:Ass30}) and (\ref{LSC:Ass31}) we have
+%
+\begin{align*}
+	&\m{reflected}(a, s \composeL r, \lmod_2(\ca{})) /| \\
+	&\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_2}
+\end{align*}
+%
+as required.
+%
+%
+%
+%
+
+
+\end{proof}
+\end{lemma}
+%
+%
+%
+%
+%
+%
+\begin{lemma}[\shiftRule-Closure-2]\label{lem:shift-closure-2}
+For all $\lmod_0, \lmod_1, \lmod_2, \lmod \in \AMods$ and  $s_1, r_1, s_0, r_0 \in \LStates$
+%
+\[
+\begin{array}{@{} l @{\hspace{-1cm}} l @{} } 
+	\extendsAM{\lmod}{s_1}{r_1}{\lmod_1} /| \lmod_1 \weakenI{\{s_1\}} \lmod_2 /| \null & \\
+	\extendsAM{\lmod}{s_0}{r_0}{\lmod_0} /| s_1 \composeL r_1 = s_0 \composeL r_0 \implies & \\
+	&\extendsAM{\lmod \cup \lmod_2}{s_0}{r_0}{\lmod_0}
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $\lmod_0, \lmod_1, \lmod_2, \lmod \in \AMods$ and $s_1, r_1, s_0, r_0 \in \LStates$ such that 
+%
+\begin{align}
+	& \extendsAM{\lmod}{s_1}{r_1}{\lmod_1} \label{SC2:Ass1}\\
+	& \lmod_1 \weakenI{\{s_1\}} \lmod_2 \label{SC2:Ass2}\\
+	& \extendsAM{\lmod}{s_0}{r_0}{\lmod_0} \label{SC2:Ass3}\\
+	& s_1 \composeL r_1 = s_0 \composeL r_0 \label{SC2:Ass4}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_0 \subseteq \lmod \cup \lmod_2\label{SC2:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_2}{n}{s_0}{r_0}{\lmod_0} \label{SC2:Goal2}
+\end{align}
+%
+\noindent\textbf{RTS. (\ref{SC2:Goal1})} \\
+From (\ref{SC2:Ass3}) and the definition of $\downarrow$ we have $\lmod_0 \subseteq \lmod$ and consequently $\lmod_0 \subseteq \lmod \cup \lmod_2$ as required.\\
+
+\noindent\textbf{RTS. (\ref{SC2:Goal2})} \\
+Rather than proving (\ref{SC2:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	& \for {n \in \Nats} \for{s_1, r_1, s_0, r_0 \in \LStates} \nonumber\\
+	& \quad \extendsAMUpto{\lmod}{n}{s_1}{r_1}{\lmod_1} /| \lmod_1 \weakenI{\{s_1\}} \lmod_2 /| \nonumber\\
+	& \quad \extendsAMUpto{\lmod}{n}{s_0}{r_0}{\lmod_0} /| s_1 \composeL r_1 = s_0 \composeL r_0 \implies \nonumber\\
+	& & \hspace{-3cm}  \extendsAMUpto{\lmod \cup \lmod_2}{n}{s_0}{r_0}{\lmod_0} \label{SC2:Goal3}
+\end{align}
+%
+We can then despatch (\ref{SC2:Goal2}) from (\ref{SC2:Ass1})-(\ref{SC2:Ass4}) and (\ref{SC2:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{SC2:Ass1}), (\ref{SC2:Ass3}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod}{n}{s_1}{r_1}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_0}{r_0}{\lmod_0}$ and consequently from (\ref{SC2:Ass2}), (\ref{SC2:Ass4}) and (\ref{SC2:Goal3}) we derive $\extendsAMUpto{\lmod \cup \lmod_2}{n}{s_0}{r_0}{\lmod_0} $ as required. \\
+
+\noindent\textbf{RTS. (\ref{SC2:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s_1, r_1, s_0, r_0 \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_2}{0}{s_0}{r_0}{\lmod_0} $ which follows trivially from the definition of $\downarrow_0$.\\
+
+
+\noindent\textbf{Inductive Case}\\
+Pick an arbitrary $n \in \Nats$ and $s_1, r_1, s_0, r_0 \in \LStates$ such that:
+\begin{align}
+	&\extendsAMUpto{\lmod}{n}{s_1}{r_1}{\lmod_1} \label{LSC2:Ass1}\\
+	&\lmod_1 \weakenI{\{s_1\}} \lmod_2 \label{LSC2:Ass2}\\
+	& \extendsAMUpto{\lmod}{n}{s_0}{r_0}{\lmod_0} \label{LSC2:Ass3}\\
+	& s_1 \composeL r_1 = s_0 \composeL r_0 \label{LSC2:Ass4}\\
+	\tag{I.H}	
+	&\begin{array}{@{} l @{\hspace{-3cm}} l @{\hspace*{-2cm}} l @{}}
+		\for{s'_1, r'_1, s'_0, r'_0 \in \LStates} &&\\
+		& \extendsAMUpto{\lmod}{(n-1)}{s'_1}{r'_1}{\lmod_1} /| \lmod_1 \weakenI{\{s'_1\}} \lmod_2 /| & \\
+		& \extendsAMUpto{\lmod}{(n-1)}{s'_0}{r'_0}{\lmod_0} /| s'_1 \composeL r'_1 = s'_0 \composeL r'_0 \implies & \\
+		&& \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'_0}{r'_0}{\lmod_0}
+	\end{array} \label{LSC2:IH}
+\end{align}
+%
+\textbf{RTS. } 
+%
+\begin{align}
+%	& 
+%	\V{\ca{}}  \V{a\in \lmod_0(\ca{})} \nonumber \\
+%  &\quad (\m{potential}(a,s_0 \composeL r_0)  => \nonumber\\
+%  & \quad\qquad \for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod \cup \lmod_2, \gmod}{(n-1)}{s'}{r'}{\lmod_0}) \label{LSC2:Goal1}\\
+%%   
+%  &\quad\land \m{enabled}(a,s_0 \composeL r_0)
+%  => (s_0 \composeL r_0, a[s_0 \composeL r_0])\in \gmod(\ca{}))
+%  /|\null \label{LSC2:Goal2}\\
+%%  
+  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_2 \right) (\ca{})}
+  \m{potential}(a, s_0 \composeL r_0) =>\null \nonumber \\
+  &\quad\begin{array}{@{} l @{}}
+		\left(\m{reflected}(a,s_0 \composeL r_0, \lmod_0(\ca{})) |/ \neg\m{visible}(a, s_0) \ \right) /| \\
+		\for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+ 	\end{array}
+  \label{LSC2:Goal3}
+\end{align}
+%
+Pick an arbitrary $\ca{}$ and $a = (p, q, c) \in \left(\lmod \cup \lmod_2 \right)(\ca{})$ such that
+%
+\begin{align}
+	\m{potential}(a, s_0 \composeL r_0) \label{LSC2:Ass5}
+\end{align}
+%(\ref{LSC2:Ass})
+There are two cases to consider:\\
+
+\noindent\textbf{Case 1. } $a \in \lmod(\ca{})$\\
+Then from (\ref{LSC2:Ass3}) and assumption of case 1. we have:
+%
+\begin{align}
+	\begin{array}{@{} l @{}}
+		\left(\m{reflected}(a, s_0 \composeL r_0, \lmod_0(\ca{})) |/ \neg\m{visible}(a, s_0) \ \right) /| \\
+		\for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_0}
+ 	\end{array}
+ 	\label{LSC2:Ass6}
+\end{align}
+%
+Pick an arbitrary $(s', r')$ such that
+%
+\begin{align}
+	& (s', r') \in a[s_0, r_0] \label{LSC2:Ass7}
+\end{align}
+%(\ref{LSC2:Ass})
+Then from (\ref{LSC2:Ass6}) and (\ref{LSC2:Ass7}) we have:
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_0} \label{LSC2:Ass8}
+\end{align}
+%
+From (\ref{LSC2:Ass7}) and the definition of $a[s_0, r_0]$, we know that $p \leq s_0 \composeL r_0$ and consequently from (\ref{LSC2:Ass4}) we have $p \leq s_1 \composeL r_1$. Thus from \lem~\ref{lem:divideUpper} we know there exists $p_s, p_r \in \LStates$ such that : 
+%
+\begin{align*}
+	p = p_s \composeL p_r /| p_s \leq s_1 /| p_r \leq r_1
+\end{align*}
+%
+From the definition of $a[s_1, r_1]$ we then have
+%
+\begin{align*}
+	& (p_s = \unitL /| (s_1, q \composeL (r_1 -p_r)) \in a[s_1, r_1])\\
+	|/ & (p_s > \unitL /| (q \composeL (s_1 - p_s), r_1 - p_r) \in a[s_1, r_1]) 
+\end{align*}
+%
+That is, there exists $s'', r'' \in \LStates$ such that
+%
+\begin{align}
+	(s'', r'') \in a[s_1, r_1]
+	\label{LSC2:Ass9}
+\end{align}
+%
+From (\ref{LSC2:Ass2}), (\ref{LSC2:Ass9}) and \lem~\ref{lem:shift-fence} we have:
+%
+\begin{align}
+	\lmod_1 \weakenI{\{s''\}} \lmod_2 \label{LSC2:Ass10}
+\end{align}
+%
+From (\ref{LSC2:Ass4}), (\ref{LSC2:Ass7}), (\ref{LSC2:Ass9}) and \lem~\ref{lem:action-application} we have:
+%
+\begin{align}
+	s' \composeL r' = s'' \composeL r'' \label{LSC2:Ass11}
+\end{align}
+%
+From the assumption of case 1, (\ref{LSC2:Ass9}) and (\ref{LSC2:Ass1}) we have: 
+%
+\begin{align*}
+	\begin{array}{@{} l @{}}
+		\left(\m{reflected}(a, s_1 \composeL r_1, \lmod_1(\ca{})) |/ \neg\m{visible}(a, s_1) \ \right) /| \\
+		\for{(s', r') \in a[s_1, r_1]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\end{array}
+\end{align*}
+%(\ref{LSC2:Ass})
+and thus from (\ref{LSC2:Ass9}) we have:
+%
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s''}{r''}{\lmod_1}
+	\label{LSC2:Ass12}
+\end{align}
+%
+Consequently, from (\ref{LSC2:Ass8}), (\ref{LSC2:Ass10}), (\ref{LSC2:Ass11}), (\ref{LSC2:Ass12}) and (\ref{LSC2:IH}) we have: 
+%
+\begin{align*}
+	\extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+\end{align*}
+%
+as required.\\
+
+%
+%
+%
+%
+
+
+\noindent\textbf{Case 2. } $a \in \lmod_2(\ca{})$\\
+From the assumption of the case and (\ref{LSC2:Ass2}) we have
+%
+\begin{align}
+	\m{reflected}(a, s_1, \lmod_1(\ca{}))
+	\label{LSC2:Ass20}
+\end{align}
+%(\ref{LSC2:Ass})
+From (\ref{LSC2:Ass4}) and (\ref{LSC2:Ass5}) we have $\m{potential}(a, s_1 \composeL r_1)$ and consequently from the definition of $\m{potential}$ we know there exists $l \in \LStates$ such that $p \composeL c \leq s_1 \composeL r_1 \composeL l$. Thus from (\ref{LSC2:Ass20}) and the definition of $\m{reflected}$ we have:
+%
+\begin{align}
+	\exsts{a', c'} a' = (p, q, c') \land a' \in \lmod_1(\ca{})   /| p \composeL c' \leq s_1 \composeL r_1 \composeL l
+	\label{LSC2:Ass21}
+\end{align}
+%
+From (\ref{LSC2:Ass4}) and (\ref{LSC2:Ass5}) we have $\m{potential}(a, s_1 \composeL r_1)$. Consequently, from (\ref{LSC2:Ass21}) and the definition of $\m{potential}$ we have:
+%
+\begin{align}
+	\m{potential}(a', s_1 \composeL r_1)
+	\label{LSC2:Ass22}
+\end{align}
+%
+Since $\lmod_1 \subseteq \lmod$, we know $a' \in \lmod(\ca{})$. Consequently, from (\ref{LSC2:Ass21}), (\ref{LSC2:Ass22}), (\ref{LSC2:Ass3}), (\ref{LSC2:Ass4}) and the definition of $a[s_0, r_0]$ we have
+%
+\begin{align}
+	\begin{array}{@{} l @{}}
+%		\left(\m{reflected}(a', s_0 \composeL r_0, \lmod_0(\ca{})) |/ \neg\m{visible}(a, s_0) \ \right) /| \\
+		\for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_0}
+	\end{array}
+	\label{LSC2:Ass23}
+\end{align}
+%
+Similarly, from (\ref{LSC2:Ass21}), (\ref{LSC2:Ass22}) (\ref{LSC2:Ass1}) and the definition of $a[s_1, r_1]$ we have
+%
+\begin{align}
+	\begin{array}{@{} l @{}}
+		\for{(s', r') \in a[s_1, r_1]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\end{array}
+	\label{LSC2:Ass24}
+\end{align}
+%
+Pick an arbitrary $(s', r')$ such that
+%
+\begin{align}
+	(s', r') \in a[s_0, r_0]
+	\label{LSC2:Ass25}
+\end{align}
+%(\ref{LSC2:Ass})
+Then from (\ref{LSC2:Ass23}) we have: 
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_0}
+	\label{LSC2:Ass26}
+\end{align}
+%(\ref{LSC2:Ass})
+From (\ref{LSC2:Ass25}) and the definition of $a[s_0, r_0]$, we know that $p \leq s_0 \composeL r_0$ and consequently from (\ref{LSC2:Ass4}) we have $p \leq s_1 \composeL r_1$. Thus from \lem~\ref{lem:divideUpper} we know there exists $p_s, p_r \in \LStates$ such that : 
+%
+\begin{align*}
+	p = p_s \composeL p_r /| p_s \leq s_1 /| p_r \leq r_1
+\end{align*}
+%
+From the definition of $a[s_1, r_1]$ we then have
+%
+\begin{align*}
+	& (p_s = \unitL /| (s_1, q \composeL (r_1 -p_r)) \in a'[s_1, r_1])\\
+	|/ & (p_s > \unitL /| (q \composeL (s_1 - p_s), r_1 - p_r) \in a'[s_1, r_1]) 
+\end{align*}
+%(\ref{LSC2:Ass})
+That is, there exists $s'', r'' \in \LStates$ such that
+%
+\begin{align}
+	(s'', r'') \in a[s_1, r_1]
+	\label{LSC2:Ass27}
+\end{align}
+%
+Thus from (\ref{LSC2:Ass24}) we have:
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s''}{r''}{\lmod_1}
+	\label{LSC2:Ass28}
+\end{align}
+%
+From (\ref{LSC2:Ass25}), (\ref{LSC2:Ass27}), (\ref{LSC2:Ass4}) and the definition of $a[s_1, r_1]$ we have:
+%
+\begin{align}
+	s' \composeL r' = s'' \composeL r'' 
+	\label{LSC2:Ass29}
+\end{align}
+%
+From (\ref{LSC2:Ass2}) and (\ref{LSC2:Ass25}) and \lem~\ref{lem:shift-fence} we have:
+%
+\begin{align}
+	\lmod_1 \weakenI{\{s'\}} \lmod_2 
+	\label{LSC2:Ass30}
+\end{align}
+%
+From (\ref{LSC2:Ass26}), (\ref{LSC2:Ass28}), (\ref{LSC2:Ass29}), (\ref{LSC2:Ass30}) and (\ref{LSC2:IH}) we have: 
+%
+\begin{align*}
+	\extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+\end{align*}
+%
+and thus from (\ref{LSC2:Ass25}) 
+%
+\begin{align}
+	\for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+	\label{LSC2:Ass31}
+\end{align}
+%
+Since either $\m{visible}(a, s_0)$ or $\neg\m{visible}(a, s_0)$, there are two cases to consider:\\
+
+\noindent \textbf{Case 2.1. } $ \neg\m{visible}(a, s_0)$\\
+From (\ref{LSC2:Ass31}) and the assumption of case 2.1. we then have
+%(\ref{LSC2:Ass})
+\begin{align*}
+	&\begin{array}{@{} l @{}}
+		\neg\m{visible}(a, s_0) /| \\
+		\for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+	\end{array}
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Case 2.2. } $\m{visible}(a, s_0)$\\
+Pick an arbitrary $l$ such that 
+%
+\begin{align}
+	p \composeL c \leq s_0 \composeL r_0 \composeL l
+	\label{LSC2:Ass32}
+\end{align}
+%(\ref{LSC2:Ass})
+From (\ref{LSC2:Ass32}) and (\ref{LSC2:Ass4}) we then know $p \composeL c \leq s_1 \composeL r_1 \composeL l$; from (\ref{LSC2:Ass20}) and the definition of $\m{reflected}$ we thus have
+%(\ref{LSC2:Ass})
+%
+\begin{align}
+	\exsts{a_1, c_1} a_1 = (p, q, c_1) \land a_1 \in \lmod_1(\ca{})  /| p \composeL c_1 \leq s_1 \composeL r_1 \composeL l
+	\label{LSC2:Ass33}
+\end{align}
+%
+Since $\lmod_1 \subseteq \lmod$, from (\ref{LSC2:Ass33}) we know $a_1 \in \lmod(\ca{})$. Consequently, from (\ref{LSC2:Ass3}), (\ref{LSC2:Ass5}), the assumption of case 2.2. and the definition of $\m{reflected}$ we then have:
+%(\ref{LSC2:Ass})
+\begin{align}
+	\exsts{a_0, c_0} a_0 = (p, q, c_0) \land a_0 \in \lmod_0(\ca{})  /| p \composeL c_0 \leq s_1 \composeL r_1 \composeL l
+	\label{LSC2:Ass34}
+\end{align}
+%
+Consequently, from (\ref{LSC2:Ass33}), (\ref{LSC2:Ass34}) and (\ref{LSC2:Ass4}) we have:
+%(\ref{LSC2:Ass})
+\begin{align}
+	\exsts{a_0, c_0} a_0 = (p, q, c_0) \land a_0 \in \lmod_0(\ca{}) /| p \composeL c_0 \leq s_0 \composeL r_0 \composeL l
+	\label{LSC2:Ass35}
+\end{align}
+%
+Thus from (\ref{LSC2:Ass32}), (\ref{LSC2:Ass35}) and by definition of $\m{reflected}$ we have:
+%
+\begin{align}
+	\m{reflected}(a, s_0 \composeL r_0, \lmod_0(\ca{})) 
+	\label{LSC2:Ass36}
+\end{align}
+%
+Finally, from (\ref{LSC2:Ass31}) and (\ref{LSC2:Ass36}) we have:
+%
+\begin{align*}
+	& \m{reflected}(a, s_0 \composeL r_0, \lmod_0(\ca{}))  /| \\
+	& \for{(s', r') \in a[s_0, r_0]} \extendsAMUpto{\lmod \cup \lmod_2}{(n-1)}{s'}{r'}{\lmod_0}
+\end{align*}
+%
+as required.
+
+\end{proof}
+%
+\end{lemma}
+%
+%
+%
+\begin{lemma}[action-application]\label{lem:action-application}
+%
+For all $a \in \LStates \times \LStates \times \LStates$ and $s_1$ , $r_1$, $s_2$, $r_2$, $s'_1$, $r'_1$, $s'_2$, $r'_2 \in \LStates$,
+\[
+	s_1 \composeL r_1 = s_2 \composeL r_2 /| (s'_1, r'_1) \in a[s_1, r_1] /| (s'_2, r'_2) \in a[s_2, r_2] \implies s'_1 \composeL r'_1 = s'_2 \composeL r'_2 
+\]
+%
+\begin{proof}
+Take arbitrary $a \in \LStates \times \LStates \times \LStates$ and $s_1$ , $r_1$, $s_2$, $r_2$, $s'_1$, $r'_1$, $s'_2$, $r'_2 \in \LStates$ such that 
+%
+\begin{align}
+	& s_1 \composeL r_1 = s_2 \composeL r_2 \label{LAA:Ass1}\\
+	& (s'_1, r'_1) \in a[s_1, r_1] \label{LAA:Ass2}\\
+	& (s'_2, r'_2) \in a[s_2, r_2] \label{LAA:Ass3}
+\end{align}
+%
+Then from (\ref{LAA:Ass2}), and the definitions of $a[s_1, r_1]$ and $a[s_1 \composeL r_1]$ we have:
+%
+\begin{align}
+	a[s_1 \composeL r_1] = s'_1 \composeL r'_1 \label{LAA:Ass4}
+\end{align}
+%
+Similarly, from (\ref{LAA:Ass3}) we have:
+%
+\begin{align}
+	a[s_2 \composeL r_2] = s'_2 \composeL r'_2 \label{LAA:Ass5}
+\end{align}
+%
+Finally, from (\ref{LAA:Ass1}), (\ref{LAA:Ass4}) and (\ref{LAA:Ass5}) we have:
+%
+\begin{align*}
+	s'_1 \composeL r'_1 = s'_2 \composeL r'_2 
+\end{align*}
+%
+as required.
+\end{proof}
+%
+\end{lemma}
+%
+%

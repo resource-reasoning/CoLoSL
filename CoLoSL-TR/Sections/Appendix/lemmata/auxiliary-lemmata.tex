@@ -1,0 +1,168 @@
+\begin{lemma}[]\label{lem:nonEmptyOverlap}Given any separation algebra $(\mathbb{A}, \compose{\mathbb{A}}, \unit{\mathbb{A}})$ with the cross-split property, for any $a, b \in \mathbb{A}$:
+%
+\[
+	\exsts{c \in \mathbb{A}} a \leq b \compose{\mathbb{A}} c \iff a \meet{\mathbb{A}} b \not= \emptyset
+\]
+%
+$\m{Proof} \implies$. We proceed with proof by contradiction.
+Take arbitrary $a, b, c \in \mathbb{A}$ such that 
+%
+\begin{equation}
+	a \leq b \composeL c \label{L5:Ass1}
+\end{equation}
+%
+and assume
+%
+\begin{equation}
+	a \meet{\mathbb{A}} b = \emptyset \label{L5:Ass2}
+\end{equation}
+%
+From (\ref{L5:Ass2}) and by definition of $\meet{\mathbb{A}}$, we have:
+%
+\begin{equation}
+	\neg\exsts{d, e, f, g} a = d \compose{\mathbb{A}} e /| b = e \compose{\mathbb{A}} f /| d \compose{\mathbb{A}} e \compose{\mathbb{A}} f = g \label{L5:Ass3}
+\end{equation}
+%
+From (\ref{L5:Ass1}) we have $\exsts{h} a \compose{\mathbb{A}} h = b \compose{\mathbb{A}} c$ and consequently by the cross-split property we have:
+%
+\begin{align}
+	\exsts{ab, ac, hb, hc, t} &
+	ab \compose{\mathbb{A}} ac = a 	\label{L5:Ass4}\\
+	& hb \compose{\mathbb{A}} hc = h \label{L5:Ass5}\\
+	& ab \compose{\mathbb{A}} hb = b \label{L5:Ass6}\\
+	& ac \compose{\mathbb{A}} hc = c \label{L5:Ass7}\\
+	& t = ab \compose{\mathbb{A}} ac \compose{\mathbb{A}} hb \compose{\mathbb{A}} hc \label{L5:Ass8}
+\end{align}
+%
+From (\ref{L5:Ass8}) we have:
+%
+\begin{equation}
+	\exsts{s} ab \compose{\mathbb{A}} ac \compose{\mathbb{A}} hb = s \label{L5:Ass9}
+\end{equation}
+%
+From (\ref{L5:Ass4}), (\ref{L5:Ass6}) and (\ref{L5:Ass9}) we have: 
+%
+\begin{equation}
+	\exsts{d, e, f, g} a = d \compose{\mathbb{A}} e /| b = e \compose{\mathbb{A}} f /| d \compose{\mathbb{A}} e \compose{\mathbb{A}} f = g \label{L5:Ass10}
+\end{equation}
+%
+From (\ref{L5:Ass3}) and (\ref{L5:Ass10}) we derive a contradiction and can hence deduce:
+%
+\begin{equation}
+	a \meet{\mathbb{A}} b \not= \emptyset \nonumber
+\end{equation}
+%
+as required.\\
+
+
+\noindent$\m{Proof} \Leftarrow$. Take arbitrary $a, b \in \mathbb{A}$ such that 
+%
+\begin{align*}
+	a \meet{\mathbb{A}}	b \not= \emptyset
+\end{align*}
+%
+Then by definition of $\meet{\mathbb{A}}$ we have: 
+%
+\begin{align*}
+	\exsts{d, e, f \in \mathbb{A}} & a = d \compose{\mathbb{A}} e\\
+	& b = e \compose{\mathbb{A}} f \\
+	& d \compose{\mathbb{A}} e \compose{\mathbb{A}} f \text{ is defined}
+\end{align*}
+% 
+and thus by definition of $\leq$ we have $a \leq b \compose{\mathbb{A}} d$ and consequently
+%
+\begin{align*}
+	\exsts{c} a \leq b \compose{\mathbb{A}} c
+\end{align*}
+%
+as required.
+\qed
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:divideUpper}
+%
+Given any separation algebra ($\mathcal{M}, \compose{\mathcal{M}}, \unit{\mathcal{M}}$) with the cross-split property:
+\[
+	\for{a, b, c \in \mathcal{M}} a \leq b \compose{\mathcal{M}} c \implies \exsts{m, n} a = m \compose{\mathcal{M}} n \;\land\; m \leq b \;\land\; n \leq c
+\]
+%
+\begin{proof}
+Pick an arbitrary $a, b, c \in \mathcal{M}$. Since $a \leq b \compose{\mathcal{M}} c$, we know $\exsts{d \in \mathcal{M}}$ such that:
+%
+\begin{equation}
+	a \compose{\mathcal{M}} d = b \compose{\mathcal{M}} c \label{L6:Ass1}
+\end{equation}
+%
+By the cross-split property of $\mathcal{M}$, We can deduce: $\exsts{ab, ac, db, dc \in \mathcal{M}}$ such that:
+%
+\begin{align}
+	a = ab \compose{\mathcal{M}} ac \label{L6:Ass2}\\
+	b = ab \compose{\mathcal{M}} db \label{L6:Ass3}\\
+	c = ac \compose{\mathcal{M}} dc \label{L6:Ass4}\\
+	d = db \compose{\mathcal{M}} dc \nonumber 
+\end{align}
+%
+Since $ab \leq b$ (\ref{L6:Ass3}) and $ac \leq c$ (\ref{L6:Ass4}), from (\ref{L6:Ass2}) we can deduce:
+%
+\begin{equation}
+	\exsts{m, n \in \mathcal{M}} a = m \compose{\mathcal{M}} n \;\land\; m \leq b \;\land\; n \leq c \nonumber
+\end{equation}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%
+\begin{lemma}[]\label{lem:disjointByOrder}
+Given any separation algebra ($\mathcal{M}, \compose{\mathcal{M}}, \unit{\mathcal{M}}$),
+\[
+	\for{a, b, c, d \in \mathcal{M}} a \compose{\mathcal{M}} b = d \;\land\; c \leq b \implies 
+	\exsts{f \in \mathcal{M}} a \compose{\mathcal{M}} c = f
+\]
+%
+\begin{proof}
+Pick an arbitrary $a, b, c, d \in \mathcal{M}$ such that:
+%
+\begin{align}
+	a \compose{\mathcal{M}} b = d \label{L7:Ass1}\\
+	c \leq b \label{L7:Ass2}
+\end{align}
+%
+From (\ref{L7:Ass2}), we have: 
+%
+\begin{equation}
+	\exsts{e \in \mathcal{M}} c \compose{\mathcal{M}} e = b \label{L7:Ass3}
+\end{equation}
+%
+and consequently from (\ref{L7:Ass1}) we have:
+%
+\begin{equation}
+	a \compose{\mathcal{M}} c \compose{\mathcal{M}} e = d \label{L7:Ass4}
+\end{equation}
+%
+Since $e \leq d$ (\ref{L7:Ass4}), we have: 
+%
+\begin{equation}
+	\exsts{f \in \mathcal{M}} e \compose{\mathcal{M}} f = d \label{L7:Ass5}
+\end{equation} 
+%
+From (\ref{L7:Ass4}), (\ref{L7:Ass5}) and cancellativity of separation algebras we have:
+%
+\begin{equation}
+	a \compose{\mathcal{M}} c = f
+\end{equation}
+%
+and thus
+%
+\begin{equation}
+	\exsts{f \in \mathcal{M}} a \compose{\mathcal{M}} c = f
+\end{equation}
+%
+as required.
+\end{proof}
+\end{lemma}
+%
+%
+
+

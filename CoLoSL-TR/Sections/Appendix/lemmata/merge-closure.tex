@@ -1,0 +1,275 @@
+\begin{lemma}[\mergeRule-Closure]\label{lem:merge-closure}
+For all $\lmod, \lmod_1, \lmod_2 \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$,
+%
+\[
+\begin{array}{l}
+	\extendsAM{\lmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} /| \extendsAM{\lmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}}
+	\implies\\
+	\hspace*{2cm} \extendsAM{\lmod}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}}
+\end{array}
+\]
+%
+\begin{proof} Pick an arbitrary $\lmod, \lmod_1, \lmod_2 \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$ such that 
+%
+\begin{align}
+	\extendsAM{\lmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} /| \extendsAM{\lmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{MC:Ass1}
+\end{align} 
+%
+From the definition of $\downarrow$, it then suffices to show
+%
+\begin{align}
+	& \lmod_1 \cup \lmod_2  \subseteq \lmod \label{MC:Goal1}\\
+	& \for {n \in \Nats}  \extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}} \label{MC:Goal2}
+\end{align}
+%
+
+\noindent\textbf{RTS. (\ref{MC:Goal1})} \\
+Since from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\lmod_1 \subseteq \lmod /| \lmod_2 \subseteq \lmod$, we can thus conclude $\lmod_1 \cup \lmod_2 \subseteq \lmod$ as required. \\
+
+\noindent\textbf{RTS. (\ref{MC:Goal2})} \\
+Rather than proving (\ref{MC:Goal2}) directly, we first establish the following.
+%
+\begin{align}
+	\for {n \in \Nats} \for{s_p, s_c, s_q, r \in \LStates} & \nonumber\\
+	& \hspace{-4cm}\extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2} \nonumber\\
+	& \hspace{-3cm} \implies \extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2} \label{MC:Goal3}
+\end{align}
+%
+We can then despatch (\ref{MC:Goal2}) from (\ref{MC:Ass1}) and (\ref{MC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2}$ and consequently from (\ref{MC:Goal3}) we derive $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2}$ as required. \\
+
+\noindent\textbf{RTS. (\ref{MC:Goal3})} \\
+We proceed by induction on the number of steps $n$.\\
+
+%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+\noindent\textbf{Base case }$n=0$\\
+Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod}{0}{s_1}{s_2 \composeL r}{\lmod'} $ which follows trivially from the definition of $\downarrow_0$.\\
+
+\noindent\textbf{Inductive Step} Pick an arbitrary $s_p, s_q, s_c, r \in \LStates$ and $n \in \Nats$, such that
+%
+\begin{align}
+	& \extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \label{LMC:Ass1}\\
+	& \extendsAMUpto{\lmod}{n}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{LMC:Ass2}\\
+	& \for{s_p, s_q, s_c, r \in \LStates} \nonumber \\
+	&	\quad \extendsAMUpto{\lmod}{(n-1)}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \;\land\; \extendsAMUpto{\lmod}{(n-1)}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \nonumber \\
+	&	\tag{I.H.} \qquad\quad\implies  \extendsAMUpto{\lmod}{(n-1)}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}} \label{LMC:IH}
+\end{align}
+%
+%
+\noindent\textbf{RTS.}
+%
+\begin{align}
+%	& 
+%	\V{\ca{}}  \V{a \in \left(\lmod_{1} \cup \lmod_{2}\right)(\ca{})} \nonumber \\
+%  &\quad(\m{potential}(a,s_p \composeL s_c \composeL s_q \composeL r) => \nonumber \\
+%  &\qquad \for{(s', r') \in a[s_p \composeL s_c \composeL s_q , r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod_{1} \cup \lmod_{2}}) /| \label{LMC:Goal1}\\
+%%    
+%  &\quad(\m{enabled}(a,s_p \composeL s_c \composeL s_q \composeL r) => \nonumber\\
+%  &\qquad\qquad (s_p \composeL s_c \composeL s_q  \composeL r, a[s_p \composeL s_c \composeL s_q  \composeL r])\in \gmod(\ca{})) \land\label{LMC:Goal2}\\
+%  
+  &\V{\ca{}}\V{a\in \lmod(\ca{})}
+  \m{potential}(a,s_p \composeL s_c \composeL s_q \composeL r) =>\null \nonumber \\
+  &\quad 
+	\begin{array}{@{} l @{}}
+		\left(\m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left( \lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c \composeL s_q) \ \right) /| \\
+		\for{(s', r') \in a[s_p \composeL s_c \composeL s_q, r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1 \cup \lmod_2})
+	\end{array}	  
+	\nonumber
+\end{align}
+%
+%
+%
+
+
+\noindent Pick an arbitrary $\ca{}$ and $a = (p, q, c) \in\lmod(\ca{})$ such that
+\begin{equation}
+	\m{potential}(a, s_p \composeL s_c \composeL s_q \composeL r) \label{LMC:Ass40}
+\end{equation}
+%(\ref{LMC:Ass})
+From (\ref{LMC:Ass1}) and (\ref{LMC:Ass40}) we have: 
+%
+\begin{align*}
+	& 
+	\begin{array}{@{} l @{}}
+		\left( \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r,\lmod_1(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c) \right) /| \\
+		\for{(s', r') \in a[s_p \composeL s_c, s_q \composeL r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\end{array}	  
+\end{align*}
+%
+and consequently from the definition of $\lmod_1 \cup \lmod_2$ we have: 
+%
+\begin{align}
+	& \begin{array}{@{} l @{}}
+		\left( \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left(\lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c) \right) /| \\
+		\for{(s', r') \in a[s_p \composeL s_c, s_q \composeL r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1}
+	\end{array}	  \label{LMC:Ass41}
+\end{align}
+%(\ref{LMC:Ass})
+Similarly, from (\ref{LMC:Ass2}) and (\ref{LMC:Ass40}) we have: 
+%
+\begin{align}
+	& \begin{array}{@{} l @{}}
+		\left( \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left(\lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_c \composeL s_q) \right) /| \\
+		\for{(s', r') \in a[s_c \composeL s_q, s_p \composeL r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_2}
+	\end{array} \label{LMC:Ass42}
+\end{align}
+%(\ref{LMC:Ass})
+From (\ref{LMC:Ass41}), (\ref{LMC:Ass42}) and the definition of $\m{visible}$ we have: 
+%
+\begin{align}
+	& \begin{array}{@{} l @{}}
+		\left( \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left(\lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c \composeL s_q) \right) /| \\
+		\for{(s', r') \in a[s_p \composeL s_c, s_q \composeL r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1} /| \\
+		\for{(s', r') \in a[s_c \composeL s_q, s_p \composeL r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_2}
+	\end{array}
+	\label{LMC:Ass43}
+\end{align}
+%(\ref{LMC:Ass})
+Pick an arbitrary $s', r' \in \LStates$ such that
+%
+\begin{align}
+	(s', r') \in a[s_p \composeL s_c \composeL s_q, r]
+	\label{LMC:Ass46}
+\end{align}
+%(\ref{LMC:Ass})
+Then from the definition of $a[s_p \composeL s_c \composeL s_q]$ and by the cross-split property we know there exists $p_p, p_c, p_q, s_p', s_c', s_q' \in \LStates$ such that :
+\begin{align}
+	\begin{array}{l}
+		s' = s_p \composeL s_c \composeL s_q |/ \\
+		\left(
+		\begin{array}{l}
+			(p_p > \unitL |/ p_c > \unitL |/ p_q > \unitL) /| s' = q \composeL s_p' \composeL s_c' \composeL s_q' 		\\
+			/| p = p_p \composeL p_c \composeL p_q \composeL p_r \\
+			/| s_p = p_p \composeL s_p' /| 
+			s_c = p_c \composeL s_c' /|
+			s_q = p_q \composeL s_q' /|
+			r = p_r \composeL r' 
+		\end{array}
+		\right)
+	\end{array}
+	\label{LMC:ass4}
+\end{align}
+%
+and consequently from the definitions of $a[s_p \composeL s_c, s_q \composeL r]$ and $a[s_c  \composeL s_q, s_p \composeL r]$ we have:
+%
+\begin{align}
+\begin{array}{l}
+	\left(
+	\begin{array}{@{} l @{}}
+		s' = s_p \composeL s_c \composeL s_q /| \\
+		(s_p \composeL s_c, s_q \composeL r') \in a[s_p \composeL s_c, s_q \composeL r] /| (s_c \composeL s_q, s_p \composeL r') \in a[s_c  \composeL s_q, s_p \composeL r]
+	\end{array}
+	\right) \\
+	|/ 
+	\left(
+	\begin{array}{@{} l @{}}
+	 	s' = q \composeL s_p' \composeL s_c' \composeL s_q' /| \\
+	 	\left(
+	 	\begin{array}{@{} l @{}}
+	 		\left(
+	 		\begin{array}{@{} l @{}}
+	 			(( p_c > \unitL |/ (p_c = \unitL /| p_p > \unitL /| p_q > \unitL))) /| \\
+	 			(q \composeL s_p' \composeL s_c' 	, s_q' \composeL r') \in a[s_p \composeL s_c, s_q \composeL r] /|\\
+	 			(q \composeL s_c' \composeL s_q', s_p' \composeL r') \in a[s_c  \composeL s_q, s_p \composeL r]
+	 		\end{array}
+	 		\right)\\
+	 		|/
+	 		\left(
+	 		\begin{array}{@{} l@{}}
+	 			p_p > \unitL /| p_c = p_q = \unitL /|\\
+	 			(q \composeL s_p' \composeL s_c', s_q' \composeL r') \in a[s_p \composeL s_c, s_q \composeL r] /|\\
+	 			(s_c' \composeL s_q', q \composeL s_p' \composeL r') \in a[s_c  \composeL s_q, s_p \composeL r] 
+	 		\end{array}
+	 		\right)\\
+	 		|/
+	 		\left(
+	 		\begin{array}{@{} l@{}}
+				p_q > \unitL /| p_c = p_p = \unitL /|\\
+				(s_p' \composeL s_c', q \composeL s_q' \composeL r') \in a[s_p \composeL s_c, s_q \composeL r] /| \\
+				(q \composeL s_c' \composeL s_q', s_p' \composeL r') \in a[s_c  \composeL s_q, s_p \composeL r]
+	 		\end{array}
+	 		\right)
+	 	\end{array}
+	 	\right)
+	\end{array}
+	\right)
+\end{array}
+\label{LMC:Ass5}
+\end{align}
+%
+From (\ref{LMC:Ass5}), (\ref{LMC:Ass1}), (\ref{LMC:Ass2}) and (\ref{LMC:Ass40}) we have:
+%
+\begin{align}
+\begin{array}{l}
+	\left(
+	\begin{array}{@{} l @{}}
+		s' = s_p \composeL s_c \composeL s_q /| \\
+		\extendsAMUpto{\lmod}{(n-1)}{s_{p} \composeL s_{c}}{s_q \composeL r'}{\lmod_1} /| 
+		\extendsAMUpto{\lmod}{(n-1)}{s_{c} \composeL s_{q}}{s_p \composeL r'}{\lmod_2} 
+	\end{array}
+	\right) \\
+	|/ 
+	\left(
+	\begin{array}{@{} l @{}}
+	 	s' = q \composeL s_p' \composeL s_c' \composeL s_q' /| \\
+	 	\left(
+	 	\begin{array}{@{} l @{}}
+	 		\left(
+	 		\begin{array}{@{} l @{}}
+	 			(( p_c > \unitL |/ (p_c = \unitL /| p_p > \unitL /| p_q > \unitL))) /| \\
+	 			\extendsAMUpto{\lmod}{(n-1)}{q \composeL s_{p}' \composeL s_{c}'}{s_q' \composeL r'}{\lmod_1} /|\\
+	 			\extendsAMUpto{\lmod}{(n-1)}{q \composeL s_{c}' \composeL s_{q}'}{s_p' \composeL r'}{\lmod_2} 
+	 		\end{array}
+	 		\right)\\
+	 		|/
+	 		\left(
+	 		\begin{array}{@{} l@{}}
+	 			p_p > \unitL /| p_c = p_q = \unitL /|\\
+	 			\extendsAMUpto{\lmod}{(n-1)}{q \composeL s_{p}' \composeL s_{c}'}{s_q' \composeL r'}{\lmod_1} /| \\
+	 			\extendsAMUpto{\lmod}{(n-1)}{s_{c}' \composeL s_{q}'}{q \composeL s_p' \composeL r'}{\lmod_2} 
+	 		\end{array}
+	 		\right)\\
+	 		|/
+	 		\left(
+	 		\begin{array}{@{} l@{}}
+				p_q > \unitL /| p_c = p_p = \unitL /|\\
+				\extendsAMUpto{\lmod}{(n-1)}{s_{p}' \composeL s_{c}'}{q \composeL s_q' \composeL r'}{\lmod_1}  /| \\
+				\extendsAMUpto{\lmod}{(n-1)}{q \composeL s_{c}' \composeL s_{q}'}{s_p' \composeL r'}{\lmod_2}  
+	 		\end{array}
+	 		\right)
+	 	\end{array}
+	 	\right)
+	\end{array}
+	\right)
+\end{array}
+\label{LMC:Ass6}
+\end{align}
+%(\ref{LMC:Ass})
+% 
+and thus from (\ref{LMC:Ass6}) and (\ref{LMC:IH}) 
+%
+\begin{align}
+	\extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1 \cup \lmod_2}
+	\label{LMC:Ass49}
+\end{align}
+%(\ref{LMC:Ass})
+Finally, from (\ref{LMC:Ass43}), (\ref{LMC:Ass46}) and (\ref{LMC:Ass49}) we have:
+%
+\begin{align*}
+	& 
+	\begin{array}{@{} l @{}}
+		\left( \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left(\lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c \composeL s_q) \right) /| \\
+		\for{(s', r') \in a[s_p \composeL s_c \composeL s_q, r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1 \cup \lmod_2} 
+	\end{array}
+\end{align*}
+%
+as required.
+%
+%
+%
+%
+%
+
+\end{proof}
+\end{lemma}
+%
+%
