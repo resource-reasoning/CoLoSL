@@ -880,7 +880,7 @@ That is, $a$ can actually happen in $g$ since $g$ holds all the resources in bot
 %
 %
 \begin{definition}[Action model closure]\label{def:actclos}
-An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\lmod' \subseteq \lmod$ and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
+An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\isContainedAM{\lmod'}{n}{s\composeL r}{\lmod}$ and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\leq_n$ and $\downarrow_n$ are defined recursively as follows:
 %%
 %\[
 %\begin{array}{@{} L @{}}
@@ -912,6 +912,14 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
 %\]
 %
 %
+%
+\[
+\begin{array}{@{} L @{}}
+	\isContainedAM{\lmod'}{0}{l}{\lmod} \iffdef \m{true}\\
+	
+	\isContainedAM{\lmod'}{n+1}{l}{\lmod} \iffdef \for{\ca{}} \for{a \in \lmod'(\ca{})} \m{reflected}(a, l, \lmod(\ca{})) \land \isContainedAM{\lmod'}{n}{a[l]}{\lmod}
+\end{array}
+\]
 %
 \[
 \begin{array}{@{} L @{}}
