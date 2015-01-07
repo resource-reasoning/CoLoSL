@@ -1,0 +1,21 @@
+\subsection*{Conclusion and Future Work}
+
+We have introduced \colosl, a new program logic that allows a flexible
+treatment of the shared state to enable truly compositional
+verification of fine-grained concurrent programs. By rethinking the
+semantic model underlying the reasoning about such programs, new
+paradigms have emerged that improve over the state of the art as far
+as compositionality is concerned. However, \colosl is still young, and
+lacks many features of its various cousins.  There are many
+interesting ideas present in the literature: e.g.\ abstract states
+governed by state transition systems~\cite{caresl}; higher-order
+reasoning~\cite{icap}; and abstract atomicity~\cite{tada}. All these
+ideas require further investigation. Here, our aim was to simply
+introduce subjective views as a fundamental new way of underpinning such reasoning.
+
+In another direction, \colosl makes heavy use of a richer fragment
+of separation logic than is typically considered (in particular by
+automatic tools), specifically due to the inclusion of the $**$ and
+$--o$ connectives. Improved ways of reasoning about these connectives
+would greatly facilitate more complex proofs, be it in \colosl or
+other program logics based on separation logic.

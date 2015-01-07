@@ -1,0 +1,51 @@
+Section 2
+---------
+
+In this regard, I also find the concurrent increment example presented
+in Section 2 to be rather unfortunate as a motivating example.  The
+authors seem to want to use the example to motivate why subjective
+views enable more scalable proofs, writing: "In this example, the
+extraneous piece of state is the variable cell z.  This additional
+resource might seem an acceptable price to pay, but straightforward
+generalisations to n participants [from 3] yields extra state of n-2
+variable cells with their associated interferences which are of no
+interest to the particular thread.  Fundamentally, for large systems,
+the burden of carrying the whole shared state around to analyse all
+threads, can lead to intractable proofs."
+
+This is simply not true, at least as it pertains to this example.  It
+is straightforward to prove this concurrent increment example in
+existing logics using a global protocol on the n counters, and scaling
+a protocol on 3 counters to n counters is very easy (because the
+protocol is completely regular).  In fact, one could argue that the
+proof for 3 counters already demonstrates all the complexity required
+for the one for n counters because the proof for 3 counters already
+includes the two special cases for the leftmost and rightmost threads
+("x" and "z"), and adding additional counters will just mean there are
+n-2 threads whose proofs are identical to the one for the middle "y"
+thread.  I expect the authors' proof of the example for 3 threads
+would generalize to n threads in exactly the same way.
+
+I did not get a clear sense of what one has to
+show in the Shift steps.  I also could not make any sense of the
+paragraph that starts "There is one more subtlety."  In one part, it
+says, "When that is the case, the piece of the state...is removed" and
+I had no idea if what that means logically speaking, or if that is
+something that happens in the model when some proof step happens.
+
+More generally, I think it's great to have an informal overview of a
+proof like this up front, but then you should come back to this
+example later on and walk through the proof of the interesting steps
+(like the Shift steps) in more detail.
+
+
+Section 3
+---------
+
+- End of Section 3: "Note that, while sometimes subtle, our semantic
+conditions are often easy to check in practice. Actions are usually
+small and typically only concern a few cells at a time. Indeed, they
+are the by-products of atomic sections in program, which are also kept
+small."  This needs to be expanded upon!  How do you check these semantic
+conditions?  Please make this clear.  Also, it is funny to talk about
+what happens "in practice" concerning a brand new logic!
