@@ -11,7 +11,7 @@ particular, do not mention subjective views.
 
 
 \subsection{\colosl worlds}
-\label{sec:model}
+\label{subsec:model}
 
 A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
@@ -111,7 +111,7 @@ $p$ is the \emph{pre-state} of the action and $q$ its
 directly to the (semantic interpretation of) an interference assertion
 $I$. Although worlds do not put further constraints on the
 relationship between $\lmod$ and $g$, they are linked more tightly in
-the semantics of assertions (\S\ref{sec:assertions}).
+the semantics of assertions (\S\ref{subsec:assertions}).
 
 \begin{definition}[Action models]
   The set of \emph{actions} $\set{Action}$, ranged over by $a$, and
@@ -136,7 +136,7 @@ they are enabled (in that their pre-state is compatible with $g$), the
 part of the state that they mutate is a sub-part of $g$. The
 definition of $g\containI\lmod$ is similar to the confinement between
 an assertion and an interference assertion, which we describe in
-\S\ref{sec:prules}.
+\S\ref{subsec:prules}.
 
 \begin{definition}[Well-formedness]
   \label{def:wf}
@@ -191,7 +191,7 @@ components and the resulting tuple is a well-formed world.
 %% form $(\unitL,g,\lmod)$.
 
 \subsection{\colosl Assertions}
-\label{sec:assertions}
+\label{subsec:assertions}
 
 Our assertion language extends separation logic with \emph{subjective
   views} and \emph{capability assertions}.  We assume an extra
@@ -249,7 +249,8 @@ $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write as
 $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
-of space; it can be found in Appendix~\ref{sec:model-continued}):
+of space; it can be found in~\cite{colosl-tr14}:
+%Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
 	
@@ -392,7 +393,7 @@ consequences of the semantics.
 
 \begin{lemma}
   \label{lem:assertion-facts}
-  \forgetRule, \mergeRule, \weakenRule, and \copyRule are valid.
+  \forgetRule, \mergeRule, \shiftRule, \weakenRule, \copyRule are valid.
   %% \begin{mathpar}
   %%       \infer{
   %%       	\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
@@ -406,16 +407,14 @@ consequences of the semantics.
 \end{lemma}
 \begin{proof}[sketch]
   The cases of \weakenRule and \copyRule are
-  straightforward. \forgetRule and \mergeRule principles are valid as action
-  model closure is preserved when picking a smaller subjective state or
-  when taking the union of subjective states and their interference
-  relations, respectively (see Appendix~\ref{sec:model-continued}).
+  straightforward. \forgetRule, \mergeRule and \shiftRule principles are valid as action
+  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference relations, or when shifting the interference relation, respectively. The full proof is provided in~\cite{colosl-tr14}.
   \qed
 \end{proof}
 
 
 \subsection{Reducing \colosl principles to separation logic entailments}
-\label{sec:prules}
+\label{subsec:prules}
 
 We turn to the remaining two principles, \extendRule and \shiftRule,
 and to stability. All three involve reasoning outside of standard
@@ -432,7 +431,7 @@ assertions with nested boxes into logically equivalent assertions with
 no nesting. Similarly, interference assertions that mention other
 subjective views in their actions may be rewritten into ones
 that do not. For lack of space, we omit these transformations; they
-can be found in Appendix~\ref{sec:assertions-continued}.
+can be found in~\cite{colosl-tr14}.% Appendix~\ref{sec:assertions-continued}.
 
 %% Moreover, in the restricted case where actions and fences (see below)
 %% can be expressed in a fragment extending the usual \emph{symbolic
@@ -512,7 +511,9 @@ ordinary separation logic. As expressed by the first rule,
 $P \containI I$ holds if there is a weaker local assertion $\lass{F}$
 that acts as a \emph{local fence} for $I$, denoted by
 $\lass{F}\strictfences I$; in particular, this means that $\lass{F}$
-must be invariant under all actions of $I$. In Appendix~\ref{sec:assertions-continued} we show that it is always possible to weaken an assertion into a local assertion. This fencing condition is
+must be invariant under all actions of $I$. In~\cite{colosl-tr14}
+%Appendix~\ref{sec:assertions-continued} 
+we show that it is always possible to weaken an assertion into a local assertion. This fencing condition is
 checked for each action in $I$ (see the second rule). For each action
 $\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
 apply. In the first of these rules, the action cannot possibly fire,
@@ -632,7 +633,9 @@ for assertions at the model level.
 \fig\ref{fig:shifting-rules} presents an axiomatisation of the main
 shifting principles, our mechanism to rewrite interference assertions
 in subjective views via \shiftRule. As with confinement, we omit the
-direct semantic definition, which can be found in Appendix~\ref{sec:model-continued}.  The
+direct semantic definition, which can be found in~\cite{colosl-tr14}.
+% Appendix~\ref{sec:model-continued}.
+The
 pseudo-entailment $\separate{\lass{P}}{\lass{Q}}$ asserts that states
 described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
   intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and $l_2,
@@ -833,7 +836,9 @@ $\m{true}$ fences any interference assertion.
 of the form $\exsts{\bar x}\lass{P} * \bigstar_{i\in
   I}\shared{\lass{Q}_i}{I_i}$ is stable. This is a more restricted
 form of assertions than our two previous axiomatisations, but a more
-elaborate set of rules exists for the general case (see Appendix~\ref{sec:assertions-continued}). The
+elaborate set of rules exists for the general case (see~\cite{colosl-tr14}).
+%(see Appendix~\ref{sec:assertions-continued}). 
+The
 first two rules state that local assertions are always stable and
 existentials can be eliminated. Then, checking the stability of
 $\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
@@ -1201,7 +1206,8 @@ achieved via a succession of 1) updates in accordance with $\lmod$, 2)
 valid extension steps and 3) valid shifting steps. A similar semantic
 condition for atomic commands is required in the frameworks from the
 CAP family~\cite{cap-ecoop10,icap,tada}. Formal definitions can be
-found in \S\ref{sec:semantics}.
+found in~\cite{colosl-tr14}. 
+%Appendix\ref{sec:semantics}.
 
 Semantic validity of Hoare triples depends on the definition of an
 operational semantics $\mathbb{C}, m \rightarrow^{\text{*}}

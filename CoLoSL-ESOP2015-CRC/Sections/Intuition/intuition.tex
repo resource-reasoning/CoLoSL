@@ -26,7 +26,7 @@ needed, and present them in more details in \S\ref{sec:colosl}.
   &
   I \weakenI{P} I'
   \text{ implies }&
-  \shared{P}{I} ===> \shared{P}{I'}
+  \shared{P}{I} => \shared{P}{I'}
   &\tag{\shiftRule}
   \\
   \shared{P}{I} &
@@ -285,11 +285,11 @@ It is however possible to give a stronger specification, as follows: \vspace*{-8
 %
 \begin{align*}
   \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{I} *[\token a_{\small\li y}]
-  &\stackrel{(\shiftRule)}{\semimplies}
+  &\stackrel{(\shiftRule)}{=>}
   \shared{\li{x}|-> 0 * \li{y}|->0 * \li{z}|-> 0}{\{a_{\small\li x}', a_{\small\li y}, a_{\small\li z}\}} *[\token a_{\small\li y} ] \vspace*{-5pt}\\
   &\stackrel{(\forgetRule)}{=>}
   \shared{\li{x}|-> 0 * \li{y}|->0 }{\{a_{\small\li x}', a_{\small\li y}, a_{\small\li z}\}} *[\token a_{\small\li y}]\\
-  &\stackrel{(\shiftRule)}{\semimplies}
+  &\stackrel{(\shiftRule)}{=>}
   \shared{\li{x}|-> 0 * \li{y}|->0 }{I_{\small\li y}'} *[\token a_{\small\li y}] \\
   &\stackrel{(\weakenRule)}{=>}
   \shared{
@@ -364,7 +364,7 @@ The interference relation is now as simple as it can get, whilst retaining enoug
 
 The proof of the specification of the thread $\mathbb{P}_{\small\li y}$ is
 now relatively straightforward. By inspection (or using the rules of
-\S\ref{sec:prules}), the invariant of the while loop is stable with
+\S\ref{subsec:prules}), the invariant of the while loop is stable with
 respect to $I_{\small\li y}'$. The atomic section allows safe manipulation
 of the contents of the subjective view.  The final postcondition of
 $\mathbb{P}_{\small\li y}$ follows from the invariant and the boolean
@@ -404,7 +404,9 @@ $I_{\small\li{y}}'$, and $I_{\small\li{z}}'$):
 %
 That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in possession of all three $[\token{a}_{\small\li{x}}]$, $[\token{a}_{\small\li{y}}]$, $[\token{a}_{\small\li{z}}]$ capabilities in its local state can carry out $a_{\textsf{rem}}$. In doing so, the acting thread will remove the three cells from the shared state (and move them into its local state). In return, it must transfer the three locally held capabilities into the shared state. Note that after adding $a_{\textsf{rem}}$, the subjective views of all three threads remain stable since each thread locally holds one of the capabilities in $\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}$ and thus knows that the environment cannot carry out $a_{\textsf{rem}}$ (as it is missing at least one of the required capabilities). Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource transfer is common in \colosl actions. In general, resources that only appear on the left hand side of $\swap$ indicate their removal from the shared state (and their addition to the thread's local state); dually, resources that only appear on the right hand side of $\swap$ denote their transfer to the shared state (from the thread's local state).
 
-In Appendix~\ref{sec:mutual-exclusion} we generalise the mutual
+In \S\ref{sec:examples}
+%Appendix~\ref{sec:mutual-exclusion} 
+we generalise the mutual
 exclusion ring presented in this section to $n$ threads and
 demonstrate how it can be used to guard a shared resource accessed concurrently. In particular, since at each point in time only one thread may perform an action, that thread can be
 granted the guarded resource exclusively (similarly to holding a lock).

@@ -290,7 +290,7 @@ From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have\vspace*
 %% \end{array}
 %% \]
 %% %
-In order to derive the local specification $\g{x}{\gamma}$ from the global specification $\G{x}{\gamma}$, it thus suffices to show $\shared{P}{I_{\gamma}} \semimplies Q$ as demonstrated below.
+In order to derive the local specification $\g{x}{\gamma}$ from the global specification $\G{x}{\gamma}$, it thus suffices to show $\shared{P}{I_{\gamma}} => Q$ as demonstrated below.
 %
 %\begin{align*}
 %	&\shared{P}{I_{\gamma}}\!\!\!\!
@@ -305,11 +305,11 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %
 \begin{align*}
 	\shared{P}{I_{\gamma}} &
-	\color{blue}\stackrel{(\textsc{Copy})}{\implies}\color{black}
+	\color{blue}\stackrel{(\copyRule)}{=>}\color{black}
 	\underbrace{\shared{P}{I_{\gamma}} * \cdots * \shared{P}{I_{\gamma}}}_{|\gamma| \text{ times}}\\
-	&\color{blue}\stackrel{(\textsc{Forget})}{\implies}\color{black}
+	&\color{blue}\stackrel{(\forgetRule)}{=>}\color{black}
 	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I_{\gamma}}  \right)\\
-	& \color{blue}\stackrel{(\textsc{Shift})}{\semimplies}\color{black}
+	& \color{blue}\stackrel{(\shiftRule)}{=>}\color{black}
 	\iterStar_{n \in \gamma} \left( \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}  \right)
 	\color{blue}\iffdef \color{black}Q
 \end{align*}
@@ -485,5 +485,6 @@ Moreover, rather than having a distinct capability to modify the element at addr
 %
 Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
 %
-The full \colosl\ specification of the set module as well as the specification proofs are provided in Appendix~\ref{sec:set-example}.
+The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}. 
+%Appendix~\ref{sec:set-example}.
 
