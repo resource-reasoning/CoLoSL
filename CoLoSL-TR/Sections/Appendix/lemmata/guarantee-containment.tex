@@ -20,17 +20,17 @@ For all $w_1, w_2, w, w' = (l', g', \lmod') \in \Worlds$,
 \begin{align*}
 	(\localPart{(w_2)}, g', \lmod') \in \rely(w_2) 
 \end{align*}
-*
+%
 From (\ref{L13:Ass2}) and by definition of \guarantee\ we know:
 %
 \begin{align}
-	(l', g', \lmod') \in \left(\updateG \cup \extendG \cup \shiftG \right)^{*}(w_2) \label{L13:Ass3}
+	(l', g', \lmod') \in \left(\updateG \cup \extendG\right)^{*}(w_2) \label{L13:Ass3}
 \end{align}
 %
-From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment}, \ref{lem:extendGContainment} and \ref{lem:shiftGContainment} we have:
+From (\ref{L13:Ass1}), (\ref{L13:Ass3}) and by Lemmata \ref{lem:updateGContainment} and \ref{lem:extendGContainment} we have:
 %
 \begin{align}
-	(\localPart{(w_2)}, g', \lmod') \in \left(\updateR \cup \extendR \cup \shiftR \right)^{*}(w_2) \nonumber
+	(\localPart{(w_2)}, g', \lmod') \in \left(\updateR \cup \extendR \right)^{*}(w_2) \nonumber
 \end{align}
 %
 and consequently 
@@ -216,53 +216,53 @@ as required.
 %
 \end{lemma}
 %
-%
-\begin{lemma}[]\label{lem:shiftGContainment}
-%
-For all $w_1, w_2, w, w' = (l', g', \lmod') \in \Worlds$, 
-\[
-\begin{array}{l}
-	w_1 \composeW w_2 = w /| w' \in \shiftG(w_1) \implies (\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2)
-\end{array}
-\]
-%
-\begin{proof} Pick an arbitrary $w_1 = (l_1, g_1, \lmod_{1})$, $w_2 = (l_2, g_2, \lmod_{2}), w$ and $w' = (l', g', \lmod')$ such that:
-%
-\begin{align}
-	& w_1 \composeW w_2 = w \label{LSGC:Ass1}\\
-	& w' \in \shiftG(w_1) \label{LSGC:Ass2}
-\end{align}
-%
-\textbf{RTS.}
-%
-\begin{align*}
-	(\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2) 
-\end{align*}
-%
-From (\ref{LSGC:Ass1}) we know:
-%
-\begin{align}
-	& g_1 = g_2 /| \lmod_{1} = \lmod_{2}  \label{LSGC:Ass3}
-\end{align}
-%
-By definition of \shiftG and from (\ref{LSGC:Ass2}), and (\ref{LSGC:Ass3}) we know there exists $\lmod'' \in \AMods$ such that
-%
-\begin{align}
-%
-%	& g' = g_2 /| \gmod' = \gmod_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \for{\ca{}} \for{a \in \lmod'' (\ca{})} \m{reflected}(a, g_2, \lmod_2) \label{LSGC:Ass7}
-	& g' = g_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \expandsAM{\lmod''}{\unitL}{g_2}{\lmod_{2}} \label{LSGC:Ass7}
-%
-\end{align}
-%
-From (\ref{LSGC:Ass7}) and the definition of $\shiftR$ we have:
-%
-\begin{equation}
-	(\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2) \nonumber
-\end{equation}
-% 
-as required.
-\end{proof}
-%
-%
-\end{lemma}
-%
+%%
+%\begin{lemma}[]\label{lem:shiftGContainment}
+%%
+%For all $w_1, w_2, w, w' = (l', g', \lmod') \in \Worlds$, 
+%\[
+%\begin{array}{l}
+%	w_1 \composeW w_2 = w /| w' \in \shiftG(w_1) \implies (\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2)
+%\end{array}
+%\]
+%%
+%\begin{proof} Pick an arbitrary $w_1 = (l_1, g_1, \lmod_{1})$, $w_2 = (l_2, g_2, \lmod_{2}), w$ and $w' = (l', g', \lmod')$ such that:
+%%
+%\begin{align}
+%	& w_1 \composeW w_2 = w \label{LSGC:Ass1}\\
+%	& w' \in \shiftG(w_1) \label{LSGC:Ass2}
+%\end{align}
+%%
+%\textbf{RTS.}
+%%
+%\begin{align*}
+%	(\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2) 
+%\end{align*}
+%%
+%From (\ref{LSGC:Ass1}) we know:
+%%
+%\begin{align}
+%	& g_1 = g_2 /| \lmod_{1} = \lmod_{2}  \label{LSGC:Ass3}
+%\end{align}
+%%
+%By definition of \shiftG and from (\ref{LSGC:Ass2}), and (\ref{LSGC:Ass3}) we know there exists $\lmod'' \in \AMods$ such that
+%%
+%\begin{align}
+%%
+%%	& g' = g_2 /| \gmod' = \gmod_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \for{\ca{}} \for{a \in \lmod'' (\ca{})} \m{reflected}(a, g_2, \lmod_2) \label{LSGC:Ass7}
+%	& g' = g_2 /| \lmod' = \lmod_{2} \cup \lmod'' /| \expandsAM{\lmod''}{\unitL}{g_2}{\lmod_{2}} \label{LSGC:Ass7}
+%%
+%\end{align}
+%%
+%From (\ref{LSGC:Ass7}) and the definition of $\shiftR$ we have:
+%%
+%\begin{equation}
+%	(\localPart{(w_2)}, g', \lmod') \in \shiftR(w_2) \nonumber
+%\end{equation}
+%% 
+%as required.
+%\end{proof}
+%%
+%%
+%\end{lemma}
+%%

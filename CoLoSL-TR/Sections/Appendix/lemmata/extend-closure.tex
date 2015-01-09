@@ -1,44 +1,43 @@
 \newpage	
+%%
+%\begin{lemma}[\extendRule-Containment]\label{lem:extend-containment}
+%Given any two action models $\lmod, \lmod' \in \AMods$, 
+%\[
+%\begin{array}{l l}
+%	\for{n \in \Nats} \for{l \in \LStates} \isContainedAM{\lmod}{n}{l}{\lmod \cup \lmod'}
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%Pick an arbitrary $\lmod, \lmod' \in \AMods$. We then proceed by induction on $n$.\\
 %
-\begin{lemma}[\extendRule-Containment]\label{lem:extend-containment}
-Given any two action models $\lmod, \lmod' \in \AMods$, 
-\[
-\begin{array}{l l}
-	\for{n \in \Nats} \for{l \in \LStates} \isContainedAM{\lmod}{n}{l}{\lmod \cup \lmod'}
-\end{array}
-\]
+%\noindent\textbf{Base case $n = 0$}\\
+%Pick an arbitrary $l \in \LStates$. From the definition of $\leq_0$ we then trivially have $\isContainedAM{\lmod}{0}{l}{\lmod \cup \lmod'}$ as required.\\
 %
-\begin{proof}
-Pick an arbitrary $\lmod, \lmod' \in \AMods$. We then proceed by induction on $n$.\\
-
-\noindent\textbf{Base case $n = 0$}\\
-Pick an arbitrary $l \in \LStates$. From the definition of $\leq_0$ we then trivially have $\isContainedAM{\lmod}{0}{l}{\lmod \cup \lmod'}$ as required.\\
-
-\noindent\textbf{Inductive case}\\
-Pick an arbitrary $n \in \Nats^{+}$ such that
+%\noindent\textbf{Inductive case}\\
+%Pick an arbitrary $n \in \Nats^{+}$ such that
+%%
+%\begin{align}
+%	\for{l' \in \LStates} \isContainedAM{\lmod}{n-1}{l'}{\lmod \cup \lmod'} \label{ECon:IH} \tag{I.H.}
+%\end{align}
+%%
+%Pick an arbitrary $l \in \LStates$. We are then required to show 
+%%
+%\begin{align*}
+%	\for{\ca{}} \for{a \in \lmod(\ca{})} \m{reflected}(a, l, (\lmod \cup \lmod')(\ca{})) \land \isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'} 
+%\end{align*}
+%%
+%Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$. From the definition of $\m{reflected}$ we trivially have:
+%%
+%\begin{align*}
+%	\m{reflected}(a, l, (\lmod \cup \lmod')(\ca{}))
+%\end{align*}
+%%
+%If $a[l]$ is undefined then we vacuously have $\isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'}$. On the other hand, if $a[l]$ is defined then from (\ref{ECon:IH}) we have $\isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'}$ as required.
+%\end{proof}
+%%
 %
-\begin{align}
-	\for{l' \in \LStates} \isContainedAM{\lmod}{n-1}{l'}{\lmod \cup \lmod'} \label{ECon:IH} \tag{I.H.}
-\end{align}
-%
-Pick an arbitrary $l \in \LStates$. We are then required to show 
-%
-\begin{align*}
-	\for{\ca{}} \for{a \in \lmod(\ca{})} \m{reflected}(a, l, (\lmod \cup \lmod')(\ca{})) \land \isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'} 
-\end{align*}
-%
-Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$. From the definition of $\m{reflected}$ we trivially have:
-%
-\begin{align*}
-	\m{reflected}(a, l, (\lmod \cup \lmod')(\ca{}))
-\end{align*}
-%
-If $a[l]$ is undefined then we vacuously have $\isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'}$. On the other hand, if $a[l]$ is defined then from (\ref{ECon:IH}) we have $\isContainedAM{\lmod}{n-1}{a[l]}{\lmod \cup \lmod'}$ as required.
-\end{proof}
-%
-
-\end{lemma}
-%
+%\end{lemma}
 %%
 %\begin{lemma}[\extendRule-Containment]\label{lem:extend-containment2}
 %Given any two action models $\lmod, \lmod' \in \AMods$, 
@@ -91,37 +90,6 @@ For all $\lmod, \lmod_{e}, \lmod_{0} \in \AMods$ such that $\for{\ca{} \in \dom{
 \end{array}
 \]
 %
-%where
-%%
-%\[
-%\begin{array}{@{} l  l @{}}
-%	\left( (\lmod_1, \fence{1}) + (\lmod_{2}, \fence{2}) \right)(\ca{}) \eqdef  & 
-%	\left\{
-%		(f', a[f']) \;\;\middle|
-%		\begin{array}{ l @{}}
-%			\left(a \in \lmod_{1}(\ca{}) |/ a \in \lmod_{2}(\ca{})  \right) /| \\
-%			f' \in \fence{1} \composeL \fence{2} /| \m{enabled}(a, f')	
-%		\end{array}		  
-%	\right\}\\
-%\end{array}
-%\]
-%%
-%and
-%%
-%\[
-%\begin{array}{@{} l l @{}}
-%	\fence{1} \composeL \fence{2} \eqdef & 
-%	\left\{
-%		f_{1} \composeL f_{2} \;\;\middle|\;\; 
-%		f_{1} \in \fence{1} /| f_{2} \in \fence{2}
-%%		\begin{array}{l @{\hspace{5pt}} l @{}}
-%%			\exsts{\fence{}, \fence{e}} & g \in \fence{} /| f \in \fence{} /| \fence{} \strictfences \lmod /| \\
-%%			& s_{e} \in \fence{e} /| f_{e} \in \fence{e} /| \fence{e} \strictfences \lmod_{e} 
-%%		\end{array}
-%	\right\}
-%\end{array}
-%\]
-%%
 \begin{proof} Pick an arbitrary $\lmod, \lmod_e, \lmod_0 \in \AMods$, $g, s_e \in \LStates$ and $\fence{}, \fence{e} \in \pset{\LStates}$ such that 
 %
 \begin{align}
@@ -133,12 +101,9 @@ For all $\lmod, \lmod_{e}, \lmod_{0} \in \AMods$ such that $\for{\ca{} \in \dom{
 From the definition of $\downarrow$, it then suffices to show
 %
 \begin{align}
-	& \for {n \in \Nats} \isContainedAM{\lmod_e}{n}{s_e \composeL g}{\lmod \cup \lmod_e \cup \lmod_0} \label{EC:Goal1}\\
 	& \for {n \in \Nats}  \extendsAMUpto{\lmod \cup \lmod_e}{n}{s_e}{g}{\lmod_e} \label{EC:Goal2}
 \end{align}
 %
-\noindent\textbf{RTS. (\ref{EC:Goal1})} \\
-This follows immediately from \lem~\ref{lem:extend-containment}.\\
 
 \noindent\textbf{RTS. (\ref{EC:Goal2})} \\
 Rather than proving (\ref{EC:Goal2}) directly, we first establish the following.
@@ -153,7 +118,6 @@ We can then despatch (\ref{EC:Goal2}) from (\ref{EC:Ass1}) and (\ref{EC:Goal3});
 \noindent\textbf{RTS. (\ref{EC:Goal3})} \\
 We proceed by induction on the number of steps $n$.\\
 
-%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
 \noindent\textbf{Base case }$n=0$\\
 Pick an arbitrary $g, s_e \in \LStates$. We are then required to show	$\extendsAMUpto{\lmod \cup \lmod_e \cup \lmod_0}{0}{s_e}{g}{\lmod_e}$ which follows trivially from the definition of $\downarrow_0$.\\
 
@@ -164,26 +128,15 @@ Pick an arbitrary $n \in \Nats$ and $g, s_e \in \LStates$ such that
 \begin{align}
 	& g \in  \fence{} \label{LEC:Ass1}\\
 	& s_e \in \fence{e} \label{LEC:Ass2}\\
-%	& \gmod = (\lmod, g) + (\lmod_{e}, s_e) \label{LEC:Ass3}\\
 	& \tag{I.H} \for{g', s_e'}  g' \in \fence{} /| s'_e \in \fence{e} \implies \extendsAMUpto{\lmod \cup \lmod_{e} \cup \lmod_0}{(n-1)}{s_e'}{g'}{\lmod_{e}} \label{LEC:IH}
 \end{align}
 %
 \textbf{RTS.}
 %
 \begin{align}
-%	& 
-%	\V{\ca{}}  \V{a\in \lmod_e(\ca{})} \nonumber \\
-%  &\quad (\m{potential}(a, s_e \composeL g)  => \nonumber\\
-%  & \quad\qquad\for{(s', r') \in a[s_e, g]} \extendsAMUpto{\lmod \cup \lmod_e \cup \lmod_0, \gmod}{(n-1)}{s'}{r'}{\lmod_e}) \label{LEC:Goal1}\\
-%%  
-%  &\quad \m{enabled}(a,s_e \composeL g)
-%  => (s_e \composeL g, a[s_e \composeL g])\in \gmod(\ca{})) \label{LEC:Goal2}\\
-%  
-  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_e \cup \lmod_0 \right) (\ca{})}
-  \m{potential}(a,s_e \composeL g) =>\null \nonumber \\
-%  &\ \m{reflected}(a, s_e \composeL g,\lmod_e(\ca{})) |/\null \nonumber \\
-%%  
-%  &\ \neg\m{visible}(a, s_e) /| \for{(s', r') \in a[s_e, g]} \extendsAMUpto{\lmod \cup \lmod_e \cup \lmod_0, \gmod}{(n-1)}{s'}{r'}{\lmod_e}  
+	& \for{\ca{}}\for{a \in \lmod_e (\ca{})} \m{potential}(a, s_e \composeL g) \implies
+	\m{reflected}(a, s_e \composeL g, (\lmod \cup \lmod_e \cup \lmod_0)(\ca{}))\label{LEC:Goal1}\\
+	& \for{\ca{}}\for{a \in (\lmod \cup \lmod_e \cup \lmod_0)(\ca{})} \m{potential}(a, s_e \composeL g) \implies \nonumber \\
 	& \quad
 	\begin{array}{@{} l @{}}
 		\left(\m{reflected}(a,s_e \composeL g, \lmod_e(\ca{})) |/ \neg\m{visible}(a, s_e) \ \right) /| \\
@@ -194,8 +147,8 @@ Pick an arbitrary $n \in \Nats$ and $g, s_e \in \LStates$ such that
 %
 %
 
-%\noindent\textbf{RTS. \ref{LEC:Goal1}}\\
-
+\noindent\textbf{RTS. \ref{LEC:Goal1}}\\
+Pick an arbitrary $\ca{}$, $a \in \lmod_e(\ca{})$ such that $\m{potential}(a, s_e \composeL g)$. From the definitions of $\lmod \cup \lmod_e \cup \lmod_0$ and $\m{reflected}$ we then trivially have $\m{reflected}(a, s_e \composeL g, (\lmod \cup \lmod_e \cup \lmod_0)(\ca{}))$ as required.\\
 %Since from (\ref{LEC:Ass5}) and the definition of $\m{potential}$ we have $s_e \composeL g \meetL \fst{a} \not= \emptyset$ and consequently, $s_e \meetL \fst{a} \not= \emptyset$, from (\ref{LEC:Ass2}) we have:
 %%
 %\begin{align}
@@ -277,24 +230,24 @@ From (\ref{LEC:ass3}) and the definition of $\m{visible}$ we have:
 On the other hand, from (\ref{LEC:ass2}), (\ref{LEC:ass3}) and the definitions of $a[s_e, g]$, $a[g]$ and $\disjoint$, we know: 
 %
 \begin{align}
-	& s' = s_e  \label{LEC:ass5}\\
-	& a[g] = r'  \label{LEC:ass6}
+	& s' = s_e  \label{LEC:ass6}\\
+	& a[g] = r'  \label{LEC:ass7}
 \end{align}
 %
-Consequently, from (\ref{EC:Ass2}), (\ref{LEC:Ass1}), (\ref{LEC:ass4}),  (\ref{LEC:ass6}) and the definition of $\strictfences$ we have:
+Consequently, from (\ref{EC:Ass2}), (\ref{LEC:Ass1}), (\ref{LEC:ass4}),  (\ref{LEC:ass7}) and the definition of $\strictfences$ we have:
 %
 \begin{align}
-	r' \in \fence{}  \label{LEC:ass7}
+	r' \in \fence{}  \label{LEC:ass8}
 \end{align}
 %
-Finally, from (\ref{LEC:Ass2}), (\ref{LEC:ass7}), (\ref{LEC:IH}) we have:
+Finally, from (\ref{LEC:Ass2}), (\ref{LEC:ass8}), (\ref{LEC:IH}) we have:
 %
 \begin{align}
 	\extendsAMUpto{\lmod \cup \lmod_{e} \cup \lmod_0}{(n-1)}{s_e}{r'}{\lmod_e}
-	\label{LEC:ass8}
+	\label{LEC:ass9}
 \end{align}
 %
-and consequently from (\ref{LEC:ass5}) and (\ref{LEC:ass2})-(\ref{LEC:ass8}) we have
+and consequently from (\ref{LEC:ass5}) and (\ref{LEC:ass2})-(\ref{LEC:ass9}) we have
 %
 \begin{align*}
 	& \neg\m{visible}(a, s_e) /| \\
@@ -400,116 +353,116 @@ For all $\lmod_0, \lmod{}, \lmod_{e} \in \AMods$, $s, g, s_e \in \LStates$ and $
 From the definition of $\downarrow$, it then suffices to show
 %
 \begin{align}
-	& \for{n \in \Nats} \isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_2} \label{EC2:Goal1}\\
+%	& \for{n \in \Nats} \isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_2} \label{EC2:Goal1}\\
 	& \for{n \in \Nats} \extendsAMUpto{\lmod \cup \lmod_e}{n}{s}{(g-s) \composeL s_e}{\lmod_0} \label{EC2:Goal2}
 \end{align}
 %
-\noindent\textbf{RTS. (\ref{EC2:Goal1})} \\
-%Since from (\ref{EC2:Ass3}) and the definition of $\downarrow$ we have $\lmod_0 \subseteq \lmod$, we can consequently derive $\lmod_0 \subseteq \lmod \cup \lmod_e$ as required.\\
-Rather than proving (\ref{EC2:Goal1}) directly, we first establish the following.
+%\noindent\textbf{RTS. (\ref{EC2:Goal1})} \\
+%%Since from (\ref{EC2:Ass3}) and the definition of $\downarrow$ we have $\lmod_0 \subseteq \lmod$, we can consequently derive $\lmod_0 \subseteq \lmod \cup \lmod_e$ as required.\\
+%Rather than proving (\ref{EC2:Goal1}) directly, we first establish the following.
+%%
+%\begin{align}
+%	& \for {n \in \Nats} \for{g, s_e \in \LStates} \nonumber\\
+%	& \quad g \in \fence{} /|  s_e \in \fence{e} /| \isContainedAM{\lmod_0}{n}{g}{\lmod} \implies \nonumber\\
+%	& \qquad \isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_e} \label{EC2G1:Goal3}
+%\end{align}
+%%
+%We can then despatch (\ref{EC2:Goal1}) from (\ref{EC2:Ass1}), (\ref{EC2:Ass3}) and (\ref{EC2G1:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{EC2:Ass3}) and the definition of $\leq_n$ we have $\isContainedAM{\lmod_0}{n}{g}{\lmod}$ and consequently from (\ref{EC2:Ass1}) and (\ref{EC2G1:Goal3}) we derive $\isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_e} $ as required. \\
 %
-\begin{align}
-	& \for {n \in \Nats} \for{g, s_e \in \LStates} \nonumber\\
-	& \quad g \in \fence{} /|  s_e \in \fence{e} /| \isContainedAM{\lmod_0}{n}{g}{\lmod} \implies \nonumber\\
-	& \qquad \isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_e} \label{EC2G1:Goal3}
-\end{align}
+%\noindent\textbf{RTS. (\ref{EC2G1:Goal3})} \\
+%We proceed by induction on the number of steps $n$.\\
 %
-We can then despatch (\ref{EC2:Goal1}) from (\ref{EC2:Ass1}), (\ref{EC2:Ass3}) and (\ref{EC2G1:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{EC2:Ass3}) and the definition of $\leq_n$ we have $\isContainedAM{\lmod_0}{n}{g}{\lmod}$ and consequently from (\ref{EC2:Ass1}) and (\ref{EC2G1:Goal3}) we derive $\isContainedAM{\lmod_0}{n}{g \composeL s_e}{\lmod \cup \lmod_e} $ as required. \\
-
-\noindent\textbf{RTS. (\ref{EC2G1:Goal3})} \\
-We proceed by induction on the number of steps $n$.\\
-
-%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
-\noindent\textbf{Base case }$n=0$\\
-Pick an arbitrary $g, s_e \in \LStates$. We are then required to show	$\isContainedAM{\lmod_0}{0}{g \composeL s_e}{\lmod \cup \lmod_e}$ which follows trivially from the definition of $\leq_0$.\\
-
-
-\noindent\textbf{Inductive case }\\
-Pick an arbitrary $n \in \Nats$ and $g, s_e \in \LStates$ such that
+%%\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
+%\noindent\textbf{Base case }$n=0$\\
+%Pick an arbitrary $g, s_e \in \LStates$. We are then required to show	$\isContainedAM{\lmod_0}{0}{g \composeL s_e}{\lmod \cup \lmod_e}$ which follows trivially from the definition of $\leq_0$.\\
 %
-\begin{align}
-	& g \in \fence{} \label{LEC2G1:Ass1}\\
-	& s_e \in \fence{e} \label{LEC2G1:Ass2}\\
-	& \isContainedAM{\lmod_0}{n}{g}{\lmod} \label{LEC2G1:Ass4}\\
-	& \for{g'', s_e''}  g'' \in \fence{} /| s''_e \in \fence{e} /| \isContainedAM{\lmod_0}{(n-1)}{g''}{\lmod} \nonumber \\
-	& \tag{I.H} \qquad \implies \isContainedAM{\lmod_0}{(n-1)}{g''\composeL s_e''}{\lmod \cup \lmod_{e}} \label{LEC2G1:IH}
-\end{align}
 %
-\textbf{RTS.}
-%
-\begin{align*}  
-	& \quad
-  \begin{array}{@{} l @{}}
-  	\for{\ca{}}\for{a \in \lmod_0(\ca{})}
-		\m{reflected}(a,g \composeL s_e, \lmod \cup \lmod_e(\ca{})) \land
-		\isContainedAM{\lmod_0}{(n-1)}{a[g \composeL s_e]}{\lmod \cup \lmod_e}
- 	\end{array} 
-\end{align*}
-%
-Pick an arbitrary $\ca{}$, $a$ and $p, q, c$ such that
-%
-\begin{align}
-	& a = (p, q, c) \in \lmod_0(\ca{}) \label{LEC2G1:Ass5}
-\end{align}
-%(\ref{LEC2G1:Ass})
-Pick an arbitrary $l$ such that
-%
-\begin{align}
-	& p \composeL c \leq g \composeL s_e \composeL l \label{LEC2G1:Ass6}
-\end{align}
-%(\ref{LEC2G1:Ass})
-Then from (\ref{LEC2G1:Ass4}),(\ref{LEC2G1:Ass6}) we know there exists $a''$ and $c''$ such that
-%
-\begin{align}
-	a'' = (p, q, c'') \in \lmod(\ca{}) \land p \composeL c'' \leq g \composeL s_e \composeL l \label{LEC2G1:Ass7}
-\end{align}
-%
-and thus from (\ref{LEC2G1:Ass6}) and by definitions of $\lmod \cup \lmod_e$ and $\m{reflected}$ we have:
-%
-\begin{align*}
-	\m{reflected}(a, g \composeL s_e, \lmod \cup \lmod_e(\ca{}))
-\end{align*}
-%
-as required. \\
-%
-On the other hand, from (\ref{LEC2G1:Ass7}) and the definition of action application we have:
-%
-\begin{align}
-	a''[g \composeL s_e] = a[g \composeL s_e] \land a''[g] = a[g] 
-	\label{LEC2G1:Ass8}
-\end{align}
-%
-From (\ref{LEC2G1:Ass1}), (\ref{LEC2G1:Ass7}) and (\ref{EC2:Ass2}) we know
-%
-\begin{align}
-	a''[g] \in \fence{} \land p \leq g \label{LEC2G1:Ass9}
-\end{align}
-%
-and consequently from the the definition of action application we have:
-%
-\begin{align}
-	a''[g \composeL s_e] = a''[g] \composeL s_e \label{LEC2G1:Ass10}
-\end{align}
-%
-From (\ref{LEC2G1:Ass4}) and (\ref{LEC2G1:Ass5}) and (\ref{LEC2G1:Ass8}) we have:
-%
-\begin{align}
-	\isContainedAM{\lmod_0}{(n-1)}{a''[g]}{\lmod} \label{LEC2G1:Ass11}
-\end{align}
-%
-Finally from (\ref{LEC2G1:Ass9}), (\ref{LEC2G1:Ass2}), (\ref{LEC2G1:Ass11}) and (\ref{LEC2G1:IH}) we have:
-%
-\begin{align*}
-	\isContainedAM{\lmod_0}{(n-1)}{a''[g] \composeL s_e}{\lmod \cup \lmod_e}
-\end{align*}
-%
-and consequently from (\ref{LEC2G1:Ass10}) and (\ref{LEC2G1:Ass8}) 
-%
-\begin{align*}
-	\isContainedAM{\lmod_0}{(n-1)}{a[g \composeL s_e]}{\lmod \cup \lmod_e}
-\end{align*}
-%
-as required.\\
+%\noindent\textbf{Inductive case }\\
+%Pick an arbitrary $n \in \Nats$ and $g, s_e \in \LStates$ such that
+%%
+%\begin{align}
+%	& g \in \fence{} \label{LEC2G1:Ass1}\\
+%	& s_e \in \fence{e} \label{LEC2G1:Ass2}\\
+%	& \isContainedAM{\lmod_0}{n}{g}{\lmod} \label{LEC2G1:Ass4}\\
+%	& \for{g'', s_e''}  g'' \in \fence{} /| s''_e \in \fence{e} /| \isContainedAM{\lmod_0}{(n-1)}{g''}{\lmod} \nonumber \\
+%	& \tag{I.H} \qquad \implies \isContainedAM{\lmod_0}{(n-1)}{g''\composeL s_e''}{\lmod \cup \lmod_{e}} \label{LEC2G1:IH}
+%\end{align}
+%%
+%\textbf{RTS.}
+%%
+%\begin{align*}  
+%	& \quad
+%  \begin{array}{@{} l @{}}
+%  	\for{\ca{}}\for{a \in \lmod_0(\ca{})}
+%		\m{reflected}(a,g \composeL s_e, \lmod \cup \lmod_e(\ca{})) \land
+%		\isContainedAM{\lmod_0}{(n-1)}{a[g \composeL s_e]}{\lmod \cup \lmod_e}
+% 	\end{array} 
+%\end{align*}
+%%
+%Pick an arbitrary $\ca{}$, $a$ and $p, q, c$ such that
+%%
+%\begin{align}
+%	& a = (p, q, c) \in \lmod_0(\ca{}) \label{LEC2G1:Ass5}
+%\end{align}
+%%(\ref{LEC2G1:Ass})
+%Pick an arbitrary $l$ such that
+%%
+%\begin{align}
+%	& p \composeL c \leq g \composeL s_e \composeL l \label{LEC2G1:Ass6}
+%\end{align}
+%%(\ref{LEC2G1:Ass})
+%Then from (\ref{LEC2G1:Ass4}),(\ref{LEC2G1:Ass6}) we know there exists $a''$ and $c''$ such that
+%%
+%\begin{align}
+%	a'' = (p, q, c'') \in \lmod(\ca{}) \land p \composeL c'' \leq g \composeL s_e \composeL l \label{LEC2G1:Ass7}
+%\end{align}
+%%
+%and thus from (\ref{LEC2G1:Ass6}) and by definitions of $\lmod \cup \lmod_e$ and $\m{reflected}$ we have:
+%%
+%\begin{align*}
+%	\m{reflected}(a, g \composeL s_e, \lmod \cup \lmod_e(\ca{}))
+%\end{align*}
+%%
+%as required. \\
+%%
+%On the other hand, from (\ref{LEC2G1:Ass7}) and the definition of action application we have:
+%%
+%\begin{align}
+%	a''[g \composeL s_e] = a[g \composeL s_e] \land a''[g] = a[g] 
+%	\label{LEC2G1:Ass8}
+%\end{align}
+%%
+%From (\ref{LEC2G1:Ass1}), (\ref{LEC2G1:Ass7}) and (\ref{EC2:Ass2}) we know
+%%
+%\begin{align}
+%	a''[g] \in \fence{} \land p \leq g \label{LEC2G1:Ass9}
+%\end{align}
+%%
+%and consequently from the the definition of action application we have:
+%%
+%\begin{align}
+%	a''[g \composeL s_e] = a''[g] \composeL s_e \label{LEC2G1:Ass10}
+%\end{align}
+%%
+%From (\ref{LEC2G1:Ass4}) and (\ref{LEC2G1:Ass5}) and (\ref{LEC2G1:Ass8}) we have:
+%%
+%\begin{align}
+%	\isContainedAM{\lmod_0}{(n-1)}{a''[g]}{\lmod} \label{LEC2G1:Ass11}
+%\end{align}
+%%
+%Finally from (\ref{LEC2G1:Ass9}), (\ref{LEC2G1:Ass2}), (\ref{LEC2G1:Ass11}) and (\ref{LEC2G1:IH}) we have:
+%%
+%\begin{align*}
+%	\isContainedAM{\lmod_0}{(n-1)}{a''[g] \composeL s_e}{\lmod \cup \lmod_e}
+%\end{align*}
+%%
+%and consequently from (\ref{LEC2G1:Ass10}) and (\ref{LEC2G1:Ass8}) 
+%%
+%\begin{align*}
+%	\isContainedAM{\lmod_0}{(n-1)}{a[g \composeL s_e]}{\lmod \cup \lmod_e}
+%\end{align*}
+%%
+%as required.\\
 
 
 
@@ -538,7 +491,6 @@ Pick an arbitrary $n \in \Nats$ and $s, r, g, s_e \in \LStates$ such that
 \begin{align}
 	& g \in \fence{} \label{LEC2:Ass1}\\
 	& s_e \in \fence{e} \label{LEC2:Ass2}\\
-%	& \gmod' = (\lmod, g) + (\lmod_{e}, s_e) 
 	& g = s \composeL r \label{LEC2:Ass3} \\
 	& \extendsAMUpto{\lmod}{n}{s}{r}{\lmod_0} \label{LEC2:Ass4}\\
 	& \for{s'', g'', s_e''}  g'' \in \fence{} /| s''_e \in \fence{e} /| \extendsAMUpto{\lmod}{(n-1)}{s''}{g''-s''}{\lmod_0} \nonumber \\
@@ -547,28 +499,48 @@ Pick an arbitrary $n \in \Nats$ and $s, r, g, s_e \in \LStates$ such that
 %
 \textbf{RTS.}
 %
-\begin{align*}
-%	& 
-%	\V{\ca{}}  \V{a\in \lmod_0(\ca{})} \nonumber \\
-%  &\quad (\m{potential}(a, g \composeL s_e) => \nonumber\\
-%  & \quad\qquad\for{(s', r') \in a[s, r \composeL s_e]} \extendsAMUpto{\lmod \cup \lmod_e, \gmod'}{(n-1)}{s'}{r'}{\lmod_0}) \label{LEC2:Goal1}\\
-%%   
-%  &\quad (\m{enabled}(a,g \composeL s_e)
-%  => (g \composeL s_e, a[g \composeL s_e])\in \gmod'(\ca{})) \label{LEC2:Goal2}\\
-%  
-%  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_e \right) (\ca{})}
-%  \m{potential}(a,g \composeL s_e) =>\null \nonumber \\
-%  &\ \m{reflected}(a, g \composeL s_e, \lmod_0(\ca{})) |/\null \nonumber \\
-%%  
-%  &\ \neg\m{visible}(a, s) /| \for{(s', r') \in a[s, r \composeL s_e]} \extendsAMUpto{\lmod \cup \lmod_e, \gmod'}{(n-1)}{s'}{r'}{\lmod_0} 
+\begin{align}
+	& 
+	\V{\ca{}}\V{a\in \lmod_0(\ca{})} 
+  (\m{potential}(a, g \composeL s_e) => \m{reflected}(a, g \composeL s_e, (\lmod \cup \lmod_e)(\ca{})) \label{LEC2:Goal1}\\
+  &\V{\ca{}}\V{a\in \left(\lmod \cup \lmod_e \right) (\ca{})}
+  \m{potential}(a,g \composeL s_e) =>\null \nonumber \\
 	& \quad
   \begin{array}{@{} l @{}}
 		\left(\m{reflected}(a,g \composeL s_e, \lmod_0(\ca{})) |/ \neg\m{visible}(a, s) \ \right) /| \\
 		\for{(s', r') \in a[s, r \composeL s_e]} \extendsAMUpto{\lmod \cup \lmod_e}{(n-1)}{s'}{r'}{\lmod_0}
- 	\end{array} 
+ 	\end{array} \label{LEC2:Goal2}
+\end{align}
+%
+%
+\noindent\textbf{RTS. (\ref{LEC2:Goal1})}\\
+Pick an arbitrary $\ca{}$, $a = (p, q, c) \in \lmod_0(\ca{})$ such that $\m{potential}(a, g \composeL s_e)$. From (\ref{LEC2:Ass3}), (\ref{LEC2:Ass4}) and the definition of $\AMExtension_n$ we then have $\m{reflected}(a, g, \lmod(\ca{}))$. Consequently, from the definition of $\m{reflected}$ we trivially have:
+%
+\begin{align}
+	\m{reflected}(a, g, (\lmod \cup \lmod_e)(\ca{})) \label{LEC2G1:Ass1}
+\end{align} 
+%
+Pick an arbitrary $l \in \LStates$ such that
+%
+\begin{align}
+	p \composeL c \leq g \composeL s_e \composeL l \label{LEC2G1:Ass2}
+\end{align}
+%
+From (\ref{LEC2G1:Ass1}) and the definition of $\m{reflected}$ we then know there exists $a', c'$ such that
+%
+\begin{align}
+	a' = (p, q, c') \in (\lmod \cup \lmod_e)(\ca{}) \land p \composeL c' \leq g \composeL s_e \composeL r \label{LEC2G1:Ass3}
+\end{align}
+%
+Finally, from (\ref{LEC2G1:Ass2}), (\ref{LEC2G1:Ass3}) and the definition of $\m{reflected}$ we have
+%
+\begin{align*}
+	\m{reflected}(a, g \composeL s_e, (\lmod \cup \lmod_e)(\ca{}))
 \end{align*}
-%
-%
+% 
+as required.\\
+
+\noindent\textbf{RTS. (\ref{LEC2:Goal2})}\\
 Pick an arbitrary $\ca{}$, $a = (p, q, c) \in \left(\lmod \cup \lmod_e \right)(\ca{})$ and $(s', r')$ such that
 %
 \begin{align}
@@ -744,3 +716,4 @@ as required.
 
 \end{proof}
 \end{lemma}
+

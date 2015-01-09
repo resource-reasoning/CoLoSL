@@ -12,19 +12,73 @@ For all $\lmod, \lmod_1, \lmod_2 \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$
 \begin{proof} Pick an arbitrary $\lmod, \lmod_1, \lmod_2 \in \AMods$ and $s_p, s_c, s_q, r \in \LStates$ such that 
 %
 \begin{align}
-	\extendsAM{\lmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} /| \extendsAM{\lmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{MC:Ass1}
+	\extendsAM{\lmod}{s_p \composeL s_c}{s_q \composeL r}{\lmod_{1}} \label{MC:Ass1}\\
+	\extendsAM{\lmod}{s_q \composeL s_c}{s_p \composeL r}{\lmod_{2}} \label{MC:Ass2}
 \end{align} 
 %
 From the definition of $\downarrow$, it then suffices to show
 %
 \begin{align}
-	& \lmod_1 \cup \lmod_2  \subseteq \lmod \label{MC:Goal1}\\
+%	& \lmod_1 \cup \lmod_2 \leqAM \lmod \label{MC:Goal1}\\
 	& \for {n \in \Nats}  \extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_{1} \cup \lmod_{2}} \label{MC:Goal2}
 \end{align}
 %
 
-\noindent\textbf{RTS. (\ref{MC:Goal1})} \\
-Since from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\lmod_1 \subseteq \lmod /| \lmod_2 \subseteq \lmod$, we can thus conclude $\lmod_1 \cup \lmod_2 \subseteq \lmod$ as required. \\
+%
+%\begin{align}
+%	\for {n \in \Nats} \for{l \in \LStates} \isContainedAM{\lmod_1}{n}{l}{\lmod} /| \isContainedAM{\lmod_2}{n}{l}{\lmod} \implies \isContainedAM{\lmod_1 \cup \lmod_2}{n}{l}{\lmod} \label{MC:Goal3}
+%\end{align}
+%%
+%We can then despatch (\ref{MC:Goal1}) from (\ref{MC:Ass1}), (\ref{MC:Ass2}) and (\ref{MC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{MC:Ass1}), (\ref{MC:Ass2}) and the definition of $\diamond$ we have $\isContainedAM{\lmod_1}{n}{s_p \composeL s_c \composeL s_q \composeL r}{\lmod} /| \isContainedAM{\lmod_2}{n}{s_p \composeL s_c \composeL s_q \composeL r}{\lmod}$ and consequently from (\ref{MC:Goal3}) we derive $\isContainedAM{\lmod_1 \cup \lmod_2}{n}{s_p \composeL s_c \composeL s_q \composeL r}{\lmod}$ as required. \\
+%
+%\noindent\textbf{RTS. \ref{MC:Goal3}}\\
+%We proceed by induction on the number of steps $n$.\\
+%
+%\noindent\textbf{Base case }$n=0$\\
+%Pick an arbitrary $l \in \LStates$. From the definition of $\leq_n$ we trivially have $\isContainedAM{\lmod_1 \cup \lmod_2}{0}{l}{\lmod}$ as required.\\
+%
+%\noindent\textbf{Inductive case}
+%Pick an arbitrary $n \in \Nats$ and $l \in \LStates$ such that
+%%
+%\begin{align}
+%	& \isContainedAM{\lmod_1}{n}{l}{\lmod} \label{MC:Ass3}\\
+%	& \isContainedAM{\lmod_2}{n}{l}{\lmod} \label{MC:Ass4}\\
+%	& \for{l'} \isContainedAM{\lmod_1}{n-1}{l'}{\lmod} /|\isContainedAM{\lmod_2}{n-1}{l'}{\lmod} \implies \isContainedAM{\lmod_1 \cup \lmod_2}{n-1}{l'}{\lmod}
+%	\label{MC:IH} \tag{I.H.}
+%\end{align}
+%%
+%Pick an arbitrary $\ca{}$ and $a \in (\lmod_1 \cup \lmod_2)(\ca{})$. From the definition of $\lmod_1 \cup \lmod_2$ we know that either $a \in \lmod_1(\ca{})$ or $a \in \lmod_2(\ca{})$. There are two cases to consider:\\
+%
+%\noindent \textbf{Case 1. $a \in \lmod_1(\ca{})$}\\
+%From (\ref{MC:Ass3}) and the definition of $\leq_n$ we have
+%%
+%\begin{align*}
+%	\m{reflected}(a, l, \lmod_1(\ca{})) \land \isContainedAM{\lmod_1}{n-1}{a[l]}{\lmod}
+%\end{align*}
+%%
+%and consequently from the definition of $\m{reflected}$
+%%
+%\begin{align}
+%	\m{reflected}(a, l, (\lmod_1 \cup \lmod_2)(\ca{})) \land \isContainedAM{\lmod_1}{n-1}{a[l]}{\lmod} \label{MC:Ass5}
+%\end{align}
+%%
+%On the other hand from (\ref{MC:Ass4}) and \lem\ref{lem:forwardClosure2} we have:
+%%
+%\begin{align}
+%	
+%\end{align}
+%Finally from (\ref{MC:IH}) we have
+%%
+%\begin{align*}
+%	\m{reflected}(a, l, (\lmod_1 \cup \lmod_2)(\ca{})) \land \isContainedAM{\lmod_1 \cup \lmod}{n-1}{a[l]}{\lmod}
+%\end{align*}
+%%
+%
+%\textbf{Case 2. $a \in \lmod_1(\ca{})$}\\
+%The proof of this case is analogous to that of case 1 and is omitted here.
+%
+%In the former case, from the definition of $\diamond$ and (\ref{MC:Ass1}) we have 
+%%Since from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\lmod_1 \subseteq \lmod /| \lmod_2 \subseteq \lmod$, we can thus conclude $\lmod_1 \cup \lmod_2 \subseteq \lmod$ as required. \\
 
 \noindent\textbf{RTS. (\ref{MC:Goal2})} \\
 Rather than proving (\ref{MC:Goal2}) directly, we first establish the following.
@@ -32,12 +86,12 @@ Rather than proving (\ref{MC:Goal2}) directly, we first establish the following.
 \begin{align}
 	\for {n \in \Nats} \for{s_p, s_c, s_q, r \in \LStates} & \nonumber\\
 	& \hspace{-4cm}\extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2} \nonumber\\
-	& \hspace{-3cm} \implies \extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2} \label{MC:Goal3}
+	& \hspace{-3cm} \implies \extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2} \label{MC:Goal4}
 \end{align}
 %
-We can then despatch (\ref{MC:Goal2}) from (\ref{MC:Ass1}) and (\ref{MC:Goal3}); since for an arbitrary $n \in \Nats$, from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2}$ and consequently from (\ref{MC:Goal3}) we derive $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2}$ as required. \\
+We can then despatch (\ref{MC:Goal2}) from (\ref{MC:Ass1}), (\ref{MC:Ass2}) and (\ref{MC:Goal4}); since for an arbitrary $n \in \Nats$, from (\ref{MC:Ass1}) and the definition of $\downarrow$ we have $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c}{s_q \composeL r}{\lmod_1} /| \extendsAMUpto{\lmod}{n}{s_c \composeL s_q}{s_p \composeL r}{\lmod_2}$ and consequently from (\ref{MC:Goal4}) we derive $\extendsAMUpto{\lmod}{n}{s_p \composeL s_c \composeL s_q}{r}{\lmod_1 \cup \lmod_2}$ as required. \\
 
-\noindent\textbf{RTS. (\ref{MC:Goal3})} \\
+\noindent\textbf{RTS. (\ref{MC:Goal4})} \\
 We proceed by induction on the number of steps $n$.\\
 
 %\noindent Pick an arbitrary $s_1, s_2, r \in \LStates, \lmod, \lmod', \gmod \in \AMods$.\\
@@ -57,15 +111,10 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
 %
 \noindent\textbf{RTS.}
 %
-\begin{align}
-%	& 
-%	\V{\ca{}}  \V{a \in \left(\lmod_{1} \cup \lmod_{2}\right)(\ca{})} \nonumber \\
-%  &\quad(\m{potential}(a,s_p \composeL s_c \composeL s_q \composeL r) => \nonumber \\
-%  &\qquad \for{(s', r') \in a[s_p \composeL s_c \composeL s_q , r]} \extendsAMUpto{\lmod, \gmod}{(n-1)}{s'}{r'}{\lmod_{1} \cup \lmod_{2}}) /| \label{LMC:Goal1}\\
-%%    
-%  &\quad(\m{enabled}(a,s_p \composeL s_c \composeL s_q \composeL r) => \nonumber\\
-%  &\qquad\qquad (s_p \composeL s_c \composeL s_q  \composeL r, a[s_p \composeL s_c \composeL s_q  \composeL r])\in \gmod(\ca{})) \land\label{LMC:Goal2}\\
-%  
+\begin{align} 
+	&\V{\ca{}}\V{a\in (\lmod_1 \cup \lmod_2)(\ca{})}
+  \m{potential}(a,s_p \composeL s_c \composeL s_q \composeL r) => \nonumber\\
+  &\quad \m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \lmod(\ca{})) \label{LMC:Goal1}\\
   &\V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s_p \composeL s_c \composeL s_q \composeL r) =>\null \nonumber \\
   &\quad 
@@ -73,14 +122,16 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
 		\left(\m{reflected}(a,s_p \composeL s_c \composeL s_q \composeL r, \left( \lmod_1 \cup \lmod_2 \right)(\ca{})) |/ \neg\m{visible}(a,s_p \composeL s_c \composeL s_q) \ \right) /| \\
 		\for{(s', r') \in a[s_p \composeL s_c \composeL s_q, r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod_1 \cup \lmod_2})
 	\end{array}	  
-	\nonumber
+	\label{LMC:Goal2}
 \end{align}
 %
 %
 %
+\noindent\textbf{RTS. (\ref{LMC:Goal1})}\\
+Pick an arbitrary $\ca{}$ and $a \in (\lmod_1 \cup \lmod_2)(\ca{})$. From the definition of $\lmod_1 \cup \lmod_2$ we know either $a \in \lmod_1(\ca{})$ or $a \in \lmod_2(\ca{})$. In the former case from (\ref{LMC:Ass1}) and the definition of $\AMExtension_n$ we have $\m{reflected}(a, s_p \composeL s_c \composeL s_q \composeL r, \lmod(\ca{}))$ as needed. In the latter case from (\ref{LMC:Ass2}) and the definition of $\AMExtension_n$ we have $\m{reflected}(a, s_p \composeL s_c \composeL s_q \composeL r, \lmod(\ca{}))$ as required.\\
 
-
-\noindent Pick an arbitrary $\ca{}$ and $a = (p, q, c) \in\lmod(\ca{})$ such that
+\noindent\textbf{RTS. (\ref{LMC:Goal2})}\\
+Pick an arbitrary $\ca{}$ and $a = (p, q, c) \in\lmod(\ca{})$ such that
 \begin{equation}
 	\m{potential}(a, s_p \composeL s_c \composeL s_q \composeL r) \label{LMC:Ass40}
 \end{equation}

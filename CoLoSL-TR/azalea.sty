@@ -277,17 +277,11 @@
 %\newcommand{\action}[3]{#1 \swap #2 \text{ provided } #3}
 
 
-\newcommand{\extendsAM}[4]{#1 \diamond \left(#2, #3, #4\right)}
-\newcommand{\extendsAMUpto}[5]{#1 \!\downarrow_{#2} \left(#3, #4, #5\right)}
-\newcommand{\isContainedAM}[4]{#1 \leq_{#2}\left(#3, #4\right)}
-%\newcommand{\extendsAMUptob}[4]{#1 \mathbin{\downarrow}_{#2} (#3, #4)}
+\newcommand{\AMExtension}{\downarrow}
+\newcommand{\extendsAM}[4]{#1 \!\AMExtension \left(#2, #3, #4\right)}
+\newcommand{\extendsAMUpto}[5]{#1 \!\AMExtension_{#2} \left(#3, #4, #5\right)}
 \newcommand{\expandsAM}[4]{#1 \!\uparrow^{\left(#2\right)} \left(#3, #4\right)}
 \newcommand{\padAM}[1]{\left\lceil #1\right\rceil}
-%\newcommand{\forwardClosure}[1]{#1^{\rightarrow}}
-%\newcommand{\backwardClosure}[1]{#1^{\leftarrow}}
-%\newcommand{\extendL}[1]{\left\lceil #1 \right\rceil}
-%\newcommand{\expandAM}[2]{#1\!\!\uparrow_{\left(#2\right)}}
-%
 
 \newcommand{\slsat}{\mathrel{\vDash_{\mathsf{SL}}}}
 

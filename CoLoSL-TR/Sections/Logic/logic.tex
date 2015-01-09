@@ -880,7 +880,7 @@ That is, $a$ can actually happen in $g$ since $g$ holds all the resources in bot
 %
 %
 \begin{definition}[Action model closure]\label{def:actclos}
-An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\isContainedAM{\lmod'}{n}{s\composeL r}{\lmod}$ and $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\leq_n$ and $\downarrow_n$ are defined recursively as follows:
+An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $r$, and action model $\lmod'$, written $\extendsAM{\lmod}{s}{r}{\lmod'}$, if $\extendsAMUpto{\lmod}{n}{s}{r}{\lmod '}$ for all $n\in\Nats$, where $\downarrow_n$ is defined recursively as follows:
 %%
 %\[
 %\begin{array}{@{} L @{}}
@@ -912,15 +912,6 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
 %\]
 %
 %
-%
-\[
-\begin{array}{@{} L @{}}
-	\isContainedAM{\lmod'}{0}{l}{\lmod} \iffdef \m{true}\\
-	
-	\isContainedAM{\lmod'}{n+1}{l}{\lmod} \iffdef \for{\ca{}} \for{a \in \lmod'(\ca{})} \m{reflected}(a, l, \lmod(\ca{})) \land \isContainedAM{\lmod'}{n}{a[l]}{\lmod}
-\end{array}
-\]
-%
 \[
 \begin{array}{@{} L @{}}
   \extendsAMUpto{\lmod}{\mathrlap{0}\phantom{n}}{s}{r}{\lmod'}
@@ -929,12 +920,8 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
   \\
   
   \extendsAMUpto{\lmod}{n+1}{s}{r}{\lmod'} \iffdef \\
-%  \quad (\V{\ca{}}  \V{a\in \lmod'(\ca{})} \\
-%  \qquad (\m{potential}(a,s\composeL r) => \for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod, \gmod}{n}{s'}{r'}{\lmod'}) /| \qquad \hfill \text{(4)}\\
-  
-    
-%  \qquad (\m{enabled}(a, s\composeL r) => (s\composeL r, a[s\composeL r])\in \gmod(\ca{})) ) /|
-%  \hfill \text{(3)}  \null\\
+  \quad (\V{\ca{}}  \V{a\in \lmod'(\ca{})} 
+  (\m{potential}(a,s\composeL r) => \m{reflected}(a, s \composeL r, \lmod(\ca{})) \hfill\quad \text{(1)}\\
   
  	\quad (\V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s\composeL r) =>\null\\
@@ -949,29 +936,32 @@ An action model $\lmod$ is \emph{closed} under a subjective state $s$, context $
 %
 \end{definition}
 %
-Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition($\lmod' \subseteq\lmod$) asserts that the subjective action model $\lmod'$ is contained in $\lmod$ ({\it cf.} property (1) in \defin~\ref{def:assertions}); consequently (from the semantics of subjective assertions), $\lmod$ represents the superset of all interferences known to subjective views.
+%Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition thus asserts that the actions in the subjective action model $\lmod'$ are reflected in $\lmod$.
+%({\it cf.} property (1) in \defin~\ref{def:assertions}); consequently (from the semantics of subjective assertions), $\lmod$ represents the superset of all interferences known to subjective views.
 
 The above states that the $\lmod$ is closed under $(s, r, \lmod')$ if the closure relation holds for any number of steps $n \in \Nats$ where 
 \begin{itemize}
 	\item $s$ denotes the subjective view of the shared state; \vspace{-5pt}
 	\item $r$ denotes the context; \vspace{-5pt}
 	\item $s \composeL r$ captures the entire shared state; \vspace{-5pt}
-	\item a step corresponds to the occurrence of an action as prescribed in $\lmod$ which may or may not be found in $\lmod'$ (since $\lmod \subseteq \lmod$). 
+	\item a step corresponds to the occurrence of an action as prescribed in $\lmod$ which may or may not be found in $\lmod'$. %(since $\lmod \subseteq \lmod$). 
 \end{itemize}   
 %
-The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff for any action $a$ in $\lmod$, where $a$ is potentially enabled in $s \composeL r$, then \textit{either}:
-
-%	\item for any action $a$ in $\lmod'$, where $a$ is potentially enabled in $s \composeL r$, then $(\lmod, \gmod)$ is also closed under any subjective state $s'$ and context $r'$ resulting from application of $a$ ($\,(s', r') \in a[s, r]$); \hfill (4)
-%	
-%	\item for any action $a$ in $\lmod'$, where $a$ is enabled in $s \composeL r$, then $\gmod$ must also contain $a$; \hfill (3)
-	
+The relation is satisfied trivially for no steps ($n = 0$). On the other hand, for an arbitrary $n\in \Nats$ the relation holds iff 
+%
+\begin{enumerate}
+	\item for any action $a$ in $\lmod'$, where $a$ is potentially enabled in $s \composeL r$, then $a$ is reflected in $\lmod$; and
+	\item for any action $a$ in $\lmod$, where $a$ is potentially enabled in $s \composeL r$, then \textit{either}:
 	\begin{enumerate}\renewcommand{\theenumi}{\alph{enumi}}
 		\item $a$ is reflected in $\lmod'$ ($a$ is known to the subjective view), and $\lmod$ is also closed under any subjective state $s'$ and context $r'$ resulting from application of $a$ ($\,(s', r') \in a[s, r]$); \textit{or} 
 		\item  \label{item:closure4}
 		$a$ does not affect the subjective state $s$ ($a$ is not visible in $s$), and $\lmod$ is also closed under any subjective state $s'$ and context $r'$ resulting from application of $a$ ($(s', r') \in a[s, r]$). 
 	\end{enumerate}
 %
+\end{enumerate}
 %
+Recall from the semantics of the assertions (\defin~\ref{def:assertion-semantics}) that $\lmod'$ corresponds to the interpretation of an interference assertion $I$ in a subjective view. The first condition thus asserts that the actions in the subjective action model $\lmod'$ are reflected in $\lmod$.
+
 Note that in the last item above (\ref{item:closure4}), since $a$ is not visible in $s$, given any $(s', r') \in a[s, r]$, from the definition of action application we then know $s' = s$. 
 
 
@@ -1009,7 +999,7 @@ We make further observations about this definition. First, property~(3) makes ou
 
 %% As illustrated above, the global behaviour $\lmod$ relies on the division between the subjective state $s$ and the context $r$. As such, it is essential to calculate it upon defining the semantics of $\shared{P}{I}$ when the boundary between the subjective state described by $P$ and the context is discernible.  In other words, we cannot correctly identify the global action model associated with  a shared state $s$ and a localised action model $\gmod$ without knowledge of the division between the subjective state and the context. 
 
-This completes the definition of the semantics of assertions. We can now show that the logical principles of \colosl are sound. The proof of the \shiftRule\ and \extendRule\ principles will be delayed until the following chapter, where $===>$ is defined.
+This completes the definition of the semantics of assertions. We can now show that the logical principles of \colosl are sound. The proof of the \extendRule principle will be delayed until the following chapter, where $===>$ is defined.
 %In what follows we illustrate the need for both local and global action models in worlds through two examples. We then proceed to show that the logical principles of \colosl are sound. The proof of the \shiftRule\ and \extendRule\ principles will be delayed until the following chapter, where $===>$ is defined.
 %
 
@@ -1021,7 +1011,7 @@ The case of \copyRule\ is straightforward from the semantics of assertions.
 In order to show that the \forgetRule\ implication is valid, it suffices to show:
 %
 \[
-	\for{\lenv\in \LEnv} \left\{w \mid w, \lenv |= \shared{P \sepish Q}{I}\right\} \subseteq \left\{w \mid w, \lenv |= \shared{P}{I} \right\}
+	\for{\lenv\in \LEnv} \left\{w \mid w, \lenv |= \shared{P * Q}{I}\right\} \subseteq \left\{w \mid w, \lenv |= \shared{P}{I} \right\}
 \]
 %
 We first demonstrate that, whenever an action model is closed under a subjective state $s_1 \composeL s_2$ and context $r$, then it is also closed under the smaller subjective state $s_1$, and the larger context extended with the forgotten state. That is,
@@ -1034,17 +1024,112 @@ We first demonstrate that, whenever an action model is closed under a subjective
 \]
 %
 This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We then proceed to establish the desired result by calculation:
+%%
+%\[
+%\begin{array}{r l}
+%	\left\{w \mid w, \lenv |= \shared{P \sepish Q}{I}\right\} &
+%	= \left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		(\unitL, \\
+%		(s \composeL r)
+%		, \lmod
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%			\exsts{s_p, s_c, s_q} s = s_p \composeL s_c \composeL s_q \\
+%			\land r \in \LStates \\
+%			\land (s_p \composeL s_c), \lenv |=_{(s \composeL r), \lmod} P \\
+%			\land (s_q \composeL s_c), \lenv |=_{(s \composeL r), \lmod} Q \\			
+%			\land \extendsAM{\lmod{}}{s_p \composeL s_c \composeL s_q}{\ r}{\semI[\lenv]{I}}
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	
+%	\text{By \lem~\ref{lem:forget-closure}} & 
+%	\subseteq \left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		(\unitL, \\
+%		(s \composeL r)
+%		, \lmod{}
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%			\exsts{s_p, s_c, s_q} s = s_p \composeL s_c \composeL s_q \\
+%			\land r \in \LStates \\
+%			\land (s_p \composeL s_c), \lenv |=_{(s \composeL r), \lmod} P \\
+%			\land (s_q \composeL s_c), \lenv |=_{(s \composeL r), \lmod} Q \\			
+%			\land \extendsAM{\lmod{}}{s_p \composeL s_c}{\ s_q \composeL r}{\semI[\lenv]{I}}
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	
+%	
+%	
+%	
+%	& \subseteq
+%	\left\{
+%	\hspace*{-0.2cm}
+%	\begin{array}{l | l}
+%		\left(
+%		\hspace*{-0.15cm}
+%		\begin{array}{l}
+%		(\unitL, \\
+%		(s_p \composeL r)
+%		, \lmod{}
+%		\end{array}
+%		\hspace*{-0.15cm}
+%		\right)
+%		&
+%		\hspace*{-0.1cm}
+%		\begin{array}{l}
+%
+%			s_p, \lenv |=_{(s_p \composeL r), \lmod} P 
+%			\land r \in \LStates \\
+%			\land \extendsAM{\lmod{}}{s_p}{\ r}{\semI[\lenv]{I}}
+%		\end{array}
+%		\hspace*{-0.1cm}
+%	\end{array}
+%	\hspace*{-0.2cm}
+%	\right\} \\
+%	
+%	
+%	& = \left\{ w \mid w, \lenv |= \shared{P}{I}\right\}
+%\end{array}
+%\]
+%%
 %
 \[
 \begin{array}{r l}
-	\left\{w \mid w, \lenv |= \shared{P \sepish Q}{I}\right\} &
+	\left\{w \mid w, \lenv |= \shared{P * Q}{I}\right\} &
 	= \left\{
 	\hspace*{-0.2cm}
 	\begin{array}{l | l}
 		\left(
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-		(\unitL, \\
+		(\unitL, 
 		(s \composeL r)
 		, \lmod
 		\end{array}
@@ -1053,16 +1138,15 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\exsts{s_p, s_c, s_q} s = s_p \composeL s_c \composeL s_q \\
-			\land r \in \LStates \\
-			\land (s_p \composeL s_c), \lenv |=_{(s \composeL r), \lmod} P \\
-			\land (s_q \composeL s_c), \lenv |=_{(s \composeL r), \lmod} Q \\			
-			\land \extendsAM{\lmod{}}{s_p \composeL s_c \composeL s_q}{\ r}{\semI[\lenv]{I}}
+			\exsts{s_p, s_q7} s = s_p \composeL s_q \\
+			\land s_p, \lenv |=_{(s \composeL r), \lmod} P \\ 
+			\land s_q, \lenv |=_{(s \composeL r), \lmod} Q \\			
+			\land \extendsAM{\lmod{}}{s_p \composeL s_q}{\ r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
 	\hspace*{-0.2cm}
-	\right\} \\
+	\right\} \vspace{3pt}\\
 	
 	
 	
@@ -1073,7 +1157,7 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 		\left(
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-		(\unitL, \\
+		(\unitL, 
 		(s \composeL r)
 		, \lmod{}
 		\end{array}
@@ -1082,16 +1166,15 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 		&
 		\hspace*{-0.1cm}
 		\begin{array}{l}
-			\exsts{s_p, s_c, s_q} s = s_p \composeL s_c \composeL s_q \\
-			\land r \in \LStates \\
-			\land (s_p \composeL s_c), \lenv |=_{(s \composeL r), \lmod} P \\
-			\land (s_q \composeL s_c), \lenv |=_{(s \composeL r), \lmod} Q \\			
-			\land \extendsAM{\lmod{}}{s_p \composeL s_c}{\ s_q \composeL r}{\semI[\lenv]{I}}
+			\exsts{s_p, s_q} s = s_p \composeL s_q \\
+			\land s_p, \lenv |=_{(s \composeL r), \lmod} P \\
+			\land s_q, \lenv |=_{(s \composeL r), \lmod} Q \\			
+			\land \extendsAM{\lmod{}}{s_p}{\ s_q \composeL r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
 	\hspace*{-0.2cm}
-	\right\} \\
+	\right\} \vspace{3pt}\\
 	
 	
 	
@@ -1105,8 +1188,8 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 		\left(
 		\hspace*{-0.15cm}
 		\begin{array}{l}
-		(\unitL, \\
-		(s_p \composeL r)
+		(\unitL, 
+		(s \composeL r)
 		, \lmod{}
 		\end{array}
 		\hspace*{-0.15cm}
@@ -1115,9 +1198,8 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 		\hspace*{-0.1cm}
 		\begin{array}{l}
 
-			s_p, \lenv |=_{(s_p \composeL r), \lmod} P 
-			\land r \in \LStates \\
-			\land \extendsAM{\lmod{}}{s_p}{\ r}{\semI[\lenv]{I}}
+			s, \lenv |=_{(s \composeL r), \lmod} P \\
+			\land \extendsAM{\lmod{}}{s}{\ r}{\semI[\lenv]{I}}
 		\end{array}
 		\hspace*{-0.1cm}
 	\end{array}
@@ -1130,6 +1212,17 @@ This is formalised in \lem~\ref{lem:forget-closure} of \app\ref{app:lemmata}. We
 \]
 %
 as required.
+
+Note that, the version of \forgetRule\ where predicates are conjoined using $**$ is also valid for all $P$, $Q$, and $I$, as shown by the following derivation, where the first implication follows from the properties of $**$.
+%
+\[
+  \vspace{-1ex}
+\shared{P ** Q}{I} \stackrel{\weakenRule}{=> }
+\shared{P * \m{true}}{I} \stackrel{\forgetRule}{=> }
+\shared{P}{I}\vspace{10pt}
+\]
+%
+%
 
 Similarly, to show that the \mergeRule\ implication is valid, it suffices to show:
 %
@@ -1227,16 +1320,121 @@ This is formalised in \lem~\ref{lem:merge-closure} of \app~\ref{app:lemmata}. We
 \end{array}
 \]
 %
-\end{proof}
 %
-Note that, the version of \forgetRule\ where predicates are conjoined using $**$ is also valid for all $P$, $Q$, and $I$, as shown by the following derivation, where the first implication follows from the properties of $**$.
+
+Finally, to show that the \shiftRule implication is valid, it suffices to show that for all $\lenv \in \LEnv$, 
 %
 \[
-  \vspace{-1ex}
-\shared{P ** Q}{I} \stackrel{\weakenRule}{=> }
-\shared{P * \m{true}}{I} \stackrel{\forgetRule}{=> }
-\shared{P}{I}
+\begin{array}{l l}
+	\text{if} & \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\}} \semI[\lenv]{I'} \\
+	\text{then} & \left\{w \mid w, \lenv |= \shared{P}{I} \right\} \subseteq \left\{w \mid w, \lenv |= \shared{P}{I'} \right\}
+\end{array}
 \]
+%
+Pick an arbitrary $w_1 = (l, g, \lmod)$ such that 
+%
+\begin{align}
+	& w_1, \lenv |= \shared{P}{I}   \label{shift:Ass1}\\
+	& \semI[\lenv]{I} \weakenI{\left\{s \mid s, \lenv \slsat P \right\} } \semI[\lenv]{I'} \label{shift:Ass2}
+\end{align}
+%
+We are then required to show 
+%
+\begin{align}
+	& w_1, \lenv |= \shared{P}{I'} \label{shift:Goal3}
+\end{align}
+%
+From (\ref{shift:Ass1}) and definition of $w_1$ we know that there exist $s, r \in \LStates$ such that 
+%
+\begin{align}
+	& l = \unitL \land g = s \composeL r \label{shift:Ass3}\\
+	& s, \lenv |=_{g, \lmod} P \label{shift:Ass4}\\
+	& \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}} \label{shift:Ass5}
+\end{align}
+%(\ref{shift:Ass})
+From the following lemma and (\ref{shift:Ass4}) we know that 
+%
+\begin{align}
+	s, \lenv \slsat P \label{shift:Ass0}
+\end{align}
+%
+\nested{
+%
+\begin{lemma}[]
+	for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$:  
+		\[
+			s, \lenv |=_{g, \lmod} P \implies s, \lenv \slsat P
+		\]
+%
+\begin{proof}
+By induction on the structure of assertion $P$.	Pick an arbitrary $\lenv \in \LEnv$, then\\
+
+\noindent\textbf{Case $P \eqdef A$\quad} Immediate.\\
+\noindent\textbf{Case $P \eqdef P_1 \implies P_2$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$ such that
+%
+\begin{align}
+	& s, \lenv |=_{g, \lmod} P_1 \implies P_2 \label{subshift:Ass1} \\
+	\tag{I.H1} & \for{\lenv, s, g , \lmod} s, \lenv |=_{g, \lmod} P_1 \implies s, \lenv \slsat P_1 \label{subshift:IH1}\\ 
+	\tag{I.H2} & \for{\lenv, s, g , \lmod} s, \lenv |=_{g, \lmod} P_2 \implies s, \lenv \slsat P_2 \label{subshift:IH2}
+\end{align}
+%
+From (\ref{subshift:Ass1}) and the definition of $|=_{g, \lmod}$ we know $s, \lenv |=_{g, \lmod} P_1$ \text{ implies } $P_2 |=_{g, \lmod}$; consequently, from (\ref{subshift:IH1}) and (\ref{subshift:IH2}) we have: $s, \lenv \slsat P_1$ \text{ implies } $s, \lenv \slsat P_2$. Thus, from the definition of $\slsat$ we have:
+%
+\begin{align*}
+	s, \lenv \slsat P_1 \implies P_2
+\end{align*}
+%
+as required.\\
+
+\noindent\textbf{Cases $P \eqdef \exsts{x} P'$; $P \eqdef P_1 * P_2$; $P \eqdef P_1 ** P_2$} \\
+These cases are analogous to the previous case and are omitted here. \\
+
+\noindent\textbf{Case $P \eqdef \shared{P'}{I}$} \\
+Pick an arbitrary $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod \in \AMods$ such that
+%
+\begin{align}
+%	\tag{I.H} & \for{s, l \in \LStates} \for{\lmod, \gmod \in \AMods} s, \lenv |=_{g, \lmod, \gmod} P' \implies s, \lenv \slsat P' \label{subshift:IH}\\ 
+	& s, \lenv |=_{g, \lmod} \shared{P'}{I} \label{subshift:Ass2}
+\end{align}
+%
+From (\ref{subshift:Ass2}) and the definition of $|=_{g, \lmod}$ we know $s, g, \lmod |= \shared{P'}{I}$ and hence, from the definition of $|=$, we have $s = \unitL$. Consequently, from the definition of $\slsat$ we have: 
+%
+\begin{align*}
+	s, \lenv \slsat \shared{P'}{I}
+\end{align*}
+%
+as required.
+\end{proof}
+%
+\end{lemma}
+%
+}
+%
+
+\noindent Consequently, from the definition of $\weakenI{}$, (\ref{shift:Ass2}) and (\ref{shift:Ass0}) we have:
+%
+\begin{align}
+	\semI[\lenv]{I} \weakenI{\{s\}} \semI[\lenv]{I'} \label{shift:Ass6}
+\end{align}
+%
+and thus from (\ref{shift:Ass5}), (\ref{shift:Ass6}) and \lem~\ref{lem:shift-closure} we have:
+%
+\begin{align}
+	\extendsAM{\lmod}{s}{r}{\semI[\lenv]{I'}} \label{shift:Ass7}
+\end{align}
+%(\ref{shift:Ass})
+
+
+Consequently, from \ref{shift:Ass3}, \ref{shift:Ass4}, \ref{shift:Ass7} and the definition of $|=$ we have
+%
+\begin{align*}
+	w, \lenv |= \shared{P}{I'}
+\end{align*}
+%
+as required.
+%
+\end{proof}
 %
 \end{lemma}
 %

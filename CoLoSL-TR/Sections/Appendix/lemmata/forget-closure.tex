@@ -17,14 +17,10 @@ For all $\lmod, \lmod' \in \AMods$ and $s_1, s_2, r \in \LStates$
 From the definition of $\downarrow$, it then suffices to show
 %
 \begin{align}
-	& \lmod' \subseteq \lmod \label{FC:Goal1}\\
+%	& \lmod' \leqAM \lmod \label{FC:Goal1}\\
 	& \for {n \in \Nats}  \extendsAMUpto{\lmod}{n}{s_1}{s_2 \composeL r}{\lmod'} \label{FC:Goal2}
-%	& \for {n \in \Nats} \for{s_1, s_2, r \in \LStates} \extendsAMUpto{\lmod, \gmod}{n}{s_1 \composeL s_2}{r}{\lmod'} \implies \extendsAMUpto{\lmod, \gmod}{n}{s_1}{s_2 \composeL r}{\lmod'} \label{LFC:Goal2}
 \end{align}
 %
-
-\noindent\textbf{RTS. (\ref{FC:Goal1})} \\
-This follows trivially from (\ref{FC:Ass1}) and the definition of $\downarrow$.\\
 
 \noindent\textbf{RTS. (\ref{FC:Goal2})} \\
 Rather than proving (\ref{FC:Goal2}) directly, we first establish the following.
@@ -56,7 +52,8 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
 \textbf{RTS. }
 %
 \begin{align}
-  &\V{\ca{}}\V{a\in \lmod(\ca{})}
+	&\V{\ca{}}\V{a\in \lmod'(\ca{})} \m{potential}(a,s_1 \composeL s_2 \composeL r) => \m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod(\ca{}))\label{FC:Goal1}\\
+  &\V{\ca{}}\V{a\in \lmod(\ca{})} 
   \m{potential}(a,s_1 \composeL s_2 \composeL r) =>\null \nonumber \\
   &\quad 
 		(\m{reflected}(a,s_1 \composeL s_2 \composeL r,\lmod'(\ca{})) 
@@ -70,6 +67,8 @@ Pick an arbitrary $s_1, s_2, r \in \LStates$. We are then required to show	$\ext
 %
 %
 %
+\noindent\textbf{RTS. (\ref{FC:Goal1})} \\
+Pick an arbitrary $\ca{}$ and $a \in \lmod'(\ca{})$ such that $\m{potential}(a, s_1 \composeL s_2 \composeL r)$. From (\ref{LCS:Ass1}) and the definition of $\AMExtension_n$ we then have $\m{reflected}(a, s_1 \composeL s_2 \composeL r, \lmod(\ca{}))$ as required.\\
 
 \noindent\textbf{RTS. (\ref{LCS:Goal3})}\\
 Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that 

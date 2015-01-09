@@ -5,9 +5,9 @@ For all $\lmod, \lmod' \in \AMods$ and $n \in \NatsPlus$
 	\for{s, r \in \LStates} \extendsAMUpto{\lmod}{n}{s}{r}{\lmod'} \implies \extendsAMUpto{\lmod}{(n-1)}{s}{r}{\lmod'}
 \]
 %
-\begin{proof} Pick an arbitrary $s, r \in \LStates$ and proceed by induction on number of steps $n$.\\
+\begin{proof} Pick an arbitrary $\lmod, \lmod' \in \AMods$ and proceed by induction on number of steps $n$.\\
 
-\noindent\textbf{Base case: n = 1}\\
+\noindent\textbf{Base case n = 1}\\
 Pick an arbitrary $s, r \in \LStates$. We are then required to show $\extendsAMUpto{\lmod}{0}{s}{r}{\lmod'}$ which trivially follows from the definition of $\downarrow_0$.\\
 
 \noindent\textbf{Inductive case}\\
@@ -20,19 +20,28 @@ Pick an arbitrary $s, r \in \LStates$ such that
 %
 \textbf{RTS. }
 %
-\begin{align*} 
+\begin{align} 
+	&\V{\ca{}}\V{a\in \lmod'(\ca{})}
+  \m{potential}(a,s \composeL r) => \m{reflected}(a, s \composeL r, \lmod') \label{FCL:Goal1}\\
   &\V{\ca{}}\V{a\in \lmod(\ca{})}
   \m{potential}(a,s \composeL r) =>\null \nonumber \\
-	& \begin{array}{@{} l @{}}
+	& \quad\begin{array}{@{} l @{}}
 		\left(\m{reflected}(a, s \composeL r, \lmod'(\ca{})) |/ \neg\m{visible}(a, s) \ \right) /| \\
 		\for{(s', r') \in a[s, r]} \extendsAMUpto{\lmod}{(n-1)}{s'}{r'}{\lmod'}
- 	\end{array}
-\end{align*}
-%
-Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that 
-\begin{align}
-	\m{potential}(a, s \composeL r) \label{FCL:Ass12}
+ 	\end{array} \label{FCL:Goal2}
 \end{align}
+%
+\noindent\textbf{RTS. (\ref{FCL:Goal1})}\\
+Pick an arbitrary $\ca{}$ and $a \in \lmod'(\ca{})$ such that $\m{potential}(a, s \composeL r)$. From (\ref{FCL:Ass1}) and the definition of $\AMExtension_{(n+1)}$ we then have $\m{reflected}(a, s \composeL r, \lmod(\ca{}))$
+%
+%\begin{align*}
+%	\m{reflected}(a, s \composeL r, \lmod(\ca{}))
+%\end{align*}
+%%
+as required.\\
+
+\noindent\textbf{RTS. (\ref{FCL:Goal2})}\\
+Pick an arbitrary $\ca{}$ and $a \in \lmod(\ca{})$ such that $\m{potential}(a, s \composeL r)$.
 %(\ref{LCS:Ass})
 Then from (\ref{FCL:Ass1}) we have: 
 %

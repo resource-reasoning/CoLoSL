@@ -1,15 +1,15 @@
-\begin{lemma}\label{lem:existential-promotion}
-Given any assertion $P \in \Assertions$, the following is valid.
-%
-\[
-	P <=> \promote{P}
-\]
-%
-\begin{proof}
-\todo
-\end{proof}
-\end{lemma}
-%
+%\begin{lemma}\label{lem:existential-promotion}
+%Given any assertion $P \in \Assertions$, the following is valid.
+%%
+%\[
+%	P <=> \promote{P}
+%\]
+%%
+%\begin{proof}
+%\todo
+%\end{proof}
+%\end{lemma}
+%%
 %
 \begin{lemma}[]\label{lem:sub-stable-extend}
 for all $P \in \Assertions$, $\lenv \in \LEnv$, $w, w' \in \Worlds$, 
@@ -197,33 +197,33 @@ as required.
 %
 \end{lemma}
 %
-%
-\begin{lemma}[]\label{lem:sub-stable-shift}
-for all $P \in \Assertions$, $\lenv \in \LEnv$, $w, w' \in \Worlds$, 
-% 
-\[
-\begin{array}{@{} l @{}}
-	w, \lenv |= P /| (w, w') \in \shiftR 
-	\implies  w', \lenv |= P
-\end{array}
-\]
-%
-\begin{proof}
-From the definition of $\shiftR$, it then suffices to show that for all $P \in \Assertions$, $\lenv \in \LEnv$, $l, g, \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
-% 
-\[
-\begin{array}{@{} l @{}}
-	(l, g, \lmod), \lenv |= P /| 
-	\expandsAM{\lmod'}{\unitL}{g}{\lmod}
-	 \implies  (l, g, \lmod \cup \lmod'), \lenv |= P
-\end{array}
-\]
-%
-This follows immediately from the more general result established in \lem~\ref{lem:sub-stable-extend} from (\ref{sub-stable-extend:Ass1}) to (\ref{sub-stable-extend:Ass5}).
-\end{proof}
-%
-\end{lemma}
-%
+%%
+%\begin{lemma}[]\label{lem:sub-stable-shift}
+%for all $P \in \Assertions$, $\lenv \in \LEnv$, $w, w' \in \Worlds$, 
+%% 
+%\[
+%\begin{array}{@{} l @{}}
+%	w, \lenv |= P /| (w, w') \in \shiftR 
+%	\implies  w', \lenv |= P
+%\end{array}
+%\]
+%%
+%\begin{proof}
+%From the definition of $\shiftR$, it then suffices to show that for all $P \in \Assertions$, $\lenv \in \LEnv$, $l, g, \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
+%% 
+%\[
+%\begin{array}{@{} l @{}}
+%	(l, g, \lmod), \lenv |= P /| 
+%	\expandsAM{\lmod'}{\unitL}{g}{\lmod}
+%	 \implies  (l, g, \lmod \cup \lmod'), \lenv |= P
+%\end{array}
+%\]
+%%
+%This follows immediately from the more general result established in \lem~\ref{lem:sub-stable-extend} from (\ref{sub-stable-extend:Ass1}) to (\ref{sub-stable-extend:Ass5}).
+%\end{proof}
+%%
+%\end{lemma}
+%%
 %
 \begin{lemma}[]\label{lem:extend1}
 for all $P \in \Assertions$, $\lenv \in \LEnv$, $s, g \in \LStates$ and $\lmod, \lmod' \in \AMods$: 
