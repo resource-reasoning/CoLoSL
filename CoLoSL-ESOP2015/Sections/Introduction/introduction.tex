@@ -29,7 +29,7 @@ reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada}
 achieve  compositional reasoning for 
 increasingly difficult inter-thread interaction. However, despite substantial
 progress, we believe that none of these approaches are fully compositional. They are all
-based on global shared memory comprising static disjoint
+based on global shared memory often  comprising static disjoint
 regions with static interference on these regions, with each thread
 verified with respect to these shared regions. The static nature
 of the regions impedes compositionality, since the code of the thread
@@ -59,55 +59,41 @@ verifiying programs using first-order logic. O'Hearn and Reynolds'
 work on separation logic has demonstrated that such reasoning is not
 compositional and does not scale. 
 
-
------next bit on-going-----
-
-Concurrent separation logic~\cite{rey02,seplog} achieves compositional reasoning
-for concurrent heap-manipulating
-programs by spliting the heap into disjoint heaplets for describing
-the local disjoint resource required by a thread. For disjoint
-concurrency, compositionality rests on two powerful mechanisms: a
-thread  can be specified using only those resources  that it actually
-accesses; and this specification can be simply  reused in any context that
-contains these resources. 
-
-
+The original separation logic~\cite{rey02,seplog} achieves
+compositional reasoning for sequential heap-manipulating programs by
+spliting the heap into disjoint heaplets for describing the local
+disjoint resource required by a thread. Compositionality rests on two
+powerful mechanisms: a thread can be specified using only those
+resources that it actually accesses; and this specification can be
+simply reused in any context that contains these resources.
+By making the specification
+as small  as possible, we can ensure that it
+can be reused in a large set of possible contexts using  the {\em frame
+rule}. 
 
 
-This is embodied by the {\em disjoint concurrency rule}  and the
-\emph{frame rule}%
-% between Hoare triples, from separation logic
-:
-\[
-disjoint concurrentcy \quad \infer[\frameRule]{\hoare{P * R}{\mathbb{C}}{Q * R}}
-{\hoare{P}{\mathbb{C}}{Q}}
-\]
-The $*$ connective between assertions means that they describe
-\emph{disjoint} sets of resources. The disjoint concurrency rule
-states that the threads use resource that can be separated
-
-
-
- By making the specification
-$\hoare{P}{\mathbb{C}}{Q}$ as local as possible, we can ensure that it
-can be reused in a large set of possible contexts via the frame
-rule. Specification reuse is paramount to achieve compositional
+\pgcomment{Maybe put frame rule in here, but I thought it was too
+  detailed
+given the rest of the introduction.}
+%
+ Specification reuse is paramount to achieve compositional
 reasoning: if the specification of a piece of code can be reused in
-any valid context, one only has to prove it once and for all. In
-non-compositional approaches, one very often needs to reprove a piece
-of code under different specifications.
+any valid context, we only have  to prove it once and for all. 
 
 
+Concurrent separation logic extends this work to concurrent programs
+using the {\em disjoint concurrency rule}, where individual threads
+use both local resource and static invariant shared regions. Since
+then, there has been much work on combining rely-guarantee reasoning
+with ideas from concurrent separation logic to reason about
+fine-grained concurrency, where threads use local resource and shared
+regions which are stable with respect to an interference relation
+stating how the current thread and the environment can effect the
+region. This work has achieved substantial success. However, we
+believe that none of these approaches are fully compositional.
+We identify the following three interconnected problems.
 
-------now summarise various extensions, static regions-----
-
-
-
-  
-------------The problem.----------
-
-
---------not touched from here--------------
+---not touched from here.......
 
 First and foremost, the region of memory shared by the threads is
 spatially coarse-grained, usually comprising the entirety of the
