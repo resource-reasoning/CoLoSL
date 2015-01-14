@@ -97,79 +97,74 @@ changing the machine states it denotes. In particular, $(P => Q) => (P
 \begin{figure}
 \centering
 \noindent\hrule\vspace{10pt}
-\begin{tabular}{@{} l @{\hspace{25pt}} l@{\ }}
+\begin{tabular}{@{} l @{\hspace{1ex}} l@{}}
 $\mathbb{INC}$:&
-$\mathbb{P}_{\li x}$:
+$\mathbb{MASTER}(\li x)$:
 \vspace{-5pt}\\
-{\hspace{20pt}\begin{lstlisting}[numbers=left,numbersep=10pt]
-//$\color{blue}\{\tx x|-> - * \tx{y}|-> - * \tx{z}|-> - \}$
-x = 0; y = 0; z = 0;
-//$\color{blue} \{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0 \}$
-//$\color{blue} \left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> 0 * \tx{y}|-> 0 * \tx{z}|-> 0} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
-($\mathbb{P}_{\tx x} \ \mid\ \mid\ \mathbb{P}_{\tx y} \ \mid\ \mid\  \mathbb{P}_{\tx z}$)
-//$\color{blue}\left\{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\shared{\tx x|-> \!\!10 * \tx{y}|-> \!\!10 * \tx{z}|-> \!\!10} I\\ \null*[\token a_{\tx x}] * [\token a_{\tx y}] * [\token a_{\tx z}]\end{array}\right\}$
+{\begin{lstlisting}[numbers=left,numbersep=5pt]
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ x_2|->0,x_1  * x_1|->0,x_0 * x_0|->0,x_2\end{array} \right\}$
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 * x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
+$\mathbb{MASTER}$(x$_0$)$\mid\mid\mathbb{FOREMAN}$(x$_1$)$\mid\mid\mathbb{SLAVE}$(x$_2$)
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 * x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
-//$\color{blue} \{\shared{\cell{\tx z}{0} * \cell{\tx x}{0}}{I_{\tx x}'} * [\token a_{\tx x}]\}$
-while(x != 10)$\{$
-//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx z}{v} * \cell{\tx x}{v} \lor\\ \cell{\tx z}{v} * \cell{\tx x}{v+1}\end{array}}{I_{\tx x}'}\!\!\!\!\!\! * [\token a_{\tx x}]\right\}$
-  $\langle$if (x == z) x++;$\rangle$ 
-$\}$
-//$\color{blue} \left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx z}{10} * \cell{\tx x}{10} \lor\\ \cell{\tx z}{9} * \cell{\tx x}{10}\end{array}}{I_{\tx x}'} * [\token a_{\tx x}]\right\}$
-\end{lstlisting}\\
-{$\mathbb{P}_{\li y}$:}&
-{$\mathbb{P}_{\li z}$:}
+//$\color{blue} \{\cell{\tx x}{x} * \shared{\cell{x}{0,p} * \cell{p}{0}}{M_x'} * [\token m_x]\}$
+while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_x'}\end{array} \right\}$
+  $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c) (x-$\!\textgreater$c)++;$\rangle\ \}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_x'}\end{array} \right\}$
+\end{lstlisting}
+\\
+$\mathbb{FOREMAN}(\li x)$:&
+{$\mathbb{SLAVE}(\li x)$:}
 \vspace{-5pt}\\
 \begin{lstlisting}
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{0} * \cell{\tx y}{0} \lor\\ \cell{\tx x}{1} * \cell{\tx y}{0}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-while(y != 10)$\{$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx x}{v} * \cell{\tx y}{v} \lor\\ \cell{\tx x}{v+1} * \cell{\tx y}{v}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
-  $\langle$if (y $<$ x) y++;$\rangle$ 
-$\}$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx x}{10} * \cell{\tx y}{10} \lor\\ \cell{\tx x}{11} * \cell{\tx y}{10}\end{array}}{I_{\tx y}'}\!\!\!\!\!\! * [\token a_{\tx y}]\right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{F_x'}\end{array} \right\}$
+ while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{F_x'}\end{array} \right\}$
+  $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
+     x-$\!\textgreater$c = p-$\!\textgreater$c;$\rangle\ \}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{F_x'}\end{array} \right\}$
 \end{lstlisting}
 &
 \begin{lstlisting}
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{0} * \cell{\tx z}{0} \lor\\ \cell{\tx y}{1} * \cell{\tx z}{0}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-while(z != 10)$\{$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\exsts{v}\cell{\tx y}{v} * \cell{\tx z}{v} \lor\\ \cell{\tx y}{v+1} * \cell{\tx z}{v}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
-  $\langle$if (z $<$ y) z++;$\rangle$
-$\}$
-//$\color{blue}\left\{\shared{\begin{array}{@{}l<{\null}@{}l<{\null}@{}}\cell{\tx y}{10} * \cell{\tx z}{10} \lor\\ \cell{\tx y}{11} * \cell{\tx z}{10}\end{array}}{I_{\tx z}'}\!\!\!\!\!\! * [\token a_{\tx z}]\right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{S_x'}\end{array} \right\}$
+ while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{S_x'}\end{array} \right\}$
+  $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
+     x-$\!\textgreater$c = p-$\!\textgreater$c;$\rangle\ \}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{S_x'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
 \begin{array}{@{}r@{}l@{}l@{}}
-  a_{\li x} &\null ==
-  [\token a_{\li x}]: \exsts{v} \cell{\li{z}}{v} * \cell{\li{x}}{v} &\null\swap
-  \cell{\li{z}}{v} * \cell{\li{x}}{v+1}\\
-  a_{\li y} &\null ==
-  [\token a_{\li y}]: \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} &\null\swap
-  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\\
-  a_{\li z} &\null ==
-  [\token a_{\li z}]: \exsts{v} \cell{\li{y}}{v+1} * \cell{\li{z}}{v} &\null\swap
-  \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1}\\
-  a_{\li x}' &\null ==
-  [\token a_{\li x}]: \exsts{v} \cell{\li{z}}{v} * \cell{\li{x}}{v} * \cell{\li{y}}{v} &\null\swap
-  \cell{\li{z}}{v} * \cell{\li{x}}{v+1} * \cell{\li{y}}{v}\\
-  a_{\li y}' &\null ==
-  [\token a_{\li y}]: \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v} &\null\swap
-  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1} * \cell{\li{z}}{v}\\
-  a_{\li z}' &\null ==
-  [\token a_{\li z}]: \exsts{v} \cell{\li{y}}{v+1} * \cell{\li{z}}{v} * \cell{\li{x}}{v+1}&\null\swap
-  \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1} * \cell{\li{x}}{v+1}
+  m_x &\null ==
+  [\token m_x]: \exsts{p,v} \cell{x}{v,p} * \cell{p}{v} &\null\swap
+  \cell{x}{v+1,p} * \cell{p}{v}
+  \\
+  s_x &\null ==
+  [\token s_x]: \exsts{p,v} \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
+  \cell{x}{v+1,p} * \cell{p}{v+1}
+  \\
+  m'_n &\null ==
+  [\token m_x]: \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v} &\null\swap
+  \cell{n}{v,x} * \cell{x}{v+1,p} * \cell{p}{v}
+  \\
+  s'_n &\null ==
+  [\token s_x]: \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
+  \cell{n}{v,x} * \cell{x}{v+1,p} * \cell{p}{v+1}
 \end{array}
 \]
 \vspace{-5pt}
 \begin{mathpar}
-  I \eqdef \{a_{\li x}, a_{\li y}, a_{\li z}\}
+  I \eqdef \{m_{x_0}, s_{x_1}, s_{x_2} \}
 
-  I_{\li x}' \eqdef \{a_{\li x}, a_{\li z}'\}
+  M_x' \eqdef \{m_x, s_x'\}
 
-  I_{\li y}' \eqdef \{a_{\li x}', a_{\li y}\}
+  F_x' \eqdef \{s_x, m_x'\}
 
-  I_{\li z}' \eqdef \{a_{\li y}', a_{\li z}\}
+  S_x' \eqdef \{s_x, s_x'\}
 \end{mathpar}
 \vspace{-5pt}\hrule
 \caption{The concurrent increment program together with a \colosl proof sketch. Lines starting with $\color{blue}{//}$ contain formulas that describe  the local state and the subjective shared state at the relevant program point.}
