@@ -276,7 +276,7 @@
 %\newcommand{\gmod}{\mathscr{G}}
 \newcommand{\composeAM}{\compose{=}}
 \newcommand{\unitAM}{\emptyset}
-
+\newcommand{\action}[3]{#1 \swap #2\xspace\textsf{ provided }\xspace #3}
 
 \newcommand{\extendsAM}[4]{#1 \!\downarrow \left(#2, #3, #4\right)}
 \newcommand{\extendsAMUpto}[5]{#1 \!\downarrow_{#2} \left(#3, #4, #5\right)}
@@ -345,7 +345,7 @@
 \newcommand{\shared}[2]{{\ovalbox{$#1\vphantom{Qq}$}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
-\newcommand{\interAss}[4]{#1: \exsts{#2} #3 \swap #4\xspace}
+\newcommand{\interAss}[5]{#1\!:\!\exsts{#2} \action{#3}{#4}{#5}\xspace}
 \newcommand{\multiInterAss}[5]{\overline{#1: \left\{ \exsts{#2} #3 \swap #4 \right\} }}
 
 \newcommand{\strengthenAction}[2]{\left\lceil #1 \right\rceil^{#2}}
