@@ -238,7 +238,8 @@ and the other satisfies $Q$; $P**Q$ is the \emph{overlapping
 $\composeW$, such that the $\composeW$-composition of the first two
 worlds satisfies $P$ and the $\composeW$-composition of the last two
 satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
-have their standard classical meaning. Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
+have their standard classical meaning. An Interference assertion $I$ describes actions enabled by a given capability, in the form of a pre- and post-condition.
+%Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
 
 A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective view} $s$ can be found in the global
@@ -388,10 +389,9 @@ assertions.
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
     (p, q, c)&
     \begin{array}{@{}l@{}}
-      \interAss{[\token{A}]}{\bar x}{P}{Q}{R} \in I /| \exsts{\bar{v}, \lmod, r, r'} \\
-      \quad c = r \composeL r' /| r, [\lenv|||\bar x:\bar v]  |=_{c, \lmod} R \;/| \\
+      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod} \\
       \quad p, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
-      /| q, [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q \\
+      /| q, [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
     \end{array}
   \end{array}
   \right\}
@@ -540,15 +540,15 @@ we show that it is always possible to weaken an assertion into a local assertion
 checked for each action in $I$ (see the second rule). For each action
 $\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
 apply. In the first of these rules, the action cannot possibly fire,
-because its pre- and side-conditions is incompatible with $\lass{F}$: no state
+because its pre-condition is incompatible with $\lass{F}$: no state
 satisfying $\lass{F}$ may be extended such that a sub-part satisfies
-$\lass{P} * \lass{R}$. 
-The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
-%The second of these rules allows one to trim neutral parts
-%$\lass{R}$ of an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$
-%appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
-%then the part of the state denoted by $\lass{R}$ is uniquely
-%determined and left unchanged by the action. 
+$\lass{P}$. 
+%The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
+The second of these rules allows one to trim neutral parts
+$\lass{R}$ of an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$
+appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
+then the part of the state denoted by $\lass{R}$ is uniquely
+determined and left unchanged by the action. 
 The last rule finally
 reduces local fencing to entailment checking, provided the fence
 $\lass{F}$ can be expressed as a disjunction of precise formulas. The
@@ -579,24 +579,24 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 		\fenceAss{} \strictfences I
 	}
 	{
-          \for{\left(\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}}\right)\in I}\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\}
+          \for{\left(\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}\right)\in I}\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\}
 	}		
 
 	\infer{
-		\fenceAss{} \!\strictfences\! \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\}		
+		\fenceAss{} \!\strictfences\! \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\}		
 	}
 	{
-		\fenceAss{} \sepish (\lass{P} * \lass{R}) \slentails \m{false}
+		\fenceAss{} \sepish \lass{P} \slentails \m{false}
 	}	
 
 	\infer{
-		\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\}	
+		\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}\right\}	
 	}
 	{
-%          \lass{P} \slentails \lass{P'} * \lass{R}\\
-%          \lass{Q} \slentails \lass{Q'} * \lass{R}\\
-%	  \exact{\lass{R}}\\
-	  \fenceAss{} \strictfences \left\{[\token{A}]\!\!: \exsts{\bar x} \lass{P} \swap \lass{Q} \right\}
+    \lass{P} \slentails \lass{P'} * \lass{R}\\
+    \lass{Q} \slentails \lass{Q'} * \lass{R}\\
+	  \exact{\lass{R}}\\
+	  \fenceAss{} \strictfences \left\{[\token{A}]\!\!: \exsts{\bar x} \lass{P'} \swap \lass{Q'} \right\}
 	}	
 		
 %	\infer{
@@ -611,7 +611,7 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 %	}
 %		
 	\infer{
-		\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\}		
+		\fenceAss{} \strictfences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\}		
 	}
 	{	
 %		\separate{\lass{P}}{\lass{Q}}
@@ -699,32 +699,35 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 		I_1 \weakenI{\fenceAss{}} I_2
 	}	
 
-	\infer{
-		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\} \approx^{\fenceAss{}}
-		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P'}}{\lass{Q'}}{\lass{R} * \lass{R}'} \right\}
-	}
-	{
-          \lass{P} \slentails \lass{P'} * \lass{R'}\\
-          \lass{Q} \slentails \lass{Q'} * \lass{R'}\\
-	  \exact{\lass{R'}}\\
-	}	
-	
 %	\infer{
-%		\left\{ [\token{A}]: \exsts{\bar x}\lass{P}  \swap \lass{Q} \right\} \weakenI{\fenceAss{}}
-%		\emptyset
+%		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\} \approx^{\fenceAss{}}
+%		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P'}}{\lass{Q'}}{\lass{R} * \lass{R}'} \right\}
 %	}
 %	{
-%          \lass{P} \slentails \lass{P'} * \lass{R}\\
-%          \lass{Q} \slentails \lass{Q'} * \lass{R}\\
-%	  \exact{\lass{R}}\\
-%	  \separate{\fenceAss{}}{\lass{P'}}
+%          \lass{P} \slentails \lass{P'} * \lass{R'}\\
+%          \lass{Q} \slentails \lass{Q'} * \lass{R'}\\
+%	  \exact{\lass{R'}}\\
 %	}	
+%	
+%%	\infer{
+%%		\left\{ [\token{A}]: \exsts{\bar x}\lass{P}  \swap \lass{Q} \right\} \weakenI{\fenceAss{}}
+%%		\emptyset
+%%	}
+%%	{
+%%          \lass{P} \slentails \lass{P'} * \lass{R}\\
+%%          \lass{Q} \slentails \lass{Q'} * \lass{R}\\
+%%	  \exact{\lass{R}}\\
+%%	  \separate{\fenceAss{}}{\lass{P'}}
+%%	}	
 	\infer{
-		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\} \weakenI{\fenceAss{}}
+		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\} \weakenI{\fenceAss{}}
 		\emptyset
 	}
 	{
-	  \separate{\fenceAss{}}{\lass{P}}
+		\lass{P} \slentails \lass{P'} * \lass{R}\\
+    \lass{Q} \slentails \lass{Q'} * \lass{R}\\
+	  \exact{\lass{R}}\\
+	  \separate{\fenceAss{}}{\lass{P'}}
 	}	
 
 	\infer
@@ -741,10 +744,10 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 	\infer
 %	[\proofRule{Expand/Contract}]
 	{
-		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{ \lass{Q}}{\lass{R} * \lass{R}_i} \right\}	
+		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\} \;\approx^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{\interAss{[\token{A}]}{\bar x}{\lass{P} * \lass{R}_i}{\lass{Q} * \lass{R}_i} \right\}	
 	}
 	{
-		\fenceAss{} \sepish (\lass{P} * \lass{R}) \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R} * \lass{R}_i \right)
+		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
 		&
 		\exact{\lass{R}_i} \text{ for } i \in I
 	}
@@ -773,14 +776,17 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 	}		
 
 	\infer{
-	  \fenceAss{} \fences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}}\right\}
+	  \fenceAss{} \fences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\}
 	}
 	{
-	  \fenceAss{} \!\fences\! \left\{[\token{A}]\!\!:\exsts{\bar x} \lass{P} \swap \lass{Q} \right\}
+		\lass{P} \slentails \lass{P'} * \lass{R}\\
+    \lass{Q} \slentails \lass{Q'} * \lass{R}\\
+	  \exact{\lass{R}}\\
+	  \fenceAss{} \!\fences\! \left\{[\token{A}]\!\!:\exsts{\bar x} \lass{P'} \swap \lass{Q'} \right\}
 	}	
 
 	\infer{
-		\fenceAss{} \fences \left\{[\token{A}]\!\!:\exsts{\bar x} \action{\lass{P}}{\lass{Q}}{\lass{R}} \right\}	
+		\fenceAss{} \fences \left\{[\token{A}]\!\!:\exsts{\bar x} \action{\lass{P}}{\lass{Q}} \right\}	
 	}
 	{
 		\separate{\fenceAss{}}{\lass{P}}
@@ -794,7 +800,7 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 %	}
 %	
 	\infer{
-		\fenceAss{} \fences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}{\lass{R}} \right\}		
+		\fenceAss{} \fences \left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\}		
 	}
 	{
 		\separate{\lass{P}}{\lass{Q}}
@@ -939,19 +945,19 @@ action, in a similar way to fencing rules above.
 	  \stable{\lass{Q},I,\lass{P},\lass{R}}
 	}
 	{
-          \for{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2}{}\in I}
-          \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P_2}}{\lass{P}_2}{}\},\lass{P},\lass{R}}
+    \for{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2} \in I}
+          \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P_2}}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}	
 	
 	\infer{
-	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2}\}{},\lass{P},\lass{R}}
+	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2}\},\lass{P},\lass{R}}
 	}
 	{
 	  [\token{A}] * \lass{P} * \lass{R} \slentails \m{false}
 	}
 
 	\infer{
-	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2}{}\},\lass{P},\lass{R}}
+	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}
 	{
 	  \lass{P} * (\lass{R} ** \lass{P}_1) \slentails \m{false}
@@ -959,7 +965,7 @@ action, in a similar way to fencing rules above.
 	
 	
 	\infer{
-	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2}{}\},\lass{P},\lass{R}}
+	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}
 	{
 	  \left(\lass{P}_1 \septraction (\lass{P} * (\lass{R} ** \lass{P}_1)\right) * \lass{P}_2 \slentails \lass{Q} * \m{true}
