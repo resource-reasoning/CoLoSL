@@ -102,39 +102,38 @@ $\mathbb{INC}$:&
 $\mathbb{MASTER}(\li x)$:
 \vspace{-5pt}\\
 {\begin{lstlisting}[numbers=left,numbersep=5pt]
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ x_2|->0,x_1  * x_1|->0,x_0 * x_0|->0,x_2\end{array} \right\}$
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 * x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \tx{x}_1|-< x_1 *\tx{x}_2|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 * x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
 $\mathbb{MASTER}$(x$_0$)$\mid\mid\mathbb{FOREMAN}$(x$_1$)$\mid\mid\mathbb{SLAVE}$(x$_2$)
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-> x_0 * \tx{x}_1|-> x_1 *\tx{x}_2|-> x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 * x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \tx{x}_1|-< x_1 *\tx{x}_2|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 * x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
-//$\color{blue} \{\cell{\tx x}{x} * \shared{\cell{x}{0,p} * \cell{p}{0}}{M_x'} * [\token m_x]\}$
+//$\color{blue} \{\varcell{\tx x}{x} * \shared{\cell{x}{0,p} * \cell{p}{0}}{M_x'} * [\token m_x]\}$
 while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_x'}\end{array} \right\}$
   $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c) (x-$\!\textgreater$c)++;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_x'}\end{array} \right\}$
 \end{lstlisting}
 \\
 $\mathbb{FOREMAN}(\li x)$:&
 {$\mathbb{SLAVE}(\li x)$:}
 \vspace{-5pt}\\
 \begin{lstlisting}
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{F_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{F_x'}\end{array} \right\}$
  while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{F_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{F_x'}\end{array} \right\}$
   $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
      x-$\!\textgreater$c = p-$\!\textgreater$c;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{F_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{F_x'}\end{array} \right\}$
 \end{lstlisting}
 &
 \begin{lstlisting}
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{S_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{S_x'}\end{array} \right\}$
  while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{S_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{S_x'}\end{array} \right\}$
   $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
      x-$\!\textgreater$c = p-$\!\textgreater$c;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\cell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{S_x'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_x]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{S_x'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
