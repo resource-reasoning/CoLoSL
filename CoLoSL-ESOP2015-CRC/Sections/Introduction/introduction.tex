@@ -23,11 +23,11 @@ are correct, since their informal arguments are typically  kept local and do
 not bring the whole system into the reasoning.
 
 
-Rely-guarantee reasoning ~\cite{rg} and various combinations of
+Rely-guarantee reasoning~\cite{rg} and various combinations of
 rely-guarantee and separation-logic
 reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
-interaction. However, despite substantial progress, we believe that
+interactions. However, despite substantial progress, we believe that
 none of these approaches are fully compositional. They are all based
 on global shared memory often comprising static disjoint regions with
 static interference on these regions, with each thread verified with
@@ -45,7 +45,7 @@ which we demonstrate on a range of examples.
 
 
 
-Jones' rely-guarantee  reasoning~\cite{.} provided a
+Jones' rely-guarantee reasoning~\cite{rg} provided a
 breakthrough in compositional reasoning about concurrent programs. It
 describes permitted interferences between threads using rely and
 guarantee conditions: the current thread guarantees that it will only
@@ -84,11 +84,11 @@ using the {\em disjoint concurrency rule}, where individual threads
 use both local resource and static invariant shared regions. Since
 then, there has been many extensions combining rely-guarantee
 reasoning with ideas from concurrent separation logic to reason about
-fine-grained concurrency: RGSep~\cite{.} and then deny-guarantee reasoning~\cite{}
+fine-grained concurrency: RGSep~\cite{viktor-marriage} and then deny-guarantee reasoning~\cite{dg}
 introduce local resource and shared disjoint regions which are stable
 with respect to an interference relation stating how the current
-thread and the environment can effect the region; CAP~\cite{.} and its
-extensions~\cite{.} in addition abstract the regions.  This work has achieved substantial
+thread and the environment can effect the region; CAP~\cite{cap-ecoop10} and its
+extensions~\cite{hocap,icap,tada} in addition abstract the regions. This work has achieved substantial
 success; see related work for more details. However, we believe that
 none of these approaches are fully compositional.  We identify the
 following three interconnected problems with shared regions and
