@@ -106,67 +106,67 @@ changing the machine states it denotes. In particular, $(P => Q) => (P
 \begin{figure}
 \centering
 \noindent\hrule\vspace{10pt}
+\vspace{-3ex}
 \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
-$\mathbb{INC}$:&
-$\mathbb{MASTER}$:
-\vspace{-5pt}\\
 {\begin{lstlisting}[numbers=left,numbersep=5pt]
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \tx{x}_1|-< x_1 *\tx{x}_2|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 *\null\\ x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
-$\mathbb{MASTER}\mid\mid\mathbb{FOREMAN}\mid\mid\mathbb{SLAVE}$;
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \tx{x}_1|-< x_1 *\tx{x}_2|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 *\null\\ x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
+inc(x0, x1, x2) $\{$
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x0}|-< x_0 * \tx{x1}|-< x_1 *\tx{x2}|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 *\null\\ x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
+master(x0) $\mid\mid$ slave(x1) $\mid\mid$ slave(x2);
+$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x0}|-< x_0 * \tx{x1}|-< x_1 *\tx{x2}|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 *\null\\ x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
-//$\color{blue} \{\varcell{\tx x_0}{x_0} * \shared{\cell{x_0}{0,x_2} * \cell{x_2}{0}}{M_{x_0}'} * [\token m_{x_0}]\}$
-while(x$_0$-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_0}{x_0} * [\token m_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x_0}{v,x_2} * \cell{x_2}{v} \lor\null\\ \quad\cell{x_0}{v+1,x_2} * \cell{x_2}{v}\end{array}}{M_{x_0}'}\end{array} \right\}$
-  $\{\ \langle$if (x$_0$-$\!\textgreater$c == x$_0$-$\!\textgreater$p-$\!\textgreater$c) (x$_0$-$\!\textgreater$c)++;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_0}{x_0} * [\token m_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x_0}{10,x_2} * \cell{x_2}{10} \lor\null\\ \quad\cell{x_0}{10,x_2} * \cell{x_2}{9}\end{array}}{M_{x_0}'}\end{array} \right\}$
+master(x)
+//$\color{blue} \{\varcell{\tx x}{x} * \shared{\cell{x}{0,p} * \cell{p}{0}}{M_{x}'} * [\token m_{x}]\}$
+$\{$ while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
+        (x-$\!\textgreater$c)++;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}'}\end{array} \right\}$
 \end{lstlisting}
 \\
-$\mathbb{FOREMAN}$:&
-{$\mathbb{SLAVE}$:}
-\vspace{-5pt}\\
 \begin{lstlisting}
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_1}{x_1} * [\token s_{x_1}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x_1}{0,x_0} * \cell{x_0}{0} \lor\null\\ \quad\cell{x_1}{1,x_0} * \cell{x_0}{0}\end{array}}{F_{x_1}'}\end{array} \right\}$
- while(x$_1$-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_1}{x_1} * [\token s_{x_1}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x_1}{v,x_0} * \cell{x_0}{v} \lor\null\\ \quad\cell{x_1}{v,x_0} * \cell{x_0}{v+1}\end{array}}{F_{x_1}'}\end{array} \right\}$
-  $\{\ \langle$if (x$_1$-$\!\textgreater$c != x$_1$-$\!\textgreater$p-$\!\textgreater$c)
-     x$_1$-$\!\textgreater$c = x$_1$-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_1}{x_1} * [\token s_{x_1}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x_1}{10,x_0} * \cell{x_0}{10} \lor\null\\ \quad\cell{x_1}{10,x_0} * \cell{x_0}{11}\end{array}}{F_{x_1}'}\end{array} \right\}$
+slave(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{F_{x}'}\end{array} \right\}$
+$\{$  while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{F_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
+       x-$\!\textgreater$c = x-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]* \shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{F_{x}'}\end{array} \right\}$
 \end{lstlisting}
 &
 \begin{lstlisting}
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_2}{x_2} * [\token s_{x_2}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x_2}{0,x_1} * \cell{x_1}{0} \lor\null\\ \quad\cell{x_2}{1,x_1} * \cell{x_1}{0}\end{array}}{S_{x_2}'}\end{array} \right\}$
- while(x$_2$-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_2}{x_2} * [\token s_{x_2}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x_2}{v,x_1} * \cell{x_1}{v} \lor\null\\ \quad\cell{x_2}{v,x_1} * \cell{x_1}{v+1}\end{array}}{S_{x_2}'}\end{array} \right\}$
-  $\{\ \langle$if (x$_2$-$\!\textgreater$c != x$_2$-$\!\textgreater$p-$\!\textgreater$c)
-     x$_2$-$\!\textgreater$c = x$_2$-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_2}{x_2} * [\token s_{x_2}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x_2}{10,x_1} * \cell{x_1}{10} \lor\null\\ \quad\cell{x_2}{10,x_1} * \cell{x_1}{11}\end{array}}{S_{x_2}'}\end{array} \right\}$
+slave(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{S_{x}'}\end{array} \right\}$
+$\{$  while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{S_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
+       x-$\!\textgreater$c = x-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{S_{x}'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
 \begin{array}{@{}r@{}l@{}l@{}}
   m_x &\null ==
-  [\token m_x]: \exsts{p,v} \cell{x}{v,p} * \cell{p}{v} &\null\swap
+  [\token m_x]{:}\, \exsts{p,v} \cell{x}{v,p} * \cell{p}{v} &\null\swap
   \cell{x}{v+1,p} * \cell{p}{v}
   \\
   s_x &\null ==
-  [\token s_x]: \exsts{p,v} \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
+  [\token s_x]{:}\, \exsts{p,v} \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
   \cell{x}{v+1,p} * \cell{p}{v+1}
   \\
   m'_n &\null ==
-  [\token m_x]: \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v} &\null\swap
+  [\token m_x]{:}\, \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v} &\null\swap
   \cell{n}{v,x} * \cell{x}{v+1,p} * \cell{p}{v}
   \\
   s'_n &\null ==
-  [\token s_x]: \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
-  \cell{n}{v,x} * \cell{x}{v+1,p} * \cell{p}{v+1}
+  [\token s_x]{:}\, \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v{+}1} &\null\swap
+  \cell{n}{v,x} * \cell{x}{v{+}1,p} * \cell{p}{v{+}1}
 \end{array}
 \]
 \vspace{-5pt}
 \begin{mathpar}
-  I \eqdef \{m_{x_0}, s_{x_1}, s_{x_2} \}
+  I \eqdef \{m_{p}, s_{x_1}, s_{x_2} \}
 
   M_x' \eqdef \{m_x, s_x'\}
 
@@ -179,30 +179,33 @@ $\mathbb{FOREMAN}$:&
 \label{fig:concurrentInc}
 \end{figure}
 
+{\smaller
 \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
 {\begin{lstlisting}
-spawn() $\{$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts p \tx{x}_0|-< x_0 * [\token e_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x_0}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x_0}{v+1,p} * \cell{p}{v}\end{array}}{E}\end{array} \right\}$
-  local x;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \varcell{\tx x}{-} * [\token e_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x_0}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x_0}{v+1,p} * \cell{p}{v}\end{array}}{E}\end{array} \right\}$
-  x = new();
-  x-$\!\textgreater$p = x$_0$-$\!\textgreater$p;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \varcell{\tx x}{x} * x|->-,p * [\token e_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x_0}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x_0}{v+1,p} * \cell{p}{v}\end{array}}{E}\end{array} \right\}$
+spawn(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts x \tx{x}|-< x * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+$\{$ local y;
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{-} * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+  y = new();
+  y-$\!\textgreater$p = x-$\!\textgreater$p;
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
   $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
-   x$_0$-$\!\textgreater$p = x;$\rangle$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}_0|-< x_0 * \varcell{\tx x}{x} * [\token s_{x}] * [\token e_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x_0}{v,x} * x|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x_0}{v+1,x} * x|->v,p * \cell{p}{v}\end{array}}{E}\end{array} \right\}$
-  $\mathbb{SLAVE}[x_2\leftarrow x, x_1\leftarrow p]\ \mid\mid$ spawn();
-$\}$
+   x-$\!\textgreater$p = y;$\rangle$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+  slave(y) $\mid\mid$ spawn(x);
+$\}$ //$\color{blue} \{\m{false}\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
-//$\color{blue} \{\varcell{\tx x_0}{x_0} * \shared{\begin{array}{@{}l@{}}\E{p}\cell{x_0}{0,p} * \cell{p}{0}\lor\null\\\cell{x_0}{0,p} * \cell{p}{-1}\end{array}}{M_{x_0}''} * [\token m_{x_0}]\}$
-while(x$_0$-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_0}{x_0} * [\token m_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x_0}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x_0}{v+1,p} * \cell{p}{v}\end{array}}{M_{x_0}''}\end{array} \right\}$
-  $\{\ \langle$if (x$_0$-$\!\textgreater$c == x$_0$-$\!\textgreater$p-$\!\textgreater$c) (x$_0$-$\!\textgreater$c)++;$\rangle\ \}$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x_0}{x_0} * [\token m_{x_0}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x_0}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x_0}{10,p} * \cell{p}{9}\end{array}}{M_{x_0}''}\end{array} \right\}$
+master(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{-1}\end{array}}{M_{x}''}\end{array}\right\}$
+$\{$ while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
+    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
+        (x-$\!\textgreater$c)++;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
 \end{lstlisting}
-\end{tabular}
+\end{tabular}}
 
 Consider the program $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
