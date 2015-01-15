@@ -17,7 +17,7 @@ A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
 \emph{local logical state} (local state) $l$ represents the
 locally owned resources of a thread, in the standard separation logic
-sense while the \emph{global logical state} (shared state)
+sense, while the \emph{global logical state} (shared state)
 $g$ represents shared resources. An action model records all possible interferences on the shared state.
 
 Logical states have two components: one describes machine states
@@ -34,21 +34,21 @@ during the entire lifetime of a thread represents its guarantee
 (resp.\ its rely), while a partially-owned capability means that the
 corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
-in particular, they may be transferred between threads and the
+in particular, they may be transferred between a thread and its
 environment just like any other resource. See the presentation of
 deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
 and motivation.
 
 In general, each component of a logical state is taken from an
 arbitrary \emph{separation algebra}~\cite{asl} (i.e.\ a cancellative,
-partial commutative monoid~\cite{asl}) that satisfies the
+partial commutative monoid) that satisfies the
 \emph{cross-split} property\footnote{ A separation algebra
   $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
   for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
   exists $x, y, z, z \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
-  $c = x + z$, and $d = y + w$.}\cite{dockins2009fresh}.  As we demonstrate in the examples of
+  $c = x + z$, and $d = y + w$.}\cite{asl,dockins2009fresh}.  As we demonstrate in the examples of
 \S\ref{sec:examples}, our programs often call for a more complex model
-of machine states and capabilities. For instance, we may need our
+of machine states and capabilities than that presented here. For instance, we may need our
 capabilities to be fractionally owned, where ownership of a
 \emph{fraction} of a capability grants the right to perform the action
 to both the thread and the environment, while a fully-owned capability
@@ -56,15 +56,13 @@ by the thread \emph{denies} the right to the environment to perform
 the associated action.  For ease of presentation, the focus of this
 paper is on the standard stack and heap model for machine states, and
 finite sets of \emph{tokens} (which are simple names) for
-capabilities.
+capabilities. We assume a set of program values $\set{Val}$, as well as infinite disjoint sets $\set{PVar}$, $\set{Loc}$, and $\set{Token}$ of program variables, memory locations, and tokens, respectively.
 
 \begin{definition}[Logical states]
-  A \emph{logical state} is a tuple $((@s, h), \ca{})$, also written
-  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s$ associating
-  program variables with values, a \emph{heap} $h$ associating heap
-  locations with values, and a \emph{capability} $\ca{}$. We assume
-  infinite disjoint sets $\set{PVar}$, $\set{Loc}$, and $\set{Token}$
-  of program variables, memory locations, and tokens, respectively.
+  A \emph{logical state} is a tuple $((@s, h), \ca{}) \in \LStates$, also written
+  $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in \set{Stack}$ associating
+  program variables with values, a \emph{heap} $h \in \set{Heap}$ associating heap
+  locations with values, and a \emph{capability} $\ca{} \in \Caps$. 
   \begin{mathpar}
     \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
     
@@ -79,25 +77,21 @@ capabilities.
 \end{definition}
 
 The local and global logical states of a world are always
-\emph{compatible}, capturing the intuition that privately-owned
-resources are disjoint from shared resources. Compatibility means that
-they may be composed as follows.
+\emph{compatible}: they can be composed with one another. This captures the intuition that privately-owned resources are disjoint from shared resources. The composition of logical states is defined component-wise as disjoint function union $\uplus$ over stacks and heaps, and disjoint set union $\uplus$ on capabilities.
 
 \begin{definition}[Logical state composition]
   The \emph{composition of logical states} $ \composeL : \LStates
   \times \LStates \rightharpoonup \LStates $ is defined
-  component-wise:
+  as:
   \[
-  (@s, h,\ca{}) \composeL (@s', h', \ca{}') \eqdef
-  (@s\uplus @s', h\uplus h', \ca{}\uplus \ca{}')
+  ((@s, h),\ca{}) \composeL ((@s', h'), \ca{}') \eqdef
+  ((@s\uplus @s', h\uplus h'), \ca{}\uplus \ca{}')
   \]
   %% The \emph{separation algebra of logical states} is given by
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or those
-representing the local logical state, and $g$ to range over logical
-states representing the shared (global) state. The empty logical state
+We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively. We write $g$ to range over logical states representing shared (global) states. The empty logical state
 $(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
 write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
@@ -105,18 +99,16 @@ exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
 An action model is a partial function from \emph{capabilities} to sets
-of \emph{actions}. An action is a triple $(p,q, c)$ of logical states where
-$p$ and $q$ are the \emph{pre-} and \emph{post-states} of the action, and $c$ is its
+of \emph{actions}. An action is a triple $(p, q, c)$ of logical states where
+$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is 
 \emph{condition}.  The \emph{action model} $\lmod$ corresponds
 directly to the (semantic interpretation of) an interference assertion
-$I$. Although worlds do not put further constraints on the
-relationship between $\lmod$ and $g$, they are linked more tightly in
-the semantics of assertions (\S\ref{subsec:assertions}).
-
+$I$.
+%
 \begin{definition}[Action models]
   The set of \emph{actions} $\set{Action}$, ranged over by $a$, and
-  the set of \emph{action models} $\AMods$, ranged over by $\lmod$ are
-  defined as follows.
+  the set of \emph{action models} $\AMods$, ranged over by $\lmod$, are
+  defined as:
   \begin{mathpar}
     \set{Action} == \LStates \times \LStates \times \LStates
     
@@ -124,31 +116,27 @@ the semantics of assertions (\S\ref{subsec:assertions}).
   \end{mathpar}
 %  We write $\unitAM$ for an action model with empty domain.
 \end{definition}
-
+%
 \paragraph{Well-formed worlds}
-\colosl worlds are triples
-$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy a
-well-formedness condition: 1) the local and shared states are always
-disjoint ($l\compatL g$), 2) the capabilities owned by $l$ and $g$ are
-in the domain of $\lmod$, and 3) actions in $\lmod$ are
-\emph{confined} to $g$ (written $g\containI\lmod$), i.e.  whenever
-they are enabled (in that their pre-state is compatible with $g$), the
-part of the state that they mutate is a sub-part of $g$. The
-definition of $g\containI\lmod$ is similar to the confinement between
-an assertion and an interference assertion, which we describe in
-\S\ref{subsec:prules}.
+are triples
+$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy the
+well-formedness conditions: 1) the local and shared states are always
+compatible ($l\compatL g$); 2) the capabilities owned by $l$ and $g$ are
+in the domain of $\lmod$; and 3) actions in $\lmod$ are
+\emph{confined} to $g$ (written $g\containI\lmod$). An action $a= (p, q, c)$ is confined to $g$ if 
+whenever it is enabled ($p \composeL c$ is compatible with $g$), then its pre-state $p$ is contained in $g$ ($p \leq g$). We provide an informal description of confinement in
+\S\ref{subsec:prules}. The formal definition of confinement is provided in~\cite{colosl-tr14}.
 
 \begin{definition}[Well-formedness]
   \label{def:wf}
-  A triple $(l, g, \lmod)\in\LStates\times\LStates\times\AMods$, where
-  $l = (-,-,\ca{l})$ and $g = (-,-,\ca{g})$ is \emph{well-formed},
+  A triple $(l, g, \lmod)\in\LStates\times\LStates\times\AMods$ is \emph{well-formed},
   written $\wf{l, g, \lmod}$, iff
   \vspace{-1ex}
   \[
   \begin{array}{L}
-    l\compatL g
+    l \compatL g
     /|
-    \ca{l}\cup\ca{g}\subseteq \bigcup \m{dom}(\lmod)
+    l_{\ca{}} \cup g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)
     /|
     g \containI \lmod
   \end{array}
@@ -165,13 +153,16 @@ The set of \emph{worlds} is defined as
 	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
 \]
 \end{definition}
+%
+Well-formed worlds do not put further constraints on the
+relationship between $\lmod$ and $g$, they are however linked more tightly in
+the semantics of assertions (\S\ref{subsec:assertions}).
 
-Finally, the composition of two worlds combines their local logical
-states, and is defined whenever the worlds agree on the other two
+Finally, the composition of two worlds combines their local states, and is defined whenever the worlds agree on the other two
 components and the resulting tuple is a well-formed world.
 
 \begin{definition}[World composition]
-  The \emph{composition} $w\composeW w'$ of two worlds $\composeW: \Worlds \rightarrow \Worlds \rightharpoonup \Worlds$, is defined as:.
+  The \emph{composition} of worlds, $\composeW: \Worlds \times \Worlds \rightharpoonup \Worlds$, is defined as:
   \[
 	(l,g,\lmod) \composeW (l',g',\lmod') \eqdef
 	\begin{cases}
@@ -194,20 +185,16 @@ components and the resulting tuple is a well-formed world.
 \label{subsec:assertions}
 
 Our assertion language extends separation logic with \emph{subjective
-  views} and \emph{capability assertions}.  We assume an extra
-infinite set $\set{LVar}$ of \emph{logical variables}, disjoint from
+  views} and \emph{capability assertions}.  We assume an infinite set $\set{LVar}$ of \emph{logical variables}, disjoint from
 $\set{PVar}$.
 
 \colosl is parametric in the assertions of machine states and
 capabilities and can be instantiated with any assertion language over
-machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
-use standard heap and stack assertions, and single-token assertions.
+machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions for machine state assertions, and single-token assertions of the form $[\token{a}]$ for capability assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
 
 \begin{definition}[Assertion syntax]\label{def:assertions}
-The assertions of \colosl are elements of $\Assertions$ described by
-the grammars below, where $x \in \set{LVar}$, $\li{x} \in \set{PVar}$,
-and $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand
-for $\oast_{\token{a} \in \token{A}}[\token{a}]$.
+Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$, \emph{the assertions of \colosl}, $\Assertions$, are described by the grammars below:
+%
 \begin{align*}	 
   A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [E]\\
   \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
@@ -416,7 +403,8 @@ consequences of the semantics.
 
 \begin{lemma}
   \label{lem:assertion-facts}
-  \forgetRule, \mergeRule, \shiftRule, \weakenRule, \copyRule are valid.
+  The \colosl reasoning principles 
+  \forgetRule, \mergeRule, \shiftRule, \weakenRule, and \copyRule are valid.
   %% \begin{mathpar}
   %%       \infer{
   %%       	\shared{P}{I} * \shared{Q}{I'} \entails \shared{R}{I} * \shared{Q}{I'}
@@ -503,19 +491,16 @@ yielding a new shared state $g\composeL l'$ and action model $\lmod
 
 In order not to invalidate the views that other threads hold of the
 shared state, in the situation above we require that the actions in
-$\lmod'$ are \emph{confined} to $l'$: whenever an action $(p,q)$ of
-$\lmod'$ is enabled, the part of $g\bullet l'$ modified by the action
-must be a substate of $l'$.  However, new actions are allowed to
-require the presence of some neutral resource outside of $l'$ provided that they are conserved by the action (i.e.\ are also present in $q$).
+$\lmod'$ are \emph{confined} to $l'$: whenever an action $a = (p, q, c)$ of
+$\lmod'$ is enabled, its pre-state $p$ (those parts of the shared state modified by $a$) must be a substate of $l'$. However, new actions are allowed to
+require the presence of some neutral resource outside of $l'$ provided that they are conserved by the action (i.e. they are present in $c$).
 %
 For instance, abusing notations temporarily to ignore empty stack and
-capability components in logical states, the action $a = ([10:0, 12:0,
-  14:0],[10:1, 12:1, 14:0])$, which modifies the cells at addresses 10
-and 12 to point from 0 to 1 provided that location 14 points to 0, is
+capability components in logical states, the action $a = ([10:0, 12:0], [10:1, 12:1], [14:0])$ (which modifies the cells at addresses 10 and 12 to point from 0 to 1 provided that location 14 points to 0), is
 confined in the states $l_1=[10:0,12:0]$ and $l_2=[10:1]$, but not in
-$l_3=[10:0]$. Indeed $p$ is compatible with $l_1$ and $l_3$, and the
+$l_3=[10:0]$. Indeed $p \composeL c$ is compatible with $l_1$ and $l_3$, and the
 modified cells 10 and 12 are fully contained in $l_1$ but not in
-$l_3$; $p$ is not compatible with $l_2$, hence $a$ has no effect on
+$l_3$; $p \composeL c$ is not compatible with $l_2$, hence $a$ has no effect on
 $l_2$ and is automatically confined to $l_2$.
 %
 Moreover, we require not only that all actions in $\lmod'$
@@ -540,7 +525,7 @@ we show that it is always possible to weaken an assertion into a local assertion
 checked for each action in $I$ (see the second rule). For each action
 $\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
 apply. In the first of these rules, the action cannot possibly fire,
-because its pre-condition is incompatible with $\lass{F}$: no state
+because its pre-condition does not agree with $\lass{F}$: no state
 satisfying $\lass{F}$ may be extended such that a sub-part satisfies
 $\lass{P}$. 
 %The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
@@ -549,20 +534,21 @@ $\lass{R}$ of an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$
 appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
 then the part of the state denoted by $\lass{R}$ is uniquely
 determined and left unchanged by the action. 
-The last rule finally
-reduces local fencing to entailment checking, provided the fence
+The last rule finally reduces local fencing to entailment checking, provided the fence
 $\lass{F}$ can be expressed as a disjunction of precise formulas. The
 first premise states that $\lass{F}$ is invariant under the action
 $\lass{P}\swap \lass{Q}$, similar to the way that RGSep encodes
 stability checks as separation logic entailments. Informally, it
 reads: for any state in $f$, remove a part satisfying $p$ and add a
 state satisfying $q$; the result should still be in $f$. The third
-premise checks the confinement condition: if a sub-part of an
-extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
-($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
-then it is also a sub-part of that state ($l_1\composeL l_2\composeL
-l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
-l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
+premise checks the confinement condition: given a state in $f_i$ ($l_1\composeL l_2|= \lass{F}_i$), and an extension of it ($l = l_1 \composeL l_2 \composeL l_3$) where a sub-part of $l$ satisfies $\lass{P}$ ($l_2 \composeL l_3 |= f_i$), the extension $l$ itself is also in $f_i$ ($l_1\composeL l_2\composeL
+l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, we have $l_2\composeL
+l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
+%if a sub-part of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
+%($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
+%then it is also a sub-part of that state ($l_1\composeL l_2\composeL
+%l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
+%l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 
 \begin{figure}
 \hrule\vspace{5pt}
@@ -650,9 +636,9 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 
 
 In the same way that all new extensions to the shared states are confined, any world
-must also be confined, hence the confinement condition in the
-well-formedness of worlds, which repeats the definition of confinement
-for assertions at the model level.
+must also be confined, as to not interfere with its future extensions. This is captured by the confinement condition in the well-formedness of worlds.
+%, which repeats the definition of confinement
+%for assertions at the model level.
 
 
 \paragraph{Shifting/fencing judgements}
@@ -916,11 +902,11 @@ action, in a similar way to fencing rules above.
 	}
 
 	\infer{
-	  \stable{\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}}
+	  \stable{\lass{P} * \bigstar_{j\in J}\shared{\lass{Q}_j}{I_j}}
 	}
 	{
-          \for{i\in I}
-	  \stable{\lass{Q}_i, I_i, \lass{P}, \bigocon_{j\in I} \lass{Q}_j}
+          \for{j\in J}
+	  \stable{\lass{Q}_j, I_j, \lass{P}, \bigocon_{j\in J} \lass{Q}_j}
 	}
 
 %	\infer{
@@ -946,7 +932,7 @@ action, in a similar way to fencing rules above.
 	}
 	{
     \for{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2} \in I}
-          \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P_2}}{\lass{P}_2} \},\lass{P},\lass{R}}
+          \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}	
 	
 	\infer{
