@@ -123,9 +123,8 @@ mark the same node and claim ownership of the same resource.
 The interference associated with the graph is described as the union
 of interferences pertaining to the vertices of the graph ($n \in
 \gamma$). For each vertex $n \in \gamma$, the only permitted action is
-that of marking $n$.
-% which can be carried out by any of the marking capabilities associated with node $n$ ($\markT{n}{-}$). 
-
+that of marking $n$; which can be carried out without requiring any capabilities ($[\emptyset]$). 
+%which can be carried out by any of the marking capabilities associated with node $n$ ($\markT{n}{-}$). 
 %\begin{figure}
 % %\centering
 %%  \hspace*{0.2cm}
@@ -177,7 +176,7 @@ that of marking $n$.
 			\qquad
 			\marked{x} \eqdef  \cell{x}{1}\\
 %
-			I(n) \eqdef & \left\{ \m{true}: \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n}\right\}
+			I(n) \eqdef & \left\{ [\emptyset]: \exsts{l, r} \unmarked{n}{l}{r} \swap \marked{n}\right\}
 		\end{array}
 		$
     \hrule
@@ -394,10 +393,10 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %%
 %%
 \begin{figure}
-\hrule     
+\hrule    
+%  //<@\codecomment{$\{\graph{\tx{x}}{\gamma}\}$}@>
+%  //<@\codecomment{$\{\shared{\G{\tx{x}}{\gamma}}{I_{\gamma}}\}$}@> 
 \begin{lstlisting}
-  //<@\codecomment{$\{\graph{\tx{x}}{\gamma}\}$}@>
-  //<@\codecomment{$\{\shared{\G{\tx{x}}{\gamma}}{I_{\gamma}}\}$}@>
   //<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
   b:= span(x) $\{$
     //<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
