@@ -3,12 +3,21 @@
 
 We illustrate our \colosl reasoning principles by sketching a proof of
 a variation of Dijkstra's token-ring mutual exclusion
-algorithm~\cite{dijkstra74}. These principles are laid out in
-\fig\ref{fig:principles}, together with the usual concurrency rule of
-separation logic~\cite{csl-tcs}, and the rule of consequence from the
-Views framework~\cite{views}.  We will introduce them informally as
-needed, and present them in more details in \S\ref{sec:colosl}.
+algorithm~\cite{dijkstra74}. 
 
+Dijkstra introduced the notion of \emph{self-stabilising} distributed algorithms in~\cite{dijkstra74}. A distributed algorithm is self-stabilising if starting from any arbitrary state, it converges to a legitimate state and remains so thereafter. Moreover, the ``current state" is not stored in a central location accessible by all machines, rather it is recorded in variables distributed over several machines.
+ 
+In~\cite{dijkstra74} Dijkstra presented the token ring algorithm - a network of $n$ machines arranged in a ring with a designated \emph{master} machine (numbered $1$) and $n-1$ slave machines (numbered $2 \cdots n$). Each machine maintains a local counter which constitute the current state of the system. 
+%and the current state of the system consists of the $n$ counters. 
+In addition, each machine (numbered $i$) can communicate with the previous machine in the ring (numbered $i-1$ when $i>1$; or $n$ when $i=1$) and enquire about the value of its counter.
+%
+ A legitimate state of the network is one in which exactly one machine holds a ``token" at any given time. The $k$th machine holds a token if there exists a value $v \in \Nats$ such that value of all counters numbered $1\cdots k-1$ is $v+1$ and the value of those numbered $k\cdots n$ is $v$ (note that the master machine holds a token when all counters hold value $v$). The $k$th machine holding a token can then increment its counter and effectively pass the token to the machine next in the ring.
+ 
+ The token ring algorithm is self-stabilising: starting from an arbitrary (illegitimate) state where counters are initialised with random values within a given range, the system converges to a legitimate state in a finite number of steps. In~\cite{dijkstra-proof}, Dijkstra provided a proof of the token ring's self-stabilisation. In~\cite{colosl-tr14}, we outline a proof sketch of self-stabilisation in \colosl and demonstrate that starting from an arbitrary state the system converges to a legitimate state.
+ 
+Since once in a legitimate state, 1) the system remains so thereafter; and 2) exactly one machine holds a token at any given time, one can use the token ring as a mutual exclusion mechanism to synchronise access to shared resources. We demonstrate this in~\cite{colosl-tr14} by using the token ring to control access to a simple shared resource $\cell{t}{v}$ (e.g. pointing to the top of a shared stack). 
+
+In the remainder of this section, we illustrate the \colosl reasoning principles through a token ring in a legitimate state where the master thread holds a token and all counters hold value $0$.  The \colosl reasoning principles are laid out in \fig\ref{fig:principles}, together with the usual concurrency rule of separation logic~\cite{csl-tcs}, and the rule of consequence from the Views framework~\cite{views}.  We will introduce them informally as needed, and present them in more details in \S\ref{sec:colosl}.
 \begin{figure}
 \centering
 \noindent\hrule
