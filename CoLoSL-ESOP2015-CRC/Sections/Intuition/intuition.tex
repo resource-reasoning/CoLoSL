@@ -432,6 +432,14 @@ $\{$ while(x-$\!\textgreater$c != 10)
 $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
+\begin{mathpar}
+  e_x ==
+  [\token e_x]{:}\, \exsts{p,v} \cell{x}{v+1,-} * \cell{p}{v}\swap
+  \cell{x}{v+1,p} * \cell{p}{v}\\
+  E_x \eqdef \{e_x\}
+
+  M_x'' \eqdef M_x'\cup\{e_x\}
+\end{mathpar}
 \hrule
 \caption{Growing the ring.}
 \label{fig:spawner}
