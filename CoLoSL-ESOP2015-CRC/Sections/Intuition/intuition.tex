@@ -2,22 +2,55 @@
 \label{sec:intuition}
 
 We illustrate our \colosl reasoning principles by sketching a proof of
-a variation of Dijkstra's token-ring mutual exclusion
-algorithm~\cite{dijkstra74}. 
-
-Dijkstra introduced the notion of \emph{self-stabilising} distributed algorithms in~\cite{dijkstra74}. A distributed algorithm is self-stabilising if starting from any arbitrary state, it converges to a \emph{legitimate} state and remains so thereafter. Moreover, the state of the system is not stored in a central location accessible by all machines, rather it is recorded in variables distributed over several machines.
+a variation of Dijkstra's token-ring mutual exclusion algorithm, which
+pioneered \emph{self-stabilising} distributed
+algorithms~\cite{dijkstra74}: starting from any arbitrary
+(distributed) state, the algorithm converges to a \emph{legitimate}
+state and remains so thereafter
  
-As an example of self-stabilisation, he presented the token ring algorithm: a network of $n$ machines arranged in a ring with a designated \emph{master} machine (numbered $1$) and $n-1$ slave machines (numbered $2 \cdots n$). Each machine maintains a local counter and the state of the system consists of all $n$ counters.
+As an example of self-stabilisation, he presented the token ring
+algorithm: a network of $n$ machines arranged in a ring with a
+designated \emph{master} machine (numbered $1$) and $n-1$ slave
+machines (numbered $2 \cdots n$). Each machine maintains a local
+counter and the state of the system consists of all $n$ counters.
 %and the current state of the system consists of the $n$ counters. 
-In addition, each machine (numbered $i$) can communicate with the previous machine (numbered $i-1$ if $i>1$; or $n$ if $i=1$) and inspect its counter value.
+In addition, each machine (numbered $i$) can communicate with the
+previous machine (numbered $i-1$ if $i>1$; or $n$ if $i=1$) and
+inspect its counter value.
 %
- A legitimate state is one in which exactly one machine can make a \emph{move} at any given time. The $k$th machine can make a move if there exists a value $v$ such that the values of all counters numbered $1\cdots k-1$ are $v+1$, and the values of those numbered $k\cdots n$ are $v$ (note that the master machine can make a move when the values of all counters are $v$). The $k$th machine can then make a move by incrementing its counter and effectively passing the turn to the next machine in the ring.
+A legitimate state is one in which exactly one machine can make a
+\emph{move} at any given time. The $k$th machine can make a move if
+there exists a value $v$ such that the values of all counters numbered
+$1\cdots k-1$ are $v+1$, and the values of those numbered $k\cdots n$
+are $v$ (note that the master machine can make a move when the values
+of all counters are $v$). The $k$th machine can then make a move by
+incrementing its counter and effectively passing the turn to the next
+machine in the ring.
  
- The token ring algorithm is self-stabilising: starting from an arbitrary (illegitimate) state where counters are initialised with random values within a given range, the system converges to a legitimate state in a finite number of steps. Dijkstra provided a proof of the token ring's self-stabilisation in~\cite{dijkstra-proof}. In~\cite{colosl-tr14}, we outline a proof sketch of token ring's self-stabilisation in \colosl and demonstrate that starting from an arbitrary state the system converges to a legitimate state.
+The token ring algorithm is self-stabilising: starting from an
+arbitrary (illegitimate) state where counters are initialised with
+random values within a given range, the system converges to a
+legitimate state in a finite number of steps. Dijkstra provided a
+proof of the token ring's self-stabilisation
+in~\cite{dijkstra-proof}. In~\cite{colosl-tr14}, we outline a proof
+sketch of token ring's self-stabilisation in \colosl and demonstrate
+that starting from an arbitrary state the system converges to a
+legitimate state.
  
-Since once the ring is in a legitimate state, 1) it remains so thereafter; and 2) exactly one machine can make a move at any given time, one can use the token ring as a mutual exclusion mechanism to synchronise access to a shared resource. We demonstrate this in~\cite{colosl-tr14} by using the token ring to control access to an arbitrary shared resource. 
-In the remainder of this section, we illustrate the \colosl reasoning principles through a token ring in a legitimate state where all counters hold value $0$.  The \colosl reasoning principles are laid out in \fig\ref{fig:principles}, together with the usual concurrency rule of separation logic~\cite{csl-tcs}, and the rule of consequence from the Views framework~\cite{views}.  We introduce them informally as needed, and present them in more details in \S\ref{sec:colosl}.
-%
+Since once the ring is in a legitimate state, 1) it remains so
+thereafter; and 2) exactly one machine can make a move at any given
+time, one can use the token ring as a mutual exclusion mechanism to
+synchronise access to a shared resource. We demonstrate this
+in~\cite{colosl-tr14} by using the token ring to control access to an
+arbitrary shared resource.  In the remainder of this section, we
+illustrate the \colosl reasoning principles through a token ring in a
+legitimate state where all counters hold value $0$.  The \colosl
+reasoning principles are laid out in \fig\ref{fig:principles},
+together with the usual concurrency rule of separation
+logic~\cite{csl-tcs}, and the rule of consequence from the Views
+framework~\cite{views}.  We introduce them informally as needed, and
+present them in more details in \S\ref{sec:colosl}.
+
 \begin{figure}
 \centering
 \noindent\hrule
@@ -77,7 +110,6 @@ In the remainder of this section, we illustrate the \colosl reasoning principles
 \caption{Main reasoning principles of \colosl.}
 \label{fig:principles}
 \end{figure}
-%
 
 \colosl introduces a new assertion $\shared{P} I$ called a
 \emph{subjective view}, which comprises an assertion $P$ describing
@@ -102,16 +134,37 @@ data structures~\cite{rey-slnotes,js-popl12,ramification}. The
 changing the machine states it denotes. In particular, $(P => Q) => (P
 ===> Q)$.
 
-Consider the program $\li{ring(m, s1, s2)}$ defined in \fig\ref{fig:concurrentInc} representing a 3-place token ring with master $m$ and slaves $\li{s1}$ and $\li{s2}$. 
+Consider the program $\li{ring(m, s1, s2)}$ defined in
+\fig\ref{fig:concurrentInc} representing a 3-place token ring with
+master $m$ and slaves $\li{s1}$ and $\li{s2}$.
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
-It is written in pseudo-code resembling C with additional constructs for concurrency: atomic sections $\atomic \_$ which declare that code behaves atomically; and parallel composition $\_ ||\_ $  which spawns threads then waits until they complete. In our example, three threads are spawned (corresponding to the master thread and the two slave threads) and are run in parallel until all counters reach value $10$ (in the fashion described above).
+It is written in pseudo-code resembling C with additional constructs
+for concurrency: atomic sections $\atomic \_$ which declare that code
+behaves atomically; and parallel composition $\_ ||\_ $ which spawns
+threads then waits until they complete. In our example, three threads
+are spawned (corresponding to the master thread and the two slave
+threads) and are run in parallel until all counters reach value $10$
+(in the fashion described above).
 
-Note that this implementation can easily be generalised to an $n$-place ring. However, due to space constraints we focus on a 3-place ring instead. While the implementation of all slave threads are identical, the proof of the first slave in the ring ($\li{s1}$) is slightly different from that of the other ($\li{s2}$). For clarity, we thus refer to the first slave thread as the \emph{foreman}, henceforth. Analogously, in the generalised $n$-place ring, the proof of all slave threads are identical and only differ slightly from that of the foreman. 
+Note that this implementation can easily be generalised to an
+$n$-place ring. However, due to space constraints we focus on a
+3-place ring instead. While the implementation of all slave threads
+are identical, the proof of the first slave in the ring ($\li{s1}$) is
+slightly different from that of the other ($\li{s2}$). For clarity, we
+thus refer to the first slave thread as the \emph{foreman},
+henceforth. Analogously, in the generalised $n$-place ring, the proof
+of all slave threads are identical and only differ slightly from that
+of the foreman.
 
-In our reasoning, we represent the resources associated with each machine in the ring as two consecutive cells in the heap recording a) the current value of the associated counter (at address $x$); and b) the address of the previous machine in the ring (at address $x+1$). 
-We now proceed with the proof outline of slave threads. The proof of the master and foreman threads are similar and can be described analogously. 
-%
+In our reasoning, we represent the resources associated with each
+machine in the ring as two consecutive cells in the heap recording a)
+the current value of the associated counter (at address $x$); and b)
+the address of the previous machine in the ring (at address $x+1$).
+We now proceed with the proof outline of slave threads. The proof of
+the master and foreman threads are similar and can be described
+analogously.
+
 \begin{figure}
 \centering
 \noindent\hrule\vspace{10pt}
@@ -197,62 +250,110 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
   is still valid when replacing $S_x'$ with $F_x'$.}
 \label{fig:concurrentInc}
 \end{figure}
-%
-%
+
 \paragraph{Slave machines}
-Since each slave machine inspects the value of its counter and compares it against that of the previous machine in the ring, a possible pre-condition for the $\li{slave(x)}$ program is\vspace{-5pt}
-%
+Since each slave machine inspects the value of its counter and
+compares it against that of the previous machine in the ring, a
+possible pre-condition for the $\li{slave(x)}$ program is
+\vspace{-5pt}
 \begin{align*}
 	\li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0, p} * \cell{p}{0} \lor \cell{x}{0,p} * \cell{p}{1}}{S_x}
 	\quad
 	S_x = \{s_{x}, s_{p}\}\\[-20pt]
 \end{align*}
-%
-The above assertion states that the current slave thread owns the variable resource \li{x} locally and that \li{x} records the address of the associated slave machine ($x$). 
-The current thread also has a subjective view of the shared state and knows that \emph{either} the machines at address $x$ and its previous sibling at address $p$ both hold value $0$; \emph{or} the value of the previous machine has been incremented to $1$ while the value of the machine at $x$ is $0$. The interference allowed on these two machines is captured by $S_x$ and consists of two actions: $s_x$ and $s_p$. For instance, the $s_{x}$ action can increment $x$ under the condition that its value is one
-less than $p$. This update can only be carried out by the thread that holds the $[\token s_x]$ \emph{capability} in its local state.In the case of the above assertion, the current thread owns the $[\token s_x]$ capability locally (and is thus the only thread that can perform its action). On the other hand, since the current thread does not own the $[\token s_p]$ capability (and thus the environment might), its action may be carried out by the environment at any time provided that its conditions are satisfied. 
+The above assertion states that the current slave thread owns the
+variable resource \li{x} locally and that \li{x} records the address
+of the associated slave machine ($x$).  The current thread also has a
+subjective view of the shared state and knows that \emph{either} the
+machines at address $x$ and its previous sibling at address $p$ both
+hold value $0$; \emph{or} the value of the previous machine has been
+incremented to $1$ while the value of the machine at $x$ is $0$. The
+interference allowed on these two machines is captured by $S_x$ and
+consists of two actions: $s_x$ and $s_p$. For instance, the $s_{x}$
+action can increment $x$ under the condition that its value is one
+less than $p$. This update can only be carried out by the thread that
+holds the $[\token s_x]$ \emph{capability} in its local state.In the
+case of the above assertion, the current thread owns the $[\token
+  s_x]$ capability locally (and is thus the only thread that can
+perform its action). On the other hand, since the current thread does
+not own the $[\token s_p]$ capability (and thus the environment
+might), its action may be carried out by the environment at any time
+provided that its conditions are satisfied.
 %that performed by the current machine (enabled by $[\token{x}]$); and that of the previous machine in the ring (enabled by $[\token{s}_p]$). Each action allows the value of the corresponding machine to be incremented by $1$ so long is it is the one that can make a move (As described above). 
-On closer inspection, this assertion turns out to be unstable: $s_p$ allows the value of $p$ to be incremented when its value is less than that of its previous sibling ($m$) by $1$. However, the value of $m$ is unknown to the current thread (since it is missing from the subjective view) and from the point of view of this thread, $s_p$ can take place indefinitely many times. We thus have to stabilise the above assertion as:\vspace{-5pt}
-%
+On closer inspection, this assertion turns out to be unstable: $s_p$
+allows the value of $p$ to be incremented when its value is less than
+that of its previous sibling ($m$) by $1$. However, the value of $m$
+is unknown to the current thread (since it is missing from the
+subjective view) and from the point of view of this thread, $s_p$ can
+take place indefinitely many times. We thus have to stabilise the
+above assertion as:\vspace{-5pt}
 \begin{align*}
 	\li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v} \cell{x}{0, p} * \cell{p}{v}}{S_x}
 	\quad
 	S_x = \{s_{x}, s_{p}\} \\[-20pt]
 \end{align*}
-%
 However, this assertion is now too weak for our purposes. Indeed, the
 programmer knows that $p$ can only be incremented when its value is
 equal to $s$ and less than $m$ by 1. However, this is not reflected in
-$s_{p}$. Since the value of $m$ is not visible to this thread, there is nothing to constrain the increment
-on $p$ given the values of $p$ and $x$. We can thus only
-stabilise to a weak assertion that loses information about how the
-values of $m$ and $x$ are connected together through $p$.
-%
-It is however possible to give a stronger specification, as follows: \vspace*{-5pt} 
-%
+$s_{p}$. Since the value of $m$ is not visible to this thread, there
+is nothing to constrain the increment on $p$ given the values of $p$
+and $x$. We can thus only stabilise to a weak assertion that loses
+information about how the values of $m$ and $x$ are connected together
+through $p$.  It is however possible to give a stronger specification,
+as follows: \vspace*{-5pt}
 \begin{align*}
 	\li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0, p} * \cell{p}{0} \lor \cell{x}{0, p} * \cell{p}{1}}{S'_x}
 	\quad
 	S'_x = \{s_{x}, s'_{x}\} \\[-20pt]
 \end{align*}
-%
-The amended action $s'_x$ reflects stronger knowledge about when $p$ can be incremented and how its value is related to $m$ and $x$.
-The proof of the specification of the $\li{slave(x)}$ is now relatively straightforward. By inspection (or using the rules of \S\ref{subsec:prules}), the invariant of the while loop is stable with respect to $S'_x$. The atomic section allows safe manipulation of the contents of the subjective view.  The final postcondition of $\li{slave(x)}$ follows from the invariant and the boolean expression of the while. 
-%
-\paragraph{Foreman thread} The proof sketch of the foreman (slave) thread is given in the left column of~\fig\ref{fig:concurrentInc}. This proof is similar to that of other slave threads and the only difference lies in the interference associated with the foreman thread. While the interference of a slave thread contains the action of the slave itself and that of the previous thread (which is also a slave), the interference associated with the foreman thread contains the action of the foreman itself and that of the master thread. The rest of the proof outline can be justified analogously. 
+The amended action $s'_x$ reflects stronger knowledge about when $p$
+can be incremented and how its value is related to $m$ and $x$.  The
+proof of the specification of the $\li{slave(x)}$ is now relatively
+straightforward. By inspection (or using the rules of
+\S\ref{subsec:prules}), the invariant of the while loop is stable with
+respect to $S'_x$. The atomic section allows safe manipulation of the
+contents of the subjective view.  The final postcondition of
+$\li{slave(x)}$ follows from the invariant and the boolean expression
+of the while.
+
+\paragraph{Foreman thread}
+The proof sketch of the foreman (slave) thread is given in the left
+column of~\fig\ref{fig:concurrentInc}. This proof is similar to that
+of other slave threads and the only difference lies in the
+interference associated with the foreman thread. While the
+interference of a slave thread contains the action of the slave itself
+and that of the previous thread (which is also a slave), the
+interference associated with the foreman thread contains the action of
+the foreman itself and that of the master thread. The rest of the
+proof outline can be justified analogously.
 
 \paragraph{The ring algorithm}
-The proof outline of the \li{ring(x0, x1, x2)} algorithm is given in~\fig\ref{fig:concurrentInc}. The assertion on line~2 declares that the current thread locally owns the three variables $\li{x0}$, $\li{x1}$ and $\li{x2}$ recording the addresses of the master ($x_0$) and slave machines ($x_1$ and $x_2$), respectively. Let $P = \cell{x_0}{0, x_2} * \cell{x_1}{0, x_0} * \cell{x_2}{0, x_1}$; the subjective view $\shared{P}{I}$ describes the initial state of the ring where all counters have value $0$ and each machine tracks the address of the previous machine in the ring. The interference associated with the subjective view ($I=\{m_{x_0}, s_{x_1}, s_{x_2}\}$) consists of actions that allow a thread to manipulate the master ($m_{x_0}$) and slave counters ($s_{x_1}$ and $s_{x_2}$). 
+The proof outline of the \li{ring(x0, x1, x2)} algorithm is given
+in~\fig\ref{fig:concurrentInc}. The assertion on line~2 declares that
+the current thread locally owns the three variables $\li{x0}$,
+$\li{x1}$ and $\li{x2}$ recording the addresses of the master ($x_0$)
+and slave machines ($x_1$ and $x_2$), respectively. Let $P =
+\cell{x_0}{0, x_2} * \cell{x_1}{0, x_0} * \cell{x_2}{0, x_1}$; the
+subjective view $\shared{P}{I}$ describes the initial state of the
+ring where all counters have value $0$ and each machine tracks the
+address of the previous machine in the ring. The interference
+associated with the subjective view ($I=\{m_{x_0}, s_{x_1},
+s_{x_2}\}$) consists of actions that allow a thread to manipulate the
+master ($m_{x_0}$) and slave counters ($s_{x_1}$ and $s_{x_2}$).
 %, provided that it holds the pertinent capabilities ($[\token{m}_{x_0}]$, $[\token{s}_{x_1}]$, $[\token{s}_{x_2}]$, resp.) in its local state. 
-Finally, the assertion in line~2 simply has all the capabilities $[\token{m}_{x_0}] * [\token{s}_{x_1}] * [\token{s}_{x_2}]$ associated with $I$ in the local state.
+Finally, the assertion in line~2 simply has all the capabilities
+$[\token{m}_{x_0}] * [\token{s}_{x_1}] * [\token{s}_{x_2}]$ associated
+with $I$ in the local state.
 
-This subjective view may then be freely duplicated using the \copyRule principle and each thread is given a copy together with the
+This subjective view may then be freely duplicated using the \copyRule
+principle and each thread is given a copy together with the
 appropriate capability using the \parRule rule. For instance, thread
-running \li{slave(x2)} gets
-$
-\varcell{\li{x2}}{x_2} * [\token{s}_{x_2}] * \shared{P}{I}
-$.
-However, this assertion does not match the pre-condition of \li{slave(x2)}. We now demonstrate how we can derive the desired pre-condition using the \colosl reasoning principles given in~\fig\ref{fig:principles}. The pre-conditions of the master and foreman threads can be obtained analogously.
+running \li{slave(x2)} gets $ \varcell{\li{x2}}{x_2} *
+[\token{s}_{x_2}] * \shared{P}{I} $.  However, this assertion does not
+match the pre-condition of \li{slave(x2)}. We now demonstrate how we
+can derive the desired pre-condition using the \colosl reasoning
+principles given in~\fig\ref{fig:principles}. The pre-conditions of
+the master and foreman threads can be obtained analogously.
 
 %Because subjective views only describe \emph{parts} of the shared state, we can use the \forgetRule principle to obtain a weaker view of the shared state, in this case a view that ignores the two cells as $x_0$ as well as the previous sibling of $x_1$ as follows. However, as discussed above (see slave machines) the resulting subjective view is not necessarily stable any longer; and we need to weaken it to regain stability:
 %\begin{align*}
@@ -274,12 +375,30 @@ The pre-condition of the \li{slave(x2)} thread can be derived thus:
 \end{align}
 %
 
-We begin by rewriting the $s_{x_1}$ action of $I$ into the stronger action of $s'_{x_2}$ as per (\ref{inc:ass1}). This implication involves subtle interaction between the assertion and the interference relation of the subjective view. Consider the $s_{x_1}$ action and the initial state with value $0$ in all the cells. This action can be replaced by $s'_{x_2}$ because, as the programmer knows, whenever the value of $x_1$ is greater than $x_2$ by 1, then $x_0$ is also greater than $x_2$ by 1 (and is equal to $x_0$). As such, rewriting $s_{x_1}$ as $s'_{x_2}$ does not alter its behaviour and merely reflects stronger knowledge about how $x_2$ and $x_0$ are related through $x_1$. 
+We begin by rewriting the $s_{x_1}$ action of $I$ into the stronger
+action of $s'_{x_2}$ as per (\ref{inc:ass1}). This implication
+involves subtle interaction between the assertion and the interference
+relation of the subjective view. Consider the $s_{x_1}$ action and the
+initial state with value $0$ in all the cells. This action can be
+replaced by $s'_{x_2}$ because, as the programmer knows, whenever the
+value of $x_1$ is greater than $x_2$ by 1, then $x_0$ is also greater
+than $x_2$ by 1 (and is equal to $x_0$). As such, rewriting $s_{x_1}$
+as $s'_{x_2}$ does not alter its behaviour and merely reflects
+stronger knowledge about how $x_2$ and $x_0$ are related through
+$x_1$.
 %This amended action gives full information about how the resource of the subjective view changes as \li{x} is being updated.
-\shiftRule allows us to replace $I$ with any interference relation $I'$ that has the same observable effect as far as the subjective assertion $P$ of the subjective view is concerned (written $I \weakenI{P} I'$). By the informal argument above, $I\weakenI{P} \{m_{x_0}, s'_{x_2}, s_{x_2}\}$, hence we can replace $I$ with $\{m_{x_0}, s'_{x_2}, s_{x_2}\}$.
+\shiftRule allows us to replace $I$ with any interference relation
+$I'$ that has the same observable effect as far as the subjective
+assertion $P$ of the subjective view is concerned (written $I
+\weakenI{P} I'$). By the informal argument above, $I\weakenI{P}
+\{m_{x_0}, s'_{x_2}, s_{x_2}\}$, hence we can replace $I$ with
+$\{m_{x_0}, s'_{x_2}, s_{x_2}\}$.
 %
 
-Because subjective views only describe \emph{parts} of the shared state, we can use the \forgetRule principle to obtain a weaker view of the shared state, in this case a view that ignores the cells at $x_0$ as well as the previous sibling of $x_1$ as in (\ref{inc:ass2}).
+Because subjective views only describe \emph{parts} of the shared
+state, we can use the \forgetRule principle to obtain a weaker view of
+the shared state, in this case a view that ignores the cells at $x_0$
+as well as the previous sibling of $x_1$ as in (\ref{inc:ass2}).
 %However, as discussed above (see slave machines) the resulting subjective view is not necessarily stable any longer; and we need to weaken it to regain stability:
 %%
 %\begin{align*}
@@ -289,8 +408,11 @@ Because subjective views only describe \emph{parts} of the shared state, we can 
 %%
 %%
 
-Since the resulting subjective view no longer observes the value of $x_0$, the action $m_{x_0}$ does not
-have observable effects as it leaves other cells unchanged. We can thus apply the \shiftRule principle to rid the interference of $m_{x_0}$ as in (\ref{inc:ass3}).%  \vspace{-5pt}
+Since the resulting subjective view no longer observes the value of
+$x_0$, the action $m_{x_0}$ does not have observable effects as it
+leaves other cells unchanged. We can thus apply the \shiftRule
+principle to rid the interference of $m_{x_0}$ as in
+(\ref{inc:ass3}).% \vspace{-5pt}
 %%
 %\begin{align*}
 % 	\shared{\cell{x_1}{0} * \cell{x_2}{0, x_1}}{\{m_{x_0}, s'_{x_2}, s_{x_2}\}}
@@ -298,7 +420,9 @@ have observable effects as it leaves other cells unchanged. We can thus apply th
 %\end{align*}
 %%
 
-Finally, we stabilise the subjective view with respect to $S'_{x_2}$ and obtain our final precondition of \li{slave(x2)} as per (\ref{inc:ass4}). \\%\vspace{-5pt}
+Finally, we stabilise the subjective view with respect to $S'_{x_2}$
+and obtain our final precondition of \li{slave(x2)} as per
+(\ref{inc:ass4}). \\%\vspace{-5pt}
 %%
 %\begin{align*}
 % 	\shared{\cell{x_1}{0} * \cell{x_2}{0, x_1}}{\{m_{x_0}, s'_{x_2}, s_{x_2}\}}
@@ -309,11 +433,17 @@ Finally, we stabilise the subjective view with respect to $S'_{x_2}$ and obtain 
 
 
 
-The rest of the \li{slave(x)} proof is straightforward. Once all threads have completed their operations, we join up their postconditions using the \mergeRule principle, which embodies a crucial feature of \colosl:
-different subjective views \emph{overlap}. Since $|/$ distributes over
-$**$, the subjective view simplifies to $\shared{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} * \cell{x_2}{10, x_1}}{S'_{x_0} \cup S'_{x_1} \cup S'_{x_2}}$. Finally, since $S'_{x_0} \cup S'_{x_1} \cup S'_{x_2}$
-$\weakenI{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} * \cell{x_2}{10, x_1}} I $, by the
-\shiftRule principle, we get the postcondition of \li{ring(x)}.
+The rest of the \li{slave(x)} proof is straightforward. Once all
+threads have completed their operations, we join up their
+postconditions using the \mergeRule principle, which embodies a
+crucial feature of \colosl: different subjective views
+\emph{overlap}. Since $|/$ distributes over $**$, the subjective view
+simplifies to $\shared{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} *
+  \cell{x_2}{10, x_1}}{S'_{x_0} \cup S'_{x_1} \cup
+  S'_{x_2}}$. Finally, since $S'_{x_0} \cup S'_{x_1} \cup S'_{x_2}$
+$\weakenI{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} * \cell{x_2}{10,
+    x_1}} I $, by the \shiftRule principle, we get the postcondition
+of \li{ring(x)}.
 
 
 %\paragraph{Comparison with other formalisms}
