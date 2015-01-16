@@ -188,9 +188,9 @@ analogously.
 \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
 {\begin{lstlisting}[numbers=left,numbersep=5pt]
 ring(x)
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x,2}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * x{+}2|->0\end{array}}{I}\end{array} \right\}$
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * x{+}2|->0\end{array}}{I}\end{array} \right\}$
 $\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid$ slave(x+2);
-$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x,2}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * x{+}2|->10\end{array}}{I}\end{array} \right\}$
+$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * x{+}2|->10\end{array}}{I}\end{array} \right\}$
 
 master(x)
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
@@ -203,7 +203,7 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m
 &
 \begin{lstlisting}
 slave(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * \cell{x{-}1}{0} \lor\null\\ \quad\cell{x}{1} * \cell{x{-}1}{0}\end{array}}{S_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * \cell{x{-}1}{0} \lor\null\\ \quad\cell{x}{0} * \cell{x{-}1}{1}\end{array}}{S_{x}'}\end{array} \right\}$
 $\{$  while(*x != 10)
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} * \cell{x{-}1}{v} \lor\null\\ \quad\cell{x}{v} * \cell{x{-}1}{v{+}1}\end{array}}{S_{x}'}\end{array} \right\}$
     $\{\ \langle$if (*x != *(x-1))
