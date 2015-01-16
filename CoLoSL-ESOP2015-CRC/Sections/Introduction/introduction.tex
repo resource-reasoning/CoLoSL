@@ -30,18 +30,18 @@ compositional reasoning for increasingly difficult inter-thread
 interactions. However, despite substantial progress, we believe that
 none of these approaches are fully compositional and question whether
 some are as natural as they might be. They are all based on global
-shared memory usually comprising disjoint regions with static
-interference on these regions. Each thread is verified with respect to
-these  regions.  
-
-
-In contrast, we introduce the program
-logic, \colosl, which is based on one global shared state with each
-thread verified with respect to its partial {\em subjective view} of
-this global state. The dynamic overlapping nature of subjective views
-enables us to provide small natural specifications of previously
-explored examples, as well as again increasing the kinds of examples
-that can be verified.
+shared memory, where each thread is verified with respect to
+disjoint shared regions of memory  with static
+interference on these regions. We explore a different approach, introducing the
+program logic, \colosl, which is based on one global shared state with
+each thread verified with respect to its partial {\em subjective view}
+of this global state. Subjective views may arbitrarily overlap with
+each other, with both their resource and interference expanding and
+contracting  in accordance with what is required by the thread.
+We believe this leads to natural  specifications where the subjective
+views correspond to the  programmer's intuition of what shared
+resource
+is required by the thread. 
 
 
 Jones' rely-guarantee reasoning~\cite{rg} provided a
