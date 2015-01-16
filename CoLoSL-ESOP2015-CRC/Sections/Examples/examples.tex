@@ -221,7 +221,7 @@ limited to the subgraph rooted at $n$. Moreover, in order to reason about the co
 	\Big\} 
 	} 
 %	
-	\command{b:= span(n)} 
+	\command{b = span(n)} 
 %
 	\color{blue}{
 	\Big\{
@@ -398,24 +398,34 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %  //<@\codecomment{$\{\shared{\G{\tx{x}}{\gamma}}{I_{\gamma}}\}$}@> 
 \begin{lstlisting}
   //<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
-  b:= span(x) $\{$
-    //<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
-    res:= $\langle$ CAS(x.m, 0, 1) $\rangle$;
-    //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} \\ * \left(\tx{res} = 0 \lor  \left(\begin{array}{l} \tx{res} = 1 * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\right)\end{array}\right\}$}@>
-    //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 0 \!\lor\! \left(\!\tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} \!*  \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \!\right)\end{array}\right\}$}@>
-    if (res) then $\{$ 
-      //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}    \end{array} \right\}$}@>
-	 $\begin{array}{l @{\hspace{10pt}} || @{\hspace{10pt}} l} \color{blue} //\{\g{l}{\gamma}\} & \color{blue} //\{\g{r}{\gamma}\} \\ \tx{b1:= span([x.l])} & \tx{b2:= span([x.r])} \\ \color{blue} //\{\tx{b1} = 0 \lor (\tx{b1} = 1 * \tr{l}{\gamma}) \} & \color{blue} //\{b2 = 0 \lor (b2 = 1 * \tr{r}{\gamma})\} \end{array}$
-      //<@\codecomment{$\left\{\begin{array}{@{} l @{} } \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}  \\  * \left( \tx{b1} = 0 \lor (\tx{b1} = 1 *  \tr{l}{\gamma}) \right) * \left( \tx{b2} = 0 \lor (\tx{b2} = 1 * \tr{r}{\gamma}) \right)  \end{array}\right\}$}@>
-      if (!b1) then 
-        $\text{[}$x.l$\text{]}$:= null
-      if (!b2) then 
-        $\text{[}$x.r$\text{]}$:= null
-      //<@\codecomment{$\left\{\begin{array}{@{} l @{}}  \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} \\ * \exsts{l' \in \{l, \tx{null}\}} \cell{\tx{x}.l}{l'} * \tr{l'}{\gamma} * \exsts{r' \in \{r, \tx{null}\}} \cell{x.r}{r'} * \tr{r'}{\gamma}  \end{array}\right\}$}@>
-      //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 *  \tr{\tx{x}}{\gamma}    \end{array}\right\}$}@>
-    $\}$    
+  b = span(x) $\{$
+    //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\tx{x} \in \gamma \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
+    if (x == null) then $\{$
+      //<@\codecomment{$\{\tx{x} = \tx{null} \land \emp\}$}@>
+      //<@\codecomment{$\{\tr{\tx{x}}{\gamma}\}$}@>
+      res = 1;
+      //<@\codecomment{$\{\tx{res} = 1 \land \tr{\tx{x}}{\gamma}\}$}@>
+    $\}$  
+    else $\{$
+      //<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
+      res = $\langle$ CAS(x.m, 0, 1) $\rangle$;
+      //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} \\ * \left(\tx{res} = 0 \lor  \left(\begin{array}{l} \tx{res} = 1 * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\right)\end{array}\right\}$}@>
+      //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 0 \!\lor\! \left(\!\tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} \!*  \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \!\right)\end{array}\right\}$}@>
+      if (res) then $\{$ 
+        //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}    \end{array} \right\}$}@>
+		 $\begin{array}{l @{\hspace{10pt}} || @{\hspace{10pt}} l} \color{blue} //\{\g{l}{\gamma}\} & \color{blue} //\{\g{r}{\gamma}\} \\ \tx{b1 = span(x-}\!>\tx{l)}; & \tx{b2 = span(x-}\!>\tx{r)}; \\ \color{blue} //\{\tx{b1} = 0 \lor (\tx{b1} = 1 * \tr{l}{\gamma}) \} & \color{blue} //\{b2 = 0 \lor (b2 = 1 * \tr{r}{\gamma})\} \end{array}$
+        //<@\codecomment{$\left\{\begin{array}{@{} l @{} } \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}  \\  * \left( \tx{b1} = 0 \lor (\tx{b1} = 1 *  \tr{l}{\gamma}) \right) * \left( \tx{b2} = 0 \lor (\tx{b2} = 1 * \tr{r}{\gamma}) \right)  \end{array}\right\}$}@>
+        if (!b1) then 
+          x-$\!\textgreater$l = null;
+        if (!b2) then 
+          x-$\!\textgreater$r = null;
+        //<@\codecomment{$\left\{\begin{array}{@{} l @{}}  \tx{res} = 1 * \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} \\ * \exsts{l' \in \{l, \tx{null}\}} \cell{\tx{x}.l}{l'} * \tr{l'}{\gamma} * \exsts{r' \in \{r, \tx{null}\}} \cell{x.r}{r'} * \tr{r'}{\gamma}  \end{array}\right\}$}@>
+        //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 *  \tr{\tx{x}}{\gamma}    \end{array}\right\}$}@>
+      $\}$    
+      //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} \tx{res} = 0  \lor (\tx{res} = 1  * \tr{\tx{x}}{\gamma})  \end{array} \right\}$}@>
+    $\}$ 
     //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} \tx{res} = 0  \lor (\tx{res} = 1  * \tr{\tx{x}}{\gamma})  \end{array} \right\}$}@>
-    return res
+    return res;
   $\}$
   //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} \tx{b} = 0  \lor (\tx{b} = 1  * \tr{\tx{x}}{\gamma}) \end{array} \right\}$}@>
 \end{lstlisting}
@@ -485,12 +495,12 @@ Moreover, rather than having a distinct capability to modify the element at addr
 Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
 %
 The full \colosl\ implementation of the set operations and their proofs are provided in~\cite{colosl-tr14}. 
-\newpage
+
 TaDA~\cite{tada} took the first steps towards addressing the above shortcomings of the CAP approach. In particular, since TaDA regions are parametric in the separation algebra of capabilities (called guards), one can choose a more suitable algebra to encode the desired behaviour of capabilities. For instance, upon creation of the set region $r$ one can choose a capability separation algebra that satisfies the following axiom.\vspace{-7pt}
 %
-\begin{align}
-	[\textsc{S}(vs)]_r <=> [\textsc{S}(vs\uplus\{v\})]_r * [\textsc{U}(v)]_r  \tag{\textsc{Ext.}} \label{extend-axiom}\\[-20pt]\nonumber 
-\end{align}
+\begin{align*}
+	[\textsc{S}(vs)]_r <=> [\textsc{S}(vs\uplus\{v\})]_r * [\textsc{U}(v)]_r   \\[-20pt]
+\end{align*}
 %
 This axiom in effect ensures that when the set region $r$ contains values $vs$, it may be extended with value $v$ and in doing so claim the the accompanying update capability $[\text{U}(v)]_r$. 
 
