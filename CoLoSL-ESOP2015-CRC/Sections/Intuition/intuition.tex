@@ -183,34 +183,6 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
 \label{fig:concurrentInc}
 \end{figure}
 
-{\smaller
-\begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
-{\begin{lstlisting}
-spawn(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts x \tx{x}|-< x * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-$\{$ local y;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{-} * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  y = new();
-  y-$\!\textgreater$p = x-$\!\textgreater$p;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
-   x-$\!\textgreater$p = y;$\rangle$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  slave(y) $\mid\mid$ spawn(x);
-$\}$ //$\color{blue} \{\m{false}\}$
-\end{lstlisting}}
-&
-\begin{lstlisting}
-master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{-1}\end{array}}{M_{x}''}\end{array}\right\}$
-$\{$ while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
-        (x-$\!\textgreater$c)++;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
-\end{lstlisting}
-\end{tabular}}
-
 Consider the program $\mathbb{INC}$ defined in \fig\ref{fig:concurrentInc}, ignoring the
 assertions. It is written in pseudo-code resembling C with additional
 constructs for concurrency: atomic sections $\atomic \_$ which
@@ -418,180 +390,110 @@ This concludes our \colosl proof of $\mathbb{INC}$. Our expansion and
 contraction of subjective views, in particular with shifting of
 interference assertions in key places, enables us to confine the
 specification and verification of each thread to just the resources
-they need. This is not possible in existing frameworks.
+they need. This is not possible in existing frameworks. This tightness
+of specifications makes proofs robust against changes to each thread's
+environment, and provide more opportunities for proof reuse. For
+instance, our proof of the ring straightforwardly generalises to $n$
+slave threads, without needing to reprove \li{master} or \li{thread}
+at all. Moreover, the proof changes only minimally if the main program
+is changed to dynamically grow the ring by spawning more slave
+threads, as described in \fig\ref{fig:spawner}. If a thread running
+\li{spawn(x0)} is added to the parallel composition of \li{ring}, then
+the proof of \li{master} has to be modified slightly to include the
+possibility for the last node of the ring to change. The proof of
+\li{slave} is unchanged.
 
+\begin{figure}
+\centering
+\noindent\hrule
+\begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
+{\begin{lstlisting}
+spawn(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts x \tx{x}|-< x * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+$\{$ local y;
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{-} * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+  y = new();
+  y-$\!\textgreater$p = x-$\!\textgreater$p;
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+  $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
+   x-$\!\textgreater$p = y;$\rangle$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+  slave(y) $\mid\mid$ spawn(x);
+$\}$ //$\color{blue} \{\m{false}\}$
+\end{lstlisting}}
+&
+\begin{lstlisting}
+master(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{-1}\end{array}}{M_{x}''}\end{array}\right\}$
+$\{$ while(x-$\!\textgreater$c != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
+    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
+        (x-$\!\textgreater$c)++;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
+\end{lstlisting}
+\end{tabular}
+\hrule
+\caption{Growing the ring.}
+\label{fig:spawner}
+\end{figure}
+
+
+%% In \S\ref{sec:examples}
+%% %Appendix~\ref{sec:mutual-exclusion} 
+%% we generalise the mutual exclusion ring presented in this section to
+%% $n$ threads and demonstrate how it can be used to guard a shared
+%% resource accessed concurrently. In particular, since at each point in
+%% time only one thread may perform an action, that thread can be granted
+%% the guarded resource exclusively (similarly to holding a lock).
+
+In contrast, the shared state in previous work has to include the
+global interference relation. In both of the extensions described
+above, this relation would change and the proofs of all threads would
+need to be adapted. Moreover, the same issue regarding the
+pre-allocation of all future tokens as in \S\ref{subsec:set} applies,
+in CAP, tokens for all possible memory locations would have to be
+allocated at the time the region is created, to account for all
+possible locations where a new counter can be created by \li{spawn}.
 
 We complete our semi-formal overview by noting that unlike
 CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
-an explicit \emph{unsharing} mechanism to claim shared
-resources and render them thread-local. Instead, this behaviour can
-be simply encoded as an additional action. For instance, in order to
-remove the \li{x}, \li{y} and \li{z} variables from the shared state
-at the end of the $\mathbb{INC}$ program, one can add the following
-action to all of the above interference assertions ($I$,
-$I_{\small\li{x}}'$,
-$I_{\small\li{y}}'$, and $I_{\small\li{z}}'$):
-%
-\vspace{-5pt}
+an explicit \emph{unsharing} mechanism to claim shared resources and
+render them thread-local. Instead, this behaviour can be simply
+encoded for a resource described by $P$ and associated with tokens
+$\token{a}_1$, \ldots $\token{a}_{n}$ as, e.g., an additional action
+of the form
 \[
-	a_{\textsf{rem}} \eqdef [\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}]: \cell{\li x}{10} * \cell{\li y}{10} * \cell{\li z}{10} \swap [\token{a}_{\small\li{x}}] * [\token{a}_{\small\li{y}}] * [\token{a}_{\small\li{z}}]
+[\token{a}_1] * \cdots * [\token{a}_{n}]{:}\, P \swap [\token{a}_1] * \cdots * [\token{a}_{n}]
 \]
-%
-That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in possession of all three $[\token{a}_{\small\li{x}}]$, $[\token{a}_{\small\li{y}}]$, $[\token{a}_{\small\li{z}}]$ capabilities in its local state can carry out $a_{\textsf{rem}}$. In doing so, the acting thread will remove the three cells from the shared state (and move them into its local state). In return, it must transfer the three locally held capabilities into the shared state. Note that after adding $a_{\textsf{rem}}$, the subjective views of all three threads remain stable since each thread locally holds one of the capabilities in $\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}$ and thus knows that the environment cannot carry out $a_{\textsf{rem}}$ (as it is missing at least one of the required capabilities). Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource transfer is common in \colosl actions. In general, resources that only appear on the left hand side of $\swap$ indicate their removal from the shared state (and their addition to the thread's local state); dually, resources that only appear on the right hand side of $\swap$ denote their transfer to the shared state (from the thread's local state).
-
-In \S\ref{sec:examples}
-%Appendix~\ref{sec:mutual-exclusion} 
-we generalise the mutual
-exclusion ring presented in this section to $n$ threads and
-demonstrate how it can be used to guard a shared resource accessed concurrently. In particular, since at each point in time only one thread may perform an action, that thread can be
-granted the guarded resource exclusively (similarly to holding a lock).
-
-
-%
-%We also note that, as in the CAP family~\cite{cap,icap,tada}, \colosl
-%cannot ensure that proved programs do not leak memory. Indeed, one may
-%at any point of a proof stash leaked resources into a new subjective
-%view, then weaken the resulting assertion to remove that view from the
-%current state, rendering the leak invisible as far as the proof system
-%is concerned.
-
-%% This finishes the justification of all uses of \eqref{eq:shift} in the
-%% derivations of \S\ref{subsec:threads}, and thus the derivations
-%% themselves.  In this section, we have informally justified
-%% manipulations of the interference relation by semantic
-%% arguments. However, \S\ref{sec:shiftax} will show how the reasoning
-%% involved can be reduced to simple logical implications between
-%% separation logic formulas that do not mention the shared state.
+That is, a thread holding all the tokens can remove the resource $P$
+from the shared state and move them into its local state. In return,
+it must transfer the associated capabilities into the shared
+state. Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource
+transfer is common in \colosl actions. In general, resources that only
+appear on the left hand side of $\swap$ indicate their removal from
+the shared state (and their addition to the thread's local state);
+dually, resources that only appear on the right hand side of $\swap$
+denote their transfer to the shared state (from the thread's local
+state).
 
 
-
-%% In the case of the less local predicate $G$, whenever the
-%% pre-condition of the action associated with $\token a_{\small\li z}$ is satisfied
-%% (third disjunct), it is also the case that $\cell{\li{x}}{v+1}$. In other
-%% words, in all the cases where the shared state satisfies
-%% $\cell{\li{y}}{v+1} * \cell{\li{z}}{v}$, it also satisfies $\cell{\li{x}}{v+1} *
-%% \cell{\li{y}}{v+1} * \cell{\li{z}}{v}$. However, this information is not
-%% reflected in $I$ and as a result when weakening $G$, we need to
-%% stabilise the resultant assertion which proves to be very weak. To
-%% remedy this, in \colosl we introduce the notion of action
-%% \emph{shifting} (rewriting) with respect to the \emph{invariant} of
-%% the shared state. Given $\shared{P}{I'}$, we write $\fence{} \fences
-%% (P, I')$ - read ``$\fence{}$ fences $P$ with respect to $I'$'' - to
-%% indicate that i) $\fence{}$ contains all states associated with $P$
-%% and ii) it is closed under $I'$; that is, given any action in $I'$
-%% whose pre-condition is satisfied by a state in $\fence{}$, the state
-%% resulting from the action is also in $\fence{}$. For instance, given
-%% the $G$ predicate of \fig\ref{fig:concurrentIncCoLoSLSpec}, we have
-%% $\fence{G} \fences (P_G, I)$ where $P_G$ denotes the assertion inside
-%% the box and $\fence{G}$ is as specified below.
+%% . For instance, in order to
+%% remove the \li{x}, \li{y} and \li{z} variables from the shared state
+%% at the end of the $\mathbb{INC}$ program, one can add the following
+%% action to all of the above interference assertions ($I$,
+%% $I_{\small\li{x}}'$,
+%% $I_{\small\li{y}}'$, and $I_{\small\li{z}}'$):
+%% %
+%% \vspace{-5pt}
 %% \[
-%% 	\begin{array}{l l}
-%% 		\fence{G} = \hspace*{-5pt}& \left\{\cell{\li{x}}{v} * \cell{\li{y}}{v} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 10\} \right\} \\
-%% 		& \cup \left\{\cell{\li{x}}{v+1} * \cell{\li{y}}{v} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 9 \} \right\} \\
-%% 		& \cup \left\{\cell{\li{x}}{v+1} * \cell{\li{y}}{v+1} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 9\} \right\}\\
-%% 	\end{array}
+%% 	a_{\textsf{rem}} \eqdef [\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}]: \cell{\li x}{10} * \cell{\li y}{10} * \cell{\li z}{10} \swap [\token{a}_{\small\li{x}}] * [\token{a}_{\small\li{y}}] * [\token{a}_{\small\li{z}}]
 %% \]
-%% %as well as the action associated with its update
-%% Given the above invariant, we can now \emph{shift} the action associated with $\token a_{\small\li z}$ in $I$ and arrive at $I'$ where
-%% \[
-%% 	I' \eqdef \left\{
-%% 		\begin{array}{@{}l@{}}
-%% 			\token a_{\small\li x}:\, \exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{z}}{v}\\
-%% 			\token a_{\small\li y}:\, \exsts{v} \cell{\li{x}}{v+1} * \cell{\li{y}}{v}  \swap  \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1}\\
-%% 			\token a_{\small\li z}:\, \exsts{v} \cell{\li{x}}{v+1} *
-%%                         \cell{\li{y}}{v+1} * \cell{\li{z}}{v} \swap\null\\
-%% 			\hspace*{2cm} \cell{\li{x}}{v+1} * \cell{\li{y}}{v+1} * \cell{\li{z}}{v+1}\\
-%% 		\end{array}			
-%% 	\right.
-%% \]
-%% Note that in doing so we have neither restricted nor relaxed the action of $\token a_{\small\li z}$ in that it can be carried out in exactly the same states given the invariant $\fence{G}$. This is formalised by the \shiftRule\ rule where $I \weakenI{\fence{}} I'$ denotes the shifting of $I$ with respect to $\fence{}$ and we defer its formalisation to \S\ref{sec:logic}.
-%% \[
-%% 	\text{if}\hspace*{0.25cm} \fence{} \fences (P, I) 
-%% 	\hspace*{0.25cm}\text{and}\hspace*{0.25cm} I \weakenI{\fence{}} I'
-%% 	\hspace*{0.25cm}\text{then}\hspace*{0.25cm}
-%% 	\shared{P}{I} ===> \shared{P}{I'} \hspace*{0.5cm} \shiftRule
-%% \]
-%% Given predicate $G$ of \fig\ref{fig:concurrentIncCoLoSLSpec}, we can first shift $I$ into $I'$ (specified above) using the \textsc{Shift} rule and then apply the \forgetRule\ rule to forget variable \li{y} and obtain $\shared{a_{\small\li x}}{I'}$.
-%% %%
-%% %\[
-%% %	X' \eqdef \shared{\exsts{v} \cell{\li{x}}{v} * \cell{\li{z}}{v} \lor \cell{\li{x}}{v+1} * \cell{\li{z}}{v}}{I'} 
-%% %\]
-%% %%
-%% We have almost arrived at a local specification for $\mathbb{P}_{\small\li x}$. However, the action of $\token a_{\small\li y}$ is still visible in $I'$ even though it does not affect the values of \li{x} or \li{z}. Through interference shifting, we can not only rewrite actions with respect to the invariant, we can also \emph{forget} actions that affect \emph{none} of the states contained in the invariant. For instance, let $\fence{\li{x}} = \left\{\cell{\li{x}}{v} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 10\} \right\} \cup \left\{\cell{\li{x}}{v+1} * \cell{\li{z}}{v} ||| v \in \{0, \cdots 9 \} \right\}$, then we have $\fence{X} \fences (X, I')$. In the case of the action of $\token a_{\small\li y}$, given any state $p$ in the action pre-condition (e.g. $p = \cell{\li{x}}{1} * \cell{\li{y}}{0}$), for an arbitrary state $s \in \fence{X}$ (e.g. $s = \cell{\li{x}}{1} * \cell{\li{z}}{0}$), \emph{all overlaps} of $p$ and $s$ ($p \meetL s = \{\cell{\li{x}}{1}\}$) are preserved by the action. We give the formal definition of overlap operator $\meetL$ in \S\ref{sec:logic}. 
+%% %
+%% That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in possession of all three $[\token{a}_{\small\li{x}}]$, $[\token{a}_{\small\li{y}}]$, $[\token{a}_{\small\li{z}}]$ capabilities in its local state can carry out $a_{\textsf{rem}}$. In doing so, the acting thread will remove the three cells from the shared state (and move them into its local state). In return, it must transfer the three locally held capabilities into the shared state. Note that after adding $a_{\textsf{rem}}$, the subjective views of all three threads remain stable since each thread locally holds one of the capabilities in $\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}$ and thus knows that the environment cannot carry out $a_{\textsf{rem}}$ (as it is missing at least one of the required capabilities). Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource transfer is common in \colosl actions. In general, resources that only appear on the left hand side of $\swap$ indicate their removal from the shared state (and their addition to the thread's local state); dually, resources that only appear on the right hand side of $\swap$ denote their transfer to the shared state (from the thread's local state).
 
-%% Given $I'$ and $\fence{X}$ we can again apply the \textsc{Shift} rule in order to forget about the action of $\token a_{\small\li y}$ and obtain $I_{\small\li x}'$ as specified in \fig\ref{fig:concurrentIncSubjectiveSpec}. We can take analogous steps in order to obtain subjective views $S_{\small\li y}$ and $S_{\small\li z}$ for threads $\tau_{\small\li y}$ and $\tau_{\small\li z}$. We then pass the $\token a_{\small\li x}$, $\token a_{\small\li y}$ and $\token a_{\small\li z}$ capabilities to $\tau_{\small\li x}$, $\tau_{\small\li y}$ and $\tau_{\small\li z}$ and verify $\mathbb{INC}$ as follows:
-%% \[
-%% \hspace*{-0.2cm}
-%% \begin{array}{c}
-%% 	\color{blue}{\left\{\token a_{\small\li x} * \token a_{\small\li y} *  \token a_{\small\li z} *  S_{\small\li x} * S_{\small\li y} * S_{\small\li z} \right\}}\vspace*{2pt}\\
-	
-%% 	\begin{array}{c || c || c}
-%% 		\color{blue}{\left\{\token a_{\small\li x} * S_{\small\li x} \right\}} & \color{blue}{\left\{\token a_{\small\li y} * S_{\small\li y} \right\}} & \color{blue}{\left\{\token a_{\small\li z} * S_{\small\li z} \right\}}\\
-%% 		&&\vspace*{-7pt}\\
-%% 		\mathbb{P}_{\small\li x} & \mathbb{P}_{\small\li y} & \mathbb{P}_{\small\li z}\\
-%% 		&&\vspace*{-5pt}\\
-
-%% 		\color{blue}{
-%% 			\left\{
-%% 					\token a_{\small\li x} * S'_{\small\li x}
-%% 			\right\}
-%% 		} 
-%% 		& 
-%% 		\color{blue}{
-%% 			\left\{
-%% 				\token a_{\small\li y} * S'_{\small\li y}
-%% 			\right\}
-%% 		} 
-
-%% 		&
-		
-%% 		\color{blue}{
-%% 			\left\{
-%% 				\token a_{\small\li z} * S'_{\small\li z}
-%% 			\right\}
-%% 		} 		
-%% 		\vspace*{3pt}
-%% 	\end{array}\\
-%% 	\color{blue}{\left\{\token a_{\small\li x} * \token a_{\small\li y} *  \token a_{\small\li z} *  S'_{\small\li x} * S'_{\small\li y} * S'_{\small\li z} \right\}}\\
-%% \end{array}
-%% \]
-%% with
-%% \[
-%% \begin{array}{l l}
-%% 	S'_{\small\li x} \eqdef & \shared{\cell{\li{x}}{10} * \cell{\li{z}}{10} \lor \cell{\li{x}}{10} * \cell{\li{z}}{9} }{I_{\small\li x}'}\\
-%% 	S'_{\small\li y} \eqdef & \shared{\cell{\li{x}}{11} * \cell{\li{y}}{10} \lor \cell{\li{x}}{10} * \cell{\li{y}}{10} }{I_{\small\li y}'}\\
-%% 	S'_{\small\li z} \eqdef & \shared{\cell{\li{y}}{11} * \cell{\li{z}}{10} \lor \cell{\li{y}}{10} * \cell{\li{z}}{10} }{I_{\small\li z}'}
-%% \end{array}
-%% \]
-
-
-
-
-
-
-
-%% \pgcomment{KEy point of intro}
-
-%% A central property of
-%% \colosl proofs is that multiple threads can view different,t
-%% potentially overlapping parts of the shared state. As such, the
-%% separating conjunction $*$ behaves as \emph{overlapping conjunction}
-%% $\sepish$~\cite{rey-slnotes,ramification} (sometimes called
-%% \emph{sepish}~\cite{gareth-js12}) over subjective states (in contrast
-%% with most existing formalisms, which would use \emph{classical
-%%   conjunction} instead).
-%% \begin{align*}
-%%   \shared{P}{I} &=> \shared{P}{I} * \shared{P}{I}
-%%   \tag{\eqref{eq:split}}\\
-%%   \shared{P}{I_1} * \shared{Q}{I_2} &=> \shared{P \sepish Q}{I_1\cup I_2} \tag{\eqref{eq:merge}}
-%% \end{align*}
-%% On local states, $*$ behaves as \emph{disjoint union}, as is standard.
-
-%% \pgcomment{ ISn't it
-%%   double-arrow on Merge, perhaps called spilt/merge} 
-
-%% \julescomment{No it's not, only this direction is valid
-%%   (\eqref{eq:split} is the valid corresponding other direction).}
-
-%% This directly justifies the \eqref{eq:split} and \eqref{eq:merge}
-%% steps of the two derivations above.
+We also note that, as in the CAP family~\cite{cap-ecoop10,icap,tada}, \colosl
+cannot ensure that proved programs do not leak memory. Indeed, one may
+at any point of a proof stash leaked resources into a new subjective
+view, then weaken the resulting assertion to remove that view from the
+current state, rendering the leak invisible as far as the proof system
+is concerned.
