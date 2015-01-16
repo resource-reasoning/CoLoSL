@@ -49,12 +49,12 @@ breakthrough in compositional reasoning about concurrent programs. It
 describes permitted interferences between threads using rely and
 guarantee conditions: the current thread guarantees that it will only
 interfere in ways described by the guarantee relation; it relies on
-the other threads (the environment) to only interfere in ways
+the other threads (the environment) to interfere only  in ways
 described by the rely relation. However, the original work is based on
 first-order logic for reasoning aboutn
 a single global heap. O'Hearn and Reynold's
 work on separation logic~\cite{2001popland john's survey} demonstrated that such reasoning is not
-compositional and does not scale. 
+fully compositional and does not scale. 
 
 The original separation logic~\cite{rey02,seplog} achieves
 compositional reasoning for sequential heap-manipulating programs by
@@ -77,15 +77,19 @@ using the {\em disjoint concurrency rule}, where individual threads
 use both local resource and static invariant shared regions. Since
 then, there has been many extensions combining rely-guarantee
 reasoning with ideas from concurrent separation logic to reason about
-fine-grained concurrency: RGSep~\cite{viktor-marriage} and then deny-guarantee reasoning~\cite{dg}
-introduce local resource and shared disjoint regions which are stable
-with respect to an interference relation stating how the current
-thread and the environment can effect the region; CAP~\cite{cap-ecoop10} and its
-extensions~\cite{hocap,icap,tada} in addition abstract the regions. This work has achieved substantial
-success; see related work for more details. However, we believe that
-none of these approaches are as natural and as  compositional as they
-might be.  The problem is that the regions and their interference is
-too static. 
+fine-grained concurrency: RGSep~\cite{viktor-marriage} and then
+deny-guarantee reasoning~\cite{dg} introduce local resource and shared
+disjoint regions which are stable with respect to an interference
+relation stating how the current thread and the environment can effect
+the region; CAP~\cite{cap-ecoop10} and its
+extensions~\cite{hocap,icap,tada} in addition abstract the
+regions. This work has achieved substantial success; see related work
+for more details. However, we believe that none of these approaches
+are as natural as they might be.  The problem is that the combination
+of disjoint regions and static interference is too rigid for many
+examples, leading to unnatural specifications....
+
+\pgcomment{NOt touched from here.}
 
 First, the focus on static disjoint shared regions is too rigid.
 Consider a binary graph accessed by a concurrent spanning tree
