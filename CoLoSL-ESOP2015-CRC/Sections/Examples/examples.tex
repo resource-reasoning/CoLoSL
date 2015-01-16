@@ -432,7 +432,7 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %
 
 \subsection{Set Module}\label{subsec:set}
-In this section we consider a concurrent set module and explore a pictorial specification. We first revisit the set specification of Concurrent Abstract Predicates (CAP) in~\cite{cap-ecoop10}; we then compare it against our specification in \colosl. We demonstrate that our \colosl\ reasoning considerably improves on CAP by producing a \emph{more concise} specification and allowing for \emph{more local} reasoning. 
+In this section we consider a concurrent set module implemented as a singly linked list as described in~\cite{cap-ecoop10} and reason about its operations pictorially. We first revisit the proofs provided in~\cite{cap-ecoop10} established using Concurrent Abstract Predicates (CAP) ; we then compare it against our proofs in \colosl. We demonstrate that our \colosl\ reasoning improves on CAP by producing  more concise proofs and allowing for more local reasoning. 
 
 %We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. 
 The following diagram illustrates the set predicate in CAP as described in~\cite{cap-ecoop10}.
@@ -451,39 +451,49 @@ In order to modify a node, a thread can acquire the lock associated with the nod
 
 Since in CAP the capabilities associated with a region can only be generated upon region creation, the shared region is required to keep track of all possible update capabilities $[\text{U}(x, y, v)]$ associated with all addresses $x$ (including those not currently in the domain of the list), all addresses $y$ and all values $v$. At any one point, given $\node{x}{v}{y}$, the only update capability that can be claimed by a thread (through locking) is the one that reflects its current status, namely $[\text{U}(x, y, v)]$. As a result, an auxiliary mathematical set $S$ is used to track those nodes of the list that are currently locked and thus infer which $[\text{U}]$ capabilities have been claimed. The distribution of update capabilities is captured by the two assertions written as the \emph{infinite multiplicative star operator} $\iterStar$. The first part of the assertion states that given any node at address $x$ with successor $y$, if it is not locked, i.e.\ $(x, y) \not\in S$, then {all} of its update capabilities of the form $[\text{U}(x, y, v)]$ lie in the shared region for {all} values $v$. Dually, if it is locked, i.e.\ $(x, y) \in S$, then the update capabilities for {all} values $v$ {but one} ($w \not= v$) are in the shared region.
 
-This specification is unnecessarily complicated. It is rather counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, it is overly verbose to consider all combinations of values and successor addresses. Lastly, each thread is required to ``know'' of the resources associated with all nodes in the list and account for their associated interference. 
+This predicate is unnecessarily complicated. It is rather counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, it is overly verbose to consider all combinations of values and successor addresses. Lastly, each thread is required to ``know'' of the resources associated with all nodes in the list and account for their associated interference. 
 
 %
-We proceed with the \colosl\ specification of the set module. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise specification.  
+We proceed with the \colosl\ proof of the set module. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise proof.  
 
 We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with \emph{all} possible addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method. 
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/coloslSet.pdf}\\}
 %
-\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is {extended} by the resources associated with the new node ($\cell{w}{v', z}$) and its associated capabilities ($\nextC{w}{z}$) are generated on the fly as depicted below.
+\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is {extended} by the resources associated with the new node ($\cell{w}{v', z}$) and its associated capabilities ($\nextC{w}{z}$) are generated on the fly as depicted below. \vspace{0pt}
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add1.pdf}\\}
 %
 %At this point, since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. However, the interference assertion associated with node $y$ ($I(y)$) allows the node to be unlocked in three possible ways. Either its successor has not changed from its old value $z$ (tracked by $\nextC{y}{z}$); \emph{or} it has been redirected to $z$'s successor (when $z$ is being deleted); \emph{or} it has been directed to a new node whose successor is $z$ (a new node is inserted between $y$ and $z$). When adding a new node after $y$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this condition, we use the (\mergeRule) principle in our reasoning to combine the subjective views of $y$ and $w$ as follows.
-\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion ($I(y)$) allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows.
+\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion ($I(y)$) allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows. \vspace{0pt}
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add2.pdf}\\}
 %
 %Finally, node $y$ is unlocked; its updated next pointer is returned to the shared state and its next capability is modified accordingly to reflect its new successor. Using the (\copyRule), (\forgetRule) and (\shiftRule) principles \textit{ad seriatim}, we can once again obtain the set predicate with the new node $w$ inserted. 
-\noindent Finally, $y$ is unlocked; its next pointer is returned to the shared state and its next capability is modified to reflect its new successor. Using the \copyRule, \forgetRule and \shiftRule principles \textit{ad seriatim}, we obtain the set predicate with $w$ inserted. 
+\noindent Finally, $y$ is unlocked; its next pointer is returned to the shared state and its next capability is modified to reflect its new successor. Using the \copyRule, \forgetRule and \shiftRule principles \textit{ad seriatim}, we obtain the set predicate with $w$ inserted. \vspace{0pt}
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add3.pdf}\\}
 %
-We can reason about the \li{remove} operation in a similar fashion. The dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser specification. 
+We can reason about the \li{remove} operation in a similar fashion. The dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser proof. 
 %
 Moreover, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$ (as with $[\text{U}(x, y, v)]$ in CAP), we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address. 
 %
 Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
 %
-The full \colosl\ specification of the set module as well as the specification proofs are provided in~\cite{colosl-tr14}. 
-%Appendix~\ref{sec:set-example}.
+The full \colosl\ implementation of the set operations and their proofs are provided in~\cite{colosl-tr14}. 
+\newpage
+TaDA~\cite{tada} took the first steps towards addressing the shortcomings of the CAP approach. In particular, since TaDA is parametric in the separation algebra of its capabilities (called guards), one can choose a more suitable algebra to encode the desired behaviour of capabilities. For instance, the extension of the set with new values and capabilities can be captured as an additional axiom of the set module specification as follows.\vspace{-7pt}
+%
+\begin{align}
+	\textsf{set}(x, vs) <=> \textsf{set}(x, vs\uplus\{v\}) * [\text{U}(v)]  \tag{\textsc{Ext.}} \label{extend-axiom}\\[-20pt]\nonumber 
+\end{align}
+%
+This axiom states that given an abstract set at address $x$ with values $vs$, the set may be extended with value $v$ together with the accompanying update capability $[\text{U}(v)]$. The module implementer must then demonstrate that the (\ref{extend-axiom}) axiom is indeed satisfied by the implementation. 
+
+While TaDA's approach is much cleaner than that of CAP, it nevertheless requires the foresight of axiomatising all potential future extensions of the region. On the other hand, as well as being parametric in its capability separation algebra, \colosl allows the dynamic extension of the shared state on the go without the need for prior axiomatisation.
+
 
