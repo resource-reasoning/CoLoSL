@@ -118,73 +118,83 @@ We now proceed with the proof outline of slave threads. The proof of the master 
 \vspace{-3ex}
 \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
 {\begin{lstlisting}[numbers=left,numbersep=5pt]
-inc(x0, x1, x2) $\{$
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x0}|-< x_0 * \tx{x1}|-< x_1 *\tx{x2}|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->0,x_2 * x_1|->0,x_0 *\null\\ x_2|->0,x_1\end{array}}{I}\end{array} \right\}$
-master(x0) $\mid\mid$ slave(x1) $\mid\mid$ slave(x2);
-$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x0}|-< x_0 * \tx{x1}|-< x_1 *\tx{x2}|-< x_2 *\null\\ * [\token m_{x_0}] * [\token s_{x_1}] * [\token s_{x_2}]*\null\\ \shared{\begin{array}{@{}l@{}}x_0|->10,x_2 * x_1|->10,x_0 *\null\\ x_2|->10,x_1\end{array}}{I}\end{array} \right\}$
+ring(x)
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x,2}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * x{+}2|->0\end{array}}{I}\end{array} \right\}$
+$\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid$ slave(x+2);
+$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x,2}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * x{+}2|->10\end{array}}{I}\end{array} \right\}$
+
+master(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
+$\{$ while(*x != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * \cell{x{+}n}{v} \lor\null\\ \quad\cell{x}{v{+}1} * \cell{x{+}n}{v}\end{array}}{M_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (*x == *(x+n))
+        *x = *x + 1;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * (\cell{x}{10} * \cell{x{+}n}{10} \lor\null\\ \quad\cell{x}{10} * \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
-master(x)
-//$\color{blue} \{\varcell{\tx x}{x} * \shared{\cell{x}{0,p} * \cell{p}{0}}{M_{x}'} * [\token m_{x}]\}$
-$\{$ while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}'}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
-        (x-$\!\textgreater$c)++;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}'}\end{array} \right\}$
-\end{lstlisting}
-\\
-\begin{lstlisting}
 slave(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{F_{x}'}\end{array} \right\}$
-$\{$  while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{F_{x}'}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
-       x-$\!\textgreater$c = x-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]* \shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{F_{x}'}\end{array} \right\}$
-\end{lstlisting}
-&
-\begin{lstlisting}
-slave(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0,p} * \cell{p}{0} \lor\null\\ \quad\cell{x}{1,p} * \cell{p}{0}\end{array}}{S_{x}'}\end{array} \right\}$
-$\{$  while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v,p} * \cell{p}{v+1}\end{array}}{S_{x}'}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c != x-$\!\textgreater$p-$\!\textgreater$c)
-       x-$\!\textgreater$c = x-$\!\textgreater$p-$\!\textgreater$c;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{11}\end{array}}{S_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * \cell{x{-}1}{0} \lor\null\\ \quad\cell{x}{1} * \cell{x{-}1}{0}\end{array}}{S_{x}'}\end{array} \right\}$
+$\{$  while(*x != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} * \cell{x{-}1}{v} \lor\null\\ \quad\cell{x}{v} * \cell{x{-}1}{v{+}1}\end{array}}{S_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (*x != *(x-1))
+       *x = *(x-1);$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} * \cell{x{-}1}{10} \lor\null\\ \quad\cell{x}{10} * \cell{x{-}1}{11}\end{array}}{S_{x}'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
 \begin{array}{@{}r@{}l@{}l@{}}
-  m_x &\null ==
-  [\token m_x]{:}\, \exsts{p,v} \cell{x}{v,p} * \cell{p}{v} &\null\swap
-  \cell{x}{v+1,p} * \cell{p}{v}
-  \\
   s_x &\null ==
-  [\token s_x]{:}\, \exsts{p,v} \cell{x}{v,p} * \cell{p}{v+1} &\null\swap
-  \cell{x}{v+1,p} * \cell{p}{v+1}
+  [\token s_x]{:}\, \exsts{v} \cell{x}{v} * \cell{x{-}1}{v{+}1} &\null\swap
+  \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
   \\
-  m'_n &\null ==
-  [\token m_x]{:}\, \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v} &\null\swap
-  \cell{n}{v,x} * \cell{x}{v+1,p} * \cell{p}{v}
+  m_{x} &\null ==
+  [\token m_{x}]{:}\, \exsts{v,n}\varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} &\null\swap
+  \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n}{v}
   \\
-  s'_n &\null ==
-  [\token s_x]{:}\, \exsts{x,p,v} \cell{n}{v,x} * \cell{x}{v,p} * \cell{p}{v{+}1} &\null\swap
-  \cell{n}{v,x} * \cell{x}{v{+}1,p} * \cell{p}{v{+}1}
+  s'_x &\null ==
+  [\token s_x]{:}\, \exsts{v} \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{-}1}{v{{+}}1} &\null\swap
+  \cell{x{+}1}{v} * \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
+\end{array}
+\]
+\vspace{-8pt}
+\[
+\begin{array}{@{}r@{}l@{}}
+  m'_{x} &\null ==
+  [\token m_{x}]{:}\, \exsts{v,n}
+  \begin{array}[t]{@{}l@{}}
+    \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{+}n}{v} \swap\null\\
+    \qquad \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v{+}1} *
+    \cell{x{+}n}{v}
+  \end{array}
+  \\
+  l'_{x}  &\null ==
+  [\token s_{x}]{:}\, \exsts{v,n}
+  \begin{array}[t]{@{}l@{}}
+    \varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} *
+    \cell{x{+}n{-}1}{v} \swap\null\\
+    \qquad
+    \varcell{\tx n}{n} *
+    \cell{x}{v} * \cell{x{+}n}{v{+}1} * \cell{x{+}n{-}1}{v}
+  \end{array}
 \end{array}
 \]
 \vspace{-5pt}
 \begin{mathpar}
-  I \eqdef \{m_{p}, s_{x_1}, s_{x_2} \}
+  I \eqdef \{m_{x}, s_{x{+}1}, s_{x{+}2} \}
 
-  M_x' \eqdef \{m_x, s_x'\}
+  M_{x}' \eqdef \{m_x, l_{x}'\}
 
-  F_x' \eqdef \{s_x, m_x'\}
+  F_{x}' \eqdef \{s_x, m_{x{-}1}'\}
 
-  S_x' \eqdef \{s_x, s_x'\}
+  S_x' \eqdef \{s_x, s_{x{-}1}'\}
 \end{mathpar}
 \vspace{-5pt}\hrule
-\caption{The concurrent increment program together with a \colosl proof sketch. Lines starting with $\color{blue}{//}$ contain formulas that describe  the local state and the subjective shared state at the relevant program point.}
+\caption{The concurrent increment program together with a \colosl
+  proof sketch. Lines starting with $\color{blue}{//}$ contain
+  formulas that describe the local state and the subjective shared
+  state at the relevant program point. The proof outline of \li{slave}
+  is still valid when replacing $S_x'$ with $F_x'$.}
 \label{fig:concurrentInc}
 \end{figure}
 %
@@ -227,40 +237,9 @@ It is however possible to give a stronger specification, as follows: \vspace*{-5
 \end{align*}
 %
 The amended action $s'_x$ reflects stronger knowledge about when $p$ can be incremented and how its value is related to $m$ and $x$.
-The proof of the specification of the $\li{spawn(x)}$ is now relatively straightforward. By inspection (or using the rules of \S\ref{subsec:prules}), the invariant of the while loop is stable with respect to $S'_x$. The atomic section allows safe manipulation of the contents of the subjective view.  The final postcondition of $\li{spawn(x)}$ follows from the invariant and the boolean expression of the while. 
+The proof of the specification of the $\li{slave(x)}$ is now relatively straightforward. By inspection (or using the rules of \S\ref{subsec:prules}), the invariant of the while loop is stable with respect to $S'_x$. The atomic section allows safe manipulation of the contents of the subjective view.  The final postcondition of $\li{slave(x)}$ follows from the invariant and the boolean expression of the while. 
 %
 \paragraph{Foreman thread} The proof sketch of the foreman (slave) thread is given in the left column of~\fig\ref{fig:concurrentInc}. This proof is similar to that of other slave threads and the only difference lies in the interference associated with the foreman thread. While the interference of a slave thread contains the action of the slave itself and that of the previous thread (which is also a slave), the interference associated with the foreman thread contains the action of the foreman itself and that of the master thread. The rest of the proof outline can be justified analogously. 
-%
-%
-{\smaller
-\begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
-{\begin{lstlisting}
-spawn(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts x \tx{x}|-< x * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-$\{$ local y;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{-} * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  y = new();
-  y-$\!\textgreater$p = x-$\!\textgreater$p;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
-   x-$\!\textgreater$p = y;$\rangle$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  slave(y) $\mid\mid$ spawn(x);
-$\}$ //$\color{blue} \{\m{false}\}$
-\end{lstlisting}}
-&
-\begin{lstlisting}
-master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{-1}\end{array}}{M_{x}''}\end{array}\right\}$
-$\{$ while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
-        (x-$\!\textgreater$c)++;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
-\end{lstlisting}
-\end{tabular}
-}
-%
 
 \paragraph{The ring algorithm}
 The proof outline of the \li{ring(x0, x1, x2)} algorithm is given in~\fig\ref{fig:concurrentInc}. The assertion on line~2 declares that the current thread locally owns the three variables $\li{x0}$, $\li{x1}$ and $\li{x2}$ recording the addresses of the master ($x_0$) and slave machines ($x_1$ and $x_2$), respectively. Let $P = \cell{x_0}{0, x_2} * \cell{x_1}{0, x_0} * \cell{x_2}{0, x_1}$; the subjective view $\shared{P}{I}$ describes the initial state of the ring where all counters have value $0$ and each machine tracks the address of the previous machine in the ring. The interference associated with the subjective view ($I=\{m_{x_0}, s_{x_1}, s_{x_2}\}$) consists of actions that allow a thread to manipulate the master ($m_{x_0}$) and slave counters ($s_{x_1}$ and $s_{x_2}$). 
@@ -269,11 +248,11 @@ Finally, the assertion in line~2 simply has all the capabilities $[\token{m}_{x_
 
 This subjective view may then be freely duplicated using the \copyRule principle and each thread is given a copy together with the
 appropriate capability using the \parRule rule. For instance, thread
-running \li{spawn(x2)} gets
+running \li{slave(x2)} gets
 $
 \varcell{\li{x2}}{x_2} * [\token{s}_{x_2}] * \shared{P}{I}
 $.
-However, this assertion does not match the pre-condition of \li{spawn(x2)}. We now demonstrate how we can derive the desired pre-condition using the \colosl reasoning principles given in~\fig\ref{fig:principles}. The pre-conditions of the master and foreman threads can be obtained analogously.
+However, this assertion does not match the pre-condition of \li{slave(x2)}. We now demonstrate how we can derive the desired pre-condition using the \colosl reasoning principles given in~\fig\ref{fig:principles}. The pre-conditions of the master and foreman threads can be obtained analogously.
 
 %Because subjective views only describe \emph{parts} of the shared state, we can use the \forgetRule principle to obtain a weaker view of the shared state, in this case a view that ignores the two cells as $x_0$ as well as the previous sibling of $x_1$ as follows. However, as discussed above (see slave machines) the resulting subjective view is not necessarily stable any longer; and we need to weaken it to regain stability:
 %\begin{align*}
@@ -283,7 +262,7 @@ However, this assertion does not match the pre-condition of \li{spawn(x2)}. We n
 %\end{align*}
 %%
 %Let $I'' = \{m_{x_0}, s'_{x_2}, s_{x_2}\}$; 
-The pre-condition of the \li{spawn(x2)} thread can be derived thus:
+The pre-condition of the \li{slave(x2)} thread can be derived thus:
 %
 \begin{align}
   \shared{P}{I}
@@ -319,7 +298,7 @@ have observable effects as it leaves other cells unchanged. We can thus apply th
 %\end{align*}
 %%
 
-Finally, we stabilise the subjective view with respect to $S'_{x_2}$ and obtain our final precondition of \li{spawn(x2)} as per (\ref{inc:ass4}). \\%\vspace{-5pt}
+Finally, we stabilise the subjective view with respect to $S'_{x_2}$ and obtain our final precondition of \li{slave(x2)} as per (\ref{inc:ass4}). \\%\vspace{-5pt}
 %%
 %\begin{align*}
 % 	\shared{\cell{x_1}{0} * \cell{x_2}{0, x_1}}{\{m_{x_0}, s'_{x_2}, s_{x_2}\}}
@@ -330,15 +309,15 @@ Finally, we stabilise the subjective view with respect to $S'_{x_2}$ and obtain 
 
 
 
-The rest of the \li{spawn(x)} proof is straightforward. Once all threads have completed their operations, we join up their postconditions using the \mergeRule principle, which embodies a crucial feature of \colosl:
+The rest of the \li{slave(x)} proof is straightforward. Once all threads have completed their operations, we join up their postconditions using the \mergeRule principle, which embodies a crucial feature of \colosl:
 different subjective views \emph{overlap}. Since $|/$ distributes over
 $**$, the subjective view simplifies to $\shared{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} * \cell{x_2}{10, x_1}}{S'_{x_0} \cup S'_{x_1} \cup S'_{x_2}}$. Finally, since $S'_{x_0} \cup S'_{x_1} \cup S'_{x_2}$
 $\weakenI{\cell{x_0}{10, x_2} * \cell{x_1}{10, x_0} * \cell{x_2}{10, x_1}} I $, by the
-\shiftRule principle, we get the postcondition of \li{spawn(x)}.
+\shiftRule principle, we get the postcondition of \li{ring(x)}.
 
 
 %\paragraph{Comparison with other formalisms}
-This concludes our \colosl proof of \li{spawn(x)}. Our expansion and
+This concludes our \colosl proof of \li{ring(x)}. Our expansion and
 contraction of subjective views, in particular with shifting of
 interference assertions in key places, enables us to confine the
 specification and verification of each thread to just the resources
@@ -350,7 +329,7 @@ slave threads, without needing to reprove \li{master} or \li{slave}
 at all. Moreover, the proof changes only minimally if the main program
 is changed to dynamically grow the ring by spawning more slave
 threads, as described in \fig\ref{fig:spawner}. If a thread running
-\li{spawn(x0)} is added to the parallel composition of \li{ring}, then
+\li{spawn(x)} is added to the parallel composition of \li{ring}, then
 the proof of \li{master} has to be modified slightly to include the
 possibility for the last node of the ring to change. The proof of
 \li{slave} is unchanged.
@@ -621,14 +600,14 @@ $\{$ local y;
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
   $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
    x-$\!\textgreater$p = y;$\rangle$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v-1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v{-}1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
   slave(y) $\mid\mid$ spawn(x);
 $\}$ //$\color{blue} \{\m{false}\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
 master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{-1}\end{array}}{M_{x}''}\end{array}\right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{{-}1}\end{array}}{M_{x}''}\end{array}\right\}$
 $\{$ while(x-$\!\textgreater$c != 10)
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
     $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
