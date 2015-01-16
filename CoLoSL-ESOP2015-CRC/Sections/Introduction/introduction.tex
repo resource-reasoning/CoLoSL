@@ -30,9 +30,12 @@ compositional reasoning for increasingly difficult inter-thread
 interactions. However, despite substantial progress, we believe that
 none of these approaches are fully compositional and question whether
 some are as natural as they might be. They are all based on global
-shared memory often comprising static disjoint regions with static
+shared memory usually comprising disjoint regions with static
 interference on these regions. Each thread is verified with respect to
-these static shared regions.  In contrast, we introduce the program
+these  regions.  
+
+
+In contrast, we introduce the program
 logic, \colosl, which is based on one global shared state with each
 thread verified with respect to its partial {\em subjective view} of
 this global state. The dynamic overlapping nature of subjective views
