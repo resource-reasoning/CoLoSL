@@ -486,14 +486,16 @@ Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ a
 %
 The full \colosl\ implementation of the set operations and their proofs are provided in~\cite{colosl-tr14}. 
 \newpage
-TaDA~\cite{tada} took the first steps towards addressing the shortcomings of the CAP approach. In particular, since TaDA is parametric in the separation algebra of its capabilities (called guards), one can choose a more suitable algebra to encode the desired behaviour of capabilities. For instance, the extension of the set with new values and capabilities can be captured as an additional axiom of the set module specification as follows.\vspace{-7pt}
+TaDA~\cite{tada} took the first steps towards addressing the above shortcomings of the CAP approach. In particular, since TaDA regions are parametric in the separation algebra of capabilities (called guards), one can choose a more suitable algebra to encode the desired behaviour of capabilities. For instance, upon creation of the set region $r$ one can choose a capability separation algebra that satisfies the following axiom.\vspace{-7pt}
 %
 \begin{align}
-	\textsf{set}(x, vs) <=> \textsf{set}(x, vs\uplus\{v\}) * [\text{U}(v)]  \tag{\textsc{Ext.}} \label{extend-axiom}\\[-20pt]\nonumber 
+	[\textsc{S}(vs)]_r <=> [\textsc{S}(vs\uplus\{v\})]_r * [\textsc{U}(v)]_r  \tag{\textsc{Ext.}} \label{extend-axiom}\\[-20pt]\nonumber 
 \end{align}
 %
-This axiom states that given an abstract set at address $x$ with values $vs$, the set may be extended with value $v$ together with the accompanying update capability $[\text{U}(v)]$. The module implementer must then demonstrate that the (\ref{extend-axiom}) axiom is indeed satisfied by the implementation. 
+This axiom in effect ensures that when the set region $r$ contains values $vs$, it may be extended with value $v$ and in doing so claim the the accompanying update capability $[\text{U}(v)]_r$. 
 
-While TaDA's approach is much cleaner than that of CAP, it nevertheless requires the foresight of axiomatising all potential future extensions of the region. On the other hand, as well as being parametric in its capability separation algebra, \colosl allows the dynamic extension of the shared state on the go without the need for prior axiomatisation.
+While TaDA's approach is much cleaner than that of CAP, it nevertheless requires the foresight of axiomatising all desired interference associated with the region upon its creation. 
+As such, interference specifications are \emph{static} and cannot be extended with new behaviour even when the existing resources are left untouched. 
+On the other hand, as well as being parametric in its capability separation algebra, \colosl allows the dynamic extension of the shared state on the go with new resources, interference and their accompanying capabilities.
 
 
