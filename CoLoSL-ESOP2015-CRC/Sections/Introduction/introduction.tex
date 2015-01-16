@@ -27,35 +27,21 @@ Rely-guarantee reasoning~\cite{rg} and various combinations of
 rely-guarantee and separation-logic
 reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
-interactions. However, despite substantial progress, we believe that
-none of these approaches are fully compositional and question whether
-some are as natural as they might be. They are all based on global
-shared memory, where each thread is verified with respect to
-disjoint shared regions of memory  with static
-interference on these regions. We explore a different approach, introducing the
-program logic, \colosl, which is based on one global shared state with
-each thread verified with respect to its partial {\em subjective view}
-of this global state. Subjective views may arbitrarily overlap with
-each other, with both their resource and interference expanding and
-contracting  in accordance with what is required by the thread.
-We believe this leads to natural  specifications where the subjective
-views correspond to the  programmer's intuition of what shared
+interactions. However, we believe that, despite substantial progress, there are many
+examples where the specifications and proofs are not as natural as
+they might be; the specifications and proofs are either too coarse or
+too 
+contrived. 
+We explore a different approach, introducing the
+program logic, \colosl, using which we can give natural small
+specifications and proofs which correspond to the  programmer's intuition of what shared
 resource
 is required by the thread. 
 
 
-Jones' rely-guarantee reasoning~\cite{rg} provided a
-breakthrough in compositional reasoning about concurrent programs. It
-describes permitted interferences between threads using rely and
-guarantee conditions: the current thread guarantees that it will only
-interfere in ways described by the guarantee relation; it relies on
-the other threads (the environment) to interfere only  in ways
-described by the rely relation. However, the original work is based on
-first-order logic for reasoning aboutn
-a single global heap. O'Hearn and Reynold's
-work on separation logic~\cite{2001popland john's survey} demonstrated that such reasoning is not
-fully compositional and does not scale. 
 
+
+Small specifications were introduced in the work on separation logic. 
 The original separation logic~\cite{rey02,seplog} achieves
 compositional reasoning for sequential heap-manipulating programs by
 spliting the heap into disjoint heaplets for describing the local
@@ -85,19 +71,17 @@ the region; CAP~\cite{cap-ecoop10} and its
 extensions~\cite{hocap,icap,tada} in addition abstract the
 regions. This work has achieved substantial success; see related work
 for more details. However, we believe that none of these approaches
-are as natural as they might be.  The problem is that the combination
-of disjoint regions and static interference is too rigid for many
-examples, leading to unnatural specifications....
+are as natural as they might be.  The problem is due to the rigid
+nature of the disjoint regions and their static interference.
 
-\pgcomment{NOt touched from here.}
 
-First, the focus on static disjoint shared regions is too rigid.
+First, the focus on  disjoint shared regions is too rigid.
 Consider a binary graph accessed by a concurrent spanning tree
 algorithm, as an example of a data structure with intrinsic sharing
 which is accessed concurrently. Disjoint shared regions cannot
 naturally be used to reason about such algorithms due to the arbitrary
 sharing associated with the subgraphs. It might be possible to do some
-coding trick with capabilities, but we wonder whether it will be
+coding trick with guards for controlling interference on regions, but we wonder whether it will be
 natural. Now consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
 thread requires access to the $i$th and $(i+1)$th nodes.  There is a
@@ -120,6 +104,47 @@ a burden in the proof effort, as stability against these irrelevant
 actions still has to be checked at every program point.
 Also, the static interference on  a region has to predict all future 
 uses of the region at the time of creation. 
+
+----------
+
+
+which is based on one global shared state with
+each thread verified with respect to its partial {\em subjective view}
+of this global state. Subjective views may arbitrarily overlap with
+each other, with both their resource and interference expanding and
+contracting  in accordance with what is required by the thread.
+We believe this leads to natural  specifications where the subjective
+views 
+
+
+
+
+believe that
+none of these approaches are fully compositional and question whether
+some are as natural as they might be. 
+
+
+
+
+
+
+They are all based on global
+shared memory, where each thread is verified with respect to
+disjoint shared regions of memory  with static
+interference on these regions.
+
+
+Jones' rely-guarantee reasoning~\cite{rg} provided a
+breakthrough in compositional reasoning about concurrent programs. It
+describes permitted interferences between threads using rely and
+guarantee conditions: the current thread guarantees that it will only
+interfere in ways described by the guarantee relation; it relies on
+the other threads (the environment) to interfere only  in ways
+described by the rely relation. However, the original work is based on
+first-order logic for reasoning aboutn
+a single global heap. O'Hearn and Reynold's
+work on separation logic~\cite{2001popland john's survey} demonstrated that such reasoning is not
+fully compositional and does not scale. 
 
 \pgcomment{OK, I don't find this next bit convincing yet.}
 
