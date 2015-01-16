@@ -6,50 +6,66 @@ a variation of Dijkstra's token-ring mutual exclusion algorithm, which
 pioneered \emph{self-stabilising} distributed
 algorithms~\cite{dijkstra74}: starting from any arbitrary
 (distributed) state, the algorithm converges to a \emph{legitimate}
-state and remains so thereafter
- 
-As an example of self-stabilisation, he presented the token ring
-algorithm: a network of $n$ machines arranged in a ring with a
-designated \emph{master} machine (numbered $1$) and $n-1$ slave
-machines (numbered $2 \cdots n$). Each machine maintains a local
-counter and the state of the system consists of all $n$ counters.
-%and the current state of the system consists of the $n$ counters. 
-In addition, each machine (numbered $i$) can communicate with the
-previous machine (numbered $i-1$ if $i>1$; or $n$ if $i=1$) and
-inspect its counter value.
-%
-A legitimate state is one in which exactly one machine can make a
-\emph{move} at any given time. The $k$th machine can make a move if
-there exists a value $v$ such that the values of all counters numbered
-$1\cdots k-1$ are $v+1$, and the values of those numbered $k\cdots n$
-are $v$ (note that the master machine can make a move when the values
-of all counters are $v$). The $k$th machine can then make a move by
-incrementing its counter and effectively passing the turn to the next
-machine in the ring.
- 
-The token ring algorithm is self-stabilising: starting from an
-arbitrary (illegitimate) state where counters are initialised with
-random values within a given range, the system converges to a
-legitimate state in a finite number of steps. Dijkstra provided a
-proof of the token ring's self-stabilisation
-in~\cite{dijkstra-proof}. In~\cite{colosl-tr14}, we outline a proof
-sketch of token ring's self-stabilisation in \colosl and demonstrate
-that starting from an arbitrary state the system converges to a
-legitimate state.
- 
-Since once the ring is in a legitimate state, 1) it remains so
-thereafter; and 2) exactly one machine can make a move at any given
-time, one can use the token ring as a mutual exclusion mechanism to
-synchronise access to a shared resource. We demonstrate this
-in~\cite{colosl-tr14} by using the token ring to control access to an
-arbitrary shared resource.  In the remainder of this section, we
-illustrate the \colosl reasoning principles through a token ring in a
-legitimate state where all counters hold value $0$.  The \colosl
-reasoning principles are laid out in \fig\ref{fig:principles},
-together with the usual concurrency rule of separation
-logic~\cite{csl-tcs}, and the rule of consequence from the Views
-framework~\cite{views}.  We introduce them informally as needed, and
-present them in more details in \S\ref{sec:colosl}.
+state, which remains legitimate forevermore.
+
+The token ring algorithm, presented in \fig\ref{fig:concurrentInc},
+assumes a network of $n$ machines (in \fig\ref{fig:concurrentInc},
+$n=3$), arranged in a ring with a designated \emph{master} machine and
+$n-1$ slave machines. Each machine maintains a local counter and has
+access to the value of its left neighbour's counter; the state of the
+system consists of all $n$ counters. Starting in an arbitrary state,
+the network eventually converges to legitimate
+states~\cite{dijkstra-proof}, of the following form: a number of
+successive machines in the ring have the same value $v+1$ (up to say,
+machine $i$, with machine $0$ being the master), then the others have
+value $v$.  In a legitimate state, only one machine at a time is able
+to make progress: either the $i+1$st machine if $i\neq 0$, or the
+master machine if $i=0$ (i.e.\ all machines in the ring hold the same
+value). Both situations are depicted below. Thus, this token ring
+provides mutual exclusion that can be used to mitigate access to a
+shared resource.\\ \null\hfill
+  \begin{tabular}{lllllll}
+    $x$&$x{+}1$&&$x{+}i{-}1$&$x{+}i$&&$x{+}n$
+    \\
+    \hline
+    \multicolumn{1}{|c|}{v+1} &
+    \multicolumn{1}{|c|}{v+1} &
+    \multicolumn{1}{|c|}{~$\cdots$~} &
+    \multicolumn{1}{|c|}{v+1} &
+    \multicolumn{1}{|c|}{~~v~\raisebox{1ex}{$\bullet$}} &
+    \multicolumn{1}{|c|}{~$\cdots$~} &
+    \multicolumn{1}{|c|}{v}\\
+    \hline
+  \end{tabular}\hfill
+  \begin{tabular}{lllllll}
+    $x$&$x{+}1$&&&&&$x{+}n$\\
+    \hline
+    \multicolumn{1}{|c|}{~~v~\raisebox{1ex}{$\bullet$}} &
+    \multicolumn{1}{|c|}{v} &
+    \multicolumn{4}{|c|}{~$\cdots$~} &
+    \multicolumn{1}{|c|}{v}\\
+    \hline
+  \end{tabular}
+  \hfill\null\\
+
+
+In~\cite{colosl-tr14}, we outline a proof sketch of token ring's
+self-stabilisation phase in \colosl and are able to show that,
+starting from an arbitrary state, the system converges to a legitimate
+state. We also provide a proof of the token ring when used for mutual
+exclusion.  In the remainder of this section, we illustrate the
+\colosl reasoning principles through a token ring in a legitimate
+state where all counters hold value $0$.  These principles are laid
+out in \fig\ref{fig:principles}, together with the usual concurrency
+rule of separation logic~\cite{csl-tcs}, and the rule of consequence
+from the Views framework~\cite{views}.  We introduce them informally
+as needed, and present them in more details in \S\ref{sec:colosl}.
+
+%% \begin{figure}
+%%   \centering
+%%   \caption{Two legitimate configurations of the token ring.}
+%%   \label{fig:ring}
+%% \end{figure}
 
 \begin{figure}
 \centering
