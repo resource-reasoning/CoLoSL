@@ -14,7 +14,7 @@ A key difficulty in verifying properties of fine-grained concurrent
 programs is being able to reason compositionally about each thread in
 isolation, even though in reality the correctness of the whole system
 is the collaborative result of intricately intertwined actions of the
-threads.  Such compositional reasoning is essential for: 1) verifying
+threads.  Such compositional reasoning is essential for: verifying
 large concurrent systems, since it allows them to be verified
 component-wise;  verifying library code and incomplete programs,
 since one does not need to know about the context of execution; and 
@@ -28,21 +28,17 @@ rely-guarantee and separation-logic
 reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
 interactions. However, despite substantial progress, we believe that
-none of these approaches are fully compositional. They are all based
-on global shared memory often comprising static disjoint regions with
-static interference on these regions, with each thread verified with
-respect to these shared regions. The static nature of the regions
-impedes compositionality, since the code of the thread often
-manipulates just a small part of the region.  In contrast, we
-introduce the program logic, \colosl, which is based on one global
-shared state with each thread verified with respect to its partial
-{\em subjective view} of this global state. The dynamic overlapping
-nature of subjective views provides truly compositional reasoning,
-which we demonstrate on a range of examples.
-
-\pgcomment{Can we make such a strong claim of fully compositional?}
-
-
+none of these approaches are fully compositional and question whether
+some are as natural as they might be. They are all based on global
+shared memory often comprising static disjoint regions with static
+interference on these regions. Each thread is verified with respect to
+these static shared regions.  In contrast, we introduce the program
+logic, \colosl, which is based on one global shared state with each
+thread verified with respect to its partial {\em subjective view} of
+this global state. The dynamic overlapping nature of subjective views
+enables us to provide small natural specifications of previously
+explored examples, as well as again increasing the kinds of examples
+that can be verified.
 
 
 Jones' rely-guarantee reasoning~\cite{rg} provided a
@@ -68,12 +64,6 @@ By making the specification
 as small  as possible, we can ensure that it
 can be reused in a large set of possible contexts using  the {\em frame
 rule}. 
-
-
-\pgcomment{Maybe put frame rule in here, but I thought it was too
-  detailed
-given the rest of the introduction.}
-%
  Specification reuse is paramount to achieve compositional
 reasoning: if the specification of a piece of code can be reused in
 any valid context, we only have  to prove it once and for all. 
@@ -90,37 +80,43 @@ with respect to an interference relation stating how the current
 thread and the environment can effect the region; CAP~\cite{cap-ecoop10} and its
 extensions~\cite{hocap,icap,tada} in addition abstract the regions. This work has achieved substantial
 success; see related work for more details. However, we believe that
-none of these approaches are fully compositional.  We identify the
-following three interconnected problems with shared regions and
-their interference. 
+none of these approaches are as natural and as  compositional as they
+might be.  The problem is that the regions and their interference is
+too static. 
 
-First and foremost, the focus on static  disjoint shared regions is too coarse-grained.  
-For instance, consider  a
-linked list consisting of $n+1$ nodes accessed concurrently by $n$
-threads (numbered $1$ to $n$) where the $i$th thread requires access
-to the $i$th and $(i+1)$th  nodes. In this example, there is a natural
-overlapping  of the resources accessed by the threads which cannot be
-mimicked by the reasoning. Since shared regions must be disjoint, the
-reasoning can only work with the entire linked list, even though  a thread is just working with a small part of the
-list.
-\pgcomment{Can we relate this linked list example to the set
-  example??? This currently is not persuasive. People would say just
-  use the whole list.???}  
-Now consider  a binary graph accessed by a concurrent
-spanning tree algorithm, as   an example of a
-data structure with intrinsic sharing which is accessed
-concurrently. Static disjoint shared regions cannot be used to reason
-about such algorithms due to  the arbitrary sharing associated with
-the subgraphs. 
-\pgcomment{Now can we think of a specific third example to do with the
-  natural sharing of two modules.} 
-Crucial ingredients of compositionality is missing using disjoint
-shared regions: one cannot give
-small specifications to programs manipulating shared data; nor can  one
-use the frame rule over shared state. 
+First, the focus on static disjoint shared regions is too rigid.
+Consider a binary graph accessed by a concurrent spanning tree
+algorithm, as an example of a data structure with intrinsic sharing
+which is accessed concurrently. Disjoint shared regions cannot
+naturally be used to reason about such algorithms due to the arbitrary
+sharing associated with the subgraphs. It might be possible to do some
+coding trick with capabilities, but we wonder whether it will be
+natural. Now consider a linked list consisting of $n+1$ nodes accessed
+concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
+thread requires access to the $i$th and $(i+1)$th nodes.  There is a
+natural overlapping of the resources accessed by the threads which
+cannot be mimicked by the reasoning. Since shared regions must be
+disjoint, the reasoning can only work either with the entire linked
+list or with individual nodes. This is in contrast with the code of a
+thread which naturally touches two nodes.
 
-Second, the interference associated with each region is defined when
-it is created and cannot change. As such, upon its creation, provision
+
+
+Second, the focus on static interference on the regions is too rigid. 
+The interference associated with each region is defined when
+the region  is created and is fixed throughout the entire lifetime of
+the region. However, the static interference  on a region might 
+become irrelevant, either because the resources it acts on have been
+deallocated or extra knowledge gained about the shared state
+falsifies its requirements.  This incurs
+a burden in the proof effort, as stability against these irrelevant
+actions still has to be checked at every program point.
+Also, the static interference on  a region has to predict all future 
+uses of the region at the time of creation. 
+
+\pgcomment{OK, I don't find this next bit convincing yet.}
+
+. As such, upon its creation, provision
 has to be made for all future extensions of it and it is generally not
 possible to arbitrarily grow it with extra state under new
 interference rules.  As we discuss in \S\ref{sec:examples}, this
@@ -128,13 +124,9 @@ results in unnatural specifications when dynamically-allocated
 resources become shared during execution, such as in the concurrent
 set module example of~\cite{cap-ecoop10}.
 
-Finally, the description of the interference on the shared state is
-fixed throughout its entire lifetime, even if a transition on the shared state 
-becomes irrelevant (either because the resources it acts on have been
-deallocated or extra knowledge gained about the shared state
-falsifies its requirements). This incurs
-a burden in the proof effort, as stability against these irrelevant
-actions still has to be checked at every program point.
+
+
+ \pgcomment{NOt touched from ehre.} 
 
 \pgcomment{Not sure should be in:These issues, in particular the first one, not only affect the
 locality of the reasoning, but also impede \emph{modularity} and proof
