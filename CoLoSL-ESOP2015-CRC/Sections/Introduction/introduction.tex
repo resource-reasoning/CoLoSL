@@ -81,61 +81,58 @@ specifications and proofs which are either too coarse  or unnatural.
 
 
 The problem is due to the rigid nature of the shared disjoint regions and
-their static interference, which   limit how we  work
+their static interference, which   limit how we can  work
 with a
 concurrent data structure. A disjoint region typically either describes 
 the entire data structure such as a linked list,  or contains
 individual 
 components on which the data structure is built such as the nodes of a
-linked list. However, threads may have shared access to arbitrary
-parts of the data structure. 
-The static interference relation 
+linked list. However, threads may have shared access to arbitray 
+parts of the data structure, and we would like directly express this
+access  in
+the reasoning. 
+The   static interference relation of a region 
  is defined when
 the region  is created and    is fixed throughout the entire lifetime of
-the region. However, inteference can become irrelevant due to resource
-allocation, threads having access to parts of a region need  only
+the region. However, 
+threads having access to parts of a shared region need  only
  know about the interference associated with those parts of the
-region and , at the time  of creation, it is not necessarilly possible
-to capture all future interactions associated with  a region. 
+region. In addition, 
+at the time  of creation, it is not necessarilly possible
+to predict all future interactions  associated with  a shared
+region. Just as the original separation logic  uses the frame rule to
+obtain small specifications for the local state, we would like to be
+able to have some analogous framing of the shared state and its
+interference  to obtain small
+specifications of the shared state. 
 
 
 For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
-thread requires access to the $i$th and $(i+1)$th nodes. The threads
-access overlapping shared resources (the two nodes) with interference 
-relative to that overlapping resource. Also, consider a binary graph accessed by a concurrent
-spanning tree algorithm. Disjoint regions with static
-interference cannot simply be
-used to reason about  data structures with intrinsic sharing which are
-accessed concurrently. Finally, consider a concurrent set. ....
-
-
-----------
-
-
-which is based on one global shared state with
-each thread verified with respect to its partial {\em subjective view}
-of this global state. Subjective views may arbitrarily overlap with
-each other, with both their resource and interference expanding and
-contracting  in accordance with what is required by the thread.
-We believe this leads to natural  specifications where the subjective
-views 
+thread requires access to the $i$th and $(i+1)$th nodes. Current
+approaches cannot reason directly about the two shared nodes being accessed
+by the threads. 
+Now consider a binary graph accessed by a concurrent
+spanning tree algorithm. Current approaches cannot reason directly
+about such  data structures with intrinsic sharing which are
+accessed concurrently. Finally, consider a concurrent set library
+with just  an
+insert function. Current approaches cannot extend their reasoning to
+include a remove function, withouthaving to  redo their
+proofs. In summary, disjoint regions with static interference ........
 
 
 
 
 
-. As such, upon its creation, provision
-has to be made for all future extensions of it and it is generally not
-possible to arbitrarily grow it with extra state under new
-interference rules.  As we discuss in \S\ref{sec:examples}, this
-results in unnatural specifications when dynamically-allocated
-resources become shared during execution, such as in the concurrent
-set module example of~\cite{cap-ecoop10}.
+%. As such, upon its creation, provision
+%has to be made for all future extensions of it and it is generally not
+%possible to arbitrarily grow it with extra state under new
+%interference rules.  As we discuss in \S\ref{sec:examples}, this
+%results in unnatural specifications when dynamically-allocated
+%resources become shared during execution, such as in the concurrent
+%set module example of~\cite{cap-ecoop10}.
 
----------------
-
-% \pgcomment{NOt touched from ehre.} 
 
 %\pgcomment{Not sure should be in:These issues, in particular the first one, not only affect the
 %locality of the reasoning, but also impede \emph{modularity} and proof
@@ -146,28 +143,21 @@ set module example of~\cite{cap-ecoop10}.
 %identically for both modules. The probability that several modules
 %agree on the exact partition and shape of the shared resources is slim.}
 
-This paper introduces the program logic \colosl,
+This paper introduces the program logic, \colosl, which stands for 
 \underline{Co}ncurrent \underline{Lo}cal \underline{S}ubjective
-\underline{L}ogic, which addresses all three issues. \colosl models
-shared resources as a single state, with a twist: the assertion
-language allows threads to hold their own \emph{subjective views} of
-this state. Each subjective (personalised) view is an assertion which
-describes of \emph{parts} of the shared state, and how the thread and
-the environment may affect these shared resources.  The subjective
-views of different threads represent potentially \emph{overlapping}
-parts of the shared state, in contrast with previous approaches that
-either mandate that all threads view the same entire shared state, or
-strictly disjoint parts of it. This allows us to provide a framing
-mechanism both on shared resources as well as their interferences even
-in the presence of overlapping footprints and entangled resources, and
-resolve the first issue outlined above. Subjective views expand and
-contract to the natural resources and the interference required by the
-current thread, solving the second issue. Finally, the description of
-the interference affecting a subjective view can be rewritten based on
-the current knowledge of a thread, allowing one to forget once and for
-all about irrelevant interference to address the third issue. These
-features provide truly compositional reasoning for shared-memory
-concurrency.
+\underline{L}ogic. \colosl is based on one global shared state with
+each thread verified with respect to its partial {\em subjective view}
+of this global state. Each subjective (personalised) view comprises an assertion which
+describes  \emph{parts} of the shared global resource used by a thread, 
+and an interference relation which describes   how the thread and
+the environment may affect these parts.  
+Subjective views may arbitrarily overlap with
+each other, with both their resource and interference expanding and
+contracting  in accordance with what is required by the
+thread. Interestingly, this
+sometimes requires rewriting  the  interference relation so that 
+the interference on the smaller state captures the same 
+information as the interference on the bigger state. 
 
 
 %\pgcomment{Not for here, section3:We give the main ideas behind the semantic model and the soundness of
@@ -176,27 +166,59 @@ concurrency.
 %to regular separation logic validity checks. Thus one can use \colosl
 %without having to reason directly in the model.}
 
-\pgcomment{now examples, we need to beef this up much more, will remove
-  sections, we need to understand the examples story more.}
+\pgcomment{damn, out of time, chanllenge to say not too much but
+  something of token ring, main points: resource of individual threads
+is two cells, interferences requires three cells, and extendsion, feel
+free to have a go Jules}
 
- We demonstrate how
-\colosl allows local reasoning about the shared state on a range of
-examples.  The first example in \S\ref{sec:intuition} admittedly
-serves as a showroom for \colosl's main reasoning principles. It is a
-variant of Dijkstra's token-ring mutual exclusion
-algorithm~\cite{dijkstra74}. As well as the local knowledge about how
+ We demonstrate 
+\colosl reasoning on a range of
+examples.  The first example in \S\ref{sec:intuition} is 
+ Dijkstra's token-ring mutual exclusion
+algorithm~\cite{dijkstra74}. Once the ring has achieved a stable
+state, the overall  behaviour of the token
+ring is that the master increments its cell when the cell at the otehr
+end of the ring is  equal
+and all other threads increments their  cells when the 
+previous cell is one bigger. \colosl can reason compositionally about
+this example. 
+.....
+
+
+
+This example is interesting because the
+threads access two shared overlapping cells, much like the list example described
+earlier, whose intereference depends on three cells. The global shared reourse of the whole token ring describes 
+
+
+
+demonstrates the use of
+subjective views to only work with the shared resource being accessed
+by an individual thread. 
+
+
+, with each
+thread responsible for changing one heap cell but constrained by the
+behaviour of the two thread. 
+
+
+As well as the local knowledge about how
 each thread behaves, the programmer also has global knowledge about
 how threads constrain one another. Pleasantly, our reasoning captures
-just that. In \S\ref{sec:examples}, we study two further, more
-challenging examples. The first is a concurrent spanning tree
-algorithm for graphs, where threads are recursively spawned on each
-(potentially overlapping) sub-graph. We demonstrate that the flexible,
+just that. 
+
+
+In \S\ref{sec:examples}, we study two further examples. The first is a concurrent spanning tree
+algorithm for graphs, where threads are recursively spawned on 
+potentially overlapping sub-graphs. We demonstrate that the flexible,
 overlapping subjective views of \colosl are just what we need.  We
 also verify a concurrent set module implemented using a hand-over-hand
-list-locking algorithm that significantly improves over the existing
+list-locking algorithm.
+
+
+
+ that significantly improves over the existing
 proof~\cite{cap-ecoop10}.
-%
-%Finally, we demonstrate how the mutual exclusion ring of \S\ref{sec:intuition} can be generalised to synchronise access to a concurrent database.
 
 Most of the technical details have been left out due to space
 constraints, and are provided in the appendix as well as in an
