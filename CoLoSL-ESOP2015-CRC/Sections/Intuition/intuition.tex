@@ -136,7 +136,7 @@ of CAP, $I$ declares transitions of the form $[\token a] : Q \swap R$,
 where a thread in possession of the $[\token a]$ capability (in its
 private state) may carry out its transition and update parts of the
 shared state that satisfy $Q$ to those described by $R$. Assertions in
-Hoare triples must be {\em stable}; that is, robust with respect to
+Hoare triples must be {\em stable}, that is, robust with respect to
 interferences from the environment (as prescribed in the interference
 relations attached to that assertion's subjective views). The $*$
 (resp.\ $**$) connective is that of separation logic and means that
@@ -150,42 +150,40 @@ data structures~\cite{rey-slnotes,js-popl12,ramification}. The
 changing the machine states it denotes. In particular, $(P => Q) => (P
 ===> Q)$.
 
-Consider the program $\li{ring(m, s1, s2)}$ defined in
-\fig\ref{fig:concurrentInc} representing a 3-place token ring with
-master $m$ and slaves $\li{s1}$ and $\li{s2}$.
+Consider the program $\li{ring(x)}$ defined in
+\fig\ref{fig:concurrentInc} representing a 3-place token ring.
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
 It is written in pseudo-code resembling C with additional constructs
 for concurrency: atomic sections $\atomic \_$ which declare that code
 behaves atomically; and parallel composition $\_ ||\_ $ which spawns
 threads then waits until they complete. In our example, three threads
-are spawned (corresponding to the master thread and the two slave
-threads) and are run in parallel until all counters reach value $10$
-(in the fashion described above).
+are spawned (corresponding to the master thread and two slave threads)
+and are run in parallel until all counters reach value $10$.
+%(in the fashion described above).
 
 Note that this implementation can easily be generalised to an
-$n$-place ring. However, due to space constraints we focus on a
-3-place ring instead. While the implementation of all slave threads
-are identical, the proof of the first slave in the ring ($\li{s1}$) is
-slightly different from that of the other ($\li{s2}$). For clarity, we
-thus refer to the first slave thread as the \emph{foreman},
-henceforth. Analogously, in the generalised $n$-place ring, the proof
-of all slave threads are identical and only differ slightly from that
-of the foreman.
+$n$-place ring. We focus on a 3-place ring instead for
+concision. While the implementation of all slave threads are
+identical, the proof of the first slave in the ring (at $x{+}1$) is
+slightly different from that of the others. For clarity, we henceforth
+refer to the first slave thread as the \emph{foreman}.  Let us proceed
+with the proof outline of slave threads. The proof of the master and
+foreman threads are similar.% and can be described analogously.
 
-In our reasoning, we represent the resources associated with each
-machine in the ring as two consecutive cells in the heap recording a)
-the current value of the associated counter (at address $x$); and b)
-the address of the previous machine in the ring (at address $x+1$).
-We now proceed with the proof outline of slave threads. The proof of
-the master and foreman threads are similar and can be described
-analogously.
+%% In our reasoning, we represent the resources associated with each
+%% machine in the ring as two consecutive cells in the heap recording
+%% the current value of the associated counter; and b)
+%% the address of the previous machine in the ring (at address $x+1$).
+%% We now proceed with the proof outline of slave threads. The proof of
+%% the master and foreman threads are similar and can be described
+%% analogously.
 
 \begin{figure}
 \centering
 \noindent\hrule\vspace{10pt}
 \vspace{-3ex}
-\begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
+\begin{tabular}{@{} l @{\hspace{2ex}} l@{}}
 {\begin{lstlisting}[numbers=left,numbersep=5pt]
 ring(x)
 //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * x{+}2|->0\end{array}}{I}\end{array} \right\}$
@@ -195,20 +193,20 @@ $\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * 
 master(x)
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
 $\{$ while(*x != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * \cell{x{+}n}{v} \lor\null\\ \quad\cell{x}{v{+}1} * \cell{x{+}n}{v}\end{array}}{M_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * (\cell{x{+}n}{v} \lor \cell{x{+}n}{v})\end{array}}{M_{x}'}\end{array} \right\}$
     $\{\ \langle$if (*x == *(x+n))
         *x = *x + 1;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * (\cell{x}{10} * \cell{x{+}n}{10} \lor\null\\ \quad\cell{x}{10} * \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * \cell{x}{10} * (\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
 slave(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * \cell{x{-}1}{0} \lor\null\\ \quad\cell{x}{0} * \cell{x{-}1}{1}\end{array}}{S_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * (\cell{x{-}1}{0} \lor \cell{x{-}1}{1})\end{array}}{S_{x}'}\end{array} \right\}$
 $\{$  while(*x != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} * \cell{x{-}1}{v} \lor\null\\ \quad\cell{x}{v} * \cell{x{-}1}{v{+}1}\end{array}}{S_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} *\null\\ (\cell{x{-}1}{v} \lor \cell{x{-}1}{v{+}1})\end{array}}{S_{x}'}\end{array} \right\}$
     $\{\ \langle$if (*x != *(x-1))
        *x = *(x-1);$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} * \cell{x{-}1}{10} \lor\null\\ \quad\cell{x}{10} * \cell{x{-}1}{11}\end{array}}{S_{x}'}\end{array} \right\}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} *\\ (\cell{x{-}1}{10} \lor \cell{x{-}1}{11})\end{array}}{S_{x}'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
@@ -268,69 +266,59 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
 \end{figure}
 
 \paragraph{Slave machines}
-Since each slave machine inspects the value of its counter and
-compares it against that of the previous machine in the ring, a
-possible pre-condition for the $\li{slave(x)}$ program is
-\vspace{-5pt}
-\begin{align*}
-	\li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0, p} * \cell{p}{0} \lor \cell{x}{0,p} * \cell{p}{1}}{S_x}
-	\quad
-	S_x = \{s_{x}, s_{p}\}\\[-20pt]
-\end{align*}
-The above assertion states that the current slave thread owns the
-variable resource \li{x} locally and that \li{x} records the address
-of the associated slave machine ($x$).  The current thread also has a
-subjective view of the shared state and knows that \emph{either} the
-machines at address $x$ and its previous sibling at address $p$ both
-hold value $0$; \emph{or} the value of the previous machine has been
-incremented to $1$ while the value of the machine at $x$ is $0$. The
-interference allowed on these two machines is captured by $S_x$ and
-consists of two actions: $s_x$ and $s_p$. For instance, the $s_{x}$
-action can increment $x$ under the condition that its value is one
-less than $p$. This update can only be carried out by the thread that
-holds the $[\token s_x]$ \emph{capability} in its local state.In the
-case of the above assertion, the current thread owns the $[\token
-  s_x]$ capability locally (and is thus the only thread that can
-perform its action). On the other hand, since the current thread does
-not own the $[\token s_p]$ capability (and thus the environment
-might), its action may be carried out by the environment at any time
-provided that its conditions are satisfied.
+Let us forget for a moment about the proof outline of
+\fig\ref{fig:concurrentInc} and attempt to prove \li{slave} in
+isolation, in the spirit of compositional reasoning. Since
+\li{slave(x)} inspects the value of its counter pointed to by \li{x}
+and compares it against the counter at \li{x-1} (its left neighbour in
+the ring), a tempting pre-condition for the $\li{slave(x)}$ program
+would capture just these two locations, e.g.
+\vspace{-3pt}
+\[
+\li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0} * (\cell{x{-}1}{0} \lor \cell{x{-}1}{1})}{S_x}
+\qquad
+S_x = \{s_{x}, s_{x{-}1}\}
+\vspace{-3pt}
+\]
+Going left to right, the above assertion states that the thread
+locally owns the variable \li{x} with value $x$, and a
+\emph{capability} $\token{s}_x$ that allows it to perform the
+associated action (see below and \fig\ref{fig:concurrentInc}).  The
+current thread also has a subjective view of the shared state: $x$
+points to $0$ and $x-1$ points to either $0$ or $1$, since its left
+neighbour might have already incremented its own counter. The
+interference relation is captured by $S_x$ and consists of two
+actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
+of the contents of $x$ under the condition that its value is one less
+than the value at address $x-1$. Since it owns $\token s_x$, the
+current thread is the only one that can perform $s_x$. On the other
+hand, the capability $[\token s_{x{-}1}]$ is not locally owned, thus
+could be owned by the environment, which is free to perform the
+associated action whenever its precondition is satisfied.
 %that performed by the current machine (enabled by $[\token{x}]$); and that of the previous machine in the ring (enabled by $[\token{s}_p]$). Each action allows the value of the corresponding machine to be incremented by $1$ so long is it is the one that can make a move (As described above). 
-On closer inspection, this assertion turns out to be unstable: $s_p$
-allows the value of $p$ to be incremented when its value is less than
-that of its previous sibling ($m$) by $1$. However, the value of $m$
-is unknown to the current thread (since it is missing from the
-subjective view) and from the point of view of this thread, $s_p$ can
-take place indefinitely many times. We thus have to stabilise the
-above assertion as:\vspace{-5pt}
-\begin{align*}
-	\li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v} \cell{x}{0, p} * \cell{p}{v}}{S_x}
-	\quad
-	S_x = \{s_{x}, s_{p}\} \\[-20pt]
-\end{align*}
-However, this assertion is now too weak for our purposes. Indeed, the
-programmer knows that $p$ can only be incremented when its value is
-equal to $s$ and less than $m$ by 1. However, this is not reflected in
-$s_{p}$. Since the value of $m$ is not visible to this thread, there
-is nothing to constrain the increment on $p$ given the values of $p$
-and $x$. We can thus only stabilise to a weak assertion that loses
-information about how the values of $m$ and $x$ are connected together
-through $p$.  It is however possible to give a stronger specification,
-as follows: \vspace*{-5pt}
-\begin{align*}
-	\li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0, p} * \cell{p}{0} \lor \cell{x}{0, p} * \cell{p}{1}}{S'_x}
-	\quad
-	S'_x = \{s_{x}, s'_{x}\} \\[-20pt]
-\end{align*}
-The amended action $s'_x$ reflects stronger knowledge about when $p$
-can be incremented and how its value is related to $m$ and $x$.  The
-proof of the specification of the $\li{slave(x)}$ is now relatively
-straightforward. By inspection (or using the rules of
-\S\ref{subsec:prules}), the invariant of the while loop is stable with
-respect to $S'_x$. The atomic section allows safe manipulation of the
-contents of the subjective view.  The final postcondition of
-$\li{slave(x)}$ follows from the invariant and the boolean expression
-of the while.
+Upon closer inspection, since the subjective view says nothing of the
+value of cell $x{-}2$, $s_{x{-}1}$ can always fire in this
+situation. This assertion is thus not \emph{stable}. If we were to
+weaken it into a stable assertion, we would get the assertion below,
+which is now too imprecise for our purposes:\vspace{-3pt}
+\[
+\li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v}
+  \cell{x}{0} * \cell{x{-}1}{v}}{S_x}
+\vspace{-3pt}
+\]
+
+To remedy this, we have to step back and think again at the level of
+the whole algorithm. As the programmer knows, the situation above
+cannot happen as $x{-}2$ can only be at most one ahead of $x$ itself.
+It is thus possible to give a stronger precondition that captures just
+what we want, as in \fig\ref{fig:concurrentInc}. The proof of
+$\li{slave(x)}$ is now relatively straightforward. By inspection (or
+using the rules of \S\ref{subsec:prules}), the invariant of the while
+loop is stable with respect to $S'_x$. The atomic section performs
+action $s_x$ (temporarily ``opening the box'', i.e.\ transferring
+shared resources into the local state to perform the update) and
+preserves the invariant.  The final postcondition of $\li{slave(x)}$
+follows from the invariant and the boolean expression of the loop.
 
 \paragraph{Foreman thread}
 The proof sketch of the foreman (slave) thread is given in the left
@@ -449,7 +437,7 @@ and obtain our final precondition of \li{slave(x2)} as per
 
 
 
-The rest of the \li{slave(x)} proof is straightforward. Once all
+The rest of the \li{ring(x)} proof is straightforward. Once all
 threads have completed their operations, we join up their
 postconditions using the \mergeRule principle, which embodies a
 crucial feature of \colosl: different subjective views
@@ -467,14 +455,14 @@ This concludes our \colosl proof of \li{ring(x)}. Our expansion and
 contraction of subjective views, in particular with shifting of
 interference assertions in key places, enables us to confine the
 specification and verification of each thread to just the resources
-they need. This is not possible in existing frameworks. This tightness
-of specifications makes proofs robust against changes to each thread's
+they need. This is not possible in existing frameworks. Small
+specifications make proofs robust against changes to each thread's
 environment, and provide more opportunities for proof reuse. For
 instance, our proof of the ring straightforwardly generalises to $n$
-slave threads, without needing to reprove \li{master} or \li{slave}
-at all. Moreover, the proof changes only minimally if the main program
-is changed to dynamically grow the ring by spawning more slave
-threads, as described in \fig\ref{fig:spawner}. If a thread running
+slave threads, without needing to reprove \li{master} or \li{slave} at
+all. Moreover, the proof changes only minimally if the main program is
+changed to dynamically grow the ring by spawning more slave threads,
+as described in \fig\ref{fig:spawner}. If a thread running
 \li{spawn(x)} is added to the parallel composition of \li{ring}, then
 the proof of \li{master} has to be modified slightly to include the
 possibility for the last node of the ring to change. The proof of
