@@ -11,19 +11,21 @@ state, which remains legitimate forevermore.
 The token ring algorithm, presented in \fig\ref{fig:concurrentInc},
 assumes a network of $n$ machines (in \fig\ref{fig:concurrentInc},
 $n=3$), arranged in a ring with a designated \emph{master} machine and
-$n-1$ slave machines. Each machine maintains a local counter and has
+$n{-}1$ slave machines. Each machine maintains a local counter and has
 access to the value of its left neighbour's counter; the state of the
 system consists of all $n$ counters. Starting in an arbitrary state,
 the network eventually converges to legitimate
-states~\cite{dijkstra-proof}, of the following form: a number of
-successive machines in the ring have the same value $v+1$ (up to say,
-machine $i$, with machine $0$ being the master), then the others have
-value $v$.  In a legitimate state, only one machine at a time is able
-to make progress: either the $i+1$st machine if $i\neq 0$, or the
-master machine if $i=0$ (i.e.\ all machines in the ring hold the same
-value). Both situations are depicted below. Thus, this token ring
-provides mutual exclusion that can be used to mitigate access to a
-shared resource.\\ \null\hfill
+states~\cite{dijkstra-proof}, of the following form: 
+in the $i$th legitimate state, all machines in the range $0\cdots i$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n{-}1$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n$). Thus, this token ring provides mutual exclusion that can be used to control access to a shared resource. The $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
+%a number of 
+%successive machines in the ring have the same value $v+1$ (up to say,
+%machine $i$, with machine $0$ being the master), then the others have
+%value $v$.  In a legitimate state, only one machine at a time is able
+%to make progress: either the $i+1$st machine if $i\neq 0$, or the
+%master machine if $i=0$ (i.e.\ all machines in the ring hold the same
+%value). Both situations are depicted below. Thus, this token ring
+%provides mutual exclusion that can be used to mitigate access to a
+%shared resource.\\ \null\hfill
   \begin{tabular}{lllllll}
     $x$&$x{+}1$&&$x{+}i{-}1$&$x{+}i$&&$x{+}n$
     \\
@@ -282,15 +284,15 @@ S_x = \{s_{x}, s_{x{-}1}\}
 \]
 Going left to right, the above assertion states that the thread
 locally owns the variable \li{x} with value $x$, and a
-\emph{capability} $\token{s}_x$ that allows it to perform the
-associated action (see below and \fig\ref{fig:concurrentInc}).  The
+\emph{capability} $[\token{s}_x]$ that allows it to perform the
+associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}).  The
 current thread also has a subjective view of the shared state: $x$
 points to $0$ and $x-1$ points to either $0$ or $1$, since its left
 neighbour might have already incremented its own counter. The
 interference relation is captured by $S_x$ and consists of two
 actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
 of the contents of $x$ under the condition that its value is one less
-than the value at address $x-1$. Since it owns $\token s_x$, the
+than the value at address $x-1$. Since it owns $[\token s_x]$, the
 current thread is the only one that can perform $s_x$. On the other
 hand, the capability $[\token s_{x{-}1}]$ is not locally owned, thus
 could be owned by the environment, which is free to perform the
@@ -310,7 +312,7 @@ which is now too imprecise for our purposes:\vspace{-3pt}
 To remedy this, we have to step back and think again at the level of
 the whole algorithm. As the programmer knows, the situation above
 cannot happen as $x{-}2$ can only be at most one ahead of $x$ itself.
-It is thus possible to give a stronger precondition that captures just
+It is thus possible to strengthen $S_x$ to $S'_x$ and give a stronger precondition that captures just
 what we want, as in \fig\ref{fig:concurrentInc}. The proof of
 $\li{slave(x)}$ is now relatively straightforward. By inspection (or
 using the rules of \S\ref{subsec:prules}), the invariant of the while
