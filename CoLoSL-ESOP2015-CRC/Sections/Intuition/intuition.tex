@@ -284,7 +284,7 @@ S_x = \{s_{x}, s_{x{-}1}\}
 \vspace{-3pt}
 \]
 Going left to right, the above assertion states that the thread
-locally owns the variable \li{x} with value $x$, and a
+locally owns  variable \li{x} with value $x$ (with variables-as-resource model~\cite{variablesAsResource}), and a
 \emph{capability} $[\token{s}_x]$ that allows it to perform the
 associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}).  The
 current thread also has a subjective view of the shared state: $x$
@@ -326,7 +326,7 @@ follows from the invariant and the boolean expression of the loop.
 \paragraph{The ring}
 The proof sketches of the foreman (first slave) and master threads are
 analogous, following \fig\ref{fig:concurrentInc}. As the first slave,
-the foreman has to account from interferences from the master thread
+the foreman has to account for interference from the master thread
 instead of another slave thread. Note that the master has access to
 variable \li{n} that indicates the current size of the ring, and so
 does its associated action $m_x$ since whether it can fire or not is
