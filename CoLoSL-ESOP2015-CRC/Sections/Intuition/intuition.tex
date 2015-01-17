@@ -738,36 +738,33 @@ possibility for the last node of the ring to change. The proof of
 \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
 {\begin{lstlisting}
 spawn(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts x \tx{x}|-< x * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-$\{$ local y;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{-} * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  y = new();
-  y-$\!\textgreater$p = x-$\!\textgreater$p;
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * y|->-,p * [\token e_{p}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  $\langle$x-$\!\textgreater$c = x$_0$-$\!\textgreater$c - 1;
-   x-$\!\textgreater$p = y;$\rangle$
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\tx{x}|-< x * \varcell{\tx y}{y} * [\token s_{y}] * [\token e_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x}{v,y} * y|->v{-}1,p * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,y} * y|->v,p * \cell{p}{v}\end{array}}{E_x}\end{array} \right\}$
-  slave(y) $\mid\mid$ spawn(x);
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
+$\{$ if(n $<$ size) then
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} n{<}s \land \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
+    $\langle$ *x + n + 1 = *x;
+       n = n+1; $\rangle$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * [\token{s}_{x{+}n}] * \\\shared{\begin{array}{@{}l@{}}\exsts{v} \tx{n}|-< n *\cell{x}{v} * \\(\cell{x{+}n{-}1}{v} * \cell{x{+}n}{v{-}1}\lor\null\\ \cell{x{+}n{-}1}{v{-}1} * \cell{x{+}n}{v{-}1})\end{array}}{E_x \cup S'_{x+n}}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\ \shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x} *\\       \![\token{s}_{x+n}] *\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x{+}n{-}1}{v} * \\ (\cell{x{+}n}{v}\lor \cell{x{+}n}{v{-}1} )\end{array}}{S'_{x+n}}  \end{array} \right\}$
+  slave(x+n) $\mid\mid$ spawn(x);
 $\}$ //$\color{blue} \{\m{false}\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
 master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}] *\null\\ \shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{0,p} * \cell{p}{0}\lor\null\\\quad\cell{x}{0,p} * \cell{p}{{-}1}\end{array}}{M_{x}''}\end{array}\right\}$
-$\{$ while(x-$\!\textgreater$c != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p,v}\cell{x}{v,p} * \cell{p}{v} \lor\null\\ \quad\cell{x}{v+1,p} * \cell{p}{v}\end{array}}{M_{x}''}\end{array} \right\}$
-    $\{\ \langle$if (x-$\!\textgreater$c == x-$\!\textgreater$p-$\!\textgreater$c)
-        (x-$\!\textgreater$c)++;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{p}\cell{x}{10,p} * \cell{p}{10} \lor\null\\ \quad\cell{x}{10,p} * \cell{p}{9}\end{array}}{M_{x}''}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \\ \shared{\exsts{n} \varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{E_{x}}\end{array}\right\}$
+$\{$ while(*x != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \exsts{n, v} \varcell{\tx n}{n} * \cell{x}{v} * \\ \;\cell{x+n}{v} \lor \cell{x{+}n}{v-1}\end{array}}{E_{x}}\end{array} \right\}$
+    $\{\ \langle$if (*x == *(x+n))
+        *x = *x + 1;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \exsts{n}\varcell{\tx n}{n} * \cell{x}{10} * \\
+\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{E_{x}}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \begin{mathpar}
   e_x ==
-  [\token e_x]{:}\, \exsts{p,v} \cell{x}{v+1,-} * \cell{p}{v}\swap
-  \cell{x}{v+1,p} * \cell{p}{v}\\
-  E_x \eqdef \{e_x\}
+  [\token e_x]{:}\, \exsts{n} \li{n} \harpoonything n \swap \li{n} \harpoonything n+1
 
-  M_x'' \eqdef M_x'\cup\{e_x\}
+  E_x \eqdef \{e_x\} \cup M'_x
 \end{mathpar}
 \hrule
 \caption{Growing the ring.}
