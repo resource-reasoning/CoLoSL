@@ -31,7 +31,7 @@ reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
 interactions. However, we believe that, despite substantial progress, there are many
 examples where the specifications and proofs are not as natural as
-they might be; the specifications and proofs are either too coarse or
+they might be; they  are either too coarse or
 too 
 contrived. 
 We explore a different approach, introducing the
@@ -63,10 +63,10 @@ any valid context, we only have  to prove it once and for all.
 
 Concurrent separation logic extends this compositional reasoning  to concurrent programs
 using the {\em disjoint concurrency rule}, where individual threads
-use both local resource which is private to the thread and static
-invariant shared regions which can be accessed by all threads if they
-have the capability. Since
-then, there has been many extensions combining rely-guarantee
+  use both local resource which is private to the thread and static
+invariant shared regions which can be accessed by all threads through
+critical regions. Since
+then, there have been many extensions combining rely-guarantee
 reasoning with ideas from concurrent separation logic to reason about
 fine-grained concurrency: RGSep~\cite{viktor-marriage} and then
 deny-guarantee reasoning~\cite{dg} introduce local resource and shared
@@ -76,45 +76,41 @@ the region; CAP~\cite{cap-ecoop10} and its
 extensions~\cite{hocap,icap,tada} in addition abstract the
 regions. This work has achieved substantial success; see related work
 for more details. However,  we believe these approaches sometimes   give
-specifications and proofs which are either not small or not natural.
+specifications and proofs which are either too coarse  or unnatural.
 
 
 
-The problem is due to the rigid nature of the disjoint regions and
-their static interference. Disjoint shared regions cannot simply be
-used to reason about  data structures with intrinsic sharing which are
-accessed concurrently, such as a binary graph accessed by a concurrent
-spanning tree algorithm. Also, disjoint regions  limit how we  work
+The problem is due to the rigid nature of the shared disjoint regions and
+their static interference, which   limit how we  work
 with a
-concurrent data structure: typically, a shared region either contains
-the entire data structure such as a linked list; or contains
+concurrent data structure. A disjoint region typically either describes 
+the entire data structure such as a linked list,  or contains
 individual 
 components on which the data structure is built such as the nodes of a
 linked list. However, threads may have shared access to arbitrary
-partsof the data structure.
-Consider a linked list consisting of $n+1$ nodes accessed
+parts of the data structure. 
+The static interference relation 
+ is defined when
+the region  is created and    is fixed throughout the entire lifetime of
+the region. However, inteference can become irrelevant due to resource
+allocation, threads having access to parts of a region need  only
+ know about the interference associated with those parts of the
+region and , at the time  of creation, it is not necessarilly possible
+to capture all future interactions associated with  a region. 
+
+
+For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
-thread requires access to the $i$th and $(i+1)$th nodes.  There is a
-natural 
-overlapping of the shared resources (the two nodes) accessed by the threads which
- is not matched by  the disjoint regions. 
-
-\pgcomment{not sorted next bit on static interference} 
-
-
-The static interference associated with the regions also causes
-problems. It  is defined when
-the region  is created and is fixed throughout the entire lifetime of
-the region. However, the static interference  on a region might 
-become irrelevant, either because the resources it acts on have been
-deallocated or extra knowledge gained about the shared state
-falsifies its requirements.  This incurs
-a burden in the proof effort, as stability against these irrelevant
-actions still has to be checked at every program point.
-Also, the static interference on  a region has to predict all future 
-uses of the region at the time of creation. 
+thread requires access to the $i$th and $(i+1)$th nodes. The threads
+access overlapping shared resources (the two nodes) with interference 
+relative to that overlapping resource. Also, consider a binary graph accessed by a concurrent
+spanning tree algorithm. Disjoint regions with static
+interference cannot simply be
+used to reason about  data structures with intrinsic sharing which are
+accessed concurrently. Finally, consider a concurrent set. ....
 
 
+----------
 
 
 which is based on one global shared state with
