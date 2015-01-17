@@ -42,11 +42,12 @@ and motivation.
 In general, each component of a logical state is taken from an
 arbitrary \emph{separation algebra}~\cite{asl} (i.e.\ a cancellative,
 partial commutative monoid) that satisfies the
-\emph{cross-split} property\footnote{ A separation algebra
+\emph{cross-split} property\footnote{A separation algebra
   $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
   for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
-  exists $x, y, z, z \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
-  $c = x + z$, and $d = y + w$.}\cite{asl,dockins2009fresh}.  As we demonstrate in the examples of
+  exists $x, y, z, w \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
+  $c = x + z$, and $d = y + w$.}\cite{dockins2009fresh} (this is
+needed for $**$ to be associative~\cite{ramification}).  As we demonstrate in the examples of
 \S\ref{sec:examples}, our programs often call for a more complex model
 of machine states and capabilities than that presented here. For instance, we may need our
 capabilities to be fractionally owned, where ownership of a
@@ -196,7 +197,7 @@ machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard
 Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$, \emph{the assertions of \colosl}, $\Assertions$, are described by the grammars below:
 %
 \begin{align*}	 
-  A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x}|-> E \mid E_1 |-> E_2 \mid [E]\\
+  A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x} \harpoonything E \mid E_1 |-> E_2 \mid [E]\\
   \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
   \Assertions \ni P,Q & ::= \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P ** Q \mid \shared{P}{I}  \\
   I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}{R}\} \cup I
@@ -212,7 +213,7 @@ magic-wand; these are reserved to local assertions. The syntax of
 assertions follows from standard separation logic with variables-as-resource~\cite{variablesAsResource} (note that expressions $E$ do not
 allow program variables), with the exception of the subjective views
 $\shared P I$.  Machine state and capability assertions are
-interpreted over a world's local state: $\li{x}|-> E$
+interpreted over a world's local state: $\li{x} \harpoonything E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
 $E$ (resp.\ points to $E_2$); the capability assertion $[E]$ is true
@@ -332,7 +333,7 @@ assertions.
   l,\lenv &\slsat E_1 = E_2
   &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
 
-  l, \lenv &\slsat \li{x}|->E
+  l, \lenv &\slsat \li{x} \harpoonything E
   &\text{iff}&
   l = ([\li x: [|E|]_{\lenv}], \emptyset, \emptyset)\\
   
