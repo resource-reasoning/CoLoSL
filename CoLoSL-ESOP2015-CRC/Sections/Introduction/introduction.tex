@@ -25,7 +25,7 @@ are correct, since their informal arguments are typically  kept local and do
 not bring the whole system into the reasoning.
 
 
-Rely-guarantee reasoning~\cite{rg} and various combinations of
+Rely-guarantee~\cite{rg} and various combinations of
 rely-guarantee and separation-logic
 reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
@@ -91,7 +91,7 @@ parts of the data structure, which cannot be directly expressed in the reasoning
 %and we would like directly express this
 %access  in
 %the reasoning. 
-The   static interference relation of a region 
+The   static interference   of a region 
  is defined when
 the region  is created and    is fixed throughout the entire lifetime of
 the region. However, 
@@ -119,7 +119,7 @@ library initially endowed with just an insert function. Current
 approaches cannot extend their reasoning to include a remove function,
 without having to prove the whole library again. In summary, disjoint
 regions with static interference are not always able to provide small
-specifications for concurrent programs, which can impede
+specifications for concurrent programs, impeding 
 compositionality.
 
 %. As such, upon its creation, provision
@@ -145,18 +145,22 @@ This paper introduces the program logic \colosl, which stands for
 \underline{L}ogic. \colosl's semantic model is based on one global
 shared state, and
 each thread is verified with respect to its partial {\em subjective view}
-of this global state. Each subjective (personalised) view comprises an assertion which
+of this global state. 
+Each subjective (personalised) view comprises an assertion which
 describes  \emph{parts} of the shared global resource used by a thread, 
 and an interference relation which describes   how the thread and
-the environment may affect these parts, thus enabling small
-specifications in the presence of concurrent behaviours.
+the environment may affect these parts. 
 Subjective views may arbitrarily overlap with
 each other, with both their resource and interference expanding and
 contracting  in accordance with what is required by the
 thread. Interestingly, this
 sometimes requires rewriting  the  interference relation so that 
 the interference on the smaller state captures the same 
-information as the interference on the bigger state. 
+information as the interference on the bigger state. This expansion
+and contraction of subjective views provides a kind of framing on a
+thread's shared state, giving rise to smaller specifications and hence
+more
+compositional reasoning about concurrent programs. 
 
 
 %\pgcomment{Not for here, section3:We give the main ideas behind the semantic model and the soundness of
@@ -168,17 +172,25 @@ information as the interference on the bigger state.
 We demonstrate \colosl reasoning on a range of examples.  The first
 example in \S\ref{sec:intuition} is Dijkstra's token-ring mutual
 exclusion algorithm~\cite{dijkstra74}. Regardless of the size of the
-ring, we are able to prove each thread in isolation, and the proved
-specification only mentions two of its neighbours. Thanks to this
-small specification, the proof can be largely reused when the
+ring, we are able to give a small specification to  each thread in
+isolation such that  each proof only mentions resource
+associated with two of its neighbours. This means that the proof can be largely reused when the
 implementation of the ring is changed to allow dynamic spawning of new
 participants.  In \S\ref{sec:examples}, we study two further
 examples. The first is a concurrent spanning tree algorithm for
 graphs, where threads are recursively spawned on potentially
-overlapping sub-graphs. We demonstrate that the flexible, overlapping
-subjective views of \colosl are just what we need. Finally, our proof
-of a concurrent set module implemented using a hand-over-hand
-list-locking algorithm improves over that of CAP significantly.
+overlapping subgraphs. We demonstrate that the flexible, overlapping
+subjective views of \colosl are just what we need. 
+The second is a concurrent set module implemented 
+using a hand-over-hand
+list-locking algorithm. Our \colosl reasoning  for this set module  improves
+on CAP reasoning (both the unnatural old style in ~\cite{.} and the more natural
+modern style introduced  in TaDA~\cite{.}) in that our small
+specifications can be dynamically extended to include other behaviour
+in future
+whereas the  static CAP interference  must predict all behaviour from the start. 
+
+
 
 Most of the technical details have been left out due to space
 constraints, and are provided in the appendix as well as in an
