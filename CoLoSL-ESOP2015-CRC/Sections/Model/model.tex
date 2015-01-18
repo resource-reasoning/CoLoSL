@@ -186,12 +186,17 @@ components and the resulting tuple is a well-formed world.
 \label{subsec:assertions}
 
 Our assertion language extends separation logic with \emph{subjective
-  views} and \emph{capability assertions}.  We assume an infinite set $\set{LVar}$ of \emph{logical variables}, disjoint from
-$\set{PVar}$.
+  views} and \emph{capability assertions}.
 
 \colosl is parametric in the assertions of machine states and
 capabilities and can be instantiated with any assertion language over
-machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions for machine state assertions, and single-token assertions of the form $[\token{a}]$ for capability assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
+machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
+use standard heap and stack assertions for machine state assertions,
+and single-token assertions of the form $[\token{a}]$ for capability
+assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$
+as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
+We assume an infinite set $\set{LVar}$ of \emph{logical variables},
+disjoint from $\set{PVar}$.
 
 \begin{definition}[Assertion syntax]\label{def:assertions}
 Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$, \emph{the assertions of \colosl}, $\Assertions$, are described by the grammars below:
@@ -399,6 +404,13 @@ assertions.
 %  \right\}
 \end{align*}
 \end{definition}
+
+Note that, as in the CAP family~\cite{cap-ecoop10,icap,tada}, \colosl
+cannot ensure that proved programs do not leak memory. This is because
+of the following property of the semantics with respect to the shared
+state (sometimes called ``intuitionistic semantics''~\cite{rey02}): if
+$(l,g,\lmod), \lenv |= P$ then $(l,g\circ g',\lmod), \lenv |= P$.
+
 
 Five of the principles of \fig\ref{fig:principles} are direct
 consequences of the semantics.

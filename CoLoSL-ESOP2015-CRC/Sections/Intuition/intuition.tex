@@ -507,12 +507,3 @@ In contrast, in existing approaches such as CAP~\cite{cap-ecoop10}, both $n$ and
 %% \]
 %% %
 %% That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in possession of all three $[\token{a}_{\small\li{x}}]$, $[\token{a}_{\small\li{y}}]$, $[\token{a}_{\small\li{z}}]$ capabilities in its local state can carry out $a_{\textsf{rem}}$. In doing so, the acting thread will remove the three cells from the shared state (and move them into its local state). In return, it must transfer the three locally held capabilities into the shared state. Note that after adding $a_{\textsf{rem}}$, the subjective views of all three threads remain stable since each thread locally holds one of the capabilities in $\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}$ and thus knows that the environment cannot carry out $a_{\textsf{rem}}$ (as it is missing at least one of the required capabilities). Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource transfer is common in \colosl actions. In general, resources that only appear on the left hand side of $\swap$ indicate their removal from the shared state (and their addition to the thread's local state); dually, resources that only appear on the right hand side of $\swap$ denote their transfer to the shared state (from the thread's local state).
-\julescomment{Move the below to next section.}
-
-We also note that, as in the CAP family~\cite{cap-ecoop10,icap,tada}, \colosl
-cannot ensure that proved programs do not leak memory. Indeed, one may
-at any point of a proof stash leaked resources into a new subjective
-view, then weaken the resulting assertion to remove that view from the
-current state, rendering the leak invisible as far as the proof system
-is concerned.
-
