@@ -246,23 +246,78 @@ accompanying technical report~\cite{colosl-tr14}.
 %Then, the view can be weakened to just the resources and possibly strengthened actions appropriate to  the thread. The strengthened actions retain  some global information despite the weakened view. 
 
 
-\pgcomment{Not touched related work} 
 
 \paragraph{Related work}
 
---------------
+Jones' rely-guarantee reasoning~\cite{rg} provided a breakthrough in
+compositional reasoning about concurrent programs. It described
+permitted interferences between threads using global rely and
+guarantee relations on one  global shared state. This work is
+compositional in the sense that the guarantee of one thread is the
+rely of another. However, O'Hearn, Reynolds and
+Yang~\cite{seplogicsmallaxiomspaper,CSL} demonstrated that, for the
+reasoning to scale, it is important to work with small specifications
+based on local and shared state rather than working with one
+global state. In particular, O'Hearn~\cite{CSL} introduced concurrent
+separation logic based on thread-local state and static invariant
+shared regions.
 
-Jones' rely-guarantee reasoning~\cite{rg} provided a
-breakthrough in compositional reasoning about concurrent programs. It
-describes permitted interferences between threads using rely and
-guarantee conditions: the current thread guarantees that it will only
-interfere in ways described by the guarantee relation; it relies on
-the other threads (the environment) to interfere only  in ways
-described by the rely relation. However, the original work is based on
-first-order logic for reasoning aboutn
-a single global heap. O'Hearn and Reynold's
-work on separation logic~\cite{2001poplandjohn'ssurvey} demonstrated that such reasoning is not
-fully compositional and does not scale. 
+
+Since then, there has been much recent work on compositional
+reasoning about fine-grained concurrent algorithms. Vafeiadis and
+Parkinson~\cite{RGSep} combined rely-guaranteee reasoning with
+separation logic, with the state split into thread-local state and
+disjoint shared regions, and global rely-guarantee relations providing
+the interference on these regions. 
+CAP reasoning~\cite{.} increased  compositionality by, instead of the
+global
+rely-guarantee relations, having static interference relations
+associated with the disjoint shared regions and guards in the local
+state for dynamically controlling the permitted  interference, and concurrent
+abstract predicates for hiding implementation details. Several
+program logics have adapted this work to incorporate more
+abstraction~\cite{carosel}, higher-order features~\cite{icap} and more flexible
+guards~\cite{tada}. We believe that all  this work has  limited composition
+reasoning in the sense that it is only possible to frame off local
+state and unused shared regions. It is not possible to 
+frame within regions nor frame inside the interference
+relations.  (It is, of course, possible to weaken the region assertion
+by the logical implication $P * Q \Rightarrow P * \texttt{true}$, but this is
+not the same as being able to shrink regions and their interference to
+just work with $P$.) 
+
+\pgcomment{What do we want to say about deny-guarantee? Does
+  deny-guarantee have static regions with interference? I know CAP
+  adapted interference lots, but I don't know if we swere the first to
+  introduce it}
+
+Meanwhile, a different breakthrough  in compositionality  came from
+Feng's local rely-guarantee (LRG)  reasoning~\cite{lrg}. The LRG model
+comprises  one global shared state,
+with assertions describing {\em parts} of the global shared state used by a
+thread and  global rely-guarantee
+relations for determining how the thread and environment can affect
+these parts. 
+
+
+wherein the shared state may be
+split into completely independent pieces, thus partially solving the
+first problem outlined above. This provides a way to frame off parts
+of the shared state but, as noted by its author, the strong
+disjointness restrictions make this applicable only at the level of
+disjoint modules in the code. 
+
+
+
+
+
+Finally, Subjective Concurrent Separation Logic (SCSL)~\cite{SCSL}
+uses \emph{subjective auxiliary states}, similar in spirit to our
+subjective views for the shared state, to reason about \emph{coarse-grained}
+concurrency. As noted by its authors, while CAP (and by design \colosl) can
+be employed to reason about their studied examples, SCSL cannot be
+used to reason about the fine-grained concurrency scenarios that \colosl tackles.
+
 
 \subsection{Related work bullet points} 
 \begin{itemize}
@@ -328,41 +383,3 @@ fully compositional and does not scale.
 		\end{enumerate}
 \end{itemize}
 ------------
-
-\subsection{Old Related Work}
-\colosl stems from a long lineage of program logics for shared-memory
-concurrency, dating back to the Owicki-Gries logic~\cite{owicki}, each of
-which made substantial advances in fine-grained compositional
-reasoning about more and more complex concurrent programs. As noted by
-Jones, and motivating his definition of rely-guarantee~\cite{rg},
-Owicki-Gries's system is fundamentally non-compositional as assertions
-at each program point in each thread have to be checked against every
-instruction of every other thread. While rely-guarantee addresses
-this concern by summarising potential interferences in terms of rely
-and guarantee conditions, its model of the shared state is global,
-even encompassing the threads' private state. Later techniques
-combined rely-guarantee with separation logic, starting with
-RGSep~\cite{viktor-marriage}, which separates private (local) and
-shared state, allowing further compositionality. However, the view of
-the shared state and interference on it is still globally shared
-across threads. 
-
-The next breakthrough as far as compositionality is
-concerned came from LRG~\cite{lrg}, wherein the shared state may be
-split into completely independent pieces, thus partially solving the
-first problem outlined above. This provides a way to frame off parts
-of the shared state but, as noted by its author, the strong
-disjointness restrictions make this applicable only at the level of
-disjoint modules in the code. Independently from LRG, the reasoning
-framework of CAP~\cite{cap-ecoop10}
-and its extended variants~\cite{icap,tada} introduced the notion
-of \emph{regions} of the shared state. Much like LRG, the division into
-regions is only possible for entirely disjoint pieces of state, with
-fixed and disjoint interference relations.
-
-Finally, Subjective Concurrent Separation Logic (SCSL)~\cite{SCSL}
-uses \emph{subjective auxiliary states}, similar in spirit to our
-subjective views for the shared state, to reason about \emph{coarse-grained}
-concurrency. As noted by its authors, while CAP (and by design \colosl) can
-be employed to reason about their studied examples, SCSL cannot be
-used to reason about the fine-grained concurrency scenarios that \colosl tackles.
