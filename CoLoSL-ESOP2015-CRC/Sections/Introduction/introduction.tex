@@ -246,138 +246,125 @@ accompanying technical report~\cite{colosl-tr14}.
 
 
 \paragraph{Related work}
-
-Jones' rely-guarantee reasoning~\cite{rg} provided a breakthrough in
+Jones's rely-guarantee reasoning~\cite{rg} provided a breakthrough in
 compositional reasoning about concurrent programs. It described
 permitted interferences between threads using global rely and
 guarantee relations on one  global shared state. This work is
 compositional in the sense that the guarantee of one thread is the
 rely of another. However, O'Hearn, Reynolds and
-Yang~\cite{seplogicsmallaxiomspaper,CSL} demonstrated that, for the
+Yang~\cite{o2001local} demonstrated that, for the
 reasoning to scale, it is important to work with small specifications
 based on local and shared state rather than working with one
-global state. In particular, O'Hearn~\cite{CSL} introduced concurrent
+global state. In particular, O'Hearn~\cite{csl-tcs} introduced concurrent
 separation logic based on thread-local state and static invariant
 shared regions.
 
 
 Since then, there has been much recent work on compositional
 reasoning about fine-grained concurrent algorithms. Vafeiadis and
-Parkinson~\cite{RGSep} combined rely-guaranteee reasoning with
+Parkinson~\cite{viktor-marriage} combined rely-guaranteee reasoning with
 separation logic, with the state split into thread-local state and
 disjoint shared regions, and global rely-guarantee relations providing
 the interference on these regions. 
-CAP reasoning~\cite{.} increased  compositionality by, instead of the
+CAP reasoning~\cite{cap-ecoop10} increased  compositionality by, instead of the
 global
 rely-guarantee relations, having static interference relations
 associated with the disjoint shared regions and guards in the local
 state for dynamically controlling the permitted  interference, and concurrent
 abstract predicates for hiding implementation details. Several
 program logics have adapted this work to incorporate more
-abstraction~\cite{carosel}, higher-order features~\cite{icap} and more flexible
-guards~\cite{tada}. We believe that all  this work has  limited composition
+abstraction~\cite{caresl}, higher-order features~\cite{icap} and more flexible
+guards~\cite{tada}. We believe that all  this work has  limited compositional
 reasoning in the sense that it is only possible to frame off local
 state and unused shared regions. It is not possible to 
 frame within regions nor frame inside the interference
 relations.  (It is, of course, possible to weaken the region assertion
 by the logical implication $P * Q \Rightarrow P * \texttt{true}$, but this is
 not the same as being able to shrink regions and their interference to
-just work with $P$.) 
+just work with $P$.)
 
-\pgcomment{What do we want to say about deny-guarantee? Does
-  deny-guarantee have static regions with interference? I know CAP
-  adapted interference lots, but I don't know if we swere the first to
-  introduce it}
+Meanwhile, a different breakthrough in compositionality came from
+Feng's local rely-guarantee (LRG) reasoning~\cite{lrg}. The LRG model
+comprises one global shared state, with assertions describing {\em
+  parts} of the global shared state used by a thread and global
+rely-guarantee relations for determining how the thread and
+environment can affect these parts. The various shared parts have to
+be disjoint in the regions of memory they described, and interference
+must be confined to individual regions. LRG thus provides a way to
+frame off parts of the shared state but, as noted by its author, the
+strong disjointness restrictions make this applicable only at the
+level of disjoint modules in the code.
 
-Meanwhile, a different breakthrough  in compositionality  came from
-Feng's local rely-guarantee (LRG)  reasoning~\cite{lrg}. The LRG model
-comprises  one global shared state,
-with assertions describing {\em parts} of the global shared state used by a
-thread and  global rely-guarantee
-relations for determining how the thread and environment can affect
-these parts. 
-
-
-wherein the shared state may be
-split into completely independent pieces, thus partially solving the
-first problem outlined above. This provides a way to frame off parts
-of the shared state but, as noted by its author, the strong
-disjointness restrictions make this applicable only at the level of
-disjoint modules in the code. 
+Finally, subjective concurrent separation logic
+(SCSL)~\cite{scsl-esop14} introduces concurroids, which are similar in
+granularity to CAP's regions, and uses \emph{subjective auxiliary
+  states}. In SCSL, subjectivity refers to the fact that each
+concurroid describes resource held either by the current thread or by
+its environment.
 
 
 
+%% \subsection{Related work bullet points} 
+%% \begin{itemize}
+%% 	\item Rely-Guarantee
+%% 		\begin{enumerate}
+%% 			\item State = one global shared state (no thread-local state)
+%% 			\item Interference defined as the union of the actions of the thread (guarantee) and the environment (rely)
+%% 			\item No composition on the state (state is always global - can't frame anything)
+%% 			\item No composition on the interference (R, G are global interference is always global)
+%% 			\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
+%% 		\end{enumerate}
+%% %
+%% %
 
+%% 		\item RGSep
+%% 			\begin{enumerate}
+%% 				\item Combines RG with separation logic
+%% 				\item State = thread local state + shared state. Shared state divided into regions
+%% 				\item Composition on the thread-private resource (using *)
+%% 				\item Limited composition on the shared resource and its interference: You can frame at the region level; granularity of frame is pre-determined and is at region level; you can frame off regions and their interference, but you can't frame within region resources or within region interferences (you can of course weaken the resource by rewriting $\shared{P*Q}{}$ as $\shared{P*true}{}$) 
+%% 				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference (rely/guarantee)
+%% 				\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
+%% 			\end{enumerate}
+%% %
+%% %
 
-Finally, Subjective Concurrent Separation Logic (SCSL)~\cite{SCSL}
-uses \emph{subjective auxiliary states}, similar in spirit to our
-subjective views for the shared state, to reason about \emph{coarse-grained}
-concurrency. As noted by its authors, while CAP (and by design \colosl) can
-be employed to reason about their studied examples, SCSL cannot be
-used to reason about the fine-grained concurrency scenarios that \colosl tackles.
+%% 		\item LRG
+%% 			\begin{enumerate}
+%% 				\item State = one shared resource
+%% 				\item Limited composition on the resource and interference (using *): one can always de-compose and frame off \emph{disjoint} resources and their disjoint interference (the R and the G); more flexible than RGSep in that there is no notion of regions and thus frames are not pre-determined; you can frame off as much as you like as long as they are disjoint; this is achieved by precise fences (invariants)
+%% 				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference (rely/guarantee)
+%% 				\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
+%% 			\end{enumerate}
+%% %
+%% %
 
+%% 		\item CAP Family
+%% 			\begin{enumerate}
+%% 				\item State = thread-local resource + bunch of regions; region = resource + interference; attached to each region is an interference relation
+%% 				\item Composition on the thread-private resource (using *)
+%% 				\item Limited composition on the shared resource and its interference: You can frame at the region level; granularity of frame is pre-determined and is at region level; you can frame off regions and their interference, but you can't frame within region resources or within region interferences (you can of course weaken the resource by rewriting $\shared{P*Q}{}$ as $\shared{P*true}{}$) 
+%% 				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference
+%% 				\item Dynamic interference;  interference defined in terms of actions associated with capabilities; borrowing techniques from deny-guarantee reasoning, it uses a combination of capabilities and the interference to temporarily block/enable actions
+%% 				\item Added abstraction through abstract predicates
+%% 			\end{enumerate}
+%% %
+%% %
 
-\subsection{Related work bullet points} 
-\begin{itemize}
-	\item Rely-Guarantee
-		\begin{enumerate}
-			\item State = one global shared state (no thread-local state)
-			\item Interference defined as the union of the actions of the thread (guarantee) and the environment (rely)
-			\item No composition on the state (state is always global - can't frame anything)
-			\item No composition on the interference (R, G are global interference is always global)
-			\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
-		\end{enumerate}
-%
-%
-
-		\item RGSep
-			\begin{enumerate}
-				\item Combines RG with separation logic
-				\item State = thread local state + shared state. Shared state divided into regions
-				\item Composition on the thread-private resource (using *)
-				\item Limited composition on the shared resource and its interference: You can frame at the region level; granularity of frame is pre-determined and is at region level; you can frame off regions and their interference, but you can't frame within region resources or within region interferences (you can of course weaken the resource by rewriting $\shared{P*Q}{}$ as $\shared{P*true}{}$) 
-				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference (rely/guarantee)
-				\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
-			\end{enumerate}
-%
-%
-
-		\item LRG
-			\begin{enumerate}
-				\item State = one shared resource
-				\item Limited composition on the resource and interference (using *): one can always de-compose and frame off \emph{disjoint} resources and their disjoint interference (the R and the G); more flexible than RGSep in that there is no notion of regions and thus frames are not pre-determined; you can frame off as much as you like as long as they are disjoint; this is achieved by precise fences (invariants)
-				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference (rely/guarantee)
-				\item Interference is static: you can't temporarily block (enable) certain threads from doing certain actions
-			\end{enumerate}
-%
-%
-
-		\item CAP Family
-			\begin{enumerate}
-				\item State = thread-local resource + bunch of regions; region = resource + interference; attached to each region is an interference relation
-				\item Composition on the thread-private resource (using *)
-				\item Limited composition on the shared resource and its interference: You can frame at the region level; granularity of frame is pre-determined and is at region level; you can frame off regions and their interference, but you can't frame within region resources or within region interferences (you can of course weaken the resource by rewriting $\shared{P*Q}{}$ as $\shared{P*true}{}$) 
-				\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their interference
-				\item Dynamic interference;  interference defined in terms of actions associated with capabilities; borrowing techniques from deny-guarantee reasoning, it uses a combination of capabilities and the interference to temporarily block/enable actions
-				\item Added abstraction through abstract predicates
-			\end{enumerate}
-%
-%
-
-		\item FCSL (concurroids)
-		\begin{enumerate}
-			\item State = a bunch of concurroids associated with labels (like regions in cap); e.g. a lock concurroid; a designated  concurroid labelled \textsf{priv} for thread local resources
-			\item Concurroid = resource + transitions
-			\item The resources held by concurroids are disjoint from one another (like regions of CAP)
-			\item Each concurroid has an associated PCM type (Partial commutative monoid)  that describe the type of concurroid resource; e.g. a heap + ghost resource
-			\item A concurroid has three parts: the joint part (j), the self part(s) and the other part (o) and this is what subjectivity refers to
-			\item Concurroids are very much like regions of CAP; so everything we said about resource and interference composition is also valid here:		
-			\item  Limited composition on the shared resource and its interference like in CAP: You can frame at the concurroid level; granularity of frame is pre-determined and is at concurroid level; you can frame off concurroids and their transitions, but you can't frame within concurroid resources or within concurroid transitions 
-			\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their transitions
-			\item Direct ``communication" (resource transfer) between concurroids (through dangling external transitions); unlike CAP where communication between regions was done through the thread-local state; in \colosl there is no regions, you can communicate between two subjective views by combining them using the \mergeRule principle
-			\item Subjectivity in this world refers to the fact that each concurroid describes what parts of the concurroid resources are held by both the thread and its environment (the self and other component)
-			\item In \colosl subjectivity refers to the fact that different threads may see different (but compatible) parts of the shared state subject to different (but compatible) interference according to their needs. 
-			\item Subjective views in \colosl can overlap; in FCSL, the self and other component (the subjective parts) are disjoint
-		\end{enumerate}
-\end{itemize}
-------------
+%% 		\item FCSL (concurroids)
+%% 		\begin{enumerate}
+%% 			\item State = a bunch of concurroids associated with labels (like regions in cap); e.g. a lock concurroid; a designated  concurroid labelled \textsf{priv} for thread local resources
+%% 			\item Concurroid = resource + transitions
+%% 			\item The resources held by concurroids are disjoint from one another (like regions of CAP)
+%% 			\item Each concurroid has an associated PCM type (Partial commutative monoid)  that describe the type of concurroid resource; e.g. a heap + ghost resource
+%% 			\item A concurroid has three parts: the joint part (j), the self part(s) and the other part (o) and this is what subjectivity refers to
+%% 			\item Concurroids are very much like regions of CAP; so everything we said about resource and interference composition is also valid here:		
+%% 			\item  Limited composition on the shared resource and its interference like in CAP: You can frame at the concurroid level; granularity of frame is pre-determined and is at concurroid level; you can frame off concurroids and their transitions, but you can't frame within concurroid resources or within concurroid transitions 
+%% 			\item Threads can't have arbitrary compatible but overlapping (in the $**$ sense) views of the shared resources and their transitions
+%% 			\item Direct ``communication" (resource transfer) between concurroids (through dangling external transitions); unlike CAP where communication between regions was done through the thread-local state; in \colosl there is no regions, you can communicate between two subjective views by combining them using the \mergeRule principle
+%% 			\item Subjectivity in this world refers to the fact that each concurroid describes what parts of the concurroid resources are held by both the thread and its environment (the self and other component)
+%% 			\item In \colosl subjectivity refers to the fact that different threads may see different (but compatible) parts of the shared state subject to different (but compatible) interference according to their needs. 
+%% 			\item Subjective views in \colosl can overlap; in FCSL, the self and other component (the subjective parts) are disjoint
+%% 		\end{enumerate}
+%% \end{itemize}
+%% ------------
