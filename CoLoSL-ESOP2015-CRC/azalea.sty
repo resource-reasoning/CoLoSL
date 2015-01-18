@@ -267,8 +267,9 @@
 %\newcommand{\containedIn}{\prec}
 \newcommand{\containedIn}{\subseteq}
 \newcommand{\reifyW}[1]{\left\lfloor #1 \right\rfloor_{\set{W}}}
-
-\newcommand{\grey}{\mathbin{{\color{gray}\ensuremath{\bullet}}}}
+%
+\definecolor{grey}{gray}{0.55}
+\newcommand{\grey}{\mathbin{{\color{grey}\ensuremath{\bullet}}}}
 
 %%%%Action Models
 \newcommand{\AMods}{\set{AMod}}
@@ -557,7 +558,7 @@
 
 \newcommand{\iterStar}{\scalebox{1.5}{$\oast$}}
 
-\definecolor{grey}{rgb}{0.8, 0.8, 0.8}
+%\definecolor{grey}{rgb}{0.8, 0.8, 0.8}
 \newcommand{\shade}[1]{\colorbox{grey}{$#1$}}
 
 % floats

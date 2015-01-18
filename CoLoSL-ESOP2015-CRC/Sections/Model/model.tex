@@ -35,7 +35,7 @@ during the entire lifetime of a thread represents its guarantee
 corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between a thread and its
-environment just like any other resource. See the presentation of
+environment just like any other resource to temporarily block (enable) certain actions. See the presentation of
 deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
 and motivation.
 
@@ -92,7 +92,7 @@ The local and global logical states of a world are always
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively. We write $g$ to range over logical states representing shared (global) states. The empty logical state
+We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively and write $l_{\textsf{M}}$ for $(@s, h)$. We write $g$ to range over logical states representing shared (global) states. The empty logical state
 $(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
 write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
@@ -186,12 +186,17 @@ components and the resulting tuple is a well-formed world.
 \label{subsec:assertions}
 
 Our assertion language extends separation logic with \emph{subjective
-  views} and \emph{capability assertions}.  We assume an infinite set $\set{LVar}$ of \emph{logical variables}, disjoint from
-$\set{PVar}$.
+  views} and \emph{capability assertions}.
 
 \colosl is parametric in the assertions of machine states and
 capabilities and can be instantiated with any assertion language over
-machine states $\Heaps$ and capabilities $\Caps$. In this paper, we use standard heap and stack assertions for machine state assertions, and single-token assertions of the form $[\token{a}]$ for capability assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$ as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
+machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
+use standard heap and stack assertions for machine state assertions,
+and single-token assertions of the form $[\token{a}]$ for capability
+assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$
+as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
+We assume an infinite set $\set{LVar}$ of \emph{logical variables},
+disjoint from $\set{PVar}$.
 
 \begin{definition}[Assertion syntax]\label{def:assertions}
 Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$, \emph{the assertions of \colosl}, $\Assertions$, are described by the grammars below:
@@ -200,7 +205,7 @@ Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token
   A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x} \harpoonything E \mid E_1 |-> E_2 \mid [E]\\
   \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
   \Assertions \ni P,Q & ::= \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P ** Q \mid \shared{P}{I}  \\
-  I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}{R}\} \cup I
+  I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}\} \cup I
   \quad
   E ::= x \mid \token a \mid E_1 + E_2 \!\mid\! \cdots
 \end{align*}
@@ -209,10 +214,10 @@ Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token
 As in RGSep~\cite{viktor-marriage}, we distinguish between
 \emph{local assertions} in $\LAssertions$ and assertions in
 $\Assertions$. For simplicity, assertions do not include negation or
-magic-wand; these are reserved to local assertions. The syntax of
+magic-wand; these are reserved for local assertions. The syntax of
 assertions follows from standard separation logic with variables-as-resource~\cite{variablesAsResource} (note that expressions $E$ do not
 allow program variables), with the exception of the subjective views
-$\shared P I$.  Machine state and capability assertions are
+$\shared P I$.  Machine and capability assertions are
 interpreted over a world's local state: $\li{x} \harpoonything E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
@@ -235,8 +240,7 @@ shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
 $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write as
-$\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
-of space; it can be found in~\cite{colosl-tr14}:
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$:
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -248,7 +252,8 @@ of space; it can be found in~\cite{colosl-tr14}:
 %	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
 
-The semantics of \colosl assertions is given by a forcing relation
+We refer to the above agreement between the action model and subjective views as the \emph{action model closure property}. We omit its definition for lack
+of space; it can be found in~\cite{colosl-tr14}. The semantics of \colosl assertions is given by a forcing relation
 $w,\lenv|= P$ between a world $w$, a logical environment
 $\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing
 relations. The first one $l,\lenv\slsat p$ interprets local assertions
@@ -294,7 +299,7 @@ assertions.
   \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}
 \end{array}
 \]
-\vspace{-3.3ex}
+\vspace{-3.0ex}
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   s, \lenv &|=_{g,\lmod} \lass{P} &\text{iff}& s, \lenv \slsat \lass{P}\\
@@ -375,11 +380,12 @@ assertions.
 \semI[\lenv]{I}(\token{A}) &==
   \left\{
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
-    (p, q, c)&
+    (p, q, c )&
     \begin{array}{@{}l@{}}
-      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod} \\
-      \quad p, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
-      /| q, [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
+      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod, r, r'} \\
+      \quad c = r \composeL r' \land \for{l} l \leq p \land l \leq q \implies l = \unitL\\
+      \quad p \composeL r, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
+      /| q \composeL r,  [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
     \end{array}
   \end{array}
   \right\}
@@ -398,6 +404,13 @@ assertions.
 %  \right\}
 \end{align*}
 \end{definition}
+
+Note that, as in the CAP family~\cite{cap-ecoop10,icap,tada}, \colosl
+cannot ensure that proved programs do not leak memory. This is because
+of the following property of the semantics with respect to the shared
+state (sometimes called ``intuitionistic semantics''~\cite{rey02}): if
+$(l,g,\lmod), \lenv |= P$ then $(l,g\circ g',\lmod), \lenv |= P$.
+
 
 Five of the principles of \fig\ref{fig:principles} are direct
 consequences of the semantics.
@@ -808,8 +821,32 @@ The first three rules of \fig\ref{fig:shifting-rules} allow one to
 check shifting piecewise: one may weaken the assertion $P$ into
 a local assertion $\lass{F}$ which, if it \emph{fences} $I_1\cup I_2$, can be used to
 reduce a shifting judgement $I \cup I_1 \weakenI{\fenceAss{}} I \cup
-I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. To check whether
-an assertion $\lass{F}$ fences an interference assertion $I$, written
+I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. 
+The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
+shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
+have the same effect on $\lass{F}$ after an arbitrary number of action
+applications. In particular, this is the case when $\lass{F}\fences I\cup
+I_1$, i.e.\ $\lass{F}$ is an \emph{invariant} of the shared region
+under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
+I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
+view of $\lass{F}$.
+
+The next two rules describe situations where an action is irrelevant
+to a particular assertion $\lass{F}$: when the effect of the action is
+entirely outside of $\lass{F}$, or when it is impossible to apply the
+action to $\lass{F}$. The next rule is an equivalence that uses the
+knowledge embodied by $\lass{F}$ of all the possible states that the
+subjective shared state may be in to rewrite an action into an equivalent
+one. More precisely, if whenever the precondition $\lass{P}$ of the
+action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
+also true, then it is safe to add $\lass{R}_i$ as a neutral part of
+the action (the fact that $\lass{R}_i$ is exact guarantees that no
+piece of state in $\lass{R}_i$ is mutated by the ``larger'' action)
+without changing the set of states in which the action can be
+applied. The last shifting equivalence is straightforward. Note that
+$\m{true}$ fences any interference assertion.
+
+To check whether an assertion $\lass{F}$ fences an interference assertion $I$, written
 $\lass{F}\fences I$, the last three rules of the figure are similar to those for local
 fencing and provide rules to apply to each action of $I$. 
 \begin{enumerate}
@@ -838,29 +875,9 @@ fencing and provide rules to apply to each action of $I$.
   we could end up with an assertion $\shared{\lass{F}}{I}$ that does
   not satisfy the action closure property.
 \end{enumerate}
-The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
-shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
-have the same effect on $\lass{F}$ after an arbitrary number of action
-applications. In particular, this is the case when $\lass{F}\fences I\cup
-I_1$, i.e.\ $\lass{F}$ is an \emph{invariant} of the shared region
-under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
-I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
-view of $\lass{F}$.
 
-The next two rules describe situations where an action is irrelevant
-to a particular assertion $\lass{F}$: when the effect of the action is
-entirely outside of $\lass{F}$, or when it is impossible to apply the
-action to $\lass{F}$. The next rule is an equivalence that uses the
-knowledge embodied by $\lass{F}$ of all the possible states that the
-subjective shared state may be in to rewrite an action into an equivalent
-one. More precisely, if whenever the precondition $\lass{P}$ of the
-action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
-also true, then it is safe to add $\lass{R}_i$ as a neutral part of
-the action (the fact that $\lass{R}_i$ is exact guarantees that no
-piece of state in $\lass{R}_i$ is mutated by the ``larger'' action)
-without changing the set of states in which the action can be
-applied. The last shifting equivalence is straightforward. Note that
-$\m{true}$ fences any interference assertion.
+
+
 
 
 \paragraph{Stability}
@@ -1213,7 +1230,7 @@ $F$.
 
 Soundness of \colosl has been established parametrically in the
 underlying models of machine states ($\Heaps$ ) and capabilities ($\Caps$), as an instance of the Views framework~\cite{views}. The
-details may be found in the accompanying technical
+details can be found in the accompanying technical
 report~\cite{colosl-tr14}. The main part of the proof is to establish
 the soundness of the following rule for atomic commands, where
 $\entails_{\textsf{SL}}$ represents standard sequential separation
@@ -1234,8 +1251,8 @@ satisfies $\lass{P}$ is exchanged for one satisfying $\lass{Q}$, there
 is $\lmod'$ and a splitting of the resulting logical state into a
 local $l'$ and shared part $g'$ such that $(l',g',\lmod')$ satisfies
 $Q$. Moreover, going from $(l,g,\lmod)$ to $(l',g',\lmod')$ can be
-achieved via a succession of 1) updates in accordance with $\lmod$, 2)
-valid extension steps and 3) valid shifting steps. A similar semantic
+achieved via a succession of 1) updates in accordance with $\lmod$; and 2)
+valid extension steps . A similar semantic
 condition for atomic commands is required in the frameworks from the
 CAP family~\cite{cap-ecoop10,icap,tada}. Formal definitions can be
 found in~\cite{colosl-tr14}. 
@@ -1249,8 +1266,7 @@ a concrete state in \Heaps.
 
 \begin{definition}[Reification]\label{def:reification}
   The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
-  defined as follows, where \heapPart{l'} denotes the first projection
-  of the pair $l'$:
+  defined as:
   \[
   \reifyW{(l, g, \lmod)} \eqdef \heapPart{(l \composeL g)}
   \]

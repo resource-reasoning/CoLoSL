@@ -314,15 +314,16 @@ which is now too imprecise for our purposes:\vspace{-3pt}
 To remedy this, we have to step back and think again at the level of
 the whole algorithm. As the programmer knows, the situation above
 cannot happen as $x{-}2$ can only be at most one ahead of $x$ itself.
-We can thus replace $S_x$ by $S'_x$ and give a stronger precondition that captures just
-what we want, as in \fig\ref{fig:concurrentInc}. The proof of
-$\li{slave(x)}$ is now relatively straightforward. By inspection (or
-using the rules of \S\ref{subsec:prules}), the invariant of the while
-loop and the postcondition are also stable. The atomic section performs
-action $s_x$ (temporarily ``opening the box'', i.e.\ transferring
-shared resources into the local state to perform the update) and
-preserves the invariant.  The final postcondition of $\li{slave(x)}$
-follows from the invariant and the boolean expression of the loop.
+We can thus replace $S_x$ by $S'_x$ and give a stronger stable
+precondition that captures just what we want, as in
+\fig\ref{fig:concurrentInc}. The proof of $\li{slave(x)}$ is now
+relatively straightforward. By inspection (or using the rules of
+\S\ref{subsec:prules}), the invariant of the while loop and the
+postcondition are also stable. The atomic section performs action
+$s_x$ (temporarily ``opening the box'', i.e.\ transferring shared
+resources into the local state to perform the update) and preserves
+the invariant.  The final postcondition of $\li{slave(x)}$ follows
+from the invariant and the boolean expression of the loop.
 
 \paragraph{The ring}
 The proof sketches of the foreman (first slave) and master threads are
@@ -352,14 +353,14 @@ thread running \li{slave(x+2)} gets $[\token{s}_{x{+}2}] *
 \li{slave(x+2)} just yet. Using the principles given
 in \fig\ref{fig:principles}, we can weaken the assertion as such:
 \begin{align*}
-  \shared{P}{I}
-  &\stackrel{(\shiftRule)}{=>}
-  \shared{P}{\{m_x, s'_{x{+}1}, s_{x{+}2}\}} \\[-5pt]
-  &\stackrel{(\forgetRule)}{=>}
+  &\shared{P}{I}
+  \stackrel{(\shiftRule)}{=>}
+  \shared{P}{\{m_x, s'_{x{+}1}, s_{x{+}2}\}}
+  \stackrel{(\forgetRule)}{=>}
   \shared{\cell{x{+}1}{0} * \cell{x{+}2}{0}}{\{m_x, s'_{x{+}1}, s_{x{+}2}\}} \\[-5pt]
   &\stackrel{(\shiftRule)}{=>}
-  \shared{\cell{x{+}1}{0} * \cell{x{+}2}{0}}{S'_{x{+}2}} \\[-5pt]
-  &\stackrel{(\weakenRule)}{=>}
+  \shared{\cell{x{+}1}{0} * \cell{x{+}2}{0}}{S'_{x{+}2}}
+  \stackrel{(\weakenRule)}{=>}
   \shared{\cell{x{+}2}{0} * (\cell{x{+}1}{0} \lor \cell{x{+}1}{1})}{S'_{x{+}2}}
 \end{align*}
 
@@ -369,21 +370,19 @@ us to replace $I$ with any interference relation $I'$ that has the
 same observable effect as far as the subjective assertion $P$ of the
 subjective view is concerned (written $I \weakenI{P} I'$). In this
 instance, actions $s_{x{+}2}$ and $s'_{x{+}2}$ have the same effect
-according to $P$: as the programmer knows, whenever the value of
-$x{+}1$ is greater than $x{+}2$ by 1, then $x$ is also greater than
-$x{+}2$ by 1 (and is equal to $x$). As such, rewriting $s_{x{+}1}$ as
-$s'_{x{+}2}$ does not alter its behaviour and merely reflects stronger
-knowledge about how $x{+}2$ and $x$ are related through $x{+}1$. In
-particular, $I\weakenI{P} \{m_{x}, s'_{x{+}2}, s_{x{+}2}\}$ as
-required.
+according to $P$, as discussed in the proof of \li{slave(x)}. As such,
+rewriting $s_{x{+}1}$ as $s'_{x{+}2}$ does not alter its behaviour and
+merely reflects stronger knowledge about how $x{+}2$ and $x$ are
+related through $x{+}1$. In particular, $I\weakenI{P} \{m_{x},
+s'_{x{+}2}, s_{x{+}2}\}$ as required.
 
 Next, because subjective views only describe \emph{parts} of the
 shared state, we can use the \forgetRule principle to obtain a weaker
 view of the shared state, in this case a view that ignores the cell at
 address $x$.  With $x$ out of scope, the action $m_{x}$ no longer has
-observable effects on the new assertion as it leaves other cells
-unchanged. We can thus apply the \shiftRule principle again to rid the
-interference of $m_{x}$ and get $S'_{x{+}2}$.
+observable effects on the assertion, since it mutates only the cell at
+address $x$. We can thus apply the \shiftRule principle again to rid
+the interference of $m_{x}$ and get $S'_{x{+}2}$.
 
 Finally, we weaken the resulting subjective view so that it is stable
 with respect to $S'_{x{+}2}$, i.e.\ preserved by those of its actions
@@ -423,27 +422,35 @@ the shared state (and their addition to the thread's local state);
 dually, resources that only appear on the right hand side of $\swap$
 denote their transfer to the shared state (from the thread's local
 state).
-%
+
 \paragraph{Small specifications and proof reuse}
 Our expansion and
 contraction of subjective views, in particular with shifting of
 interference assertions in key places, enables us to confine the
 specification and verification of each thread to just the resources
-they need. This is not possible in existing frameworks. At first glance, the benefits of a small specification may not be obvious. However, as we shortly demonstrate small
-specifications make proofs robust against changes to each thread's
-environment, and provide more opportunities for \emph{proof reuse}.
+they need. Such small specifications make proofs robust against changes to each thread's
+environment, and provide more opportunities for proof reuse.
 % For
 %instance, our proof of the ring straightforwardly generalises to $n$
 %slave threads, without needing to reprove \li{master} or \li{slave} at
 %all. 
 
-For instance, let us now modify the code of \li{ring(x)} in line~3 by forking an additional thread that dynamically grows the ring by spawning more slave threads (we leave the details to the accompanying technical report). In the general case of growing the ring of size $n$, we use an instance of the \extendRule principle as follows in order to add a new slave (at $x{+}n{+}1$) to the shared state. In doing so, we also define the new slave's associated interference and accompanying capability. \vspace{0pt}
-%
+For instance, let us now modify the code of \li{ring(x)} in line~3 by
+forking an additional thread that dynamically grows the ring by
+spawning more slave threads (we leave the details to the accompanying
+technical report). When the ring has size
+$n$, we use an instance of the \extendRule principle as follows in
+order to add a new slave (at $x{+}n{+}1$) to the shared state. In
+doing so, we also define the new slave's associated interference and
+accompanying capability.
 \begin{align*}
-	\cell{(x{+}n{+}1)}{v} \semimplies [\token{s}_{x{+}n{+}1}] * \shared{(\cell{x{+}n{+}1)}{v}}{\{s_{x{+}n{+}1}\}} \\[-20pt]
+  \cell{(x{+}n{+}1)}{v} \semimplies \exsts{\token{s}_{x{+}n{+}1}}[\token{s}_{x{+}n{+}1}] * \shared{\cell{x{+}n{+}1}{v}}{\{s_{x{+}n{+}1}\}}
 \end{align*}
-%
-With this modified code, our proof changes only minimally: the proof of \li{master(x)} has to be adapted slightly to account for the new interference on the value of $n$ since the environment can grow the ring and thus increment the value of $n$. However, since the code of \li{slave(x)} does not depend on $n$ (and thus $n$ is not observed in the subjective view of the precondition), its proof remains unchanged. 
+Our proof changes only minimally to accommodate the updated program: the proof
+of \li{master(x)} now has to account for the new
+interference on the value of $n$ since the environment can grow the
+ring and thus increment the value of $n$. However, the proofs of
+other threads can be reused straightforwardly.
 
 %% \begin{figure}
 %% \centering
@@ -500,12 +507,3 @@ In contrast, in existing approaches such as CAP~\cite{cap-ecoop10}, both $n$ and
 %% \]
 %% %
 %% That is, when \li{x}, \li{y} and \li{z} all hold value $10$, any thread in possession of all three $[\token{a}_{\small\li{x}}]$, $[\token{a}_{\small\li{y}}]$, $[\token{a}_{\small\li{z}}]$ capabilities in its local state can carry out $a_{\textsf{rem}}$. In doing so, the acting thread will remove the three cells from the shared state (and move them into its local state). In return, it must transfer the three locally held capabilities into the shared state. Note that after adding $a_{\textsf{rem}}$, the subjective views of all three threads remain stable since each thread locally holds one of the capabilities in $\{\token{a}_{\small\li{x}}, \token{a}_{\small\li{y}}, \token{a}_{\small\li{z}}\}$ and thus knows that the environment cannot carry out $a_{\textsf{rem}}$ (as it is missing at least one of the required capabilities). Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource transfer is common in \colosl actions. In general, resources that only appear on the left hand side of $\swap$ indicate their removal from the shared state (and their addition to the thread's local state); dually, resources that only appear on the right hand side of $\swap$ denote their transfer to the shared state (from the thread's local state).
-\julescomment{Move the below to next section.}
-
-We also note that, as in the CAP family~\cite{cap-ecoop10,icap,tada}, \colosl
-cannot ensure that proved programs do not leak memory. Indeed, one may
-at any point of a proof stash leaked resources into a new subjective
-view, then weaken the resulting assertion to remove that view from the
-current state, rendering the leak invisible as far as the proof system
-is concerned.
-
