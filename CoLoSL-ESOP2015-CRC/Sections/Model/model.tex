@@ -92,7 +92,7 @@ The local and global logical states of a world are always
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively. We write $g$ to range over logical states representing shared (global) states. The empty logical state
+We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively and write $l_{\textsf{M}}$ for $(@s, h)$. We write $g$ to range over logical states representing shared (global) states. The empty logical state
 $(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
 write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
@@ -235,8 +235,7 @@ shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
 $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write as
-$\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
-of space; it can be found in~\cite{colosl-tr14}):
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$:
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -248,7 +247,8 @@ of space; it can be found in~\cite{colosl-tr14}):
 %	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
 
-The semantics of \colosl assertions is given by a forcing relation
+We refer to the above agreement between the action model and subjective views as the \emph{action model closure property}. We omit its definition for lack
+of space; it can be found in~\cite{colosl-tr14}. The semantics of \colosl assertions is given by a forcing relation
 $w,\lenv|= P$ between a world $w$, a logical environment
 $\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing
 relations. The first one $l,\lenv\slsat p$ interprets local assertions
@@ -1214,7 +1214,7 @@ $F$.
 
 Soundness of \colosl has been established parametrically in the
 underlying models of machine states ($\Heaps$ ) and capabilities ($\Caps$), as an instance of the Views framework~\cite{views}. The
-details may be found in the accompanying technical
+details can be found in the accompanying technical
 report~\cite{colosl-tr14}. The main part of the proof is to establish
 the soundness of the following rule for atomic commands, where
 $\entails_{\textsf{SL}}$ represents standard sequential separation
@@ -1235,8 +1235,8 @@ satisfies $\lass{P}$ is exchanged for one satisfying $\lass{Q}$, there
 is $\lmod'$ and a splitting of the resulting logical state into a
 local $l'$ and shared part $g'$ such that $(l',g',\lmod')$ satisfies
 $Q$. Moreover, going from $(l,g,\lmod)$ to $(l',g',\lmod')$ can be
-achieved via a succession of 1) updates in accordance with $\lmod$, 2)
-valid extension steps and 3) valid shifting steps. A similar semantic
+achieved via a succession of 1) updates in accordance with $\lmod$; and 2)
+valid extension steps . A similar semantic
 condition for atomic commands is required in the frameworks from the
 CAP family~\cite{cap-ecoop10,icap,tada}. Formal definitions can be
 found in~\cite{colosl-tr14}. 
@@ -1250,8 +1250,7 @@ a concrete state in \Heaps.
 
 \begin{definition}[Reification]\label{def:reification}
   The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
-  defined as follows, where \heapPart{l'} denotes the first projection
-  of the pair $l'$:
+  defined as:
   \[
   \reifyW{(l, g, \lmod)} \eqdef \heapPart{(l \composeL g)}
   \]
