@@ -809,8 +809,32 @@ The first three rules of \fig\ref{fig:shifting-rules} allow one to
 check shifting piecewise: one may weaken the assertion $P$ into
 a local assertion $\lass{F}$ which, if it \emph{fences} $I_1\cup I_2$, can be used to
 reduce a shifting judgement $I \cup I_1 \weakenI{\fenceAss{}} I \cup
-I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. To check whether
-an assertion $\lass{F}$ fences an interference assertion $I$, written
+I_2$ to the simpler $I_1 \weakenI{\fenceAss{}} I_2$. 
+The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
+shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
+have the same effect on $\lass{F}$ after an arbitrary number of action
+applications. In particular, this is the case when $\lass{F}\fences I\cup
+I_1$, i.e.\ $\lass{F}$ is an \emph{invariant} of the shared region
+under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
+I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
+view of $\lass{F}$.
+
+The next two rules describe situations where an action is irrelevant
+to a particular assertion $\lass{F}$: when the effect of the action is
+entirely outside of $\lass{F}$, or when it is impossible to apply the
+action to $\lass{F}$. The next rule is an equivalence that uses the
+knowledge embodied by $\lass{F}$ of all the possible states that the
+subjective shared state may be in to rewrite an action into an equivalent
+one. More precisely, if whenever the precondition $\lass{P}$ of the
+action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
+also true, then it is safe to add $\lass{R}_i$ as a neutral part of
+the action (the fact that $\lass{R}_i$ is exact guarantees that no
+piece of state in $\lass{R}_i$ is mutated by the ``larger'' action)
+without changing the set of states in which the action can be
+applied. The last shifting equivalence is straightforward. Note that
+$\m{true}$ fences any interference assertion.
+
+To check whether an assertion $\lass{F}$ fences an interference assertion $I$, written
 $\lass{F}\fences I$, the last three rules of the figure are similar to those for local
 fencing and provide rules to apply to each action of $I$. 
 \begin{enumerate}
@@ -839,29 +863,9 @@ fencing and provide rules to apply to each action of $I$.
   we could end up with an assertion $\shared{\lass{F}}{I}$ that does
   not satisfy the action closure property.
 \end{enumerate}
-The extra fencing condition $\lass{F}\fences I\cup I_1$ is necessary because
-shifting means that the actions in $I\cup I_1$ and $I\cup I_2$
-have the same effect on $\lass{F}$ after an arbitrary number of action
-applications. In particular, this is the case when $\lass{F}\fences I\cup
-I_1$, i.e.\ $\lass{F}$ is an \emph{invariant} of the shared region
-under interferences in $I\cup I_1$, whereas $I_1 \weakenI{\fenceAss{}}
-I_2$ only states that $I_1$ and $I_2$ are equivalent from the point of
-view of $\lass{F}$.
 
-The next two rules describe situations where an action is irrelevant
-to a particular assertion $\lass{F}$: when the effect of the action is
-entirely outside of $\lass{F}$, or when it is impossible to apply the
-action to $\lass{F}$. The next rule is an equivalence that uses the
-knowledge embodied by $\lass{F}$ of all the possible states that the
-subjective shared state may be in to rewrite an action into an equivalent
-one. More precisely, if whenever the precondition $\lass{P}$ of the
-action is compatible with $\lass{F}$ then one of the $\lass{R}_i$'s is
-also true, then it is safe to add $\lass{R}_i$ as a neutral part of
-the action (the fact that $\lass{R}_i$ is exact guarantees that no
-piece of state in $\lass{R}_i$ is mutated by the ``larger'' action)
-without changing the set of states in which the action can be
-applied. The last shifting equivalence is straightforward. Note that
-$\m{true}$ fences any interference assertion.
+
+
 
 
 \paragraph{Stability}
