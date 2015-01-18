@@ -43,40 +43,39 @@ is required by the thread.
 
 
 
-Small specifications were emphasised  in the work of O'Hearn, Reynolds
-and Yang on separation logic~\cite{paperincludesYang}. 
-The original separation logic~\cite{rey02,seplog} achieves
-compositional reasoning for sequential heap-manipulating programs by
-spliting the heap into disjoint heaplets for describing the local
-resource required by a program. Compositionality rests on two
-powerful mechanisms: a program  can be specified using only those
-resources that it actually accesses; and this specification can be
-simply reused in any context that contains these resources.
-By making the specification
-as small  as possible, we can ensure that it
-can be reused in a large set of possible contexts using  the {\em frame
-rule}. 
- Specification reuse is paramount to achieve compositional
-reasoning: if the specification of a piece of code can be reused in
-any valid context, we only have  to prove it once and for all. 
+Small specifications were emphasised in the work of O'Hearn, Reynolds
+and Yang on separation logic~\cite{o2001local}.  The original
+separation logic~\cite{rey02,seplog} achieves compositional reasoning
+for sequential heap-manipulating programs by spliting the heap into
+disjoint heaplets for describing the local resource required by a
+program. Compositionality rests on two powerful mechanisms: a program
+can be specified using only those resources that it actually accesses;
+and this specification can be simply reused in any context that
+contains these resources.  By making the specification as small as
+possible, we can ensure that it can be reused in a large set of
+possible contexts using the {\em frame rule}. This plays an important
+role in achieving scalable \emph{compositional reasoning}: each
+function is proved in isolation and its small specification is reused
+at every call site.
 
 
-Concurrent separation logic extends this compositional reasoning  to concurrent programs
-using the {\em disjoint concurrency rule}, where individual threads
-  use both local resource which is private to the thread and static
-invariant shared regions which can be accessed by all threads through
-critical regions. Since
-then, there have been many extensions combining rely-guarantee
-reasoning with ideas from concurrent separation logic to reason about
-fine-grained concurrency: RGSep~\cite{viktor-marriage} and then
-deny-guarantee reasoning~\cite{dg} introduce local resource and shared
-disjoint regions which are stable with respect to a static  interference
-relation stating how the current thread and the environment can effect
+Concurrent separation logic extends this compositional reasoning to
+concurrent programs using the {\em disjoint concurrency rule}, where
+individual threads use both local resource which is private to the
+thread and static invariant shared regions which can be accessed by
+all threads through critical regions. Since then, there have been many
+extensions combining rely-guarantee reasoning with ideas from
+concurrent separation logic to reason about fine-grained concurrency:
+RGSep~\cite{viktor-marriage} and then deny-guarantee
+reasoning~\cite{dg} introduce local resource and shared disjoint
+regions which are stable with respect to a static interference
+relation stating how the current thread and the environment can affect
 the region; CAP~\cite{cap-ecoop10} and its
 extensions~\cite{hocap,icap,tada} in addition abstract the
-regions. This work has achieved substantial success; see related work
-for more details. However,  we believe these approaches sometimes   give
-specifications and proofs which are either too coarse  or unnatural.
+regions. This work has achieved substantial success; see the related
+work section for more details. However, we believe these approaches
+sometimes give specifications and proofs which are either too coarse
+or unnatural.
 
 
 
@@ -88,9 +87,10 @@ the entire data structure such as a linked list,  or contains
 individual 
 components on which the data structure is built such as the nodes of a
 linked list. However, threads may have shared access to arbitray 
-parts of the data structure, and we would like directly express this
-access  in
-the reasoning. 
+parts of the data structure, which cannot be directly expressed in the reasoning.
+%and we would like directly express this
+%access  in
+%the reasoning. 
 The   static interference relation of a region 
  is defined when
 the region  is created and    is fixed throughout the entire lifetime of
@@ -110,20 +110,17 @@ specifications of the shared state.
 For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
 thread requires access to the $i$th and $(i+1)$th nodes. Current
-approaches cannot reason directly about the two shared nodes being accessed
-by the threads. 
-Now consider a binary graph accessed by a concurrent
-spanning tree algorithm. Current approaches cannot reason directly
-about such  data structures with intrinsic sharing which are
-accessed concurrently. Finally, consider a concurrent set library
-with just  an
-insert function. Current approaches cannot extend their reasoning to
-include a remove function, withouthaving to  redo their
-proofs. In summary, disjoint regions with static interference ........
-
-
-
-
+approaches cannot reason directly about the two shared nodes being
+accessed by the threads. Now consider a binary graph accessed by a
+concurrent spanning tree algorithm. Current approaches cannot reason
+directly about the concurrent manipulation of sub-graphs in such data
+structures with intrinsic sharing. Finally, consider a concurrent set
+library initially endowed with just an insert function. Current
+approaches cannot extend their reasoning to include a remove function,
+without having to prove the whole library again. In summary, disjoint
+regions with static interference are not always able to provide small
+specifications for concurrent programs, which can impede
+compositionality.
 
 %. As such, upon its creation, provision
 %has to be made for all future extensions of it and it is generally not
@@ -143,14 +140,16 @@ proofs. In summary, disjoint regions with static interference ........
 %identically for both modules. The probability that several modules
 %agree on the exact partition and shape of the shared resources is slim.}
 
-This paper introduces the program logic, \colosl, which stands for 
+This paper introduces the program logic \colosl, which stands for 
 \underline{Co}ncurrent \underline{Lo}cal \underline{S}ubjective
-\underline{L}ogic. \colosl is based on one global shared state with
-each thread verified with respect to its partial {\em subjective view}
+\underline{L}ogic. \colosl's semantic model is based on one global
+shared state, and
+each thread is verified with respect to its partial {\em subjective view}
 of this global state. Each subjective (personalised) view comprises an assertion which
 describes  \emph{parts} of the shared global resource used by a thread, 
 and an interference relation which describes   how the thread and
-the environment may affect these parts.  
+the environment may affect these parts, thus enabling small
+specifications in the presence of concurrent behaviours.
 Subjective views may arbitrarily overlap with
 each other, with both their resource and interference expanding and
 contracting  in accordance with what is required by the
@@ -166,59 +165,20 @@ information as the interference on the bigger state.
 %to regular separation logic validity checks. Thus one can use \colosl
 %without having to reason directly in the model.}
 
-\pgcomment{damn, out of time, chanllenge to say not too much but
-  something of token ring, main points: resource of individual threads
-is two cells, interferences requires three cells, and extendsion, feel
-free to have a go Jules}
-
- We demonstrate 
-\colosl reasoning on a range of
-examples.  The first example in \S\ref{sec:intuition} is 
- Dijkstra's token-ring mutual exclusion
-algorithm~\cite{dijkstra74}. Once the ring has achieved a stable
-state, the overall  behaviour of the token
-ring is that the master increments its cell when the cell at the otehr
-end of the ring is  equal
-and all other threads increments their  cells when the 
-previous cell is one bigger. \colosl can reason compositionally about
-this example. 
-.....
-
-
-
-This example is interesting because the
-threads access two shared overlapping cells, much like the list example described
-earlier, whose intereference depends on three cells. The global shared reourse of the whole token ring describes 
-
-
-
-demonstrates the use of
-subjective views to only work with the shared resource being accessed
-by an individual thread. 
-
-
-, with each
-thread responsible for changing one heap cell but constrained by the
-behaviour of the two thread. 
-
-
-As well as the local knowledge about how
-each thread behaves, the programmer also has global knowledge about
-how threads constrain one another. Pleasantly, our reasoning captures
-just that. 
-
-
-In \S\ref{sec:examples}, we study two further examples. The first is a concurrent spanning tree
-algorithm for graphs, where threads are recursively spawned on 
-potentially overlapping sub-graphs. We demonstrate that the flexible,
-overlapping subjective views of \colosl are just what we need.  We
-also verify a concurrent set module implemented using a hand-over-hand
-list-locking algorithm.
-
-
-
- that significantly improves over the existing
-proof~\cite{cap-ecoop10}.
+We demonstrate \colosl reasoning on a range of examples.  The first
+example in \S\ref{sec:intuition} is Dijkstra's token-ring mutual
+exclusion algorithm~\cite{dijkstra74}. Regardless of the size of the
+ring, we are able to prove each thread in isolation, and the proved
+specification only mentions two of its neighbours. Thanks to this
+small specification, the proof can be largely reused when the
+implementation of the ring is changed to allow dynamic spawning of new
+participants.  In \S\ref{sec:examples}, we study two further
+examples. The first is a concurrent spanning tree algorithm for
+graphs, where threads are recursively spawned on potentially
+overlapping sub-graphs. We demonstrate that the flexible, overlapping
+subjective views of \colosl are just what we need. Finally, our proof
+of a concurrent set module implemented using a hand-over-hand
+list-locking algorithm improves over that of CAP significantly.
 
 Most of the technical details have been left out due to space
 constraints, and are provided in the appendix as well as in an
@@ -289,7 +249,7 @@ the other threads (the environment) to interfere only  in ways
 described by the rely relation. However, the original work is based on
 first-order logic for reasoning aboutn
 a single global heap. O'Hearn and Reynold's
-work on separation logic~\cite{2001popland john's survey} demonstrated that such reasoning is not
+work on separation logic~\cite{2001poplandjohn'ssurvey} demonstrated that such reasoning is not
 fully compositional and does not scale. 
 
 \subsection{Related work bullet points} 
