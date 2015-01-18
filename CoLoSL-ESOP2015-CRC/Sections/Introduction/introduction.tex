@@ -54,9 +54,9 @@ and this specification can be simply reused in any context that
 contains these resources.  By making the specification as small as
 possible, we can ensure that it can be reused in a large set of
 possible contexts using the {\em frame rule}. This plays an important
-role in achieving scalable \emph{compositional reasoning}: each
-function is proved in isolation and its small specification is reused
-at every call site.
+role in achieving scalable \emph{compositional reasoning}, as each
+block of code can be proved in isolation and its small specification
+can be reused in a larger context.
 
 
 Concurrent separation logic extends this compositional reasoning to
@@ -113,7 +113,7 @@ thread requires access to the $i$th and $(i+1)$th nodes. Current
 approaches cannot reason directly about the two shared nodes being
 accessed by the threads. Now consider a binary graph accessed by a
 concurrent spanning tree algorithm. Current approaches cannot reason
-directly about the concurrent manipulation of sub-graphs in such data
+directly about the concurrent manipulation of subgraphs in such data
 structures with intrinsic sharing. Finally, consider a concurrent set
 library initially endowed with just an insert function. Current
 approaches cannot extend their reasoning to include a remove function,
