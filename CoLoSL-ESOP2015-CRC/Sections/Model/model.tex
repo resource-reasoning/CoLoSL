@@ -35,7 +35,7 @@ during the entire lifetime of a thread represents its guarantee
 corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between a thread and its
-environment just like any other resource. See the presentation of
+environment just like any other resource to temporarily block (enable) certain actions. See the presentation of
 deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
 and motivation.
 
@@ -200,7 +200,7 @@ Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token
   A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x} \harpoonything E \mid E_1 |-> E_2 \mid [E]\\
   \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
   \Assertions \ni P,Q & ::= \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P ** Q \mid \shared{P}{I}  \\
-  I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}{R}\} \cup I
+  I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}\} \cup I
   \quad
   E ::= x \mid \token a \mid E_1 + E_2 \!\mid\! \cdots
 \end{align*}
@@ -209,10 +209,10 @@ Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token
 As in RGSep~\cite{viktor-marriage}, we distinguish between
 \emph{local assertions} in $\LAssertions$ and assertions in
 $\Assertions$. For simplicity, assertions do not include negation or
-magic-wand; these are reserved to local assertions. The syntax of
+magic-wand; these are reserved for local assertions. The syntax of
 assertions follows from standard separation logic with variables-as-resource~\cite{variablesAsResource} (note that expressions $E$ do not
 allow program variables), with the exception of the subjective views
-$\shared P I$.  Machine state and capability assertions are
+$\shared P I$.  Machine and capability assertions are
 interpreted over a world's local state: $\li{x} \harpoonything E$
 (resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
 where only \li{x} (resp.\ address $E_1$) is allocated and has value
@@ -236,7 +236,7 @@ $r$), such that $s$ satisfies $P$ in the standard separation logic
 sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write as
 $\extendsAM{\lmod}{s}{r}{\semI{I}}$ (we omit its definition for lack
-of space; it can be found in~\cite{colosl-tr14}:
+of space; it can be found in~\cite{colosl-tr14}):
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -294,7 +294,7 @@ assertions.
   \extendsAM{\lmod}{s}{r}{\semI[\lenv]{I}}
 \end{array}
 \]
-\vspace{-3.3ex}
+\vspace{-3.0ex}
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   s, \lenv &|=_{g,\lmod} \lass{P} &\text{iff}& s, \lenv \slsat \lass{P}\\
@@ -375,11 +375,12 @@ assertions.
 \semI[\lenv]{I}(\token{A}) &==
   \left\{
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
-    (p, q, c)&
+    (p, q, c )&
     \begin{array}{@{}l@{}}
-      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod} \\
-      \quad p, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
-      /| q, [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
+      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod, r, r'} \\
+      \quad c = r \composeL r' \land \for{l} l \leq p \land l \leq q \implies l = \unitL\\
+      \quad p \composeL r, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
+      /| q \composeL r,  [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
     \end{array}
   \end{array}
   \right\}
