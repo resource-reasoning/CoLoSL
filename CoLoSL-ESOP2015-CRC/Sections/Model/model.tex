@@ -100,7 +100,7 @@ exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
 An action is a triple $(p, q, c)$ of logical states where
-$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}: it has to be present for the action to take effect, but is left unchanged by the action. Moreover, the catalyst is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, [x:v], \emptyset)$, $(\emptyset, [x:v+1], \emptyset)$, $(\emptyset, [x-1:v+1], \emptyset)$).
+$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}: it has to be present for the action to take effect, but is left unchanged by the action. Moreover, the catalyst is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, \{x:v\}, \emptyset)$, $(\emptyset, \{x:v{+}1\}, \emptyset)$, $(\emptyset, \{x-1:v{+}1\}, \emptyset)$).
 
 An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}; action models correspond to the (semantic interpretation of)  interference assertions
@@ -510,9 +510,9 @@ $\lmod'$ is enabled, its pre-state $p$ (those parts of the shared state modified
 require the presence of some neutral resource outside of $l'$ provided that they are conserved by the action (i.e. they are present in $c$).
 %
 For instance, abusing notations temporarily to ignore empty stack and
-capability components in logical states, the action $a = ([10:0, 12:0], [10:1, 12:1], [14:0])$ (which modifies the cells at addresses 10 and 12 to point from 0 to 1 provided that location 14 points to 0), is
-confined in the states $l_1=[10:0,12:0]$ and $l_2=[10:1]$, but not in
-$l_3=[10:0]$. Indeed $p \composeL c$ is compatible with $l_1$ and $l_3$, and the
+capability components in logical states, the action $a = (\{10:0, 12:0\}, \{10:1, 12:1\}, \{14:0\})$ (which modifies the cells at addresses 10 and 12 to point from 0 to 1 provided that location 14 points to 0), is
+confined in the states $l_1=\{10:0,12:0\}$ and $l_2=\{10:1\}$, but not in
+$l_3=\{10:0\}$. Indeed $p \composeL c$ is compatible with $l_1$ and $l_3$, and the
 modified cells 10 and 12 are fully contained in $l_1$ but not in
 $l_3$; $p \composeL c$ is not compatible with $l_2$, hence $a$ has no effect on
 $l_2$ and is automatically confined to $l_2$.
@@ -520,7 +520,7 @@ $l_2$ and is automatically confined to $l_2$.
 Moreover, we require not only that all actions in $\lmod'$
 are confined to $l'$ in this sense, but also that all states resulting
 from the successive application of actions in $\lmod'$ themselves confine
-all actions in $\lmod'$. This is achieved by first finding a set that
+all actions in $\lmod'$. Inspired by the LRG approach~\cite{lrg}, this is achieved by first finding a set that
 is invariant under all actions in $\lmod'$ (called a \emph{fence}),
 then checking the confinement condition for each action.
 
