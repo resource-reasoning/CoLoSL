@@ -99,11 +99,11 @@ write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
 exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
+An action is a triple $(p, q, c)$ of logical states where
+$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}: it has to be present for the action to take effect, but is left unchanged by the action. Moreover, the catalyst is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, [x:v], \emptyset)$, $(\emptyset, [x:v+1], \emptyset)$, $(\emptyset, [x-1:v+1], \emptyset)$).
+
 An action model is a partial function from \emph{capabilities} to sets
-of \emph{actions}. An action is a triple $(p, q, c)$ of logical states where
-$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is 
-\emph{condition}.  The \emph{action model} $\lmod$ corresponds
-directly to the (semantic interpretation of) an interference assertion
+of \emph{actions}; action models correspond to the (semantic interpretation of)  interference assertions
 $I$.
 %
 \begin{definition}[Action models]
