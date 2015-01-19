@@ -442,21 +442,20 @@ consequences of the semantics.
 \label{subsec:prules}
 
 We turn to the remaining two principles, \extendRule and \shiftRule,
-and to stability. All three involve reasoning outside of standard
-separation logic, hence one would potentially need to reason
-semantically in the model when using \colosl. Fortunately, a partial
-axiomatisation in terms of standard separation logic entailments
-exists for all three conditions, which we found to be enough to verify
+and to the stability condition. These involve reasoning outside our
+assertion language, potentially requiring semantic reasoning 
+in the model. Fortunately, it is enough to work
+with a partial 
+axiomatisation  for all three conditions to verify
 our examples. In this section, we give cut-down versions of these
-rules that apply only for a fragment of \colosl assertions where 1)
-nesting of subjective views is not permitted and 2) interference
+rules for a fragment of the \colosl assertion language where the 
+nesting of subjective views is not permitted   and  interference
 assertions cannot mention subjective views. This restriction is easily
-lifted, since it turns out that one can always \emph{flatten}
+lifted. We can always \emph{flatten}
 assertions with nested boxes into logically equivalent assertions with
-no nesting. Similarly, interference assertions that mention other
+no nesting, and  interference assertions  mentioning  other
 subjective views in their actions may be rewritten into ones
-that do not. For lack of space, we omit these transformations; they
-can be found in~\cite{colosl-tr14}.% Appendix~\ref{sec:assertions-continued}.
+that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:assertions-continued}.
 
 %% Moreover, in the restricted case where actions and fences (see below)
 %% can be expressed in a fragment extending the usual \emph{symbolic
@@ -471,10 +470,11 @@ can be found in~\cite{colosl-tr14}.% Appendix~\ref{sec:assertions-continued}.
 %% of this adaptation to Appendix~\ref{sec:assertions-continued}. The following standard definition will
 %% be needed in the remainder of this section.
 
-\begin{definition}[Precision, exactness]
-  $p\in\LAssertions$ is \emph{precise} (resp.\ \emph{exact}) if it is
-  satisfied by at most one sub-state of each state (resp.\ at most one
-  state).
+\begin{definition}[Exactness, precision]
+The local assertion   $p\in\LAssertions$ is \emph{exact}
+(respectively, 
+\ \emph{precise}) if it is
+  satisfied by at most one state (respectively, one substate of each state):
   \begin{align*}
     \exact{p} &==
     \for{\lenv, l_1, l_2} l_1, \lenv \slsat p\text{ and }l_2, \lenv
