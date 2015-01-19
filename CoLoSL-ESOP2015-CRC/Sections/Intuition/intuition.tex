@@ -354,42 +354,41 @@ in \fig\ref{fig:principles}, we can weaken the assertion as such:
 \begin{align*}
   \shared{P}{I} 
   &\stackrel{(\shiftRule)}{=>}
-  \shared{P}{\{m_x\} \cup \{s_{x{+}j} \mid 1 \leq j < i-1\} \cup \{s'_{x{+}i{-}1}\} \cup \{s_{x{+} j} \mid  i \leq j \leq n\}}\\[-5pt]
+  \shared{P}{\left(I \setminus \{s_{x{+}i{-}1}\}\right)\cup \{s'_{x{+}i{-}1}\}}
+%  {\{m_x\} \cup \{s_{x{+}j} \mid 1 \leq j < i-1\} \cup \{s'_{x{+}i{-}1}\} \cup \{s_{x{+} j} \mid  i \leq j \leq n\}}
+  \\[-5pt]
 %  
   &\stackrel{(\forgetRule)}{=>}
-  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{\{m_x, \cdots, s'_{x{+}i{-}1}, s_{x{+}i, \cdots, s_{x{+}n}}\}} \\[-5pt]
+  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{\left(I \setminus \{s_{x{+}i{-}1}\}\right)\cup \{s'_{x{+}i{-}1}\}} \\[-5pt]
 %  
   &\stackrel{(\shiftRule)}{=>}
-  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{S'_{x{+}i}}\\[-5pt]
+  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{\{s'_{x{+}i{-}1}, s_{x{+}i}\}}\\[-5pt]
 % 
   &\stackrel{(\weakenRule)}{=>}
-  \shared{\cell{x{+}2}{0} * (\cell{x{+}1}{0} \lor \cell{x{+}1}{1})}{S'_{x{+}2}}
+  \shared{\cell{x{+}i}{0} * (\cell{x{+}i{-}1}{0} \lor \cell{x{+}i{-}1}{1})}{\{s'_{x{+}i{-}1}, s_{x{+}i}\}}
 \end{align*}
 %
-We begin by rewriting the $s_{x{+}1}$ action of $I$ into the stronger
-action of $s'_{x{+}1}$ using \shiftRule. In general, \shiftRule allows
+We begin by rewriting the $s_{x{+}i{-}1}$ action of $I$ into the stronger
+action of $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
 us to replace $I$ with any interference relation $I'$ that has the
 same observable effect as far as the subjective assertion $P$ of the
 subjective view is concerned (written $I \weakenI{P} I'$). In this
-instance, actions $s_{x{+}2}$ and $s'_{x{+}2}$ have the same effect
+instance, actions $s_{x{+}i{-}1}$ and $s'_{x{+}i{-}1}$ have the same effect
 according to $P$, as discussed in the proof of \li{slave(x)}. As such,
-rewriting $s_{x{+}1}$ as $s'_{x{+}2}$ does not alter its behaviour and
-merely reflects stronger knowledge about how $x{+}2$ and $x$ are
-related through $x{+}1$. In particular, $I\weakenI{P} \{m_{x},
-s'_{x{+}2}, s_{x{+}2}\}$ as required.
+rewriting $s_{x{+}i{-}1}$ as $s'_{x{+}i{-}1}$ does not alter its behaviour and
+merely reflects stronger knowledge about how $x{+}i$ and $x{+}i{-}2$ are
+related through $x{+}i{-}1$. In particular, $I\weakenI{P} \left(I \setminus \{s_{x{+}i{-}1}\}\right)\cup \{s'_{x{+}i{-}1}\}$ as required.
 
 Next, because subjective views only describe \emph{parts} of the
 shared state, we can use the \forgetRule principle to obtain a weaker
-view of the shared state, in this case a view that ignores the cell at
-address $x$.  With $x$ out of scope, the action $m_{x}$ no longer has
-observable effects on the assertion, since it mutates only the cell at
-address $x$. We can thus apply the \shiftRule principle again to rid
-the interference of $m_{x}$ and get $S'_{x{+}2}$.
+view of the shared state, in this case a view that ignores all cells in the ring except for those at address $x{+}i{-}1$ and $x{+}i$. With all other cells out of the scope, their actions no longer have
+observable effects on the assertion, since their mutations are limited to those cells and leave $x{+}i{-}1$ and $x{+}i$ untouched. We can thus apply the \shiftRule principle again to remove
+those actions and obtain $S'_{x{+}i} = \{s'_{x{+}i{-}1}, s_{x{+}i}\}$.
 
 Finally, we weaken the resulting subjective view so that it is stable
-with respect to $S'_{x{+}2}$, i.e.\ preserved by those of its actions
-that the environment may perform (here, $s'_{x{+}2}$). This
-yields the precondition of \li{slave(x+2)} as in
+with respect to $S'_{x{+}i}$, i.e.\ preserved by those of its actions
+that the environment may perform (here, $s'_{x{+}i{-}1}$). This
+yields the precondition of \li{slave(x+$i$)} as in
 \fig\ref{fig:concurrentInc}. The preconditions of the master and
 foreman threads can be derived analogously.
 
@@ -397,11 +396,9 @@ Once all threads have completed their operations, we join up their
 postconditions using the \mergeRule principle, which embodies a
 crucial feature of \colosl: different subjective views
 \emph{overlap}. Since $|/$ distributes over $**$, the subjective view
-simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} *
-  \cell{x{+}2}{10}}{S'_{x} \cup S'_{x{+}1} \cup
-  S'_{x{+}2}}$. Finally, since $S'_{x} \cup S'_{x{+}1} \cup
-S'_{x{+}2}$ $\weakenI{\li{n}|-< n * \cell{x}{10} * \cell{x{+}1}{10} *
-  \cell{x{+}2}{10}} I $, by the \shiftRule principle, we get
+simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots *
+  \cell{x{+}n}{10}}{M'_{x}, S'_{x{+}1} \cup \cdots \cup S'_{x{+}n} }$. Finally, since $M'_{x} \cup S'_{x{+}1} \cup \cdots \cup S'_{x{+}n}$ $\weakenI{\li{n}|-< n * \cell{x}{10} * \cell{x{+}1}{10} * \cdots *
+  \cell{x{+}n}{10}} I $, by the \shiftRule principle, we get
 the postcondition of \li{ring(x)}. This concludes our \colosl proof of \li{ring(x)}. 
 
 We complete our semi-formal overview by noting that unlike
