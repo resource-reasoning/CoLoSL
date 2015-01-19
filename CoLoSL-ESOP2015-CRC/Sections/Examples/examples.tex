@@ -208,7 +208,7 @@ is a \emph{global} account of the graph in that it captures all
 vertices and the interference associated with them. However, our
 spanning tree algorithm operates \emph{locally} as it is called upon
 recursively for each node. That is, for each \li{span(n)} call (where
-$\cell{\li{n}}{n}$ and $n \in \gamma$), the footprint of the call is
+$\li{n} \in \gamma$), the footprint of the call is
 limited to the subgraph rooted at $n$. Moreover, in order to reason about the concurrent recursive calls $\li{span(x.l)} || \li{span(x.r)}$, we need to \emph{split} the state into two $*$-composed states prior to the calls, pass each constituent state onto the relevant thread and combine the resulting states by $*$ composition through an application of the \parRule\ rule. We thus provide a \emph{local} specification of the graph, $\g{x}{\gamma}$ as defined in \fig\ref{fig:localCST} such that for all $\li{n}  \in \gamma$\vspace{-2pt}
 %
 \[
@@ -464,14 +464,13 @@ Since in CAP the capabilities associated with a region can only be generated upo
 This predicate is unnecessarily complicated. It is counter-intuitive to account for the capabilities pertaining to addresses not in the domain of the list. Moreover, each thread observes all nodes in the list and thus needs to account for their associated interference. 
 
 TaDA~\cite{tada} took the first steps towards addressing the above shortcomings of the CAP approach. In particular, since TaDA regions are parametric in the separation algebra of capabilities (called guards), one can choose a more suitable algebra to encode the desired behaviour of capabilities. 
-For instance, when creating the set region $r$, one can choose a capability algebra that satisfies the following axiom.\vspace{-7pt}
-%
-\begin{align*}
-	[\textsc{S}(vs)]_r <=> [\textsc{S}(vs\uplus\{v\})]_r * [\textsc{U}(v)]_r   \\[-20pt]
-\end{align*}
-%
-This axiom effectively ensures that when the set region $r$ contains values $vs$, it may be extended with value $v$, and in doing so claim the the accompanying update capability $[\text{U}(v)]_r$. 
-
+%For instance, when creating the set region $r$, one can choose a capability algebra that satisfies the following axiom.\vspace{-7pt}
+%%
+%\begin{align*}
+%	[\textsc{S}(vs)]_r <=> [\textsc{S}(vs\uplus\{v\})]_r * [\textsc{U}(v)]_r   \\[-20pt]
+%\end{align*}
+%%
+%This axiom effectively ensures that when the set region $r$ contains values $vs$, it may be extended with value $v$, and in doing so claim the the accompanying update capability $[\text{U}(v)]_r$. 
 While TaDA's approach is much cleaner than that of CAP, it nevertheless requires the foresight of specifying all desired interference associated with the region upon its creation. 
 As such, interference specifications are \emph{static} and cannot be extended with new behaviour even when the existing resources are left untouched. 
 On the other hand, as well as being parametric in its capability separation algebra, \colosl allows the \emph{dynamic} extension of the shared state on the go with new resources, interference and their accompanying capabilities.
