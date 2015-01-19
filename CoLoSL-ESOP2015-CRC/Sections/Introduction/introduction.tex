@@ -28,7 +28,7 @@ rely-guarantee and separation-logic
 reasoning~\cite{viktor-marriage,dg,lrg,cap-ecoop10,icap,tada} achieve
 compositional reasoning for increasingly difficult inter-thread
 interactions. However, we believe that, despite substantial progress, there are many
-examples where the specifications and proofs are not as natural as
+examples where the specifications and proofs are not as concise as
 they might be; they  are either too coarse or
 too 
 contrived. 
@@ -44,8 +44,8 @@ is required by the thread.
 Small specifications were emphasised in the work of O'Hearn, Reynolds
 and Yang on separation logic~\cite{o2001local}.  The original
 separation logic~\cite{rey02,seplog} achieves local, compositional reasoning
-for sequential heap-manipulating programs by spliting the heap into
-disjoint heaplets for describing the local resource required by a
+for sequential heap-manipulating programs by splitting the heap into
+disjoint heaplets for describing the local resources required by a
 program. Compositionality rests on two powerful mechanisms: a program
 can be specified using only those resources that it actually accesses;
 and this specification can be simply reused in any context that
@@ -59,13 +59,14 @@ can be reused in a larger context.
 
 Concurrent separation logic extends this compositional reasoning to
 concurrent programs using the {\em disjoint concurrency rule}, where
-individual threads use both local resource which is private to the
-thread and static invariant shared regions which can be accessed by
-all threads through critical regions. Since then, there have been many
+individual threads use both local resources private to the
+thread as well as static invariant shared resources which can be accessed by
+all threads through critical sections. Since then, there have been many
 extensions combining rely-guarantee reasoning with ideas from
 concurrent separation logic to reason about fine-grained concurrency:
-RGSep~\cite{viktor-marriage} and then deny-guarantee
-reasoning~\cite{dg} introduce local resource and shared disjoint
+RGSep~\cite{viktor-marriage} 
+%and then deny-guarantee reasoning~\cite{dg} 
+introduced local resource and shared disjoint
 regions which are stable with respect to a static interference
 relation stating how the current thread and the environment can affect
 the region; CAP~\cite{cap-ecoop10} and its
@@ -84,39 +85,34 @@ concurrent data structure. A disjoint region typically either describes
 the entire data structure such as a linked list,  or contains
 individual 
 components on which the data structure is built such as the nodes of a
-linked list. However, threads may have shared access to arbitray 
+linked list. However, threads may have shared access to arbitrary 
 parts of the data structure, which cannot be directly expressed in the reasoning.
 %and we would like directly express this
 %access  in
 %the reasoning. 
-The   static interference   of a region 
- is defined when
-the region  is created and    is fixed throughout the entire lifetime of
-the region. However, 
-threads having access to parts of a shared region need  only
- know about the interference associated with those parts of the
+The interference associated with the region is static in that it is defined when
+the region is created and is fixed throughout its entire lifetime. However, 
+threads having access to parts of a shared region need only know about the interference on those parts of the
 region. In addition, 
-at the time  of creation, it is not necessarilly possible
+at the time  of creation, it is not necessarily possible
 to predict all future interactions  associated with  a shared
 region. Just as the original separation logic  uses the frame rule to
-obtain small specifications for the local state, we would like to be
-able to have some analogous framing of the shared state and its
-interference  to obtain small
+obtain small specifications for the local state, we would like to have an analogous framing mechanism on the shared state and its
+interference to obtain small
 specifications of the shared state. 
 
 
 For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
-thread requires access to the $i$th and $(i+1)$th nodes. Current
-approaches cannot reason directly about the two shared nodes being
-accessed by the threads. Now consider a binary graph accessed by a
-concurrent spanning tree algorithm. Current approaches cannot reason
-directly about the concurrent manipulation of subgraphs in such data
-structures with intrinsic sharing. Finally, consider a concurrent set
-library initially endowed with just an insert function. Current
-approaches cannot extend their reasoning to include a remove function,
-without having to prove the whole library again. In summary, disjoint
-regions with static interference are not always able to provide small
+thread requires access to the $i$th and $(i+1)$st nodes. Current
+approaches cannot provide a small specification for each thread capturing just the two shared nodes and their interference. Now consider a program whose threads manipulate subgraphs of a graph, for instance  a recursive
+concurrent spanning tree algorithm. Current approaches cannot give small specifications capturing just the subgraph manipulated by each thread due to intrinsic, unspecified sharing  between subgraphs.
+Finally, consider a concurrent set implementation. In \colosl it is possible to describe the interference associated with each element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot specify such dynamic interference relations.
+% Finally, consider a concurrent set
+%library initially endowed with just an insert function. Current
+%approaches cannot extend their reasoning to include a remove function,
+%without having to prove the whole library again.
+In summary, disjoint regions with static interference are not always able to provide small
 specifications for concurrent programs, impeding 
 compositionality.
 
@@ -147,7 +143,7 @@ view comprises an assertion which describes \emph{parts} of the shared
 global resource used by a thread, and an interference relation which
 describes how the thread and the environment may affect these parts.
 Subjective views may arbitrarily overlap with each other, with both
-their resource and interference expanding and contracting in
+their resources and interference expanding and contracting in
 accordance with what is required by the thread. Interestingly, this
 sometimes requires rewriting the interference relation so that the
 interference on the smaller state captures the same information as the
@@ -166,7 +162,7 @@ We demonstrate \colosl reasoning on a range of examples.  The first
 example in \S\ref{sec:intuition} is Dijkstra's token-ring mutual
 exclusion algorithm~\cite{dijkstra74}. Regardless of the size of the
 ring, we are able to give a small specification to  each thread in
-isolation such that  each proof only mentions resource
+isolation such that each proof only mentions resources
 associated with two of its neighbours. This means that the proof can be largely reused when the
 implementation of the ring is changed to allow dynamic spawning of new
 participants.  In \S\ref{sec:examples}, we study two further
@@ -177,8 +173,7 @@ subjective views of \colosl are just what we need.
 The second is a concurrent set module implemented 
 using a hand-over-hand
 list-locking algorithm. Our \colosl reasoning  for this set module  improves
-on CAP reasoning (both the unnatural old style in~\cite{cap-ecoop10} and the more natural
-modern style introduced  in TaDA~\cite{tada}) in that our small
+on CAP reasoning~\cite{cap-ecoop10} in that our small
 specifications can be dynamically extended to include other behaviour
 in future
 whereas the  static CAP interference  must predict all behaviour from the start. 
@@ -186,8 +181,7 @@ whereas the  static CAP interference  must predict all behaviour from the start.
 
 
 Most of the technical details have been left out due to space
-constraints, and are provided in the appendix as well as in an
-accompanying technical report~\cite{colosl-tr14}.
+constraints, and are provided in the accompanying technical report~\cite{colosl-tr14}.
 
 %This paper presents the program logic \colosl, which achieves
 %compositional reasoning for concurrent programs by enabling
@@ -252,39 +246,39 @@ reasoning to scale, it is important to work with small specifications
 based on local and shared state rather than working with one
 global state. In particular, O'Hearn~\cite{csl-tcs} introduced concurrent
 separation logic based on thread-local state and static invariant
-shared regions.
+shared resources.
 
 
 Since then, there has been much recent work on compositional
 reasoning about fine-grained concurrent algorithms. Vafeiadis and
-Parkinson~\cite{viktor-marriage} combined rely-guaranteee reasoning with
+Parkinson~\cite{viktor-marriage} combined rely-guarantee reasoning with
 separation logic, with the state split into thread-local state and
 disjoint shared regions, and global rely-guarantee relations providing
 the interference on these regions. 
 CAP reasoning~\cite{cap-ecoop10} increased  compositionality by, instead of the
 global
 rely-guarantee relations, having static interference relations
-associated with the disjoint shared regions and guards in the local
+associated with the disjoint shared regions and capabilities in the local
 state for dynamically controlling the permitted  interference, and concurrent
 abstract predicates for hiding implementation details. Several
 program logics have adapted this work to incorporate more
 abstraction~\cite{caresl}, higher-order features~\cite{icap} and more flexible
-guards~\cite{tada}. We believe that all  this work has  limited compositional
+capabilities~\cite{tada}. We believe that all  this work has  limited compositional
 reasoning in the sense that it is only possible to frame off local
 state and unused shared regions. It is not possible to 
 frame within regions nor frame inside the interference
 relations.  (It is, of course, possible to weaken the region assertion
 by the logical implication $P * Q \Rightarrow P * \texttt{true}$, but this is
-not the same as being able to shrink regions and their interference to
+not the same as being able to shrink regions \emph{and} their interference to
 just work with $P$.) 
 
 Meanwhile, a different breakthrough in compositionality came from
 Feng's local rely-guarantee (LRG) reasoning~\cite{lrg}. The LRG model
 comprises one global shared state, with assertions describing
-{disjoint } but flexible parts of this state and rely-guarantee
+{disjoint} but flexible parts of this state and rely-guarantee
 relations determining how the thread and environment can affect these
-partial states. With LRG, it is possible to frame off both parts of
-shared state and parts of the rely-guarantee relation, but, as noted
+partial states. With LRG, it is possible to frame off disjoint parts of
+shared state and their associated disjoint rely-guarantee relation, but, as noted
 by its author, the strong disjointness restrictions make this approach
 only applicable for disjoint modules in the code. We took significant
 inspiration from LRG, combining the flexibility of the LRG approach
@@ -295,21 +289,18 @@ state.
 
 
 
-Finally, we should mention Subjective Concurrent Separation Logic
-(SCSL)~\cite{scsl-esop14} of Navevski {\em et al.}, which has a different notion
-of region called {\em concurroids}. Like the regions in  CAP,  concurroids describe
+Finally, we should mention Fine-grained Concurrent Concurrent Separation Logic
+(FCSL)~\cite{scsl-esop14} of Nanevski {\em et al.}, which has a different notion
+of region called {\em concurroids}. Like the regions in CAP,  concurroids describe
 shared state which must be disjoint from each other and static
-interference acting on this state. It is therefore  not
-possible to frame off partial concurroids. Unlike CAP,
-concurroids have three parts: the joint part (j);  and the disjoint self  (s)
- and   other part (o), hence  their very different use of  the adjective `subjective'.
-Although SCSL did  not influence \colosl, it does 
-highlight  an interesting point regarding
-resource transfer between regions: in CAP, communication between
-regions is achieved  indirectly via  the local state; in LRG, communication
+interference acting on this state. It is therefore not
+possible to frame within concurroids. Unlike CAP,
+concurroids have three parts: the joint part (j);  and the disjoint self (s) and other part (o), hence  their very different use of  the adjective `subjective'.
+Although FCSL did  not influence \colosl, it does 
+highlight  an interesting point regarding resource transfer between regions: in CAP, communication between regions is achieved indirectly via the local state; in SCSL, communication
 between concurroids is achieved directly through dangling external
 transitions; and, in \colosl, communication between compatible
-subjective views happens directly after the views have been merged. 
+subjective views can be achieved by merging the two views. 
 
 
 
