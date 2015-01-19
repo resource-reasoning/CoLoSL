@@ -16,7 +16,7 @@ access to the value of its left neighbour's counter; the state of the
 system consists of all $n{+}1$ counters. Starting in an arbitrary state,
 the network eventually stabilises to legitimate
 states~\cite{dijkstra-proof}, with the following global property: 
-in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n$). For a ring at address $x$, the $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
+in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n{+}1$). For a ring at address $x$, the $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
 %a number of 
 %successive machines in the ring have the same value $v+1$ (up to say,
 %machine $i$, with machine $0$ being the master), then the others have
@@ -51,13 +51,13 @@ in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with m
   \hfill\null\\
 
 
-In the accompanying technical report ~\cite{colosl-tr14}, we outline a proof sketch of token ring's
+In the accompanying technical report~\cite{colosl-tr14}, we outline a proof sketch of token ring's
 self-stabilisation phase in \colosl. We show that,
 starting from an arbitrary state, the system converges to a legitimate
 state. We also provide a proof of the token ring being used for mutual
 exclusion (in a legitimate state, only one machine can make progress,
-indicated by the $\bullet$ above).  Here, we
-focus on the part of the algorithm that makes interesting use of \colosl. We assume that the token ring is in  a legitimate state and all counters hold value $0$. Our proof will make use of the \colosl
+indicated by the $\bullet$ above). Here, we
+focus on the part of the algorithm that makes interesting use of \colosl. We assume that the token ring is in the $0$th legitimate state and all counters hold value $0$. Our proof will make use of the \colosl
 principles laid out in \fig\ref{fig:principles}, together with the
 usual concurrency rule of separation logic~\cite{csl-tcs} and the rule
 of semantic consequence from the Views framework~\cite{views}.  We introduce
