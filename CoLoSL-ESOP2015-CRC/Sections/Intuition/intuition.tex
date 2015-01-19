@@ -404,26 +404,26 @@ simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots *
   \cell{x{+}n}{10}} I $, by the \shiftRule principle, we get
 the postcondition of \li{ring(x)}. This concludes our \colosl proof of \li{ring(x)}. 
 
-We complete our semi-formal overview by noting that unlike
-CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
-an explicit \emph{unsharing} mechanism to claim shared resources and
-render them thread-local. Instead, this behaviour can be simply
-encoded for a resource described by $P$ and associated with tokens
-$[\token{a}_1]$, \ldots , $[\token{a}_{n}]$ as an additional action
-of the form \vspace{0pt}
-\[
-[\token{a}_1] * \cdots * [\token{a}_{n}]{:}\, P \swap [\token{a}_1] * \cdots * [\token{a}_{n}]\vspace{0pt}
-\]
-That is, a thread holding all the tokens can remove the resource $P$
-from the shared state and move them into its local state. In return,
-it must transfer the associated capabilities into the shared
-state. Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource
-transfer is common in \colosl actions. In general, resources that only
-appear on the left hand side of $\swap$ indicate their removal from
-the shared state (and their addition to the thread's local state);
-dually, resources that only appear on the right hand side of $\swap$
-denote their transfer to the shared state (from the thread's local
-state).
+%We complete our semi-formal overview by noting that unlike
+%CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
+%an explicit \emph{unsharing} mechanism to claim shared resources and
+%render them thread-local. Instead, this behaviour can be simply
+%encoded for a resource described by $P$ and associated with tokens
+%$[\token{a}_1]$, \ldots , $[\token{a}_{n}]$ as an additional action
+%of the form \vspace{0pt}
+%\[
+%[\token{a}_1] * \cdots * [\token{a}_{n}]{:}\, P \swap [\token{a}_1] * \cdots * [\token{a}_{n}]\vspace{0pt}
+%\]
+%That is, a thread holding all the tokens can remove the resource $P$
+%from the shared state and move them into its local state. In return,
+%it must transfer the associated capabilities into the shared
+%state. Borrowed from CAP~\cite{cap-ecoop10}, this pattern of resource
+%transfer is common in \colosl actions. In general, resources that only
+%appear on the left hand side of $\swap$ indicate their removal from
+%the shared state (and their addition to the thread's local state);
+%dually, resources that only appear on the right hand side of $\swap$
+%denote their transfer to the shared state (from the thread's local
+%state).
 
 \paragraph{Small specifications and proof reuse}
 Our expansion and
@@ -441,8 +441,22 @@ For instance, let us now modify the code of \li{ring(x)} in line~3 by
 forking an additional thread that dynamically grows the ring by
 spawning more slave threads (we leave the details to the accompanying
 technical report). When the ring has size
-$n$, we use an instance of the \extendRule principle as follows in
-order to add a new slave (at $x{+}n{+}1$) to the shared state. In
+$n$ (i.e. $\li{n} \harpoonything n$), we use an instance of the \extendRule principle as follows in
+order to add a new slave (at $x{+}n{+}1$) to the shared state\footnote{
+Unlike CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
+an explicit \emph{unsharing} mechanism to claim shared resources and
+render them thread-local. Instead, this behaviour can be simply
+encoded 
+%for a resource described by $P$ and associated with tokens
+%$[\token{a}_1]$, \ldots , $[\token{a}_{n}]$ 
+as an action of the form \vspace{0pt}
+$
+\oast_{j \in J}[\token{a}_j]{:}\, P \swap \oast_{j \in J}[\token{a}_j]\vspace{0pt}
+$.
+That is, a thread holding tokens $\oast_{j \in J}[\token{a}_j]$ can move the shared resource $P$
+into its local state in exchange for the associated capabilities $\oast_{j \in J}[\token{a}_j]$.
+state.
+}. In
 doing so, we also define the new slave's associated interference and
 accompanying capability.
 \begin{align*}
@@ -456,8 +470,8 @@ changing the machine states it denotes. In particular, $(P => Q) => (P
 ===> Q)$.
 Our proof changes only minimally to accommodate the updated program: the proof
 of \li{master(x)} now has to account for the new
-interference on the value of $n$ since the environment can grow the
-ring and thus increment the value of $n$. However, the proofs of
+interference on $\li{n} \harpoonything n$ since the environment can grow the
+ring and thus mutate $\li{n} \harpoonything n$. However, the proofs of
 other threads can be reused straightforwardly.
 
 %% \begin{figure}
@@ -499,7 +513,7 @@ other threads can be reused straightforwardly.
 %% \label{fig:spawner}
 %% \end{figure}
 
-In contrast, in existing approaches such as CAP~\cite{cap-ecoop10}, both $n$ and the global interference relation are observed by all threads.  As such, with the above extension, the global interference relation needs to change (to include the interference on $n$) and the proofs of \emph{both} master and slave threads need to be adapted. 
+In contrast, in existing CAP-like approaches~\cite{cap-ecoop10,tada}, both $\li{n} \harpoonything n$ and the global interference relation are observed by all threads.  As such, with the above extension, the global interference relation needs to change (to include the interference on $\li{n} \harpoonything n$) and the proofs of \emph{both} master and slave threads need to be adapted. 
 %
 %
 %% . For instance, in order to
