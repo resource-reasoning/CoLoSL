@@ -177,8 +177,8 @@ subjective views of \colosl are just what we need.
 The second is a concurrent set module implemented 
 using a hand-over-hand
 list-locking algorithm. Our \colosl reasoning  for this set module  improves
-on CAP reasoning (both the unnatural old style in ~\cite{.} and the more natural
-modern style introduced  in TaDA~\cite{.}) in that our small
+on CAP reasoning (both the unnatural old style in~\cite{cap-ecoop10} and the more natural
+modern style introduced  in TaDA~\cite{tada}) in that our small
 specifications can be dynamically extended to include other behaviour
 in future
 whereas the  static CAP interference  must predict all behaviour from the start. 
@@ -278,11 +278,6 @@ by the logical implication $P * Q \Rightarrow P * \texttt{true}$, but this is
 not the same as being able to shrink regions and their interference to
 just work with $P$.) 
 
-\pgcomment{What do we want to say about deny-guarantee? Does
-  deny-guarantee have static regions with interference? I know CAP
-  adapted interference lots, but I don't know if we swere the first to
-  introduce it}
-
 Meanwhile, a different breakthrough in compositionality came from
 Feng's local rely-guarantee (LRG) reasoning~\cite{lrg}. The LRG model
 comprises one global shared state, with assertions describing
@@ -301,7 +296,7 @@ state.
 
 
 Finally, we should mention Subjective Concurrent Separation Logic
-(SCSL)~\cite{SCSLand new referenceesop14} of Navevski {\em et al.}, which has a different notion
+(SCSL)~\cite{scsl-esop14} of Navevski {\em et al.}, which has a different notion
 of region called {\em concurroids}. Like the regions in  CAP,  concurroids describe
 shared state which must be disjoint from each other and static
 interference acting on this state. It is therefore  not
