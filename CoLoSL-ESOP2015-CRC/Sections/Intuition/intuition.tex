@@ -2,106 +2,17 @@
 \label{sec:intuition}
 
 We illustrate the main \colosl reasoning principles by sketching a
-proof of an implementation of Dijkstra's token-ring mutual exclusion
+proof of an implementation of Dijkstra's token ring mutual exclusion
 algorithm, which pioneered \emph{self-stabilising} distributed
 algorithms~\cite{dijkstra74}.
 
-\begin{figure}
-\centering
-\noindent\hrule\vspace{10pt}
-\vspace{-3ex}
-\begin{tabular}{@{} l @{\hspace{2ex}} l@{}}
-{\begin{lstlisting}[numbers=left,numbersep=5pt]
-ring(x)
-//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * x{+}2|->0\end{array}}{I}\end{array} \right\}$
-$\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid$ slave(x+2);
-$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * [\token s_{x{+}2}]*\null\\ \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * x{+}2|->10\end{array}}{I}\end{array} \right\}$
-
-master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
-$\{$ while(*x != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * (\cell{x{+}n}{v} \lor \cell{x{+}n}{v})\end{array}}{M_{x}'}\end{array} \right\}$
-    $\{\ \langle$if (*x == *(x+n))
-        *x = *x + 1;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * \cell{x}{10} * (\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
-\end{lstlisting}}
-&
-\begin{lstlisting}
-slave(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * (\cell{x{-}1}{0} \lor \cell{x{-}1}{1})\end{array}}{S_{x}'}\end{array} \right\}$
-$\{$  while(*x != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} *\null\\ (\cell{x{-}1}{v} \lor \cell{x{-}1}{v{+}1})\end{array}}{S_{x}'}\end{array} \right\}$
-    $\{\ \langle$if (*x != *(x-1))
-       *x = *(x-1);$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} *\\ (\cell{x{-}1}{10} \lor \cell{x{-}1}{11})\end{array}}{S_{x}'}\end{array} \right\}$
-\end{lstlisting}
-\end{tabular}
-\[
-\begin{array}{@{}r@{}l@{}l@{}}
-  s_x &\null ==
-  [\token s_x]{:}\, \exsts{v} \cell{x}{v} * \cell{x{-}1}{v{+}1} &\null\swap
-  \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
-  \\
-  m_{x} &\null ==
-  [\token m_{x}]{:}\, \exsts{v,n}\varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} &\null\swap
-  \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n}{v}
-  \\
-  s'_x &\null ==
-  [\token s_x]{:}\, \exsts{v} \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{-}1}{v{{+}}1} &\null\swap
-  \cell{x{+}1}{v} * \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
-\end{array}
-\]
-\vspace{-8pt}
-\[
-\begin{array}{@{}r@{}l@{}}
-  m'_{x} &\null ==
-  [\token m_{x}]{:}\, \exsts{v,n}
-  \begin{array}[t]{@{}l@{}}
-    \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{+}n}{v} \swap\null\\
-    \qquad \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v{+}1} *
-    \cell{x{+}n}{v}
-  \end{array}
-  \\
-  l'_{x}  &\null ==
-  [\token s_{x}]{:}\, \exsts{v,n}
-  \begin{array}[t]{@{}l@{}}
-    \varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} *
-    \cell{x{+}n{-}1}{v} \swap\null\\
-    \qquad
-    \varcell{\tx n}{n} *
-    \cell{x}{v} * \cell{x{+}n}{v{+}1} * \cell{x{+}n{-}1}{v}
-  \end{array}
-\end{array}
-\]
-\vspace{-5pt}
-\begin{mathpar}
-  I \eqdef \{m_{x}, s_{x{+}1}, s_{x{+}2} \}
-
-  M_{x}' \eqdef \{m_x, l_{x}'\}
-
-  F_{x}' \eqdef \{s_x, m_{x{-}1}'\}
-
-  S_x' \eqdef \{s_x, s_{x{-}1}'\}
-\end{mathpar}
-\vspace{-5pt}\hrule
-\caption{A proof sketch of the ring program together in \colosl. Lines
-  starting with $\color{blue}{//}$ contain formulas that describe the
-  local state and the subjective shared state at the relevant program
-  point. The proof of \li{slave} is still valid when replacing $S_x'$
-  with $F_x'$, which is needed to prove the first slave of the ring
-  (the foreman).}
-\label{fig:concurrentInc}
-\end{figure}
-
-The token ring algorithm, presented in \fig\ref{fig:concurrentInc},
-assumes a network of $n$ machines (in \fig\ref{fig:concurrentInc},
-$n=3$), arranged in a ring with a designated \emph{master} machine and
-$n{-}1$ slave machines. Each machine maintains a local counter and has
+The token ring algorithm, %presented in \fig\ref{fig:concurrentInc},
+assumes a network of $n{+}1$ machines, arranged in a ring with a designated \emph{master} machine and$n$ slave machines. Each machine maintains a local counter and has
 access to the value of its left neighbour's counter; the state of the
-system consists of all $n$ counters. Starting in an arbitrary state,
-the network eventually converges to legitimate
-states~\cite{dijkstra-proof}, of the following form: 
-in the $i$th legitimate state, all machines in the range $0\cdots i$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n{-}1$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n$). The $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
+system consists of all $n{+}1$ counters. Starting in an arbitrary state,
+the network eventually stabilises to legitimate
+states~\cite{dijkstra-proof}, with the following global property: 
+in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n$). For a ring at address $x$, the $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
 %a number of 
 %successive machines in the ring have the same value $v+1$ (up to say,
 %machine $i$, with machine $0$ being the master), then the others have
@@ -136,18 +47,17 @@ in the $i$th legitimate state, all machines in the range $0\cdots i$ (with machi
   \hfill\null\\
 
 
-In~\cite{colosl-tr14}, we outline a proof sketch of token ring's
-self-stabilisation phase in \colosl and are able to show that,
+In the accompanying technical report ~\cite{colosl-tr14}, we outline a proof sketch of token ring's
+self-stabilisation phase in \colosl. We show that,
 starting from an arbitrary state, the system converges to a legitimate
-state. We also provide a proof of the token ring when used for mutual
+state. We also provide a proof of the token ring being used for mutual
 exclusion (in a legitimate state, only one machine can make progress,
-indicated with $\bullet$ above).  In the remainder of this section, we
-focus on a variant where the token ring is in a legitimate state and
-all counters hold value $0$. Our proof will make use of the \colosl
+indicated by the $\bullet$ above).  Here, we
+focus on the part of the algorithm that makes interesting use of \colosl. We assume that the token ring is in  a legitimate state and all counters hold value $0$. Our proof will make use of the \colosl
 principles laid out in \fig\ref{fig:principles}, together with the
 usual concurrency rule of separation logic~\cite{csl-tcs} and the rule
-of consequence from the Views framework~\cite{views}.  We introduce
-them informally as needed, and present them in more details in
+of semantic consequence from the Views framework~\cite{views}.  We introduce
+them informally as needed, and present them in more detail in
 \S\ref{sec:colosl}.
 
 %% \begin{figure}
@@ -212,23 +122,20 @@ them informally as needed, and present them in more details in
 	}
 \end{mathpar}
 \hrule
-\caption{Main reasoning principles of \colosl.}
+\caption{Main reasoning principles and rules of \colosl.}
 \label{fig:principles}
 \end{figure}
 
 \colosl introduces a new assertion $\shared{P} I$ called a
 \emph{subjective view}, which comprises an assertion $P$ describing
-\emph{parts} of the global shared state and an interference assertion
+a \emph{part} of the global shared state and an interference assertion
 $I$ which characterises how this partial shared state may be changed
 by the thread or the environment. Similar to interference assertions
 of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
 $I$ declares transitions of the form $[\token a] : Q \swap R$, where a
-thread in possession of the $[\token a]$ capability (in its
-private--or local--state) may carry out its transition and update parts of the shared
-state that satisfy $Q$ to those described by $R$. Assertions in Hoare
-triples must be {\em stable}, that is, robust with respect to
-interferences from the environment (as prescribed in the interference
-relations attached to that assertion's subjective views). The $*$
+thread in possession of the $[\token a]$ capability (in its local state) may carry out its transition and update parts of the shared
+state satisfying $Q$ to those satisfying $R$. Assertions in Hoare
+triples must be {\em stable} with respect to the interference from the environment: that is, robust with respect to the interference assertion $I$. The $*$
 (resp.\ $**$) connective is that of separation logic and means that
 the current state is a disjoint (resp.\ potentially overlapping)
 composition of two states satisfying each sub-formula. The overlapping
@@ -241,26 +148,116 @@ changing the machine states it denotes. In particular, $(P => Q) => (P
 ===> Q)$.
 
 Consider the program $\li{ring(x)}$ defined in
-\fig\ref{fig:concurrentInc} representing a 3-place token ring.
+\fig\ref{fig:concurrentInc} representing a token ring with $n{+}1$ machines.
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
 It is written in pseudo-code resembling C with additional constructs
 for concurrency: atomic sections $\atomic \_$ which declare that code
 behaves atomically; and parallel composition $\_ ||\_ $ which spawns
-threads then waits until they complete. In our example, three threads
-are spawned (corresponding to the master thread and two slave threads)
+threads then waits until they complete. In our example, $n{+}1$ threads
+are spawned (corresponding to the master thread and $n$ slave threads)
 and are run in parallel until all counters reach value $10$.
 %(in the fashion described above).
 
-Note that this implementation can easily be generalised to an
-$n$-place ring. We focus on a 3-place ring for concision. While the
-implementation of all slave threads are identical, the proof of the
-first slave in the ring (at $x{+}1$) is slightly different from that
-of the others. We henceforth refer to the first slave thread as the
+%Note that this implementation can easily be generalised to an
+%$n$-place ring. We focus on a 3-place ring for concision.
+While the implementation of all slave threads are identical, we shall see that the proof of the
+first slave in the ring (at $x{+}1$) is slightly different from the others.
+We henceforth refer to the first slave thread as the
 \emph{foreman}.  Let us proceed with the proof outline of the other
 slave thread, which would apply as-is to any further slaves added to
 the program.
 
+%
+\begin{figure}
+\centering
+\noindent\hrule\vspace{10pt}
+\vspace{-3ex}
+{\begin{lstlisting}[numbers=left,numbersep=5pt]
+ring(x)
+//$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * \cdots * [\token s_{x{+}n}]* \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * \cdots * x{+}n|->0\end{array}}{I}\end{array} \right\}$
+$\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid \cdots \mid\mid$ slave(x+n);
+$\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * \cdots * [\token s_{x{+}n}]* \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * \cdots * x{+}n|->10\end{array}}{I}\end{array} \right\}$
+\end{lstlisting}}
+%
+\begin{tabular}{@{} l @{\hspace{2ex}} l@{}}
+{\begin{lstlisting}
+master(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
+$\{$ while(*x != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * \cell{x{+}n}{v} \end{array}}{M_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (*x == *(x+n))
+        *x = *x + 1;$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * \cell{x}{10} * (\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
+\end{lstlisting}}
+&
+\begin{lstlisting}
+slave(x)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\cell{x}{0} * (\cell{x{-}1}{0} \lor \cell{x{-}1}{1})\end{array}}{S_{x}'}\end{array} \right\}$
+$\{$  while(*x != 10)
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} *\null\\ (\cell{x{-}1}{v} \lor \cell{x{-}1}{v{+}1})\end{array}}{S_{x}'}\end{array} \right\}$
+    $\{\ \langle$if (*x != *(x-1))
+       *x = *(x-1);$\rangle\ \}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} *\\ (\cell{x{-}1}{10} \lor \cell{x{-}1}{11})\end{array}}{S_{x}'}\end{array} \right\}$
+\end{lstlisting}
+\end{tabular}
+\[
+\begin{array}{@{}r@{}l@{}l@{}}
+  s_x &\null ==
+  [\token s_x]{:}\, \exsts{v} \cell{x}{v} * \cell{x{-}1}{v{+}1} &\null\swap
+  \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
+  \\
+  m_{x} &\null ==
+  [\token m_{x}]{:}\, \exsts{v,n}\varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} &\null\swap
+  \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n}{v}
+  \\
+  s'_x &\null ==
+  [\token s_x]{:}\, \exsts{v} \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{-}1}{v{{+}}1} &\null\swap
+  \cell{x{+}1}{v} * \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
+\end{array}
+\]
+\vspace{-8pt}
+\[
+\begin{array}{@{}r@{}l@{}}
+  m'_{x} &\null ==
+  [\token m_{x}]{:}\, \exsts{v,n}
+  \begin{array}[t]{@{}l@{}}
+    \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{+}n}{v} \swap\null\\
+    \qquad \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v{+}1} *
+    \cell{x{+}n}{v}
+  \end{array}
+  \\
+  l'_{x}  &\null ==
+  [\token s_{x}]{:}\, \exsts{v,n}
+  \begin{array}[t]{@{}l@{}}
+    \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n{-}1}{v{+}1} * \cell{x{+}n}{v}
+    \swap\null\\
+    \qquad
+    \varcell{\tx n}{n} *
+    \cell{x}{v{+}1} * \cell{x{+}n{-}1}{v{+}1} * \cell{x{+}n}{v{+}1}
+  \end{array}
+\end{array}
+\]
+\vspace{-5pt}
+\begin{mathpar}
+  I \eqdef \{m_{x}, s_{x{+}1}, \cdots, s_{x{+}n} \}
+
+  M_{x}' \eqdef \{m_x, l_{x}'\}
+
+  F_{x}' \eqdef \{s_x, m_{x{-}1}'\}
+
+  S_x' \eqdef \{s_x, s_{x{-}1}'\}
+\end{mathpar}
+\vspace{-5pt}\hrule
+\caption{A proof sketch of the ring program together in \colosl. Lines
+  starting with $\color{blue}{//}$ contain assertions that describe the
+  local state and the subjective shared state at the relevant program
+  point. The proof of \li{slave} is still valid when replacing $S_x'$
+  with $F_x'$, which is needed to prove the first slave of the ring
+  (the foreman).}
+\label{fig:concurrentInc}
+\end{figure}
+%
 %% In our reasoning, we represent the resources associated with each
 %% machine in the ring as two consecutive cells in the heap recording
 %% the current value of the associated counter; and b)
@@ -269,13 +266,13 @@ the program.
 %% the master and foreman threads are similar and can be described
 %% analogously.
 
-\paragraph{Proof of the slaves}
+\paragraph{Proof of slave threads}
 Let us forget for a moment about the proof outline of
 \fig\ref{fig:concurrentInc} and attempt to prove \li{slave} in
-isolation, in the spirit of compositional reasoning. Since
+isolation, in the spirit of local reasoning. Since
 \li{slave(x)} inspects the value of its counter pointed to by \li{x}
 and compares it against the counter at \li{x-1} (its left neighbour in
-the ring), a tempting precondition for $\li{slave(x)}$ would capture
+the ring), a tempting precondition for $\li{slave(x)}$ would be one describing
 just these two locations, e.g.
 \vspace{-3pt}
 \[
@@ -284,20 +281,20 @@ just these two locations, e.g.
 S_x = \{s_{x}, s_{x{-}1}\}
 \vspace{-3pt}
 \]
-Going left to right, the above assertion states that the thread
-locally owns  variable \li{x} with value $x$ (using the variables-as-resource model~\cite{variablesAsResource}), and a
+%
+The above assertion comprises: a) a variable assertion stating that the thread
+locally owns  variable \li{x} with value $x$ (using the variables-as-resource model~\cite{variablesAsResource}); b) a
 \emph{capability} $[\token{s}_x]$ that allows it to perform the
-associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}).  The
-current thread also has a subjective view of the shared state: $x$
-points to $0$ and $x-1$ points to either $0$ or $1$, since its left
+associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}); and c) a subjective view of the shared state: $x$
+points to $0$ and $x{-}1$ (its left neighbour) points to either $0$ or $1$, since its left
 neighbour might have already incremented its own counter. The
-interference relation is captured by $S_x$ and consists of two
+interference assertion associated with the subjective view is captured by $S_x$ and consists of two
 actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
 of the contents of $x$ under the condition that its value is one less
-than the value at address $x-1$. Since it owns $[\token s_x]$, the
+than the value at address $x{-}1$. Since it owns $[\token s_x]$ locally, the
 current thread is the only one that can perform $s_x$. On the other
 hand, the capability $[\token s_{x{-}1}]$ is not locally owned, thus
-could the environment could potentially perform the
+the environment could potentially perform the
 associated action whenever its precondition (on the left-hand side of $\swap$) is satisfied.
 %that performed by the current machine (enabled by $[\token{x}]$); and that of the previous machine in the ring (enabled by $[\token{s}_p]$). Each action allows the value of the corresponding machine to be incremented by $1$ so long is it is the one that can make a move (As described above). 
 Upon closer inspection, since the subjective view says nothing of the
@@ -325,45 +322,50 @@ resources into the local state to perform the update) and preserves
 the invariant.  The final postcondition of $\li{slave(x)}$ follows
 from the invariant and the boolean expression of the loop.
 
-\paragraph{The ring}
-The proof sketches of the foreman (first slave) and master threads are
+\paragraph{Proof of master and foreman threads}
+The proof sketches of the master and foreman (first slave) threads are
 analogous, following \fig\ref{fig:concurrentInc}. As the first slave,
 the foreman has to account for interference from the master thread
 instead of another slave thread. Note that the master has access to
-variable \li{n} holding the current size of the ring, and so
-does its associated action $m_x$ since whether it can fire or not is
-decided by the value of the counter at address $x+n$. Let us now
-detail the proof of \li{ring(x)}.
+variable \li{n} holding the current size of the ring, as
+does its associated action $m_x$, since whether it can fire or not is
+decided by the value of the counter at address $x+n$. 
+%Let us now detail the proof of \li{ring(x)}.
 
+\paragraph{Proof of the ring}
 The precondition of \li{ring} states that it owns all capabilities,
-which will be distributed amongst the three threads; the global
+which will be distributed amongst the $n+1$ threads; the global
 variable \li{n} is shared, as are all three counters, initialised
 to 0. The interference $I$ associated with the subjective view
 consists of the actions of the three threads. Because at this stage we have a global view
 of the state of the ring (and moreover all capabilities are held
-locally), the ``small'' actions $s_{x+i}$ are enough to guarantee
+locally), the $s_{x+i}$ actions are enough to guarantee
 stability.
 
 Let us write $\shared P I$ for this initial subjective
 view. This assertion may be freely duplicated using the \copyRule
-principle and each thread is given a copy together with the
+principle of \fig\ref{fig:principles} and each thread is given a copy together with the
 appropriate capability using the \parRule rule. For instance, the
-thread running \li{slave(x+2)} gets $[\token{s}_{x{+}2}] *
+thread running \li{slave(x+$i$)} (for $i>1$) gets $[\token{s}_{x{+}i}] *
 \shared{P}{I}$.  This assertion does not match the precondition of
-\li{slave(x+2)} just yet. Using the principles given
+\li{slave(x+i)} just yet. Using the principles given
 in \fig\ref{fig:principles}, we can weaken the assertion as such:
+%
 \begin{align*}
-  &\shared{P}{I}
-  \stackrel{(\shiftRule)}{=>}
-  \shared{P}{\{m_x, s'_{x{+}1}, s_{x{+}2}\}}
-  \stackrel{(\forgetRule)}{=>}
-  \shared{\cell{x{+}1}{0} * \cell{x{+}2}{0}}{\{m_x, s'_{x{+}1}, s_{x{+}2}\}} \\[-5pt]
+  \shared{P}{I} 
   &\stackrel{(\shiftRule)}{=>}
-  \shared{\cell{x{+}1}{0} * \cell{x{+}2}{0}}{S'_{x{+}2}}
-  \stackrel{(\weakenRule)}{=>}
+  \shared{P}{\{m_x\} \cup \{s_{x{+}j} \mid 1 \leq j < i-1\} \cup \{s'_{x{+}i{-}1}\} \cup \{s_{x{+} j} \mid  i \leq j \leq n\}}\\[-5pt]
+%  
+  &\stackrel{(\forgetRule)}{=>}
+  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{\{m_x, \cdots, s'_{x{+}i{-}1}, s_{x{+}i, \cdots, s_{x{+}n}}\}} \\[-5pt]
+%  
+  &\stackrel{(\shiftRule)}{=>}
+  \shared{\cell{x{+}i{-}1}{0} * \cell{x{+}i}{0}}{S'_{x{+}i}}\\[-5pt]
+% 
+  &\stackrel{(\weakenRule)}{=>}
   \shared{\cell{x{+}2}{0} * (\cell{x{+}1}{0} \lor \cell{x{+}1}{1})}{S'_{x{+}2}}
 \end{align*}
-
+%
 We begin by rewriting the $s_{x{+}1}$ action of $I$ into the stronger
 action of $s'_{x{+}1}$ using \shiftRule. In general, \shiftRule allows
 us to replace $I$ with any interference relation $I'$ that has the
