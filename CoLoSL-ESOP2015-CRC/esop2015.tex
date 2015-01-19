@@ -21,16 +21,17 @@
 A key difficulty in verifying shared-memory concurrent programs is
 reasoning compositionally about each thread in isolation. Existing
 verification techniques for fine-grained concurrency typically require
-reasoning about either entirely disjoint or entirely overlaid pieces
-of shared memory, impeding compositionality.  This paper introduces
+reasoning about either the entire shared state  or disjoint
+parts of the shared state,  impeding compositionality.  This paper introduces
 the program logic \colosl, where each thread is verified with respect
 to its subjective view of the global shared state.  This subjective
-view describes only that part of the global shared resource accessed
+view describes only that part of the state  accessed
 by the thread. Subjective views may arbitrarily overlap with each
 other, and expand and contract depending on the resource required by
-the thread.  This flexibility provides small specifications and
-therefore more compositional reasoning for concurrent programs, which
-we demonstrate on a range of examples including a concurrent
+the thread.  This flexibility gives rise to small specifications and,
+hence,  more compositional reasoning for concurrent programs. We
+demonstrate our reasoning on 
+a range of examples,  including a concurrent
 computation of a spanning tree of a graph.
 \end{abstract}
 
