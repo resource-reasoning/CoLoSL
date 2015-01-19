@@ -45,7 +45,7 @@ is required by the thread.
 
 Small specifications were emphasised in the work of O'Hearn, Reynolds
 and Yang on separation logic~\cite{o2001local}.  The original
-separation logic~\cite{rey02,seplog} achieves compositional reasoning
+separation logic~\cite{rey02,seplog} achieves local, compositional reasoning
 for sequential heap-manipulating programs by spliting the heap into
 disjoint heaplets for describing the local resource required by a
 program. Compositionality rests on two powerful mechanisms: a program
@@ -140,27 +140,22 @@ compositionality.
 %identically for both modules. The probability that several modules
 %agree on the exact partition and shape of the shared resources is slim.}
 
-This paper introduces the program logic \colosl, which stands for 
+This paper introduces the program logic \colosl, which stands for
 \underline{Co}ncurrent \underline{Lo}cal \underline{S}ubjective
 \underline{L}ogic. \colosl's semantic model is based on one global
-shared state, and
-each thread is verified with respect to its partial {\em subjective view}
-of this global state. 
-Each subjective (personalised) view comprises an assertion which
-describes  \emph{parts} of the shared global resource used by a thread, 
-and an interference relation which describes   how the thread and
-the environment may affect these parts. 
-Subjective views may arbitrarily overlap with
-each other, with both their resource and interference expanding and
-contracting  in accordance with what is required by the
-thread. Interestingly, this
-sometimes requires rewriting  the  interference relation so that 
-the interference on the smaller state captures the same 
-information as the interference on the bigger state. This expansion
-and contraction of subjective views provides a kind of framing on a
-thread's shared state, giving rise to smaller specifications and hence
-more
-compositional reasoning about concurrent programs. 
+shared state, and each thread is verified with respect to its partial
+{\em subjective view} of this state.  Each subjective (personalised)
+view comprises an assertion which describes \emph{parts} of the shared
+global resource used by a thread, and an interference relation which
+describes how the thread and the environment may affect these parts.
+Subjective views may arbitrarily overlap with each other, with both
+their resource and interference expanding and contracting in
+accordance with what is required by the thread. Interestingly, this
+sometimes requires rewriting the interference relation so that the
+interference on the smaller state captures the same information as the
+interference on the bigger state. This expansion and contraction of
+subjective views provides small specifications for individual threads
+and local reasoning about a thread's shared state.
 
 
 %\pgcomment{Not for here, section3:We give the main ideas behind the semantic model and the soundness of
@@ -247,8 +242,7 @@ accompanying technical report~\cite{colosl-tr14}.
 
 
 
-\paragraph{Related work}
-
+\noindent {\bf Related work.}\/
 Jones' rely-guarantee reasoning~\cite{rg} provided a breakthrough in
 compositional reasoning about concurrent programs. It described
 permitted interferences between threads using global rely and
@@ -291,32 +285,39 @@ just work with $P$.)
   adapted interference lots, but I don't know if we swere the first to
   introduce it}
 
-Meanwhile, a different breakthrough  in compositionality  came from
-Feng's local rely-guarantee (LRG)  reasoning~\cite{lrg}. The LRG model
-comprises  one global shared state,
-with assertions describing {\em parts} of the global shared state used by a
-thread and  global rely-guarantee
-relations for determining how the thread and environment can affect
-these parts. 
+Meanwhile, a different breakthrough in compositionality came from
+Feng's local rely-guarantee (LRG) reasoning~\cite{lrg}. The LRG model
+comprises one global shared state, with assertions describing
+{disjoint } but flexible parts of this state and rely-guarantee
+relations determining how the thread and environment can affect these
+partial states. With LRG, it is possible to frame off both parts of
+shared state and parts of the rely-guarantee relation, but, as noted
+by its author, the strong disjointness restrictions make this approach
+only applicable for disjoint modules in the code. We took significant
+inspiration from LRG, combining the flexibility of the LRG approach
+with subjective views to reason locally about overlapping shared
+state.
 
-
-wherein the shared state may be
-split into completely independent pieces, thus partially solving the
-first problem outlined above. This provides a way to frame off parts
-of the shared state but, as noted by its author, the strong
-disjointness restrictions make this applicable only at the level of
-disjoint modules in the code. 
-
-
+\pgcomment{Have I grabbed all the points about LRG?}
 
 
 
-Finally, Subjective Concurrent Separation Logic (SCSL)~\cite{SCSL}
-uses \emph{subjective auxiliary states}, similar in spirit to our
-subjective views for the shared state, to reason about \emph{coarse-grained}
-concurrency. As noted by its authors, while CAP (and by design \colosl) can
-be employed to reason about their studied examples, SCSL cannot be
-used to reason about the fine-grained concurrency scenarios that \colosl tackles.
+Finally, we should mention Subjective Concurrent Separation Logic
+(SCSL)~\cite{SCSLand new referenceesop14} of Navevski {\em et al.}, which has a different notion
+of region called {\em concurroids}. Like the regions in  CAP,  concurroids describe
+shared state which must be disjoint from each other and static
+interference acting on this state. It is therefore  not
+possible to frame off partial concurroids. Unlike CAP,
+concurroids have three parts: the joint part (j);  and the disjoint self  (s)
+ and   other part (o), hence  their very different use of  the adjective `subjective'.
+Although SCSL did  not influence \colosl, it does 
+highlight  an interesting point regarding
+resource transfer between regions: in CAP, communication between
+regions is achieved  indirectly via  the local state; in LRG, communication
+between concurroids is achieved directly through dangling external
+transitions; and, in \colosl, communication between compatible
+subjective views happens directly after the views have been merged. 
+
 
 
 \subsection{Related work bullet points} 
