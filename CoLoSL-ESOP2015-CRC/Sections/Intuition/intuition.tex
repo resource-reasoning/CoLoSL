@@ -259,7 +259,7 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
 
 \paragraph{Proof of slave threads}
 Let us forget for a moment about the proof outline of
-\fig\ref{fig:concurrentInc} and attempt to prove \li{slave} in
+\fig\ref{fig:concurrentInc} and attempt to prove \li{slave(x)} in
 isolation, in the spirit of local reasoning. Since
 \li{slave(x)} inspects the value of its counter pointed to by \li{x}
 and compares it against the counter at \li{x-1} (its left neighbour in
@@ -326,10 +326,10 @@ decided by the value of the counter at address $x+n$.
 
 \paragraph{Proof of the ring}
 The precondition of \li{ring} states that it owns all capabilities,
-which will be distributed amongst the $n+1$ threads; the global
-variable \li{n} is shared, as are all three counters, initialised
+which will be distributed amongst the $n{+}1$ threads; the global
+variable $\li{n} \harpoonything n$ is shared, as are all $n{+}1$ counters, initialised
 to 0. The interference $I$ associated with the subjective view
-consists of the actions of the three threads. Because at this stage we have a global view
+consists of the actions of the $n{+}1$ threads. Because at this stage we have a global view
 of the state of the ring (and moreover all capabilities are held
 locally), the $s_{x+i}$ actions are enough to guarantee
 stability.
@@ -338,10 +338,10 @@ Let us write $\shared P I$ for this initial subjective
 view. This assertion may be freely duplicated using the \copyRule
 principle of \fig\ref{fig:principles} and each thread is given a copy together with the
 appropriate capability using the usual \parRule rule of concurrent
-separation logics. For instance, the
+separation logic. For instance, the slave
 thread running \li{slave(x+$i$)} (for $i>1$) gets $[\token{s}_{x{+}i}] *
 \shared{P}{I}$.  This assertion does not match the precondition of
-\li{slave(x+i)} just yet. Using the principles given
+\li{slave(x+$i$)} just yet. Using the principles given
 in \fig\ref{fig:principles}, we can weaken the assertion as such:
 %
 \begin{align*}
