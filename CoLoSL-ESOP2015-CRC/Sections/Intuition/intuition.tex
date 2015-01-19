@@ -394,11 +394,9 @@ potentially \emph{overlapping} pieces of state. In particular, $A * B
 => A ** B$ and $A /| B => A**B$. This connective has been used in the past to reason about sharing in
 data structures~\cite{rey-slnotes,js-popl12,ramification}.
  Since $|/$ distributes over $**$, the subjective view
-simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} *
-  \cell{x{+}2}{10}}{S'_{x} \cup S'_{x{+}1} \cup
-  S'_{x{+}2}}$. Finally, since $S'_{x} \cup S'_{x{+}1} \cup
-S'_{x{+}2}$ $\weakenI{{\scriptli{n}}|-< n * \cell{x}{10} * \cell{x{+}1}{10} *
-  \cell{x{+}2}{10}} I $, by the \shiftRule principle, we get
+ simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots * \cell{x{+}n}{10}}{M'_{x}, S'_{x{+}1} \cup \cdots \cup S'_{x{+}n} }$. 
+ Finally, since $M'_{x} \cup S'_{x{+}1} \cup \cdots \cup S'_{x{+}n}$ $\weakenI{{\scriptli{n}}|-< n * \cell{x}{10} * \cell{x{+}1}{10} * \cdots *
+ \cell{x{+}n}{10}} I $, by the \shiftRule principle, we get
 the postcondition of \li{ring(x)}. This concludes our \colosl proof of \li{ring(x)}. 
 
 %We complete our semi-formal overview by noting that unlike
