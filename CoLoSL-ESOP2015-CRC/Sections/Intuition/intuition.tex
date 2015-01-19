@@ -173,7 +173,7 @@ the program.
 \centering
 \noindent\hrule\vspace{10pt}
 \vspace{-3ex}
-{\begin{lstlisting}[numbers=left,numbersep=5pt]
+{\begin{lstlisting}[numbers=none,numbersep=5pt]
 ring(x)
 //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * \cdots * [\token s_{x{+}n}]* \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->0 * x{+}1|->0 * \cdots * x{+}n|->0\end{array}}{I}\end{array} \right\}$
 $\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid \cdots \mid\mid$ slave(x+n);
@@ -434,7 +434,7 @@ environment, and provide more opportunities for proof reuse.
 %slave threads, without needing to reprove \li{master} or \li{slave} at
 %all. 
 
-For instance, let us now modify the code of \li{ring(x)} in line~3 by
+For instance, let us now modify the third line of \li{ring(x)} by
 forking an additional thread that dynamically grows the ring by
 spawning more slave threads (we leave the details to the accompanying
 technical report). When the ring has size
