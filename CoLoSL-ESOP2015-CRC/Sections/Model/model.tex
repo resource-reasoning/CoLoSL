@@ -433,7 +433,7 @@ consequences of the semantics.
 \begin{proof}[sketch]
   The cases of \weakenRule and \copyRule are
   straightforward. \forgetRule, \mergeRule and \shiftRule principles are valid as action
-  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference relations, or when shifting the interference relation, respectively. The full proof is provided in~\cite{colosl-tr14}.
+  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference assertions, or when shifting the interference assertion, respectively. The full proof is provided in~\cite{colosl-tr14}.
   \qed
 \end{proof}
 
@@ -492,7 +492,7 @@ set of potential actions on that region, represented by the last two
 components of each world $(l,g,\lmod)$. \colosl's most
 distinguishing features are the ability to focus on a sub-part of this
 shared region, to extend the shared state, and to exchange an
-interference relation for an other that is equivalent as far as the
+interference assertion for an other that is equivalent as far as the
 subjective view is concerned. The soundness of \colosl hinges on the
 fact that the action model $\lmod$ of a world contains all the actions
 that could possibly affect the shared state $g$. (Similarly, the
@@ -525,7 +525,7 @@ is invariant under all actions in $\lmod'$ (called a \emph{fence}),
 then checking the confinement condition for each action.
 
 In the logic, the shared state is extended by the resources in
-$P$ under the interference $I$ via the \extendRule principle,
+$P$ under the interference assertion $I$ via the \extendRule principle,
 which requires that $P\containI I$ be
 established. \fig~\ref{fig:local-fencing-rules} presents a set of
 rules to reduce $P \containI I$ to a series of entailments in

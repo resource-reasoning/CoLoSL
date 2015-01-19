@@ -127,8 +127,8 @@ them informally as needed, and present them in more detail in
 \end{figure}
 
 \colosl introduces a new assertion $\shared{P} I$ called a
-\emph{subjective view}, which comprises an assertion $P$ describing
-a \emph{part} of the global shared state and an interference assertion
+\emph{subjective view}, which comprises a \emph{subjective assertion} $P$ describing
+a \emph{part} of the global shared state and an \emph{interference assertion}
 $I$ which characterises how this partial shared state may be changed
 by the thread or the environment. Similar to interference assertions
 of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
@@ -370,7 +370,7 @@ in \fig\ref{fig:principles}, we can weaken the assertion as such:
 %
 We begin by rewriting the $s_{x{+}i{-}1}$ action of $I$ into the stronger
 action of $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
-us to replace $I$ with any interference relation $I'$ that has the
+us to replace $I$ with any interference assertion $I'$ that has the
 same observable effect as far as the subjective assertion $P$ of the
 subjective view is concerned (written $I \weakenI{P} I'$). In this
 instance, actions $s_{x{+}i{-}1}$ and $s'_{x{+}i{-}1}$ have the same effect
