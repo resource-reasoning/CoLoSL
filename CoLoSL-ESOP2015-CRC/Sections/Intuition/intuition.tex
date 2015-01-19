@@ -1,13 +1,17 @@
 \section{Informal Development}
 \label{sec:intuition}
 
-We illustrate the main \colosl reasoning principles by sketching a
-proof of an implementation of Dijkstra's token ring mutual exclusion
-algorithm, which pioneered \emph{self-stabilising} distributed
-algorithms~\cite{dijkstra74}.
+We sketch a proof of an implementation of Dijkstra's token ring mutual
+exclusion algorithm, which pioneered \emph{self-stabilising}
+distributed algorithms~\cite{dijkstra74}. Our proof highlight the main
+reasoning principles supported by \colosl and results in \emph{small
+  specifications} for each participant in the ring. Besides their
+concision, we show how small specifications are robust against
+non-trivial changes in the algorithm.
 
-The token ring algorithm, %presented in \fig\ref{fig:concurrentInc},
-assumes a network of $n{+}1$ machines, arranged in a ring with a designated \emph{master} machine and$n$ slave machines. Each machine maintains a local counter and has
+The token ring algorithm %presented in \fig\ref{fig:concurrentInc},
+assumes a network of $n{+}1$ machines arranged in a ring, with a
+designated \emph{master} machine and $n$ slave machines. Each machine maintains a local counter and has
 access to the value of its left neighbour's counter; the state of the
 system consists of all $n{+}1$ counters. Starting in an arbitrary state,
 the network eventually stabilises to legitimate
@@ -135,28 +139,18 @@ of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
 $I$ declares transitions of the form $[\token a] : Q \swap R$, where a
 thread in possession of the $[\token a]$ capability (in its local state) may carry out its transition and update parts of the shared
 state satisfying $Q$ to those satisfying $R$. Assertions in Hoare
-triples must be {\em stable} with respect to the interference from the environment: that is, robust with respect to the interference assertion $I$. The $*$
-(resp.\ $**$) connective is that of separation logic and means that
-the current state is a disjoint (resp.\ potentially overlapping)
-composition of two states satisfying each sub-formula. The overlapping
-conjunction $**$ has been used in the past to reason about sharing in
-data structures~\cite{rey-slnotes,js-popl12,ramification}. The
-\emph{view shift}~\cite{views} (or
-\emph{repartitioning}~\cite{cap-ecoop10}) $P ===> Q$ means that an
-(instrumented) state satisfying $P$ may be manipulated without
-changing the machine states it denotes. In particular, $(P => Q) => (P
-===> Q)$.
+triples must be {\em stable} with respect to the interference from the environment: that is, robust with respect to the interference assertion $I$.
 
 Consider the program $\li{ring(x)}$ defined in
-\fig\ref{fig:concurrentInc} representing a token ring with $n{+}1$ machines.
+\fig\ref{fig:concurrentInc} representing a token ring with $n{+}1$
+machines (one master thread and $n$ slave threads).
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
 It is written in pseudo-code resembling C with additional constructs
 for concurrency: atomic sections $\atomic \_$ which declare that code
 behaves atomically; and parallel composition $\_ ||\_ $ which spawns
-threads then waits until they complete. In our example, $n{+}1$ threads
-are spawned (corresponding to the master thread and $n$ slave threads)
-and are run in parallel until all counters reach value $10$.
+threads then waits until they complete. In our example, the $n{+}1$ threads
+run in parallel until all counters reach value $10$.
 %(in the fashion described above).
 
 %Note that this implementation can easily be generalised to an
@@ -164,11 +158,9 @@ and are run in parallel until all counters reach value $10$.
 While the implementation of all slave threads are identical, we shall see that the proof of the
 first slave in the ring (at $x{+}1$) is slightly different from the others.
 We henceforth refer to the first slave thread as the
-\emph{foreman}.  Let us proceed with the proof outline of the other
-slave thread, which would apply as-is to any further slaves added to
-the program.
+\emph{foreman}.  Let us proceed with the proof of the other
+slave threads, which uniformly applies to \emph{all} of them.
 
-%
 \begin{figure}
 \centering
 \noindent\hrule\vspace{10pt}
@@ -179,16 +171,16 @@ ring(x)
 $\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid \cdots \mid\mid$ slave(x+n);
 $\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * \cdots * [\token s_{x{+}n}]* \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * \cdots * x{+}n|->10\end{array}}{I}\end{array} \right\}$
 \end{lstlisting}}
-%
-\begin{tabular}{@{} l @{\hspace{2ex}} l@{}}
+\vspace{-2ex}
+\begin{tabular}{@{} l @{\hspace{8ex}} l@{}}
 {\begin{lstlisting}
 master(x)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]* \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\ \shared{\varcell{\tx n}{n} * \cell{x}{0} * \cell{x{+}n}{0}}{M_{x}'}\end{array}\right\}$
 $\{$ while(*x != 10)
-//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} * \cell{x{+}n}{v} \end{array}}{M_{x}'}\end{array} \right\}$
+//$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} *[\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}} \varcell{\tx n}{n} * \exsts{v}\cell{x}{v} *\null\\\quad (\cell{x{+}n}{v}\lor\cell{x{+}n}{v{-}1}) \end{array}}{M_{x}'}\end{array} \right\}$
     $\{\ \langle$if (*x == *(x+n))
         *x = *x + 1;$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * \cell{x}{10} * (\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token m_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\varcell{\tx n}{n} * \cell{x}{10} *\null\\\quad (\cell{x{+}n}{10} \lor \cell{x{+}n}{9})\end{array}}{M_{x}'}\end{array} \right\}$
 \end{lstlisting}}
 &
 \begin{lstlisting}
@@ -207,40 +199,38 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
   [\token s_x]{:}\, \exsts{v} \cell{x}{v} * \cell{x{-}1}{v{+}1} &\null\swap
   \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
   \\
+  s'_x &\null ==
+  [\token s_x]{:}\, \exsts{v} \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{-}1}{v{{+}}1} &\null\swap
+  \cell{x{+}1}{v} * \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}\\
   m_{x} &\null ==
   [\token m_{x}]{:}\, \exsts{v,n}\varcell{\tx n}{n} * \cell{x}{v} * \cell{x{+}n}{v} &\null\swap
   \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n}{v}
   \\
-  s'_x &\null ==
-  [\token s_x]{:}\, \exsts{v} \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{-}1}{v{{+}}1} &\null\swap
-  \cell{x{+}1}{v} * \cell{x}{v{+}1} * \cell{x{-}1}{v{+}1}
-\end{array}
-\]
-\vspace{-8pt}
-\[
-\begin{array}{@{}r@{}l@{}}
-  m'_{x} &\null ==
-  [\token m_{x}]{:}\, \exsts{v,n}
+  m'_{x} &
+  \multicolumn{2}{@{}l@{}}{%
+    \null ==  [\token m_{x}]{:}\, \exsts{v,n}
   \begin{array}[t]{@{}l@{}}
     \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v} * \cell{x{+}n}{v} \swap\null\\
-    \qquad \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v{+}1} *
+    \varcell{\tx n}{n} * \cell{x{+}1}{v} * \cell{x}{v{+}1} *
     \cell{x{+}n}{v}
-  \end{array}
+  \end{array}}
   \\
-  l'_{x}  &\null ==
+  l'_{x}  &
+  \multicolumn{2}{@{}l@{}}{%
+    \null ==
   [\token s_{x}]{:}\, \exsts{v,n}
   \begin{array}[t]{@{}l@{}}
-    \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n{-}1}{v{+}1} * \cell{x{+}n}{v}
+    \varcell{\tx n}{n} * \cell{x}{v{+}1} * \cell{x{+}n}{v} * \cell{x{+}n{-}1}{v{+}1}
     \swap\null\\
-    \qquad
     \varcell{\tx n}{n} *
-    \cell{x}{v{+}1} * \cell{x{+}n{-}1}{v{+}1} * \cell{x{+}n}{v{+}1}
-  \end{array}
+    \cell{x}{v{+}1} * \cell{x{+}n}{v{+}1}
+    * \cell{x{+}n{-}1}{v{+}1}
+  \end{array}}
 \end{array}
 \]
 \vspace{-5pt}
 \begin{mathpar}
-  I \eqdef \{m_{x}, s_{x{+}1}, \cdots, s_{x{+}n} \}
+  I \eqdef \{m_{x}, s_{x{+}1}, \ldots, s_{x{+}n} \}
 
   M_{x}' \eqdef \{m_x, l_{x}'\}
 
@@ -249,12 +239,13 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
   S_x' \eqdef \{s_x, s_{x{-}1}'\}
 \end{mathpar}
 \vspace{-5pt}\hrule
-\caption{A proof sketch of the ring program together in \colosl. Lines
-  starting with $\color{blue}{//}$ contain assertions that describe the
-  local state and the subjective shared state at the relevant program
-  point. The proof of \li{slave} is still valid when replacing $S_x'$
-  with $F_x'$, which is needed to prove the first slave of the ring
-  (the foreman).}
+\caption{A proof sketch of the ring program in \colosl. Lines starting
+  with $\color{blue}{//}$ contain assertions that describe the local
+  state and the subjective shared state at the relevant program
+  point. The proof of \li{slave} applies uniformly to all slaves
+  expect the first one (called the foreman) in the parallel
+  composition, whose proof is the same as other slaves, except for the
+  substitution of $S_x'$ with $F_x'$.}
 \label{fig:concurrentInc}
 \end{figure}
 %
@@ -274,12 +265,10 @@ isolation, in the spirit of local reasoning. Since
 and compares it against the counter at \li{x-1} (its left neighbour in
 the ring), a tempting precondition for $\li{slave(x)}$ would be one describing
 just these two locations, e.g.
-\vspace{-3pt}
 \[
 \li{x} \harpoonything x * [\token{s}_x] * \shared{\cell{x}{0} * (\cell{x{-}1}{0} \lor \cell{x{-}1}{1})}{S_x}
 \qquad
 S_x = \{s_{x}, s_{x{-}1}\}
-\vspace{-3pt}
 \]
 %
 The above assertion comprises: a) a variable assertion stating that the thread
@@ -287,7 +276,11 @@ locally owns  variable \li{x} with value $x$ (using the variables-as-resource mo
 \emph{capability} $[\token{s}_x]$ that allows it to perform the
 associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}); and c) a subjective view of the shared state: $x$
 points to $0$ and $x{-}1$ (its left neighbour) points to either $0$ or $1$, since its left
-neighbour might have already incremented its own counter. The
+neighbour might have already incremented its own counter.
+ The $*$
+connective used between assertions is that of separation logic and
+means that the assertions describe \emph{disjoint} pieces of state.
+ The
 interference assertion associated with the subjective view is captured by $S_x$ and consists of two
 actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
 of the contents of $x$ under the condition that its value is one less
@@ -301,11 +294,10 @@ Upon closer inspection, since the subjective view says nothing of the
 value of the cell at address $x{-}2$, $s_{x{-}1}$ can always fire in this
 situation. This assertion is thus not \emph{stable}. If we were to
 weaken it to a stable assertion, we would get the assertion below,
-which is now too imprecise for our purposes:\vspace{-3pt}
+which is now too imprecise for our purposes:
 \[
 \li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v}
   \cell{x}{0} * \cell{x{-}1}{v}}{S_x}
-\vspace{-3pt}
 \]
 
 To remedy this, we have to step back and think again at the level of
@@ -345,7 +337,8 @@ stability.
 Let us write $\shared P I$ for this initial subjective
 view. This assertion may be freely duplicated using the \copyRule
 principle of \fig\ref{fig:principles} and each thread is given a copy together with the
-appropriate capability using the \parRule rule. For instance, the
+appropriate capability using the usual \parRule rule of concurrent
+separation logics. For instance, the
 thread running \li{slave(x+$i$)} (for $i>1$) gets $[\token{s}_{x{+}i}] *
 \shared{P}{I}$.  This assertion does not match the precondition of
 \li{slave(x+i)} just yet. Using the principles given
@@ -395,7 +388,17 @@ foreman threads can be derived analogously.
 Once all threads have completed their operations, we join up their
 postconditions using the \mergeRule principle, which embodies a
 crucial feature of \colosl: different subjective views
-\emph{overlap}. Since $|/$ distributes over $**$, the subjective view
+\emph{overlap}. The overlapping
+conjunction $**$ between two assertions means that the two assertions describe
+potentially \emph{overlapping} pieces of state. In particular, $A * B
+=> A ** B$ and $A /| B => A**B$. This connective has been used in the past to reason about sharing in
+data structures~\cite{rey-slnotes,js-popl12,ramification}.
+ Since $|/$ distributes over $**$, the subjective view
+simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} *
+  \cell{x{+}2}{10}}{S'_{x} \cup S'_{x{+}1} \cup
+  S'_{x{+}2}}$. Finally, since $S'_{x} \cup S'_{x{+}1} \cup
+S'_{x{+}2}$ $\weakenI{\li{n}|-< n * \cell{x}{10} * \cell{x{+}1}{10} *
+  \cell{x{+}2}{10}} I $, by the \shiftRule principle, we get
 simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots *
   \cell{x{+}n}{10}}{M'_{x}, S'_{x{+}1} \cup \cdots \cup S'_{x{+}n} }$. Finally, since $M'_{x} \cup S'_{x{+}1} \cup \cdots \cup S'_{x{+}n}$ $\weakenI{\li{n}|-< n * \cell{x}{10} * \cell{x{+}1}{10} * \cdots *
   \cell{x{+}n}{10}} I $, by the \shiftRule principle, we get
@@ -457,8 +460,14 @@ state.
 doing so, we also define the new slave's associated interference and
 accompanying capability.
 \begin{align*}
-  \cell{(x{+}n{+}1)}{v} \stackrel{\extendRule}{\semimplies} \exsts{\token{s}_{x{+}n{+}1}}[\token{s}_{x{+}n{+}1}] * \shared{\cell{x{+}n{+}1}{v}}{\{s_{x{+}n{+}1}\}}
+  \cell{(x{+}n{+}1)}{v} \semimplies \exsts{\token{s}_{x{+}n{+}1}}[\token{s}_{x{+}n{+}1}] * \shared{\cell{x{+}n{+}1}{v}}{\{s_{x{+}n{+}1}\}}
 \end{align*}
+Here, the
+\emph{view shift}~\cite{views} (or
+\emph{repartitioning}~\cite{cap-ecoop10}) $P ===> Q$ means that an
+(instrumented) state satisfying $P$ may be manipulated without
+changing the machine states it denotes. In particular, $(P => Q) => (P
+===> Q)$.
 Our proof changes only minimally to accommodate the updated program: the proof
 of \li{master(x)} now has to account for the new
 interference on $\li{n} \harpoonything n$ since the environment can grow the
