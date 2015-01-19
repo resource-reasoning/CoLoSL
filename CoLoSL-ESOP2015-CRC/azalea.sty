@@ -189,9 +189,10 @@
 \newlength{\@mli}
 \newcommand{\mli}[1]{%
   \settowidth{\@mli}{\lstinline/#1/}
-  \hspace{-.5ex}\begin{minipage}[t]{\@mli}\lstinline/#1/\end{minipage}}
+  \hspace{-.8ex}\begin{minipage}[t]{\@mli}\lstinline/#1/\end{minipage}}
 \makeatother
-\newcommand{\li}[1]{\ifmmode\mbox{\mli{#1}}\else\mbox{\lstinline/#1/}\fi}
+\newcommand{\li}[1]{\ifmmode\mbox{\larger\mli{#1}}\else\mbox{\larger\lstinline/#1/}\fi}
+\newcommand{\scriptli}[1]{\ifmmode\mbox{\scriptsize\larger\mli{#1}}\else\mbox{\lstinline/#1/}\fi}
 \newcommand{\tx}[1]{\text{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%% MODEL %%%%%%%%%%%%%%%%%%%%%%%%
@@ -556,7 +557,9 @@
 \newcommand{\frameRule}{\proofRule{Frame}\xspace}
 \newcommand{\conseqRule}{\proofRule{Consq}\xspace}
 
-\newcommand{\iterStar}{\scalebox{1.5}{$\oast$}}
+\newcommand{\iterStar}{\mathop{\null\scalebox{1.5}{$\oast$}}}
+%\DeclareMathOperator*{\iterStar}{\oast}
+%\let\iterStar\bigstar
 
 %\definecolor{grey}{rgb}{0.8, 0.8, 0.8}
 \newcommand{\shade}[1]{\colorbox{grey}{$#1$}}
