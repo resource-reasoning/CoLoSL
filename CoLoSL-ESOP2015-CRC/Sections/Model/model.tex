@@ -206,7 +206,7 @@ machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
 use standard heap and stack assertions for machine state assertions,
 and single-token assertions of the form $[\token{a}]$ for capability
 assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$
-as a shorthand for $\bigstar_{\token{a} \in \token{A}} [\token{a}]$.
+as a shorthand for $\bigvarstar_{\token{a} \in \token{A}} [\token{a}]$.
 We assume an infinite set $\set{LVar}$ of \emph{logical variables},
 disjoint from $\set{PVar}$.
 
@@ -920,7 +920,7 @@ fencing and provide rules to apply to each action of $I$.
 
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} presents rules to show that an assertion
-of the form $\exsts{\bar x}\lass{P} * \bigstar_{i\in
+of the form $\exsts{\bar x}\lass{P} * \bigvarstar_{i\in
   I}\shared{\lass{Q}_i}{I_i}$ is stable. This is a more restricted
 form of assertions than our two previous axiomatisations, but a more
 elaborate set of rules exists for the general case (see~\cite{colosl-tr14}).
@@ -928,7 +928,7 @@ elaborate set of rules exists for the general case (see~\cite{colosl-tr14}).
 The
 first two rules state that local assertions are always stable and
 existentials can be eliminated. Then, checking the stability of
-$\lass{P} * \bigstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
+$\lass{P} * \bigvarstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
 establishing, for each subjective view $\shared{\lass{Q}_i}{I_i}$, the
 four-place $\mathsf{Stable}$ predicate which in this case means that
 $\lass{Q}_i$ is stable under the interference assertion $I_i$, a local
@@ -958,7 +958,7 @@ action, in a similar way to fencing rules above.
 	}
 
 	\infer{
-	  \stable{\lass{P} * \bigstar_{j\in J}\shared{\lass{Q}_j}{I_j}}
+	  \stable{\lass{P} * \bigvarstar_{j\in J}\shared{\lass{Q}_j}{I_j}}
 	}
 	{
           \for{j\in J}

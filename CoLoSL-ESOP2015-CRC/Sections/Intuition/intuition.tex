@@ -440,7 +440,7 @@ forking an additional thread that dynamically grows the ring by
 spawning more slave threads (we leave the details to the accompanying
 technical report). When the ring has size
 $n$ (i.e. $\li{n} \harpoonything n$), we use an instance of the \extendRule principle as follows in
-order to add a new slave (at $x{+}n{+}1$) to the shared state\footnote{
+order to add a new slave (at $x{+}n{+}1$) to the shared state\footnote{%
 Unlike CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
 an explicit \emph{unsharing} mechanism to claim shared resources and
 render them thread-local. Instead, this behaviour can be simply
@@ -449,10 +449,10 @@ encoded
 %$[\token{a}_1]$, \ldots , $[\token{a}_{n}]$ 
 as an action of the form \vspace{0pt}
 $
-\oast_{j \in J}[\token{a}_j]{:}\, P \swap \oast_{j \in J}[\token{a}_j]\vspace{0pt}
+\bigvarstar_{j \in J}[\token{a}_j]{:}\, P \swap \bigvarstar_{j \in J}[\token{a}_j]\vspace{0pt}
 $.
-That is, a thread holding tokens $\oast_{j \in J}[\token{a}_j]$ can move the shared resource $P$
-into its local state in exchange for the associated capabilities $\oast_{j \in J}[\token{a}_j]$.
+That is, a thread holding tokens $\bigvarstar_{j \in J}[\token{a}_j]$ can move the shared resource $P$
+into its local state in exchange for the associated capabilities $\bigvarstar_{j \in J}[\token{a}_j]$.
 state.
 }. In
 doing so, we also define the new slave's associated interference and
@@ -478,13 +478,13 @@ other threads can be directly reused.
 %% \begin{tabular}{@{} l @{\hspace{4ex}} l@{}}
 %% {\begin{lstlisting}
 %% spawn(x)
-%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
+%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigvarstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
 %% $\{$ if(n $<$ size) then
-%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} n{<}s \land \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
+%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} n{<}s \land \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigvarstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * \\\shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x}\end{array} \right\}$
 %%     $\langle$ *x + n + 1 = *x;
 %%        n = n+1; $\rangle$
-%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * [\token{s}_{x{+}n}] * \\\shared{\begin{array}{@{}l@{}}\exsts{v} \tx{n}|-< n *\cell{x}{v} * \\(\cell{x{+}n{-}1}{v} * \cell{x{+}n}{v{-}1}\lor\null\\ \cell{x{+}n{-}1}{v{-}1} * \cell{x{+}n}{v{-}1})\end{array}}{E_x \cup S'_{x+n}}\end{array} \right\}$
-%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\ \shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x} *\\       \![\token{s}_{x+n}] *\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x{+}n{-}1}{v} * \\ (\cell{x{+}n}{v}\lor \cell{x{+}n}{v{-}1} )\end{array}}{S'_{x+n}}  \end{array} \right\}$
+%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigvarstar_{i=n+1}^{s} (\cell{x{+}i}{-})\;\; * [\token{s}_{x{+}n}] * \\\shared{\begin{array}{@{}l@{}}\exsts{v} \tx{n}|-< n *\cell{x}{v} * \\(\cell{x{+}n{-}1}{v} * \cell{x{+}n}{v{-}1}\lor\null\\ \cell{x{+}n{-}1}{v{-}1} * \cell{x{+}n}{v{-}1})\end{array}}{E_x \cup S'_{x+n}}\end{array} \right\}$
+%% //$\color{blue} \left\{\begin{array}{@{}l@{}}\exsts{x, s, n} \tx{x}|-< x * \tx{size}|-< s * [\token e_{x}]*\null\\ \bigvarstar_{i=n{+}1}^{s} (\cell{x{+}i}{-})\;\; * \\ \shared{\begin{array}{@{}l@{}}\exsts{v}  \tx{n}|-< n * \cell{x}{v} *\\ \quad(\cell{x{+}n}{v} \lor\cell{x{+}n}{v{-}1})\end{array}}{E_x} *\\       \![\token{s}_{x+n}] *\shared{\begin{array}{@{}l@{}}\exsts{v} \cell{x{+}n{-}1}{v} * \\ (\cell{x{+}n}{v}\lor \cell{x{+}n}{v{-}1} )\end{array}}{S'_{x+n}}  \end{array} \right\}$
 %%   slave(x+n) $\mid\mid$ spawn(x);
 %% $\}$ //$\color{blue} \{\m{false}\}$
 %% \end{lstlisting}}

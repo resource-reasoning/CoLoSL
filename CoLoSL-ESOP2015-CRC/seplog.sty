@@ -11,6 +11,13 @@
       }{}
 \DeclareSymbolFont{matha}{U}{matha}{m}{n}
 \DeclareMathSymbol{\varstar}       {2}{matha}{"0F}
+\DeclareFontFamily{U}{mathb}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathb}{m}{n}{
+      <5> <6> <7> <8> <9> <10> gen * mathb
+      <10.95> mathb10 <12> <14.4> <17.28> <20.74> <24.88> mathb12
+      }{}
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+\DeclareMathSymbol{\bigvarstar}    {2}{mathb}{"0F}
 \RequirePackage{wasysym}
 
 \newcommand{\scon}{\mathbin{\varstar}}
