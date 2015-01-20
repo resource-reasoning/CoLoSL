@@ -3,13 +3,13 @@
 
 We sketch a proof of an implementation of Dijkstra's token ring mutual
 exclusion algorithm, which pioneered \emph{self-stabilising}
-distributed algorithms~\cite{dijkstra74}. Our proof highlight the main
+distributed algorithms~\cite{dijkstra74}. Our proof highlights the main
 reasoning principles supported by \colosl and results in \emph{small
   specifications} for each participant in the ring. Besides their
 concision, we show how small specifications are robust against
-non-trivial changes in the algorithm.
+non-trivial changes to the algorithm.
 
-The token ring algorithm %presented in \fig\ref{fig:concurrentInc},
+The algorithm %presented in \fig\ref{fig:concurrentInc},
 assumes a network of $n{+}1$ machines arranged in a ring, with a
 designated \emph{master} machine and $n$ slave machines. Each machine maintains a local counter and has
 access to the value of its left neighbour's counter; the state of the
@@ -190,7 +190,7 @@ $\{$  while(*x != 10)
 //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\\shared{\begin{array}{@{}l@{}}\exsts{v}\cell{x}{v} *\null\\ (\cell{x{-}1}{v} \lor \cell{x{-}1}{v{+}1})\end{array}}{S_{x}'}\end{array} \right\}$
     $\{\ \langle$if (*x != *(x-1))
        *x = *(x-1);$\rangle\ \}$
-$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} *\\ (\cell{x{-}1}{10} \lor \cell{x{-}1}{11})\end{array}}{S_{x}'}\end{array} \right\}$
+$\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s_{x}]*\null\\ \shared{\begin{array}{@{}l@{}}\cell{x}{10} *\null\\ (\cell{x{-}1}{10} \lor \cell{x{-}1}{11})\end{array}}{S_{x}'}\end{array} \right\}$
 \end{lstlisting}
 \end{tabular}
 \[
@@ -274,7 +274,7 @@ S_x = \{s_{x}, s_{x{-}1}\}
 The above assertion comprises: a) a variable assertion stating that the thread
 locally owns  variable \li{x} with value $x$ (using the variables-as-resource model~\cite{variablesAsResource}); b) a
 \emph{capability} $[\token{s}_x]$ that allows it to perform the
-associated $s_x$ action (see below and \fig\ref{fig:concurrentInc}); and c) a subjective view of the shared state: $x$
+associated $s_x$ action (see below); and c) a subjective view of the shared state: $x$
 points to $0$ and $x{-}1$ (its left neighbour) points to either $0$ or $1$, since its left
 neighbour might have already incremented its own counter.
  The $*$
@@ -284,23 +284,26 @@ means that the assertions describe \emph{disjoint} pieces of state.
 interference assertion associated with the subjective view is captured by $S_x$ and consists of two
 actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
 of the contents of $x$ under the condition that its value is one less
-than the value at address $x{-}1$. Since it owns $[\token s_x]$ locally, the
-current thread is the only one that can perform $s_x$. On the other
-hand, the capability $[\token s_{x{-}1}]$ is not locally owned, thus
-the environment could potentially perform the
-associated action whenever its precondition (on the left-hand side of $\swap$) is satisfied.
+than the value at address $x{-}1$ (see
+\fig\ref{fig:concurrentInc}). Since the current thread owns $[\token s_x]$ locally,
+it is the only one that can perform $s_x$. On the
+other hand, the capability $[\token s_{x{-}1}]$ is not locally owned,
+thus the environment could potentially perform the associated action
+whenever its precondition (on the left-hand side of $\swap$) is
+satisfied.
 %that performed by the current machine (enabled by $[\token{x}]$); and that of the previous machine in the ring (enabled by $[\token{s}_p]$). Each action allows the value of the corresponding machine to be incremented by $1$ so long is it is the one that can make a move (As described above). 
-Upon closer inspection, since the subjective view says nothing of the
+Upon closer inspection, since this subjective view says nothing of the
 value of the cell at address $x{-}2$, $s_{x{-}1}$ can always fire in this
-situation. This assertion is thus not \emph{stable}. If we were to
-weaken it to a stable assertion, we would get the assertion below,
-which is now too imprecise for our purposes:
+situation. The assertion is thus not \emph{stable}: nothing prevents
+the counter at $x{-}1$ from incrementing beyond value 1. A weaker,
+stable assertion is thus:
 \[
 \li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v}
   \cell{x}{0} * \cell{x{-}1}{v}}{S_x}
 \]
 
-To remedy this, we have to step back and think again at the level of
+Fortunately, we can do better and obtain a stronger small precondition.
+Let us first step back and think again at the level of
 the whole algorithm. As the programmer knows, the situation above
 cannot happen as $x{-}2$ can only be at most one ahead of $x$ itself.
 We can thus replace $S_x$ by $S'_x$ and give a stronger stable
@@ -319,9 +322,9 @@ The proof sketches of the master and foreman (first slave) threads are
 analogous, following \fig\ref{fig:concurrentInc}. As the first slave,
 the foreman has to account for interference from the master thread
 instead of another slave thread. Note that the master has access to
-variable \li{n} holding the current size of the ring, as
-does its associated action $m_x$, since whether it can fire or not is
-decided by the value of the counter at address $x+n$. 
+variable \li{n} holding the current size of the ring, as does its
+associated action $m_x$, since they both depend on the value of the
+counter at address $x+n$.
 %Let us now detail the proof of \li{ring(x)}.
 
 \paragraph{Proof of the ring}
@@ -338,11 +341,10 @@ Let us write $\shared P I$ for this initial subjective
 view. This assertion may be freely duplicated using the \copyRule
 principle of \fig\ref{fig:principles} and each thread is given a copy together with the
 appropriate capability using the usual \parRule rule of concurrent
-separation logic. For instance, the slave
-thread running \li{slave(x+$i$)} (for $i>1$) gets $[\token{s}_{x{+}i}] *
+separation logic. For instance, the
+thread running \li{slave(x+$i$)} ($i>1$) gets $[\token{s}_{x{+}i}] *
 \shared{P}{I}$.  This assertion does not match the precondition of
-\li{slave(x+$i$)} just yet. Using the principles given
-in \fig\ref{fig:principles}, we can weaken the assertion as such:
+\li{slave(x+$i$)} just yet. Using the principles of \fig\ref{fig:principles}, we can weaken the assertion as such:
 %
 \begin{align*}
   \shared{P}{I} 
@@ -361,21 +363,22 @@ in \fig\ref{fig:principles}, we can weaken the assertion as such:
   \shared{\cell{x{+}i}{0} * (\cell{x{+}i{-}1}{0} \lor \cell{x{+}i{-}1}{1})}{\{s'_{x{+}i{-}1}, s_{x{+}i}\}}
 \end{align*}
 %
-We begin by \emph{rewriting} the $s_{x{+}i{-}1}$ action of $I$ into the stronger
-action of $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
+We start by \emph{rewriting} the action $s_{x{+}i{-}1}$ of $I$ into the stronger
+action $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
 us to replace $I$ with any interference assertion $I'$ that has the
 same observable effect as far as the subjective assertion $P$ of the
 subjective view is concerned (written $I \weakenI{P} I'$). In this
-instance, actions $s_{x{+}i{-}1}$ and $s'_{x{+}i{-}1}$ have the same effect
+instance, the actions $s_{x{+}i{-}1}$ and $s'_{x{+}i{-}1}$ have the same effect
 according to $P$, as discussed in the proof of \li{slave(x)}. As such,
-rewriting $s_{x{+}i{-}1}$ as $s'_{x{+}i{-}1}$ does not alter its behaviour and
+rewriting $s_{x{+}i{-}1}$ as $s'_{x{+}i{-}1}$
 merely reflects stronger knowledge about how $x{+}i$ and $x{+}i{-}2$ are
 related through $x{+}i{-}1$. In particular, $I\weakenI{P} \left(I \setminus \{s_{x{+}i{-}1}\}\right)\cup \{s'_{x{+}i{-}1}\}$ as required.
 
 Next, because subjective views only describe \emph{parts} of the
 shared state, we can use the \forgetRule principle to obtain a weaker
-view of the shared state, in this case a view that ignores all cells in the ring except for those at $x{+}i{-}1$ and $x{+}i$. With all other cells out of the scope, their actions no longer have
-observable effects on the assertion, since their mutations are limited to those cells and leave $x{+}i{-}1$ and $x{+}i$ untouched. We can thus apply the \shiftRule principle again to \emph{frame off}
+view of the shared state, in this case a view that ignores all cells
+in the ring except for those at addresses $x{+}i{-}1$ and $x{+}i$. With all other cells out of the scope, their actions no longer have
+observable effects on the assertion, since they leave $x{+}i{-}1$ and $x{+}i$ unchanged. We can thus apply the \shiftRule principle again to \emph{frame off}
 those actions and obtain $S'_{x{+}i} = \{s'_{x{+}i{-}1}, s_{x{+}i}\}$.
 
 Finally, we weaken the resulting subjective view so that it is stable
@@ -460,14 +463,14 @@ accompanying capability.
 Here, the
 \emph{view shift}~\cite{views} (or
 \emph{repartitioning}~\cite{cap-ecoop10}) $P ===> Q$ means that an
-(instrumented) state satisfying $P$ may be manipulated without
+(instrumented) state satisfying $P$ may be changed to $Q$ without
 changing the machine states it denotes. In particular, $(P => Q) => (P
 ===> Q)$.
-Our proof changes only minimally to accommodate the updated program: the proof
-of \li{master(x)} now has to account for the new
+Our proof changes only minimally to accommodate the new program: the proof
+of \li{master(x)} has to account for the new
 interference on $\li{n} \harpoonything n$ since the environment can grow the
-ring and thus mutate $\li{n} \harpoonything n$. However, the proofs of
-other threads can be reused straightforwardly.
+ring and thus mutate $\li{n} \harpoonything n$, and the proofs of
+other threads can be directly reused.
 
 %% \begin{figure}
 %% \centering
