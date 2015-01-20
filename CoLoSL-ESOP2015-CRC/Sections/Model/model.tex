@@ -1266,12 +1266,12 @@ $F$.
 
 \subsection{Soundness}
 
-We prove soundness of our \colosl reasoning, parametrised by the
-underlying models of machine states ($\Heaps$) and capabilities
-($\Caps$). We appeal to the general soundness result of the views
-framework, providing parameters such as the reification function in
-definition~\ref{def10} and proving lemmas required to make the result
-hold.  
+We prove soundness of \colosl, parametrised by the underlying models
+of machine states ($\Heaps$) and capabilities ($\Caps$). We appeal to
+the general soundness result of the views framework, providing
+parameters such as the reification function in
+Def.~\ref{def:reification} and proving lemmas required to make the
+result hold.
 
 The main part of the proof  establishes
 the soundness of the following rule for atomic commands, where
@@ -1286,12 +1286,12 @@ logic:
 }
 \]
 This rule  is required in the frameworks from the
-CAP family~\cite{cap-ecoop10,icap,tada}. 
+CAP family~\cite{cap-ecoop10,icap}. 
 For \colosl, the \emph{repartitioning} $\repartitions{P}{Q}{\lass{P}}{\lass{Q}}$
 holds if, from any world $(l,g,\lmod)$ satisfying $P$, 
-whenever $l \composeL  g$ 
-satisfies $\lass{P}$ then we know that there exists $l'\composeL  g'$ which
-satisfies $\lass{Q}$ in such a way that there exists $\lmod'$ such
+whenever parts of $l \composeL  g$ 
+satisfies $\lass{P}$ then substituting that part for any other satisfying
+ $\lass{Q}$ will yield a state $l'\composeL g'$ such that there exists $\lmod'$ such
 that $(l', g', \lmod')$ satisfies $Q$. 
 Moreover, the passage  from $(l,g,\lmod)$ to $(l',g',\lmod')$ can be
 achieved via a succession of valid updates  from $\lmod$
@@ -1319,8 +1319,8 @@ a concrete machine state.
   and only if,  for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
   \vspace{-10pt}
   \[
-    \left(w, \lenv |= P  \land \mathbb{C}, \reifyW{w} \rightarrow^{\text{*}} \li{skip}, \h{}'\right)
-    \text{ implies } \exsts{w'} w', \lenv |= Q \land \h{}' = \reifyW{w'}
+    (w, \lenv |= P  \text{ and } \mathbb{C}, \reifyW{w} \rightarrow^{\text{*}} \li{skip}, \h{}')
+    \text{ implies } \exsts{w'} w', \lenv |= Q \text{ and } \h{}' = \reifyW{w'}
   \]
 \end{definition}
 
