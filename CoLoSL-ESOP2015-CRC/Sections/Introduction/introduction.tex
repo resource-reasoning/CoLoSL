@@ -46,7 +46,7 @@ and Yang on separation logic~\cite{o2001local}.  The original
 separation logic~\cite{rey02,seplog} achieves local, compositional reasoning
 for sequential heap-manipulating programs by splitting the heap into
 disjoint heaplets for describing the local resources required by a
-program. Compositionality rests on two powerful mechanisms: a program
+program. Compositionality then rests on two powerful mechanisms: a program
 can be specified using only those resources that it actually accesses;
 and this specification can be simply reused in any context that
 contains these resources.  By making the specification as small as
@@ -54,7 +54,7 @@ possible, we can ensure that it can be reused in a large set of
 possible contexts using the {\em frame rule}. This plays an important
 role in achieving scalable \emph{compositional reasoning}, as each
 block of code can be proved in isolation and its small specification
-can be reused in a larger context.
+can be reused in larger contexts.
 
 
 Concurrent separation logic extends this compositional reasoning to
@@ -79,12 +79,12 @@ or unnatural.
 
 
 The problem is due to the rigid nature of the shared disjoint regions and
-their static interference, which   limit how we can  work
+their static interference, which   limits how we can  work
 with a
 concurrent data structure. A disjoint region typically either describes 
 the entire data structure such as a linked list,  or contains
 individual 
-components on which the data structure is built such as the nodes of a
+components of the data structure such as the nodes of a
 linked list. However, threads may have shared access to arbitrary 
 parts of the data structure, which cannot be directly expressed in the reasoning.
 %and we would like directly express this
@@ -97,7 +97,7 @@ region. In addition,
 at the time  of creation, it is not necessarily possible
 to predict all future interactions  associated with  a shared
 region. Just as the original separation logic  uses the frame rule to
-obtain small specifications for the local state, we would like to have an analogous framing mechanism on the shared state and its
+obtain small specifications for the \emph{local} state, we would like to have an analogous framing mechanism on the \emph{shared} state \emph{and} its
 interference to obtain small
 specifications of the shared state. 
 
@@ -105,9 +105,10 @@ specifications of the shared state.
 For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads (numbered $1$ to $n$) where the $i$th
 thread requires access to the $i$th and $(i+1)$st nodes. Current
-approaches cannot provide a small specification for each thread capturing just the two shared nodes and their interference. Now consider a program whose threads manipulate subgraphs of a graph, for instance  a recursive
+approaches cannot provide a small specification for each thread capturing just these two shared nodes and their interference. Now consider a program whose threads manipulate subgraphs of a graph, for instance  a recursive
 concurrent spanning tree algorithm. Current approaches cannot give small specifications capturing just the subgraph manipulated by each thread due to intrinsic, unspecified sharing  between subgraphs.
-Finally, consider a concurrent set implementation. In \colosl it is possible to describe the interference associated with each element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot specify such dynamic interference relations.
+Finally, consider a concurrent set implementation. In \colosl it is
+possible to describe the interference associated with a new element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot accomodate such dynamic interference relations.
 % Finally, consider a concurrent set
 %library initially endowed with just an insert function. Current
 %approaches cannot extend their reasoning to include a remove function,
@@ -169,7 +170,9 @@ participants.  In \S\ref{sec:examples}, we study two further
 examples. The first is a concurrent spanning tree algorithm for
 graphs, where threads are recursively spawned on potentially
 overlapping subgraphs. We demonstrate that the flexible, overlapping
-subjective views of \colosl are just what we need. 
+subjective views of \colosl are just what we need. In particular, to
+the best of our knowledge,
+\colosl provides the first local proof of a concurrent graph algorithm.
 The second is a concurrent set module implemented 
 using a hand-over-hand
 list-locking algorithm. Our \colosl reasoning  for this set module  improves
@@ -245,9 +248,8 @@ Yang~\cite{o2001local} demonstrated that, for the
 reasoning to scale, it is important to work with small specifications
 based on local and shared state rather than working with one
 global state. In particular, O'Hearn~\cite{csl-tcs} introduced concurrent
-separation logic based on thread-local state and static invariant
+separation logic based on thread-local state and static invariants for
 shared resources.
-
 
 Since then, there has been much recent work on compositional
 reasoning about fine-grained concurrent algorithms. Vafeiadis and
@@ -295,9 +297,10 @@ of region called {\em concurroids}. Like the regions in CAP,  concurroids descri
 shared state which must be disjoint from each other and static
 interference acting on this state. It is therefore not
 possible to frame within concurroids. Unlike CAP,
-concurroids have three parts: the joint part (j);  and the disjoint self (s) and other part (o), hence  their very different use of  the adjective ``subjective''.
+concurroids have three parts: the ``joint'' part;  and the disjoint
+``self'' and ``other'' parts, hence  their very different use of  the adjective ``subjective''.
 Although FCSL did  not influence \colosl, it does 
-highlight  an interesting point regarding resource transfer between regions: in CAP, communication between regions is achieved indirectly via the local state; in SCSL, communication
+highlight  an interesting point regarding resource transfer between regions: in CAP, communication between regions is achieved indirectly via the local state; in FCSL, communication
 between concurroids is achieved directly through dangling external
 transitions; and, in \colosl, communication between compatible
 subjective views can be achieved by merging the two views. 
