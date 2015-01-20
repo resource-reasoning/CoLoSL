@@ -35,7 +35,7 @@ during the entire lifetime of a thread represents its guarantee
 corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between a thread and its
-environment just like any other resource to temporarily block (enable) certain actions. See the presentation of
+environment just like any other resource to temporarily block or enable certain actions. See the presentation of
 deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
 and motivation.
 
@@ -63,7 +63,7 @@ capabilities. We assume a set of program values $\set{Val}$, as well as infinite
   A \emph{logical state} is a tuple $((@s, h), \ca{}) \in \LStates$, also written
   $(@s,h,\ca{})$, of a finite partial \emph{stack} $@s\in \set{Stack}$ associating
   program variables with values, a \emph{heap} $h \in \set{Heap}$ associating heap
-  locations with values, and a \emph{capability} $\ca{} \in \Caps$. 
+  locations with values, and a \emph{capability} $\ca{} \in \Caps$:
   \begin{mathpar}
     \set{Stack} == \set{PVar} --`_{\m{fin}} \set{Val}
     
@@ -78,7 +78,7 @@ capabilities. We assume a set of program values $\set{Val}$, as well as infinite
 \end{definition}
 
 The local and global logical states of a world are always
-\emph{compatible}: they can be composed with one another. This captures the intuition that privately-owned resources are disjoint from shared resources. The composition of logical states is defined component-wise as disjoint function union $\uplus$ over stacks and heaps, and disjoint set union $\uplus$ on capabilities.
+\emph{compatible}: they can be composed with one another. This captures the intuition that locally-owned resources are disjoint from shared resources. The composition of logical states is defined component-wise as disjoint function union $\uplus$ over stacks and heaps, and disjoint set union $\uplus$ on capabilities.
 
 \begin{definition}[Logical state composition]
   The \emph{composition of logical states} $ \composeL : \LStates
@@ -92,23 +92,22 @@ The local and global logical states of a world are always
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively and write $l_{\textsf{M}}$ for $(@s, h)$. We write $g$ to range over logical states representing shared (global) states. The empty logical state
+We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively and write $l_{\textsf{M}}$ for $(@s, h)$. We write $g$ to range over logical states representing global shared states. The empty logical state
 $(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
 \leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
-write $l_2 - l_1$ to denote the unique (by cancellativity) such $l$ when it
+write $l_2 - l_1$ to denote the unique such $l$ (by cancellativity) when it
 exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
 An action is a triple $(p, q, c)$ of logical states where
-$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}: it has to be present for the action to take effect, but is left unchanged by the action. Moreover, the catalyst is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, \{x:v\}, \emptyset)$, $(\emptyset, \{x:v{+}1\}, \emptyset)$, $(\emptyset, \{x-1:v{+}1\}, \emptyset)$).
+$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}. An action catalyst has to be present for the action to take effect, but is left unchanged by the action. It is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, \{x:v\}, \emptyset)$, $(\emptyset, \{x:v{+}1\}, \emptyset)$, $(\emptyset, \{x-1:v{+}1\}, \emptyset)$). We record the action catalyst separately for technical convenience. As we will shortly demonstrate (see \emph{worlds} below), we often need to refer to the action pre-state in isolation, i.e. only those parts of the shared state modified by the action.
 
 An action model is a partial function from \emph{capabilities} to sets
-of \emph{actions}; action models correspond to the (semantic interpretation of)  interference assertions
-$I$.
+of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion $I$.
 %
 \begin{definition}[Action models]
-  The set of \emph{actions} $\set{Action}$, ranged over by $a$, and
-  the set of \emph{action models} $\AMods$, ranged over by $\lmod$, are
+  The set of \emph{actions}, $\set{Action}$, ranged over by $a$, and
+  the set of \emph{action models}, $\AMods$, ranged over by $\lmod$, are
   defined as:
   \begin{mathpar}
     \set{Action} == \LStates \times \LStates \times \LStates
@@ -118,15 +117,15 @@ $I$.
 %  We write $\unitAM$ for an action model with empty domain.
 \end{definition}
 %
-\paragraph{Well-formed worlds}
+\paragraph{Worlds}
 are triples
-$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy the
-well-formedness conditions: 1) the local and shared states are always
-compatible ($l\compatL g$); 2) the capabilities owned by $l$ and $g$ are
-in the domain of $\lmod$; and 3) actions in $\lmod$ are
-\emph{confined} to $g$ (written $g\containI\lmod$). An action $a= (p, q, c)$ is confined to $g$ if 
-whenever it is enabled ($p \composeL c$ is compatible with $g$), then its pre-state $p$ is contained in $g$ ($p \leq g$). We provide an informal description of confinement in
-\S\ref{subsec:prules}. The formal definition of confinement is provided in~\cite{colosl-tr14}.
+$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy several
+well-formedness conditions: the local and shared states are compatible ($l\compatL g$); 
+the capabilities owned by $l$ and $g$ are in the domain of $\lmod$; 
+and actions in $\lmod$ are \emph{confined} to $g$ (written $g\containI\lmod$).
+An action $a = (p, q, c)$ is confined to $g$ if and only if whenever it is enabled ($p \composeL c$ is compatible with $g$), then its pre-state $p$ is contained in $g$ ($p \leq g$). We motivate the need for the confinement condition in \S\ref{subsec:prules}.
+%We provide an informal description of confinement in
+%\S\ref{subsec:prules}. The formal definition of confinement is given in~\cite{colosl-tr14}.
 
 \begin{definition}[Well-formedness]
   \label{def:wf}
@@ -155,12 +154,11 @@ The set of \emph{worlds} is defined as
 \]
 \end{definition}
 %
-Well-formed worlds do not put further constraints on the
+Worlds do not put further constraints on the
 relationship between $\lmod$ and $g$, they are however linked more tightly in
 the semantics of assertions (\S\ref{subsec:assertions}).
 
-Finally, the composition of two worlds combines their local states, and is defined whenever the worlds agree on the other two
-components and the resulting tuple is a well-formed world.
+Finally, the composition of two worlds is defined when their local states are compatible, their global shared states and action models are the same, and the resulting tuple is well-formed.
 
 \begin{definition}[World composition]
   The \emph{composition} of worlds, $\composeW: \Worlds \times \Worlds \rightharpoonup \Worlds$, is defined as:
