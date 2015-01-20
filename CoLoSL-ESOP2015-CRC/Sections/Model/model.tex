@@ -200,43 +200,60 @@ disjoint from $\set{PVar}$.
 Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token}$, \emph{the assertions of \colosl}, $\Assertions$, are described by the grammars below:
 %
 \begin{align*}	 
-  A &::=\m{false} \mid E_1 = E_2 \mid \emp \mid \li{x} \harpoonything E \mid E_1 |-> E_2 \mid [E]\\
-  \LAssertions \ni \lass{p}, \lass{q} & ::= A \mid \neg\lass{P} \mid \exsts{x} \lass{P} \mid \lass{P} \lor \lass{Q} \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid \lass{P} \septraction \lass{Q}\\
+  \LAssertions \ni \lass{p}, \lass{q} & ::=
+  \begin{array}[t]{@{}l@{}}
+  \m{false} \mid E_1 = E_2
+  \mid \emp \mid \li{x} \harpoonything E \mid E_1 |-> E_2 \mid [E]\\
+  \null\mid \lass{P} \lor \lass{Q} \mid  \neg\lass{P} \mid \exsts{x} \lass{P}
+  \mid \lass{P} * \lass{Q} \mid \lass{P} ** \lass{Q} \mid
+  \lass{P} \septraction \lass{Q}
+  \end{array}\\
   \Assertions \ni P,Q & ::= \lass{P} \mid \exsts{x} P \mid P \lor Q \mid P * Q \mid P ** Q \mid \shared{P}{I}  \\
   I &::= \emptyset \mid \{\interAss{[\token{A}]}{\bar{x}}{P}{Q}\} \cup I
-  \quad
-  E ::= x \mid \token a \mid E_1 + E_2 \!\mid\! \cdots
+  \qquad
+  E ::= x \mid \token a \mid E_1 + E_2 \mid \cdots
 \end{align*}
 \end{definition}
 
-As in RGSep~\cite{viktor-marriage}, we distinguish between
-\emph{local assertions} in $\LAssertions$ and assertions in
-$\Assertions$. For simplicity, assertions do not include negation or
-magic-wand; these are reserved for local assertions. The syntax of
-assertions follows from standard separation logic with variables-as-resource~\cite{variablesAsResource} (note that expressions $E$ do not
-allow program variables), with the exception of the subjective views
-$\shared P I$.  Machine and capability assertions are
-interpreted over a world's local state: $\li{x} \harpoonything E$
-(resp.\ $E_1|->E_2$) is true of the singleton stack (resp.\ heap)
-where only \li{x} (resp.\ address $E_1$) is allocated and has value
-$E$ (resp.\ points to $E_2$); the capability assertion $[E]$ is true
-of the singleton capability $\{\token{a}\}$ if $E$ evaluates to
-$\token a$.  $\emp$ is true of worlds with empty local state (the
-units of $\composeW$); $P * Q$ is true of worlds that can be split
-into two according to $\composeW$ such that one state satisfies $P$
-and the other satisfies $Q$; $P**Q$ is the \emph{overlapping
-  conjunction}, true of worlds can be split three-ways according to
-$\composeW$, such that the $\composeW$-composition of the first two
-worlds satisfies $P$ and the $\composeW$-composition of the last two
-satisfy $Q$~\cite{rey-slnotes}; classical predicates and connectives
-have their standard classical meaning. An Interference assertion $I$ describes actions enabled by a given capability, in the form of a pre- and post-condition.
-%Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
+The syntax and semantics of \emph{local assertions} $\LAssertions$ are
+that of standard separation logic with
+variables-as-resource~\cite{variablesAsResource}\footnote{Note in
+  particular that expressions $E$ do not allow program variables: they
+  can only appear on the left-hand side of $\li{x} \harpoonything E$.}
+interpreted over a world's local state. The assertion $\li{x}
+\harpoonything E$ denotes a singleton stack where \li{x} has value
+$E$. Similarly, $E_1|->E_2$ is true of the singleton heap where only
+address $E_1$ is allocated and has value $E_2$.  The capability
+assertion $[E]$ is true of the singleton capability $\{\token{a}\}$ if
+$E$ evaluates to $\token a$. The empty local state $\unitL$ is denoted
+by $\emp$. The \emph{separating conjunction} $\lass{P} * \lass{Q}$ is
+true when the local state can be split into two according to
+$\composeL$ such that one state satisfies $\lass{P}$ and the other
+satisfies $\lass{Q}$. The \emph{overlapping conjunction}
+$\lass{P}**\lass{Q}$ is true when the local state can be split
+three-ways according to $\composeL$, such that the
+$\composeL$-composition of the first two states satisfies $\lass{P}$
+and the $\composeL$-composition of the last two satisfy
+$\lass{Q}$~\cite{ramification,gareth-js12,rey-slnotes}. \emph{Septraction}
+(or \emph{existential magicwand}) $\lass{P}\septraction\lass{Q}$ is
+true when there exists a local state satisfying $\lass{P}$ that can be
+$\composeL$-composed with the current one to yield a state satisfying
+$\lass{Q}$. Classical predicates and connectives have their standard
+classical meaning.
 
-A subjective view $\shared P I$ is true of $(l,g,\lmod)$ when $l =
-\unitL$ and a \emph{subjective view} $s$ can be found in the global
-shared state $g$ (i.e.\ $g = s\composeL r$ for some \emph{context}
+As in RGSep~\cite{viktor-marriage}, our assertions $\Assertions$ are
+defined on top of local assertions. For simplicity, assertions do not
+include negation nor septraction. The interpretation of assertions
+is a simple lift from that of local assertions, with the exception
+of the subjective views $\shared P I$.  First, an \emph{interference
+  assertion} $I$ describes actions enabled by a given capability, in
+the form of a pre- and post-condition.
+%Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
+A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
+\unitL$ and a \emph{subjective state} $s$ can be found in the global
+shared state $g$ (i.e.\ $g = s\composeL r$ for some
 $r$), such that $s$ satisfies $P$ in the standard separation logic
-sense, and $I$ and $\lmod$ \emph{agree} given the decomposition $s$,
+sense, and $\lmod$ and $I$ \emph{agree} given the decomposition $s$,
 $r$, in the following sense, which we write as
 $\extendsAM{\lmod}{s}{r}{\semI{I}}$:
 %Appendix~\ref{sec:model-continued}):
@@ -249,42 +266,43 @@ $\extendsAM{\lmod}{s}{r}{\semI{I}}$:
 %	\item the above is true for any state resulting from any number of actions of $\lmod$ applied to $g$.
 %	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
+Thus, given a world $(l,g,\lmod)$ and a subjective view $\shared P I$,
+$P$ describes a subjective state $s$ that is \emph{parts} of $g$ and
+$I$ describes \emph{all parts} of $\lmod$ concerning $s$, while
+$\lmod$ describes the overall interference on $g$.  We refer to the
+above agreement between the action model and the subjective view as
+the \emph{action model closure property}. We omit its formal
+definition for lack of space.
+%; it can be found in~\cite{colosl-tr14}.
 
-We refer to the above agreement between the action model and subjective views as the \emph{action model closure property}. We omit its definition for lack
-of space; it can be found in~\cite{colosl-tr14}. The semantics of \colosl assertions is given by a forcing relation
+The semantics of \colosl assertions is given by a forcing relation
 $w,\lenv|= P$ between a world $w$, a logical environment
-$\lenv\in\LEnv$, and a formula $P$. We use two auxiliary forcing
+$\lenv\in\LEnv$, and an assertion $P$. We use two auxiliary forcing
 relations. The first one $l,\lenv\slsat p$ interprets local assertions
 $p\in\LAssertions$ in the usual separation logic sense over a logical
 state $l$. The second one $s,\lenv|=_{g,\lmod} P$ interprets
-assertions over a \emph{subjective state} $s$ that is part of the
-global shared state $g$, subject to action model $\lmod$. This third
-form of satisfaction is needed to deal with nesting of subjective
-views.
-%% \footnote{This presentation with
-%%   several forcing relations differs from the usual CAP
-%%   presentation~\cite{cap-ecoop10}, where formulas are first
-%%   interpreted over worlds that are not necessarily well-formed, and
-%%   then cut down to well-formed ones. The CAP presentation strays from
-%%   separation logic models in some respects; e.g.\ in CAP, $*$ is not
-%%   the adjoint of $--*$, the ``magic wand'' connective of separation
-%%   logic. Although we have omitted this connective from our
-%%   presentation, its definition in \colosl would be standard and
-%%   satisfy the adjunction with $*$.}.
-Since logical connectives are interpreted uniformly in all cases, we
-write $|=_\dagger$ for any of the three satisfaction relations, and
-then write $u$ for elements of either $\Worlds$ or $\LStates$, and
-$\grey$ for either $\composeW$ or $\composeL$, depending on whether
-the satisfaction relation is $|=$, or either $\slsat$ or
-$|=_{l,\lmod}$, respectively.
+assertions $P\in\Assertions$ over a \emph{subjective state} $s$ that
+is part of the global shared state $g$, subject to action model
+$\lmod$. This third form of satisfaction is needed to deal with the
+nesting of subjective views.\footnote{This presentation with several
+  forcing relations differs from the usual CAP
+  presentation~\cite{cap-ecoop10}, where formulas are first
+  interpreted over worlds that are not necessarily well-formed, and
+  then cut down to well-formed ones. The advantage of our presentation
+  is that the semantics of assertions is \emph{compositional},
+  e.g.\ the semantics of $P * Q$ follows directly from the semantics
+  of $P$ and $Q$.}  Since logical connectives are interpreted
+uniformly in all cases, we write $|=_\dagger$ for any of the three
+satisfaction relations, $u$ for elements of either $\Worlds$ or
+$\LStates$, and $\grey$ for either $\composeW$ or $\composeL$, as
+appropriate.
 
 \begin{definition}[Assertion semantics]\label{def:assertion-semantics}
 Given a logical environment $\lenv: \set{LVar} --> \set{Val}$, the
-semantics of \colosl assertions is as follows, where $\semI[(.)]{.}:
-\LEnv \rightarrow \AMods$ denotes the semantics of interference
-assertions.
+semantics of \colosl assertions is defined below, using a semantics of
+interference assertions $\semI[(.)]{.}: \LEnv \rightarrow \AMods$ also
+defined below.
 \vspace{-1ex}
-%
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   (l,g,\lmod), \lenv &|= \lass{P}  &\text{iff}& l,\lenv \slsat \lass{P}\\
@@ -313,7 +331,6 @@ assertions.
   
   u,\lenv &|=_\dagger P \lor Q
   &\text{iff}& u,\lenv |=_\dagger P\text{ or }u,\lenv |=_\dagger Q\\
-  
   u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
   \exsts{u_1,u_2} u = u_1 \grey u_2\text{ and }
   u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
@@ -338,12 +355,12 @@ assertions.
 
   l, \lenv &\slsat \li{x} \harpoonything E
   &\text{iff}&
-  l = ([\li x: [|E|]_{\lenv}], \emptyset, \emptyset)\\
+  l = (\{\li x: [|E|]_{\lenv}\}, \emptyset, \emptyset)\\
   
   l, \lenv &\slsat E_1|->E_2 
   &\text{iff}&
   l =
-  (\emptyset, [[|E_1|]_{\lenv}: [|E_2|]_{\lenv}], \emptyset)\\
+  (\emptyset, \{[|E_1|]_{\lenv}: [|E_2|]_{\lenv}\}, \emptyset)\\
   
   l, \lenv & \slsat [E]
   & \text{iff} &
@@ -381,7 +398,7 @@ assertions.
     (p, q, c )&
     \begin{array}{@{}l@{}}
       \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod, r, r'} \\
-      \quad c = r \composeL r' \land \for{l} l \leq p \land l \leq q \implies l = \unitL\\
+      \quad c = r \composeL r' \land \for{l} l \leq p \land l \leq q \implies l = \unitL/|\null\\
       \quad p \composeL r, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
       /| q \composeL r,  [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
     \end{array}
@@ -431,7 +448,7 @@ consequences of the semantics.
 \begin{proof}[sketch]
   The cases of \weakenRule and \copyRule are
   straightforward. \forgetRule, \mergeRule and \shiftRule principles are valid as action
-  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference assertions, or when shifting the interference assertion, respectively. The full proof is provided in~\cite{colosl-tr14}.
+  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference assertions, and when shifting the interference assertion, respectively. The full proof is provided in~\cite{colosl-tr14}.
   \qed
 \end{proof}
 
@@ -580,7 +597,7 @@ appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
 then the part of the state denoted by $\lass{R}$ is uniquely
 determined and left unchanged by the action. 
 The last rule finally reduces local fencing to entailment checking, provided the fence
-$\lass{F}$ can be expressed as a disjunction of precise formulas. The
+$\lass{F}$ can be expressed as a disjunction of precise assertions. The
 first premise states that $\lass{F}$ is invariant under the action
 $\lass{P}\swap \lass{Q}$, similar to the way that RGSep encodes
 stability checks as separation logic entailments. Informally, it
@@ -1017,7 +1034,7 @@ action, in a similar way to fencing rules above.
 The first of these is new: unlike fencing, stability only has to be
 checked against actions for which the environment may hold enough
 capabilities. If the capabilities required by the action cannot exist
-separately from those held by the whole formula, which may be summed
+separately from those held by the whole assertion, which may be summed
 up by $\lass{P} * \lass{R}$, then the environment cannot perform the
 action. Similarly, an action whose precondition is incompatible with
 the current knowledge about the state cannot possibly fire. This is
