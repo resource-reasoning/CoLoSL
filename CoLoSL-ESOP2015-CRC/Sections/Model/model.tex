@@ -99,8 +99,22 @@ write $l_2 - l_1$ to denote the unique such $l$ (by cancellativity) when it
 exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
 $l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
 
-An action is a triple $(p, q, c)$ of logical states where
-$p$ and $q$ are the action \emph{pre-} and \emph{post-states} describing how the shared state is modified by the action; and $c$ is the action \emph{catalyst}. An action catalyst has to be present for the action to take effect, but is left unchanged by the action. It is maximal in the sense that no further, non-empty catalyst $c'$ can be found such that $c' \leq p$ and $c' \leq q$. For instance, the action corresponding to $s_x$ in \fig\ref{fig:concurrentInc}, is informally the triple ($(\emptyset, \{x:v\}, \emptyset)$, $(\emptyset, \{x:v{+}1\}, \emptyset)$, $(\emptyset, \{x-1:v{+}1\}, \emptyset)$). We record the action catalyst separately for technical convenience. As we will shortly demonstrate (see \emph{worlds} below), we often need to refer to the action pre-state in isolation, i.e. only those parts of the shared state modified by the action.
+An action is a triple $(p, q, c)$ of logical states where $p$ and $q$
+are the action \emph{pre-} and \emph{post-states} describing how the
+shared state is modified by the action; and $c$ is the action
+\emph{catalyst}. An action catalyst has to be present for the action
+to take effect, but is left unchanged by the action. It is maximal in
+the sense that no further, non-empty catalyst $c'$ can be found such
+that $c' \leq p$ and $c' \leq q$. For instance, \label{ex:sxsem} as we shall shortly
+see, $s_x$ in \fig\ref{fig:concurrentInc} will be interpreted as the
+set of all actions of the form $((\emptyset, \{\ell:v\}, \emptyset),
+(\emptyset, \{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
+\emptyset))$ for some $v$, where $\ell$ is the value of $x$ in the
+current logical environment. We record the action catalyst separately
+for technical convenience. As we will shortly demonstrate (see
+\emph{worlds} below), we often need to refer to the action pre-state
+in isolation, i.e. only those parts of the shared state modified by
+the action.
 
 An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion $I$.
@@ -247,8 +261,8 @@ include negation nor septraction. The interpretation of assertions
 is a simple lift from that of local assertions, with the exception
 of the subjective views $\shared P I$.  First, an \emph{interference
   assertion} $I$ describes actions enabled by a given capability, in
-the form of a pre- and post-condition.
-%Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and post-condition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
+the form of a pre- and postcondition.
+%Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and postcondition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
 A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective state} $s$ can be found in the global
 shared state $g$ (i.e.\ $g = s\composeL r$ for some
@@ -466,7 +480,7 @@ our examples. In this section, we give cut-down versions of these
 rules for a fragment of the \colosl assertion language where the 
 nesting of subjective views is not permitted   and  interference
 assertions cannot mention subjective views. This restriction is easily
-lifted. We can always \emph{flatten}
+lifted: we can always \emph{flatten}
 assertions with nested boxes into logically equivalent assertions with
 no nesting, and  interference assertions  mentioning  other
 subjective views in their actions may be rewritten into ones
@@ -485,21 +499,6 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 %% of this adaptation to Appendix~\ref{sec:assertions-continued}. The following standard definition will
 %% be needed in the remainder of this section.
 
-\begin{definition}[Exactness, precision]
-The local assertion   $p\in\LAssertions$ is \emph{exact}
-(respectively, 
-\ \emph{precise}) if it is
-  satisfied by at most one state (respectively, one substate of each state):
-  \begin{align*}
-    \exact{p} &==
-    \for{\lenv, l_1, l_2} l_1, \lenv \slsat p\text{ and }l_2, \lenv
-    \slsat p\text{ implies } l_1 = l_2\\
-    \precise{p} &==
-    \for{\lenv, l, l_1, l_2} l_1\leq l\text{ and }l_2\leq l\text{ and }l_1, \lenv \slsat p\text{ and }l_2, \lenv
-    \slsat p\\
-    &\qquad\text{ implies } l_1 = l_2
-  \end{align*}
-\end{definition}
 
 \paragraph{Confinement}
 
@@ -519,30 +518,14 @@ possible for some of the catalyse $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
 
-
-
-
-
-
-\pgcomment{Now you've previously talked about catalyst using the $s_x$
-  example from figure 2. Would it be possible to use this rather than
-  examples below? It would be better if you can, using this spawner
-  idea? Too hard? Maybe it illustrates the transitivity of
-  confinement?}
-
-For example, 
-abusing notations temporarily to ignore empty stack and
-capability components in logical states, the action $a = (\{10:0,
-12:0\}, \{10:1, 12:1\}, \{14:0\})$ 
- modifies the cells at addresses 10 and 12 to point from 0 to 1, 
- provided that location 14 points to 0.
-It  is
-confined in the state $l_1=\{10:0,12:0\}$ because $l_1$ is the first
-component of the action, 
- and $l_2=\{10:1\}$ because $l_2$ is incompatible with the action, 
-but not 
-$l_3=\{10:0\}$ because the action can affect another part
-of the shared state with the cell $12:1$. 
+For example, going back to the interpretation of $s_x$ described on
+page~\pageref{ex:sxsem}, the action $a_0 = ((\emptyset, \{\ell:0\},
+\emptyset), (\emptyset, \{\ell:1\}, \emptyset), (\emptyset,
+\{\ell{-}1:1\}, \emptyset))$ is confined to the state
+$l_1=\{\ell:0\}$ because $l_1$ is the first component of the
+action, and $l_2=\{\ell{-}1:0\}$ because $l_2$ is incompatible with the
+action, but not $l_3=\{\ell{-}1:1\}$ because the action can
+potentially affect address $\ell$.
 %Indeed $p \composeL c$ is compatible with $l_1$ and $l_3$, and the
 %modified cells 10 and 12 are fully contained in $l_1$ but not in
 %$l_3$; $p \composeL c$ is not compatible with $l_2$, hence $a$ has no effect on
@@ -574,7 +557,6 @@ established.
 ------------------now an explanation of the figure, this can be
 improved, esp explanation of  confinement in last rule---------------
 
-
 \fig~\ref{fig:local-fencing-rules} presents a set of
 rules to reduce $P \containI I$ to a series of entailments in
 ordinary separation logic. As expressed by the first rule,
@@ -587,28 +569,36 @@ we show that it is always possible to weaken an assertion into a local assertion
 checked for each action in $I$ (see the second rule). For each action
 $\lass{P}\swap \lass{Q}$, the three remaining rules of the figure may
 apply. In the first of these rules, the action cannot possibly fire,
-because its pre-condition does not agree with $\lass{F}$: no state
-satisfying $\lass{F}$ may be extended such that a sub-part satisfies
+because its precondition does not agree with $\lass{F}$: no state
+satisfying $\lass{F}$ may be extended such that a subpart satisfies
 $\lass{P}$. 
 %The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
 The second of these rules allows one to trim neutral parts
 $\lass{R}$ of an action $\lass{P}\swap \lass{Q}$: if $\lass{R}$
-appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is exact,
+appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is \emph{exact}, i.e.\ satisfied by at most
+one logical state\footnote{$\exact{p} ==
+    \for{\lenv, l_1, l_2} l_1, \lenv \slsat p\text{ and }l_2, \lenv
+    \slsat p\text{ implies } l_1 = l_2$},
 then the part of the state denoted by $\lass{R}$ is uniquely
 determined and left unchanged by the action. 
 The last rule finally reduces local fencing to entailment checking, provided the fence
-$\lass{F}$ can be expressed as a disjunction of precise assertions. The
+$\lass{F}$ can be expressed as a disjunction of \emph{precise}
+assertions, i.e.\ assertions satisfied by at most one substate of each
+logical state\footnote{$\precise{p} ==
+    \for{\lenv, l, l_1, l_2} l_1\leq l\text{, }l_2\leq l\text{, }l_1,
+    \lenv \slsat p\text{, and }l_2, \lenv \slsat p
+    \text{ implies } l_1 = l_2$}. The
 first premise states that $\lass{F}$ is invariant under the action
 $\lass{P}\swap \lass{Q}$, similar to the way that RGSep encodes
 stability checks as separation logic entailments. Informally, it
 reads: for any state in $f$, remove a part satisfying $p$ and add a
 state satisfying $q$; the result should still be in $f$. The third
-premise checks the confinement condition: given a state in $f_i$ ($l_1\composeL l_2|= \lass{F}_i$), and an extension of it ($l = l_1 \composeL l_2 \composeL l_3$) where a sub-part of $l$ satisfies $\lass{P}$ ($l_2 \composeL l_3 |= f_i$), the extension $l$ itself is also in $f_i$ ($l_1\composeL l_2\composeL
+premise checks the confinement condition: given a state in $f_i$ ($l_1\composeL l_2|= \lass{F}_i$), and an extension of it ($l = l_1 \composeL l_2 \composeL l_3$) where a subpart of $l$ satisfies $\lass{P}$ ($l_2 \composeL l_3 |= f_i$), the extension $l$ itself is also in $f_i$ ($l_1\composeL l_2\composeL
 l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, we have $l_2\composeL
 l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
-%if a sub-part of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
+%if a subpart of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
 %($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
-%then it is also a sub-part of that state ($l_1\composeL l_2\composeL
+%then it is also a subpart of that state ($l_1\composeL l_2\composeL
 %l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
 %l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 
@@ -666,7 +656,7 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
 %		&
 		\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
 		\\
-		\fenceAss{} \!<=>\! \bigvee\limits_{i \in I}\fenceAss{i} 		
+		\fenceAss{} \!<=>\! \bigvee_{i \in I}\fenceAss{i} 		
 		\\
 		(\precise{\fenceAss{i}}
 		\land
@@ -714,7 +704,7 @@ pseudo-entailment $\separate{\lass{P}}{\lass{Q}}$ asserts that states
 described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
   intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and $l_2,
 \lenv \slsat \lass{Q}$, $l_1$ and $l_2$ do not have any non-trivial
-common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
+common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \unitL$). This is expressible using standard connectives as follows:
 \[
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
@@ -803,7 +793,7 @@ common sub-state ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 	\infer
 %	[\proofRule{Disj}]
 	{
-	  \bigcup\limits_{i \in I,j\in J}\!\! \left\{[\token{A}]\!:\!\exsts{\bar{x}} \lass{P}_i \!\swap\! \lass{Q}_j \right\}
+	  \bigcup_{i \in I,j\in J}\!\! \left\{[\token{A}]\!:\!\exsts{\bar{x}} \lass{P}_i \!\swap\! \lass{Q}_j \right\}
 	  \mathrel{\approx^{\m{true}}}
 	  \left\{\![\token{A}]\!: \exsts{\bar{x}}
           \bigvee_{i \in I} \lass{P}_i \!\swap\!
