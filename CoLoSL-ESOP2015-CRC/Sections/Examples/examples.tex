@@ -2,6 +2,7 @@
 
 
 \subsection{Concurrent Spanning Tree}\label{subsec:CST-example}
+
 Programs manipulating arbitrary graphs present a
 significant challenge for compositional verification: because of deep,
 \emph{unspecified} sharing between different components of a graph,
@@ -14,7 +15,7 @@ to each subgraph. We now demonstrate on a concurrent spanning tree
 example that \colosl may be just the tool needed in this case, as it
 naturally deals with arbitrary overlapping views of the shared state,
 and allows one to tailor interferences to a given subjective view,
-thus achieving local reasoning for this challenging program.
+achieving local reasoning about the shared state for this challenging program.
 
 Our example, presented in \fig\ref{fig:conSpanningTree}, operates on a
 \emph{directed binary graph} (henceforth simply \emph{graph}),
@@ -110,7 +111,7 @@ shared state. In the marked state $\marked{x}$, only $\cell{x}{1}$ is
 owned. In both cases, the shared state also contains the left and
 right subgraphs represented by $\G{l}{\gamma}$ and $\G{r}{\gamma}$.
 
-To understand the discrepancy of ownership denoted by $\unmarked{x}{l}{r}$ and $\marked{x}$, let us look at the interference associated
+To understand the difference in ownership between $\unmarked{x}{l}{r}$ and $\marked{x}$, let us look at the interference associated
 with the graph, which is the union of interferences pertaining each
 vertex in the graph. For each vertex $n \in \gamma$, the only
 permitted action is that of marking $n$. (For simplicity, this action
@@ -119,7 +120,7 @@ from $0$ to $1$, the current thread also claims ownership of its left
 and right pointers. Indeed, we observe that other threads need not
 access the children of $n$ once they see that it has already been
 marked. The atomic \li{CAS} (compare-and-swap) instruction prevents
-several threads to concurrently mark the same node and claim ownership
+two threads from concurrently marking the same node and claiming ownership
 of the same resource.
 %% The shared state contains node $x$ which can
 %% be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as
@@ -221,17 +222,14 @@ $\li{n} \in \gamma$), the footprint of the call is limited to the
 subgraph rooted at $n$. Moreover, in order to reason about the
 concurrent recursive calls \li{span(x-}$\!\textgreater$\li{l)
   $\ \mid\mid\ $ span(x-}$\!\textgreater$\li{r)}, we need to
-\emph{split} the state into two $*$-composed states prior to the
-calls, pass each constituent state to the relevant thread and combine
-the resulting states by $*$ composition through an application of the
+\emph{split} the state into two using $*$, pass each constituent state to the relevant thread and $*$-combine
+the resulting states, as required by the
 \parRule\ rule. We thus conduct our proof with respect to a
 \emph{local} description of the graph, $\g{x}{\gamma}$ as defined in
 \fig\ref{fig:localCST}. We show at the end of this section how to
 derive the following, perhaps more natural specification from the one
 in \fig\ref{fig:conSpanningTree}:
-%
 \[
-\begin{array}{@{} c @{} }
 	{\color{blue}{
 	\{
 %		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
@@ -255,9 +253,8 @@ in \fig\ref{fig:conSpanningTree}:
 %		\right)
 	\}
 	}}
-\end{array}
 \]
-%
+
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of
 $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the single view
 $\shared{\G{x}{\gamma}}{I_{\gamma}}$ has been broken down into individual
@@ -298,10 +295,8 @@ $\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\exsts{l, r} \ga
     //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}    \end{array} \right\}$}@>
       $\begin{array}{l @{\hspace{10pt}} || @{\hspace{10pt}} l} \color{blue} //\{\g{l}{\gamma}\} & \color{blue} //\{\g{r}{\gamma}\} \\ \tx{b1 = span(x-}\!>\tx{l)}; & \tx{b2 = span(x-}\!>\tx{r)}; \\ \color{blue} //\{(\tx{b1} = 0\land\emp) \lor (\tx{b1} = 1 \land \tr{l}{\gamma}) \} & \color{blue} //\{(\tx{b2} = 0 \land\emp)\lor (\tx{b2} = 1 \land \tr{r}{\gamma})\} \end{array}$
     //<@\codecomment{$\left\{\begin{array}{@{} l @{} } \tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} *\null\\ \left( (\tx{b1} = 0\land\emp) \lor (\tx{b1} = 1 \land  \tr{l}{\gamma}) \right) * \left( (\tx{b2} = 0\land\emp) \lor (\tx{b2} = 1 \land \tr{r}{\gamma}) \right)  \end{array}\right\}$}@>
-    if (!b1)
-      x-$\!\textgreater$l = null;
-    if (!b2)
-      x-$\!\textgreater$r = null;
+    if (!b1) $\{$ x-$\!\textgreater$l = null; $\}$
+    if (!b2) $\{$ x-$\!\textgreater$r = null; $\}$
     //<@\codecomment{$\left\{\begin{array}{@{} l @{}}  \tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} *\null\\ \exsts{l' \in \{l, \tx{null}\}} \cell{\tx{x}.l}{l'} * \tr{l'}{\gamma} * \exsts{r' \in \{r, \tx{null}\}} \cell{x.r}{r'} * \tr{r'}{\gamma}  \end{array}\right\}$}@>
     //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 \land  \tr{\tx{x}}{\gamma}    \end{array}\right\}$}@>
   $\}$ //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} (\tx{res} = 0\land\emp)  \lor (\tx{res} = 1  \land \tr{\tx{x}}{\gamma})  \end{array} \right\}$}@>
@@ -340,7 +335,8 @@ From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have
 %% \end{array}
 %% \]
 %% %
-In order to derive the local specification $\g{x}{\gamma}$ from the global specification $\graph{x}{\gamma}$, it thus suffices to show $\shared{P(x,@g)}{I_{\gamma}} => Q(x,@g)$ as demonstrated below.
+We can now derive the global specification using \conseqRule and the
+derivation
 %
 %\begin{align*}
 %	&\shared{P}{I_{\gamma}}\!\!\!\!
@@ -517,8 +513,4 @@ Moreover, rather than having a distinct capability to modify the element at addr
 %
 Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
 %
-The full \colosl\ implementation of the set operations and their proofs are provided in~\cite{colosl-tr14}. 
-
-
-
-
+The technical details can be found in~\cite{colosl-tr14}. 

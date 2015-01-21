@@ -964,8 +964,6 @@ forgetting actions associated with it via shifting. For instance, it
 would make it impossible to forget actions as we do in
 \S\ref{sec:intuition}.
 
-\pgcomment{Not touched from here, but minor, }
-
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} partially axiomatises the stability of
 assertions of the form $\exsts{\bar x}\lass{P} * \bigvarstar_{i\in
@@ -1033,15 +1031,14 @@ action, in a similar way to the fencing rules above.
 %	}
 %	
 %	
-
 	\infer{
 	  \stable{\lass{Q},I,\lass{P},\lass{R}}
 	}
 	{
-    \for{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2} \in I}
+    \for{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}\!}{\!\lass{P}_2} {\in} I}
           \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P_1}}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}	
-	
+	\quad\ 
 	\infer{
 	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2}\},\lass{P},\lass{R}}
 	}
@@ -1061,7 +1058,7 @@ action, in a similar way to the fencing rules above.
 	  \stable{\lass{Q},\{\interAss{[\token{A}]}{\bar{x}}{\lass{P}_1}{\lass{P}_2} \},\lass{P},\lass{R}}
 	}
 	{
-	  \left(\lass{P}_1 \septraction (\lass{P} * (\lass{R} ** \lass{P}_1)\right) * \lass{P}_2 \slentails \lass{Q} * \m{true}
+	  (\lass{P}_1 \septraction (\lass{Q} ** \lass{P}_1)) * \lass{P}_2 \slentails \lass{Q} * \m{true}
 	}
 \end{mathpar}
 \hrule
@@ -1074,13 +1071,13 @@ action, in a similar way to the fencing rules above.
 
 The first of these rules  is unfamilar. Unlike fencing, stability
 checking for assertions only has to be
-checked against actions for which the environment may have the 
+checked against actions for which the environment may have the
 capability. If the capability required by the action cannot exist
 separately from those held by the assertion  (that is, those in $p *
 r$) then the environment cannot possibly own
 the capablity  and perform the action. Similarly, an action whose
-precondition is incompatible with the assertion 
-$p*r$ cannot possibly fire, as stated by the   next rule. 
+precondition is incompatible with the assertion
+$p*r$ cannot possibly fire, as stated by the   next rule.
 %
 %The current
 %knowledge consists of the local context $*$-separated with the shared
@@ -1088,7 +1085,7 @@ $p*r$ cannot possibly fire, as stated by the   next rule.
 %action. Indeed, that precondition must hold somewhere in the shared
 %state, separately from any private state (but possibly partially
 %outside of the current combined subjective view of the shared
-%state). 
+%state).
 %
 The last rule checks that a particular local assertion
 $\lass{Q}$ is preserved by the effect of an action. Again, there is a
