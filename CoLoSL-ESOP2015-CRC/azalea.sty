@@ -511,7 +511,7 @@
 \DeclareDocumentCommand{\unlockC}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\harpoonything} #3}
 \DeclareDocumentCommand{\valueC}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\harpoonything} #4}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\harpoonything} #3}
-\DeclareDocumentCommand{\nextC}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\harpoonything} #3}
+\DeclareDocumentCommand{\nextC}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
 
 \newcommand{\isLock}[2]{\textsf{isLock}\left(#1, #2\right)}
 \newcommand{\locked}[1]{\textsf{locked}\left(#1 \right)}

@@ -105,7 +105,6 @@ write $l_1\compatL l_2$.
 %% respectively and write $l_{\textsf{M}}$ for $(@s, h)$.
 
 An action is a triple $(p, q, c)$ of logical states where $p$ and $q$
-<<<<<<< HEAD
 are the action \emph{pre-} and \emph{post-states} describing how the
 shared state is modified by the action; and $c$ is the action
 \emph{catalyst}. An action catalyst has to be present for the action
@@ -173,11 +172,11 @@ is compatible with $g$), then its pre-state $p$ is contained in $g$
 \end{definition}
 
 \begin{definition}[Worlds]\label{def:worlds}
-The set $\Worlds$ of \emph{worlds} consists of all well-formed triples.
-%% \[
-%% 	\Worlds \eqdef 
-%% 	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
-%% \]
+The set $\Worlds$ of \emph{worlds} consists of all well-formed triples:
+\[
+	\Worlds \eqdef 
+	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
+\]
 \end{definition}
 
 %% Worlds do not put further constraints on the
@@ -523,31 +522,30 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 
 
 \paragraph{Confinement}
-
 The soundness of \colosl hinges on the fact that the action model
 $\lmod$ contains all the actions that could possibly affect the shared
 state $g$. This was expressed as a well-formedness condition in the
-definition of worlds~\ref{deinition4}, by a confinement relation that
-actions in $\lmod$ are confined by a global state $g$, written $g
-\confines \lmod$. It is also possible to extend $g$ at any time.  Any
+definition of worlds (Def.~\ref{def:worlds}), by a confinement
+relation $g\confines \lmod$ that actions in $\lmod$ are confined by a
+global state $g$. It is also possible to extend $g$ at any time.  Any
 part $l'$ of the local state can to migrate to the shared state under
 a new set of actions $\lmod'$, yielding a new shared state $g\composeL
 l'$ and action model $\lmod \cup \lmod'$. This migration is only
 permitted if $\l ' \confines \lmod'$. This confinement condition means
-that that the migration does not invalidate the views  of the threads.
+that that the migration does not invalidate the views of the threads.
 
 
 The technical definition of confinement of an action model on a
-logical state is given in the technical report~\cite{.}. Intuitively,
+logical state is given in the technical report~\cite{colosl-tr14}. Intuitively,
 it means that whenever an action $a = (p, q, c)$ of
 $\lmod'$ is enabled, the state $p$ must be a substate of $l'$.  It is
 possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
-For example, recall the interpretation of $s_x$ described on
-page~\pageref{ex:sxsem} as $S=\{a_v \,{=}\, ((\emptyset, \{\ell\,{:}\,v\}, \emptyset), (\emptyset, \{\ell\,{:}\,v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1\,{:}\,v{+}1\})) \mid v \in \Nats\}$. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
+For example, recall the interpretation of $s_x$ given by $S$ on
+page~\pageref{ex:sxsem}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
 \emptyset), (\emptyset, \{\ell\,{:}\,1\}, \emptyset), (\emptyset,
-\{\ell{-}1\,{:}\,1\}, \emptyset))$ is confined to the logical state
+\{\ell{-}1\,{:}\,1\}, \emptyset))\in S$ is confined to the logical state
 $l_0=(\emptyset, \{\ell\,{:}\,0\}, \emptyset)$ because $l_0$ is the first component of the
 action, and state $(\emptyset, \{\ell{-}1\,{:}\,0\}, \emptyset)$
 because it  is incompatible with the
@@ -566,74 +564,15 @@ first finding a set that is invariant under all actions in $\lmod'$
 (called a \emph{fence}), then checking the confinement condition for
 each action. We provide the technical details of confinement in~\cite{colosl-tr14}.
 
-For our examples in this paper, it is in fact enough to work with confinement in the
-logic. We lift the notion of confinement to the assertions and write
-$P \confines I$ to denote that the set of states described by $P$
- confine the actions of interface assertion $I$.  In the logic, the shared state is extended by the resources in
-$P$ under the interference assertion $I$ via the \extendRule principle,
+For the examples of this paper, it is in fact enough to work with confinement in the
+logic. We lift the notion of confinement to assertions and write
+$P \confines I$ when the set of states described by $P$
+ confines the actions of interface assertion $I$.  In the logic, the
+ shared state can be extended by the resources in
+$P$ under the interference assertion $I$ via \extendRule,
 which requires that $P\containI I$ be
 established. 
 
-
-
-\fig~\ref{fig:local-fencing-rules} presents a set of
-rules which reduces  $P \containI I$ to a series of entailments in
-ordinary separation logic. As expressed by the first rule,
-$P \containI I$ holds if there is a weaker local assertion $\lass{F}$
-that acts as a \emph{local fence} for $I$, written 
-$\lass{F}\strictfences I$. This relation states that  $\lass{F}$
-must be invariant under all actions of $I$ and must confine the
-actions in $f$.  In~\cite{colosl-tr14},
-%Appendix~\ref{sec:assertions-continued} 
-we show that it is always possible to weaken an arbitrary assertion into a local assertion. This fencing condition is
-checked for each action in $I$ (see the second rule). For each action
-$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, the three remaining rules of the figure may
-apply. In the first of these rules, the action cannot possibly fire,
-because its precondition does not agree with $\lass{F}$: no state
-satisfying $\lass{F}$ may be extended such that a subpart satisfies
-$\lass{P}$. 
-%The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
-The second of these rules allows us  to trim neutral parts
-$\lass{R}$ of an action $\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$
-appears both in $\lass{P}$ and $\lass{Q}$, and $\lass{R}$ is \emph{exact}, i.e.\ satisfied by at most
-one logical state\footnote{$\exact{p} ==
-    \for{\lenv, l_1, l_2} l_1, \lenv \slsat p\text{ and }l_2, \lenv
-    \slsat p\text{ implies } l_1 = l_2$},
-then the part of the state denoted by $\lass{R}$ is uniquely
-determined and left unchanged by the action. 
-The last rule finally reduces local fencing to entailment checking, provided the fence
-$\lass{F}$ can be expressed as a disjunction of \emph{precise}
-assertions, i.e.\ assertions satisfied by at most one substate of each
-logical state\footnote{$\precise{p} ==
-    \for{\lenv, l, l_1, l_2} l_1\leq l\text{, }l_2\leq l\text{, }l_1,
-    \lenv \slsat p\text{, and }l_2, \lenv \slsat p
-    \text{ implies } l_1 = l_2$}. The
-first premise states that $\lass{F}$ is invariant under the action
-$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, similar to the way that RGSep encodes
-stability checks as separation-logic entailments. Informally, it
-reads: for any state in $f$, remove a part satisfying $p$,  add a
-state satisfying $q$, and  the result should still be in $f$. The third
-premise checks the confinement condition: given a state in local
-assertion $f_i$ ($l_1\composeL l_2|= \lass{F}_i$), and 
-a state in $p$ ($l_2 \composeL   l_3 |= p$ with $l_1$ and $l_3 $
-disjoint), the the combined state ($l = l_1 \composeL \l_2 \composeL l_3$)
-must also be in $f_i$.
-
-\pgcomment{Have I got the last bit right???? Given time constraints, haven't followed:  (Hence, by precision of $\lass{F}_i$, we have $l_2\composeL
-l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$.) If
-correct, should be in.} 
-
-
-
-%an extension of it ($l = l_1 \composeL l_2 \composeL l_3$) where a subpart of $l$ satisfies $\lass{P}$ ($l_2 \compo%seL l_3 |= f_i$), the extension $l$ itself is also in $f_i$ ($l_1\composeL l_2\composeL
-%l_3|=\lass{F}_i$,hence by precision of $\lass{F}_i$, we have $l_2\composeL
-%l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
-
-%if a subpart of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
-%($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
-%then it is also a subpart of that state ($l_1\composeL l_2\composeL
-%l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
-%l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
 
 \begin{figure}
 \hrule\vspace{5pt}
@@ -715,9 +654,70 @@ correct, should be in.}
 \end{mathpar}
 \hrule
 \caption{Selected confinement and local fencing rules. We assume that variables in
-  $\bar x$ do not appear free in $\lass{F}$ and  $\lass{F}_i$ for any $i$.}
+  $\bar x$ do not appear free in $\lass{F}$, and in $\lass{F}_i$ for any $i$.}
 \label{fig:local-fencing-rules}
 \end{figure}
+
+
+\fig~\ref{fig:local-fencing-rules} presents a set of
+rules which reduces  $P \containI I$ to a series of entailments in
+ordinary separation logic. As expressed by the first rule,
+$P \containI I$ holds if there is a weaker local assertion $\lass{F}$
+that acts as a \emph{local fence} for $I$, written 
+$\lass{F}\strictfences I$. This relation states that  $\lass{F}$
+must be invariant under all actions of $I$ and must confine the
+actions in $f$.  In~\cite{colosl-tr14},
+%Appendix~\ref{sec:assertions-continued} 
+we show that it is always possible to weaken an arbitrary assertion into a local assertion. This fencing condition is
+checked for each action in $I$ (see the second rule). For each action
+$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, the three remaining rules of the figure may
+apply. In the first of these rules, the action cannot possibly fire,
+because its precondition does not agree with $\lass{F}$: no state
+satisfying $\lass{F}$ may be extended such that a subpart satisfies
+$\lass{P}$. 
+%The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
+The second of these rules allows us to trim \emph{neutral} parts
+$\lass{R}$ (corresponding to parts of the catalysts in the
+interpretation of this action) of an action
+$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$ appearing both in
+$\lass{P}$ and $\lass{Q}$. This only applies when $\lass{R}$ is
+\emph{exact}, i.e.\ satisfied by at most one logical
+state:\footnote{$\exact{p} == \for{\lenv, l_1, l_2} l_1, \lenv \slsat
+  p\text{ and }l_2, \lenv \slsat p\text{ implies } l_1 = l_2$} the
+part of the state denoted by $\lass{R}$ is then uniquely determined
+and left unchanged by the action.  The last rule finally reduces local
+fencing to entailment checking, provided the fence $\lass{F}$ can be
+expressed as a disjunction of \emph{precise} assertions,
+i.e.\ assertions satisfied by at most one substate of each logical
+state.\footnote{$\precise{p} == \for{\lenv, l, l_1, l_2} l_1\leq
+  l\text{, }l_2\leq l\text{, }l_1, \lenv \slsat p\text{, and }l_2,
+  \lenv \slsat p \text{ implies } l_1 = l_2$} The first premise states
+that $\lass{F}$ is invariant under the action
+$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, similar to the
+way that RGSep encodes stability checks as separation-logic
+entailments. Informally, it reads: for any state in $f$, remove a part
+satisfying $p$, add a state satisfying $q$, and the result should
+still be in $f$. The third premise checks the confinement condition:
+given a state in local assertion $f_i$ ($l_1\composeL l_2|=
+\lass{F}_i$), and a state in $p$ ($l_2 \composeL l_3 |= p$ with $l_1$
+and $l_3 $ disjoint), the combined state ($l = l_1 \composeL \l_2
+\composeL l_3$) must also be in $f_i$. Hence, by precision of
+$\lass{F}_i$, we have $l_2\composeL l_3\leq l_1\composeL l_2\composeL
+l_3 = l_1\composeL l_2$, i.e.\ $l_2\composeL l_3 \leq l_1\composeL
+l_2$ as required.
+
+
+
+%an extension of it ($l = l_1 \composeL l_2 \composeL l_3$) where a subpart of $l$ satisfies $\lass{P}$ ($l_2 \compo%seL l_3 |= f_i$), the extension $l$ itself is also in $f_i$ ($l_1\composeL l_2\composeL
+%l_3|=\lass{F}_i$,hence by precision of $\lass{F}_i$, we have $l_2\composeL
+%l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
+
+%if a subpart of an extension of a state in $\lass{F}_i$ satisfies $\lass{P}$
+%($l_1\composeL l_2|= \lass{F}_i$ and $l_2\composeL l_3 |= \lass{P}$),
+%then it is also a subpart of that state ($l_1\composeL l_2\composeL
+%l_3|=\lass{F}_i$, hence by precision of $\lass{F}_i$, $l_2\composeL
+%l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$).
+
 
 
 
@@ -925,38 +925,44 @@ straightforward.
 
 The last five rules partially axiomatise the \emph{fencing} relation
  $\lass{F}\fences I$. Most are similar to those for local
-fencing  $\lass{F}\strictfences I$ 
-\begin{enumerate}
-\item[1, 2.]
-  $\m{true}$ fences any interference assertion, and fencing can be
-  checked per action.
-  \addtocounter{enumi}{2}
-\item
-  When $\lass{P}$ and $\lass{Q}$ do not intersect in an action $\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} $
-(e.g.\ when their common parts have
-  been removed according to 5.), then the application of the action
-  must preserve the fence $\lass{F}$. Because the action is allowed to
-  act partly outside of $\lass{F}$, the state on which the action is
-  applied is $\lass{F} ** \lass{P}$, unlike local fencing where
-  $\lass{P}$ would be contained in $\lass{F}$. 
-\pgcomment{I don't get this yet: The reason why
-  $\lass{P}$ and $\lass{Q}$ must not intersect is precisely that we
-  consider the action on $\lass{F} ** \lass{P}$ and not just $\lass{F}$;
-  if $\lass{P}$ and $\lass{Q}$ have a non-empty intersection $l$ then
-  it might be that $l$ is not part of $\lass{F}$ and is added together
-  with $\lass{Q}$ by $*$ on the left-hand side of the sequent. But
-  there is no guarantee that $I$ accounts for all possible actions on
-  that piece of state $l$ since it was not part of $\lass{F}$, hence
-  we could end up with an assertion $\shared{\lass{F}}{I}$ that does
-  not satisfy the action closure property.}
-\item
-  Contrarily to local fencing, actions are allowed to have effects
-  outside of the fence. If the action precondition does not intersect
-  with the fence, then its effect is entirely outside the fence and
-  the action may be ignored.
-\item
-  As for local fencing, neutral parts of actions may be ignored.
-\end{enumerate}
+fencing  $\lass{F}\strictfences I$. The first two state that
+$\m{true}$ fences any interference assertion, and fencing can be
+checked per action. The last one states that, as for local fencing,
+neutral parts of actions may be ignored. The one before that states
+that, contrarily to local fencing, actions are allowed to have effects
+outside of the fence. If the action precondition does not intersect
+with the fence, then its effect is entirely outside the fence and
+the action may be ignored.
+
+Let us now focus on the third of these rules, which states that
+whenever $\lass{P}$ and $\lass{Q}$ do not intersect in an action
+$\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} $ (e.g.\ when
+their common parts have been removed using the last rule), then the
+application of the action must preserve the fence
+$\lass{F}$. Contrarily to the case of local fencing, the action is
+allowed to act partly outside of $\lass{F}$, hence the state on which
+the action is applied is $\lass{F} ** \lass{P}$. However, the whole of
+the postcondition $\lass{Q}$ of the action is then added, and the
+resulting state must still be in $\lass{F}$. One might instead have
+expected that only parts of the resulting state need to be represented
+in $\lass{F}$, to mimic the relationship between $\lass{F}$ and
+$\lass{P}$ (and indeed, this is all that is required for stability, as
+we shall see next). However, we do want to capture the spatially
+larger state, because shifting asserts that two interference
+assertions have the same effect even after an arbitrary number of
+steps. Doing otherwise is unsound because there is no guarantee that
+$I$ accounts for all possible actions on that part of $q$ that would
+be discarded, since it was not part of $\lass{F}$. Hence, we could end
+up with an assertion $\shared{\lass{F}}{I}$ that does not satisfy the
+action closure property.  Finally, the reason why $\lass{P}$ and
+$\lass{Q}$ must not intersect stems from similar considerations. If
+$\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$ then it
+might be that $c$ is not part of $\lass{F}$ and is added together with
+$\lass{Q}$ by $*$ on the left-hand side of the sequent. This would
+force the fence to account for this catalyst, and prevent us from
+forgetting actions associated with it via shifting. For instance, it
+would make it impossible to forget actions as we do in
+\S\ref{sec:intuition}.
 
 \pgcomment{Not touched from here, but minor, }
 
@@ -1060,7 +1066,7 @@ action, in a similar way to the fencing rules above.
 \end{mathpar}
 \hrule
 %\vspace*{5pt}
-\caption{Rules for checking stability (excerpt).
+\caption{Selected rules for stability checks.
  We assume that variables in
   $\bar x$ do not appear free in $\lass{P}$, $\lass{Q}$, and $\lass{R}$.}
 \label{fig:stability-rules}
@@ -1362,7 +1368,7 @@ a concrete machine state.
   The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
   defined as:
   \[
-  \reifyW{(l, g, \lmod)} \eqdef \heapPart{(l \composeL g)}
+  \reifyW{((@s_l, h_l, \ca{l}), (@s_g, h_g, \ca{g}), \lmod)} \eqdef  ((@s_l \uplus @s_g), (h_l \uplus h_g))
   \]
 \end{definition}
 
@@ -1371,7 +1377,7 @@ a concrete machine state.
   and only if,  for all $\lenv \in \LEnv$, $w \in  \Worlds$ and  $\h{}, \h{}' \in \Heaps$,
   \vspace{-10pt}
   \[
-    (w, \lenv |= P  \text{ and } \mathbb{C}, \reifyW{w} \rightarrow^{\text{*}} \li{skip}, \h{}')
+    (w, \lenv |= P  \text{ and } \mathbb{C}, \reifyW{w} \rightarrow^{\ast} \li{skip}, \h{}')
     \text{ implies } \exsts{w'} w', \lenv |= Q \text{ and } \h{}' = \reifyW{w'}
   \]
 \end{definition}
