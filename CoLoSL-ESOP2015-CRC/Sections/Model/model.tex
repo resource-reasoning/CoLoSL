@@ -107,9 +107,9 @@ to take effect, but is left unchanged by the action. It is maximal in
 the sense that no further, non-empty catalyst $c'$ can be found such
 that $c' \leq p$ and $c' \leq q$. For instance, \label{ex:sxsem} as we shall shortly
 see, $s_x$ in \fig\ref{fig:concurrentInc} will be interpreted as the
-set of all actions of the form $((\emptyset, \{\ell:v\}, \emptyset),
+set of actions $S=\{((\emptyset, \{\ell:v\}, \emptyset),
 (\emptyset, \{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
-\emptyset))$ for some $v$, where $\ell$ is the value of $x$ in the
+\emptyset))\mid v \in \Nats\}$, where $\ell$ is the value of $x$ in the
 current logical environment. We record the action catalyst separately
 for technical convenience. As we will shortly demonstrate (see
 \emph{worlds} below), we often need to refer to the action pre-state
@@ -249,7 +249,7 @@ three-ways according to $\composeL$, such that the
 $\composeL$-composition of the first two states satisfies $\lass{P}$
 and the $\composeL$-composition of the last two satisfy
 $\lass{Q}$~\cite{ramification,gareth-js12,rey-slnotes}. \emph{Septraction}
-(or \emph{existential magicwand}) $\lass{P}\septraction\lass{Q}$ is
+(or \emph{existential magic wand}) $\lass{P}\septraction\lass{Q}$ is
 true when there exists a local state satisfying $\lass{P}$ that can be
 $\composeL$-composed with the current one to yield a state satisfying
 $\lass{Q}$. Classical predicates and connectives have their standard
@@ -501,12 +501,12 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 
 
 \paragraph{Confinement}
-
-A \colosl world $(l,g,\lmod)$ descibes the local state $l$ and the
+A \colosl world $(l,g,\lmod)$ describes the local state $l$ and the
 global shared state $g$ with interference given by the action model
 $\lmod$.  The soundness of \colosl hinges on the fact that the action
 model $\lmod$ contains all the actions that could possibly affect the
-shared state $g$. Using the \extendRule principle, it is possible for
+shared state $g$. 
+Using the \extendRule principle, it is possible for
 any part $l'$ of the local state to migrate to the shared state under
 a new set of actions $\lmod'$, yielding a new shared state $g\composeL
 l'$ and action model $\lmod \cup \lmod'$, as long as this migration
@@ -514,48 +514,38 @@ does not invalidate the views of the other threads. We therefore only
 permit this migration if the actions in $\lmod'$ are \emph{confined}
 to $l'$. This means that whenever an action $a = (p, q, c)$ of
 $\lmod'$ is enabled, the state $p$ must be a substate of $l'$.  It is
-possible for some of the catalyse $c$ to lie outside $l'$, since the
+possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
 
-For example, going back to the interpretation of $s_x$ described on
-page~\pageref{ex:sxsem}, the action $a_0 = ((\emptyset, \{\ell:0\},
-\emptyset), (\emptyset, \{\ell:1\}, \emptyset), (\emptyset,
-\{\ell{-}1:1\}, \emptyset))$ is confined to the state
-$l_1=\{\ell:0\}$ because $l_1$ is the first component of the
-action, and $l_2=\{\ell{-}1:0\}$ because $l_2$ is incompatible with the
-action, but not $l_3=\{\ell{-}1:1\}$ because the action can
+For example, recall the interpretation of $s_x$ described on
+page~\pageref{ex:sxsem} as $S=\{a_v \,{=}\, ((\emptyset, \{\ell\,{:}\,v\}, \emptyset), (\emptyset, \{\ell\,{:}\,v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1\,{:}\,v{+}1\})) \mid v \in \Nats\}$. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
+\emptyset), (\emptyset, \{\ell\,{:}\,1\}, \emptyset), (\emptyset,
+\{\ell{-}1\,{:}\,1\}, \emptyset))$ is confined to the state
+$l_0=(\emptyset, \{\ell\,{:}\,0\}, \emptyset)$ because $l_0$ is the first component of the
+action, and $l' =(\emptyset, \{\ell{-}1\,{:}\,0\}, \emptyset)$ because $l'$ is incompatible with the
+action, but not $l''=(\emptyset, \{\ell{-}1\,{:}\,1\}, \emptyset)$ because the action can
 potentially affect address $\ell$.
 %Indeed $p \composeL c$ is compatible with $l_1$ and $l_3$, and the
 %modified cells 10 and 12 are fully contained in $l_1$ but not in
 %$l_3$; $p \composeL c$ is not compatible with $l_2$, hence $a$ has no effect on
 %$l_2$ and is automatically confined to $l_2$. 
-
-This simple example does not show the full subtlety of containment. We  also require that all states resulting from the successive
-application of actions in $\lmod'$ themselves confine all actions in
-$\lmod'$. 
-Inspired by the LRG approach~\cite{lrg}, this is achieved by
+%
+As part of the confinement of an action model $\lmod'$, we also require that all states resulting from the successive application of actions in $\lmod'$ themselves confine all actions in $\lmod'$. For instance, we also require that $l_1 = (\emptyset, \{\ell\,{:}\,1\}, \emptyset)$,  resulting from the application of $a_0$ on $l_0$, $l_2 = (\emptyset, \{\ell\,{:}\,2\}, \emptyset)$, resulting from the application of $a_1$ on $l_1$, and so forth, \emph{all} confine the actions in $S$. 
+%This simple example does not show the full subtlety of confinement. We  also require that all states resulting from the successive application of actions in $\lmod'$ themselves confine all actions in
+%$\lmod'$. 
+Inspired by the LRG approach~\cite{lrg}, we achieve this by
 first finding a set that is invariant under all actions in $\lmod'$
 (called a \emph{fence}), then checking the confinement condition for
-each action. This is complex and detailed in the technical
-report. Fortunately, for our examples,  it is in fact enough to work with containment in the
-logic. 
+each action. We provide the technical details of confinement in~\cite{colosl-tr14}.
 
--------a paragraph transfering to containment for logic, rather than model------
-
-\pgcomment{Now  what does it mean to transfer to the logic. Might make
-  sense to use somewhere: Similarly, the
-action model closure ensures that subjective views in assertions have
-to account for all actions potentially affecting their piece of the shared
-state.}
-
-In the logic, the shared state is extended by the resources in
+For our examples in this paper, it is in fact enough to work with confinement in the
+logic. We lift the notion of confinement to the assertions and write $P \confines I$ to denote that the set of states described by $P$, confine the actions of $I$.  In the logic, the shared state is extended by the resources in
 $P$ under the interference assertion $I$ via the \extendRule principle,
 which requires that $P\containI I$ be
 established. 
 
-------------------now an explanation of the figure, this can be
-improved, esp explanation of  confinement in last rule---------------
+
 
 \fig~\ref{fig:local-fencing-rules} presents a set of
 rules to reduce $P \containI I$ to a series of entailments in
@@ -848,7 +838,7 @@ common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \caption{Selected action shifting rules; we write $I
   \equiv^{\fenceAss{}} I'$ for $I \weakenI{\fenceAss{}} I' /| I'
   \weakenI{\fenceAss{}} I$, $\separate p q$ to denote that states
-  satifying $p$ and states satisfying $q$ have empty intersections,
+  satisfying $p$ and states satisfying $q$ have empty intersections,
   and assume that variables in $\bar x$ do not appear free in
   $\lass{F}$.}
 \label{fig:shifting-rules}
@@ -877,7 +867,7 @@ subjective shared state may be in to rewrite an action into an
 equivalent one. More precisely, if whenever the precondition
 $\lass{P}$ of the action is compatible with $\lass{F}$ then one of the
 $\lass{R}_i$'s is also true, then adding $\lass{R}_i$ as a neutral
-part of the action produces the same behavour. We can use this rule
+part of the action produces the same behaviour. We can use this rule
 (with the single $r_0 = x|->v$) to justify the shiftings of
 \S\ref{sec:intuition}. The fact that the $\lass{R}_i$'s are exact
 guarantees that no piece of state in $\lass{R}_i$ is mutated by the
@@ -1277,7 +1267,7 @@ We prove the soundness of \colosl, parametrised by the underlying models
 of machine states ($\Heaps$) and capabilities ($\Caps$). We appeal to
 the general soundness result of the views framework, providing
 parameters such as the reification function in
-Def.~\ref{def:reification} and proving lemmas required to make the
+\defin~\ref{def:reification} and proving lemmas required to make the
 result hold.
 
 The main part of the proof  establishes
