@@ -1,12 +1,12 @@
 \section{\colosl}\label{sec:colosl}
 We now give a more formal overview of how to use \colosl for program
-verification, eschewing some details of the semantics for lack of space,
-while still providing enough ingredients to carry program proofs. We
-describe the underlying model of \colosl, give the semantics of
-\colosl assertions, then present proof rules to reduce the various
-checks one has to perform in the course of \colosl program proofs
-(namely, the side-conditions of \shiftRule and \extendRule, and
-stability checks) to classical separation logic entailments that, in
+verification, eschewing some details of the semantics for lack of
+space, while still providing enough ingredients to carry program
+proofs. We describe the underlying model of \colosl, give the
+semantics of \colosl assertions, then present proof rules to reduce
+the various obligations typically encountered in proofs (namely, the
+side-conditions of \shiftRule and \extendRule, and stability checks)
+to classical separation logic entailments that, in
 particular, do not mention subjective views.
 
 
@@ -15,9 +15,9 @@ particular, do not mention subjective views.
 
 A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{logical states} and $\lmod$ is an \emph{action model}. The
-\emph{local logical state} (local state) $l$ represents the
+\emph{local logical state} (or local state) $l$ represents the
 locally owned resources of a thread, in the standard separation logic
-sense, while the \emph{global logical state} (shared state)
+sense, while the \emph{global logical state} (or shared state)
 $g$ represents shared resources. An action model records all possible interferences on the shared state.
 
 Logical states have two components: one describes machine states
@@ -42,10 +42,10 @@ and motivation.
 In general, each component of a logical state is taken from an
 arbitrary \emph{separation algebra}~\cite{asl} (i.e.\ a cancellative,
 partial commutative monoid) that satisfies the
-\emph{cross-split} property\footnote{A separation algebra
-  $(\mathbb{B}, +, \mathbf{1})$ satisfies the cross-split property iff
-  for all $a, b, c, d \in \mathbb{B}$, if $a + b = c + d$, there
-  exists $x, y, z, w \in \mathbb{B}$ s.t.\ $a = x + y$, $b = z + w$,
+\emph{cross-split} property\footnote{A monoid
+  $(\mathbb{A}, +, \mathbf{1})$ satisfies the cross-split property iff
+  for all $a, b, c, d \in \mathbb{A}$, if $a + b = c + d$, there
+  exists $x, y, z, w \in \mathbb{A}$ s.t.\ $a = x + y$, $b = z + w$,
   $c = x + z$, and $d = y + w$.}\cite{dockins2009fresh} (this is
 needed for $**$ to be associative~\cite{ramification}).  As we demonstrate in the examples of
 \S\ref{sec:examples}, our programs often call for a more complex model
@@ -92,37 +92,48 @@ The local and global logical states of a world are always
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or just local states. Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$ and $l_{\ca{}}$ for the first, second, and third projections, respectively and write $l_{\textsf{M}}$ for $(@s, h)$. We write $g$ to range over logical states representing global shared states. The empty logical state
-$(\emptyset, \emptyset, \emptyset)$ is written $\unitL$. We write $l_1
-\leq l_2$ when there exists $l$ such that $l\composeL l_1 = l_2$, and
-write $l_2 - l_1$ to denote the unique such $l$ (by cancellativity) when it
-exists. When $l_1\composeL l_2$ is defined, we say that $l_1$ and
-$l_2$ are \emph{compatible} and write $l_1\compatL l_2$.
+We write $l$ to range over either arbitrary logical states or just
+local states, and $g$ to range over logical states representing global
+states. The empty logical state $(\emptyset, \emptyset, \emptyset)$ is
+written $\unitL$. We write $l_1 \leq l_2$ when there exists $l$ such
+that $l\composeL l_1 = l_2$, and write $l_2 - l_1$ to denote the
+unique such $l$ (by cancellativity) when it exists. When $l_1\composeL
+l_2$ is defined, we say that $l_1$ and $l_2$ are \emph{compatible} and
+write $l_1\compatL l_2$.
+%% Given a logical state $l= (@s, h, \ca{})$, we write $l_{@s}, l_h$
+%% and $l_{\ca{}}$ for the first, second, and third projections,
+%% respectively and write $l_{\textsf{M}}$ for $(@s, h)$.
 
 An action is a triple $(p, q, c)$ of logical states where $p$ and $q$
+<<<<<<< HEAD
 are the action \emph{pre-} and \emph{post-states} describing how the
 shared state is modified by the action; and $c$ is the action
 \emph{catalyst}. An action catalyst has to be present for the action
 to take effect, but is left unchanged by the action. It is maximal in
 the sense that no further, non-empty catalyst $c'$ can be found such
-that $c' \leq p$ and $c' \leq q$. For instance, \label{ex:sxsem} as we shall shortly
+that $c' \leq p$ and $c' \leq q$\footnote{Alternatively, the catalyst
+could be computed a posteriori for each action.  However, we often
+need to isolate the part of the state that is modified by an action,
+hence our technical choice of recording the catalyst in the model.}. 
+For instance, \label{ex:sxsem} as we shall shortly
 see, $s_x$ in \fig\ref{fig:concurrentInc} will be interpreted as the
 set of actions $S=\{((\emptyset, \{\ell:v\}, \emptyset),
 (\emptyset, \{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
 \emptyset))\mid v \in \Nats\}$, where $\ell$ is the value of $x$ in the
-current logical environment. We record the action catalyst separately
-for technical convenience. As we will shortly demonstrate (see
-\emph{worlds} below), we often need to refer to the action pre-state
-in isolation, i.e. only those parts of the shared state modified by
-the action.
+current logical environment. 
+%We record the action catalyst separately
+%for technical convenience. As we will shortly demonstrate (see
+%\emph{worlds} below), we often need to refer to the action pre-state
+%in isolation, i.e. only those parts of the shared state modified by
+%the action.
 
 An action model is a partial function from \emph{capabilities} to sets
-of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion $I$.
+of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion.
 %
 \begin{definition}[Action models]
-  The set of \emph{actions}, $\set{Action}$, ranged over by $a$, and
-  the set of \emph{action models}, $\AMods$, ranged over by $\lmod$, are
-  defined as:
+  The set $\set{Action}$ of \emph{actions}, ranged over by $a$, and
+  the set $\AMods$ of \emph{action models}, ranged over by $\lmod$,
+  are defined as:
   \begin{mathpar}
     \set{Action} == \LStates \times \LStates \times \LStates
     
@@ -130,47 +141,48 @@ of \emph{actions}. It corresponds to the semantic interpretation of an interfere
   \end{mathpar}
 %  We write $\unitAM$ for an action model with empty domain.
 \end{definition}
-%
-\paragraph{Worlds}
-are triples
-$(l,g,\lmod)\in\LStates\times\LStates\times\AMods$ that satisfy several
-well-formedness conditions: the local and shared states are compatible ($l\compatL g$); 
-the capabilities owned by $l$ and $g$ are in the domain of $\lmod$; 
-and actions in $\lmod$ are \emph{confined} to $g$ (written $g\containI\lmod$).
-An action $a = (p, q, c)$ is confined to $g$ if and only if whenever it is enabled ($p \composeL c$ is compatible with $g$), then its pre-state $p$ is contained in $g$ ($p \leq g$). We motivate the need for the confinement condition in \S\ref{subsec:prules}.
+
+Worlds are triples $(l,g,\lmod)\in\LStates\times\LStates\times\AMods$
+that satisfy several well-formedness conditions: the local and shared
+states are compatible; the capabilities owned by $l$ and $g$ are in
+the domain of $\lmod$; and actions in $\lmod$ are \emph{confined} to
+$g$ (written $g\containI\lmod$).  An action $a = (p, q, c)$ is
+confined to $g$ if and only if whenever it is enabled ($p \composeL c$
+is compatible with $g$), then its pre-state $p$ is contained in $g$
+($p \leq g$). We motivate the need for the confinement condition in
+\S\ref{subsec:prules}.
 %We provide an informal description of confinement in
 %\S\ref{subsec:prules}. The formal definition of confinement is given in~\cite{colosl-tr14}.
 
 \begin{definition}[Well-formedness]
   \label{def:wf}
   A triple $(l, g, \lmod)\in\LStates\times\LStates\times\AMods$ is \emph{well-formed},
-  written $\wf{l, g, \lmod}$, iff
-  \vspace{-1ex}
-  \[
-  \begin{array}{L}
-    l \compatL g
-    /|
-    l_{\ca{}} \cup g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)
-    /|
-    g \containI \lmod
-  \end{array}
-\vspace{-1ex}
-\]
-%
+  written $\wf{l, g, \lmod}$, iff $l \compatL g$, $l_{\ca{}} \cup
+  g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)$, and $g \containI \lmod$.
+%%   \vspace{-1ex}
+%%   \[
+%%   \begin{array}{L}
+%%     l \compatL g
+%%     /|
+%%     l_{\ca{}} \cup g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)
+%%     /|
+%%     g \containI \lmod
+%%   \end{array}
+%% \vspace{-1ex}
+%% \]
 \end{definition}
 
 \begin{definition}[Worlds]\label{def:worlds}
-The set of \emph{worlds} is defined as
-%
-\[
-	\Worlds \eqdef 
-	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
-\]
+The set $\Worlds$ of \emph{worlds} consists of all well-formed triples.
+%% \[
+%% 	\Worlds \eqdef 
+%% 	\{w\in \LStates\times\LStates\times\AMods ||| \wf{w}\}
+%% \]
 \end{definition}
-%
-Worlds do not put further constraints on the
-relationship between $\lmod$ and $g$, they are however linked more tightly in
-the semantics of assertions (\S\ref{subsec:assertions}).
+
+%% Worlds do not put further constraints on the
+%% relationship between $\lmod$ and $g$, they are however linked more tightly in
+%% the semantics of assertions (\S\ref{subsec:assertions}).
 
 Finally, the composition of two worlds is defined when their local states are compatible, their global shared states and action models are the same, and the resulting tuple is well-formed.
 
@@ -230,11 +242,11 @@ Given $x \in \set{LVar}$, $\li{x} \in \set{PVar}$, and $\token{a} \in \set{Token
 \end{definition}
 
 The syntax and semantics of \emph{local assertions} $\LAssertions$ are
-that of standard separation logic with
-variables-as-resource~\cite{variablesAsResource}\footnote{Note in
+as in standard separation logic with
+variables-as-resource~\cite{variablesAsResource}.\footnote{Note in
   particular that expressions $E$ do not allow program variables: they
   can only appear on the left-hand side of $\li{x} \harpoonything E$.}
-interpreted over a world's local state. The assertion $\li{x}
+Local assertions are interpreted over a world's local state. The assertion $\li{x}
 \harpoonything E$ denotes a singleton stack where \li{x} has value
 $E$. Similarly, $E_1|->E_2$ is true of the singleton heap where only
 address $E_1$ is allocated and has value $E_2$.  The capability
@@ -336,19 +348,18 @@ defined below.
   
   s, \lenv &|=_{g,\lmod} \shared P I &\text{iff}&
   (s,g,\lmod), \lenv |= \shared P I\\
-  
+
   u,\lenv &|=_\dagger \exsts x P
   &\text{iff}& \exsts v u, [\lenv|||x:v] |=_\dagger P\\
 %  
 %  u,\lenv &|=_\dagger \for{x} P
 %  &\text{iff}& \for{v}u, [\lenv|||x:v] |=_\dagger P\\
-  
   u,\lenv &|=_\dagger P \lor Q
   &\text{iff}& u,\lenv |=_\dagger P\text{ or }u,\lenv |=_\dagger Q\\
   u, \lenv &|=_\dagger P_1 * P_2 &\text{iff}&
   \exsts{u_1,u_2} u = u_1 \grey u_2\text{ and }
   u_1, \lenv |=_\dagger P_1 \text{ and }u_2, \lenv |=_\dagger P_2\\
-  
+
   u, \lenv &|=_\dagger P_1 ** P_2 &\text{iff}&
   \exsts{u',u_1,u_2} u = u'\grey u_1\grey u_2\text{ and}\\
   &&&
@@ -359,14 +370,14 @@ defined below.
 %  &\text{iff}&
 %  l = (\emptyset,\emptyset, \{[|E|]_{\lenv}\})\\
 %  &&\cdots\\
-
+  
   l,\lenv &\slsat \m{false}  && \text{never}\\
-
+  
   l, \lenv &\slsat \emp &\text{iff}&l = \unitL\\
   
   l,\lenv &\slsat E_1 = E_2
   &\text{iff}& [|E_1|]_{\lenv} = [|E_2|]_{\lenv}\\
-
+  
   l, \lenv &\slsat \li{x} \harpoonything E
   &\text{iff}&
   l = (\{\li x: [|E|]_{\lenv}\}, \emptyset, \emptyset)\\
@@ -376,6 +387,11 @@ defined below.
   l =
   (\emptyset, \{[|E_1|]_{\lenv}: [|E_2|]_{\lenv}\}, \emptyset)\\
   
+%%   \end{array}
+%% \]
+%% \vspace{-3.0ex}
+%% \[
+%% \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
   l, \lenv & \slsat [E]
   & \text{iff} &
   l = (\emptyset, \emptyset, \{[|E|]_{\lenv}\})\\
@@ -460,9 +476,13 @@ consequences of the semantics.
   %% \end{mathpar}
 \end{lemma}
 \begin{proof}[sketch]
-  The cases of \weakenRule and \copyRule are
-  straightforward. \forgetRule, \mergeRule and \shiftRule principles are valid as action
-  model closure is preserved when picking a smaller subjective state, when taking the union of subjective states and their interference assertions, and when shifting the interference assertion, respectively. The full proof is provided in~\cite{colosl-tr14}.
+  The cases of \weakenRule and \copyRule are straightforward. For
+  \forgetRule, \mergeRule, and \shiftRule, we note
+  in~\cite{colosl-tr14} that action model closure is preserved by
+  picking a smaller subjective state, taking the union of subjective
+  states and their interference assertions, and shifting the
+  interference assertion, respectively.
+  %The full proof is provided in~\cite{colosl-tr14}.
   \qed
 \end{proof}
 
@@ -646,12 +666,12 @@ l_3\leq l_1\composeL l_2\composeL l_3 = l_1\composeL l_2$)
 %		&
 		\left(\lass{P} \septraction \fenceAss{} \right) * \lass{Q} \slentails \fenceAss{}	
 		\\
-		\fenceAss{} \!<=>\! \bigvee_{i \in I}\fenceAss{i} 		
+		\fenceAss{} \!<=>\! \bigvee_{i \in J}\fenceAss{i} 		
 		\\
 		(\precise{\fenceAss{i}}
 		\land
 		\fenceAss{i} \sepish \lass{P} \slentails \fenceAss{i}
-		\;\;\text{for } i \in I)
+		\;\;\text{for } i \in J)
 	}	
 %	{
 %		\begin{array}{@{} l @{}}			
@@ -764,7 +784,7 @@ common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 	}
 	{
 %		& \fenceAss{} \fences  \left\{ [\token{A}]: \left\{ P \swap Q \right\}\right\}
-		\left(\lass{P} \septraction (\lass{P} \sepish \fenceAss{})\right) * \lass{Q} \slentails \m{false}
+		\left(\lass{P} \septraction (\fenceAss{} \sepish \lass{P} )\right) * \lass{Q} \slentails \m{false}
 	}	
 	
 	\infer
@@ -773,18 +793,18 @@ common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 		\left\{\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}} \right\} \;\equiv^{\fenceAss{}}\;  \bigcup_{i \in I} \left\{\interAss{[\token{A}]}{\bar x}{\lass{P} * \lass{R}_i}{\lass{Q} * \lass{R}_i} \right\}	
 	}
 	{
-		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in I} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
+		\fenceAss{} \sepish \lass{P} \slentails \bigvee_{i \in J} \fenceAss{} \sepish \left(\lass{P} * \lass{R}_i \right)
 		\\
-		\exact{\lass{R}_i} \text{ for } i \in I
+		\exact{\lass{R}_i} \text{ for } i \in J
 	}
 
 	\infer
 %	[\proofRule{Disj}]
 	{
-	  \bigcup_{i \in I,j\in J}\!\! \left\{[\token{A}]\!:\!\exsts{\bar{x}} \lass{P}_i \!\swap\! \lass{Q}_j \right\}
+	  \bigcup_{i \in K,j\in J}\!\! \left\{[\token{A}]\!:\!\exsts{\bar{x}} \lass{P}_i \!\swap\! \lass{Q}_j \right\}
 	  \mathrel{\equiv^{\m{true}}}
 	  \left\{\![\token{A}]\!: \exsts{\bar{x}}
-          \bigvee_{i \in I} \lass{P}_i \!\swap\!
+          \bigvee_{i \in K} \lass{P}_i \!\swap\!
           \bigvee_{j\in J}\lass{Q}_j \right\} 
 	}
 	{

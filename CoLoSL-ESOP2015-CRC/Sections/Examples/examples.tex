@@ -320,10 +320,9 @@ We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from th
 When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial.
 Let us define
 \begin{align*}
-	P(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \left( \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n}) \; \right)\\
-	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \left( \exsts{l,r}\gamma(n) = (l, r)
+	P(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n})\\
+	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \exsts{l,r}\gamma(n) = (l, r)
         \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}
-        \right)
 \end{align*}
 From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have
 %

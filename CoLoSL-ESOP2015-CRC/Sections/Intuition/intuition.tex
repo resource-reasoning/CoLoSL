@@ -4,19 +4,27 @@
 We sketch a proof of an implementation of Dijkstra's token ring mutual
 exclusion algorithm, which pioneered \emph{self-stabilising}
 distributed algorithms~\cite{dijkstra74}. Our proof highlights the main
-reasoning principles supported by \colosl and results in \emph{small
+reasoning principles of \colosl and results in \emph{small
   specifications} for each participant in the ring. Besides their
 concision, we show how small specifications are robust against
 non-trivial changes to the algorithm.
 
-The algorithm %presented in \fig\ref{fig:concurrentInc},
-assumes a network of $n{+}1$ machines arranged in a ring, with a
-designated \emph{master} machine and $n$ slave machines. Each machine maintains a local counter and has
-access to the value of its left neighbour's counter; the state of the
-system consists of all $n{+}1$ counters. Starting in an arbitrary state,
-the network eventually stabilises to legitimate
-states~\cite{dijkstra-proof}, with the following global property: 
-in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with machine $0$ being the master) have some value $v{+}1$, and all others in the $i \cdots n$ range have value $v$.  In the $i$th legitimate state, only the $i$th machine can make progress: it increments its counter by $1$ and takes the system to the next legitimate state ($i{+}1 \,\text{mod}\, n{+}1$). For a ring at address $x$, the $i$th legitimate state is depicted below (for both $i>0$ and $i=0$).  \\ \null\hfill
+The algorithm %presented in \fig\ref{fig:concurrentInc}, assumes a
+network of $n{+}1$ machines arranged in a ring, with a designated
+\emph{master} machine and $n$ slave machines. Each machine maintains a
+local counter and has access to the value of its left neighbour's
+counter; the state of the system consists of all $n{+}1$
+counters. Starting in an arbitrary state, the network eventually
+stabilises to legitimate states~\cite{dijkstra-proof}, with the
+following global property: in the $i$th legitimate state, machines
+$0$ to $i{-}1$ (machine $0$ being the master) have some
+value $v{+}1$, and all others have value
+$v$.  In the $i$th legitimate state, only the $i$th machine (indicated
+by $\bullet$ below) can make
+progress: it increments its counter by $1$ and takes the system to the
+next legitimate state ($i{+}1 \,\text{mod}\, n{+}1$). For a ring at
+address $x$, the $i$th legitimate state is depicted below (for both
+$i>0$ and $i=0$).  \\ \null\hfill
 %a number of 
 %successive machines in the ring have the same value $v+1$ (up to say,
 %machine $i$, with machine $0$ being the master), then the others have
@@ -51,18 +59,18 @@ in the $i$th legitimate state, all machines in the range $0\cdots i{-}1$ (with m
   \hfill\null\\
 
 
-In the accompanying technical report~\cite{colosl-tr14}, we outline a proof sketch of token ring's
-self-stabilisation phase in \colosl. We show that,
-starting from an arbitrary state, the system converges to a legitimate
-state. We also provide a proof of the token ring being used for mutual
-exclusion (in a legitimate state, only one machine can make progress,
-indicated by the $\bullet$ above). Here, we
-focus on the part of the algorithm that makes interesting use of \colosl. We assume that the token ring is in the $0$th legitimate state and all counters hold value $0$. Our proof will make use of the \colosl
-principles laid out in \fig\ref{fig:principles}, together with the
-usual concurrency rule of separation logic~\cite{csl-tcs} and the rule
-of semantic consequence from the Views framework~\cite{views}.  We introduce
-them informally as needed, and present them in more detail in
-\S\ref{sec:colosl}.
+In~\cite{colosl-tr14}, we outline a proof of the token ring's
+self-stabilisation phase, which shows that the system always converges
+to a legitimate state. We also provide a proof of the token ring as a
+mutual exclusion mechanism, where a machine holding $\bullet$ may gain
+ownership of a shared resource. For simplicity, we focus here on the
+case where the token ring is already in the $0$th legitimate state,
+with all counters holding value $0$. Our proof makes use of the
+\colosl principles laid out in \fig\ref{fig:principles}, together with
+the usual concurrency rule of separation logic~\cite{csl-tcs} and the
+rule of semantic consequence from the Views framework~\cite{views}.
+We introduce them informally as needed, and present them in more
+details in \S\ref{sec:colosl}.
 
 %% \begin{figure}
 %%   \centering
@@ -132,18 +140,18 @@ them informally as needed, and present them in more detail in
 
 \colosl introduces a new assertion $\shared{P} I$ called a
 \emph{subjective view}, which comprises a \emph{subjective assertion} $P$ describing
-a \emph{part} of the global shared state and an \emph{interference assertion}
+a \emph{part} of the global shared state, and an \emph{interference assertion}
 $I$ which characterises how this partial shared state may be changed
 by the thread or the environment. Similar to interference assertions
 of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
-$I$ declares transitions of the form $[\token a] : Q \swap R$, where a
+$I$ declares actions of the form $[\token a] : Q \swap R$, where a
 thread in possession of the $[\token a]$ capability (in its local state) may carry out its transition and update parts of the shared
-state satisfying $Q$ to those satisfying $R$. Assertions in Hoare
+state satisfying $Q$ to a state satisfying $R$. Assertions in Hoare
 triples must be {\em stable} with respect to the interference from the environment: that is, robust with respect to the interference assertion $I$.
 
 Consider the program $\li{ring(x)}$ defined in
 \fig\ref{fig:concurrentInc} representing a token ring with $n{+}1$
-machines (one master thread and $n$ slave threads).
+machines.
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
 It is written in pseudo-code resembling C with additional constructs
@@ -152,17 +160,16 @@ behaves atomically; and parallel composition $\_ ||\_ $ which spawns
 threads then waits until they complete. In our example, the $n{+}1$ threads
 run in parallel until all counters reach value $10$.
 %(in the fashion described above).
-
 %Note that this implementation can easily be generalised to an
 %$n$-place ring. We focus on a 3-place ring for concision.
-While the implementation of all slave threads are identical, we shall see that the proof of the
-first slave in the ring (at $x{+}1$) is slightly different from the others.
+While the implementation of all the slave threads are identical, we shall see that the proof of the
+first slave in the ring (at $x{+}1$) is slightly different from the
+others, for which a single proof suffices.
 We henceforth refer to the first slave thread as the
 \emph{foreman}.  Let us proceed with the proof of the other
-slave threads, which uniformly applies to \emph{all} of them.
+slaves.
 
 \begin{figure}
-\centering
 \noindent\hrule\vspace{10pt}
 \vspace{-3ex}
 {\begin{lstlisting}[numbers=none,numbersep=5pt]
@@ -171,7 +178,7 @@ ring(x)
 $\{$ master(x) $\mid\mid$ slave(x+1) $\mid\mid \cdots \mid\mid$ slave(x+n);
 $\}$ //$\color{blue}\left\{\begin{array}{@{}l@{}}\tx{x}|-< x * [\token m_{x}] * [\token s_{x{+}1}] * \cdots * [\token s_{x{+}n}]* \shared{\begin{array}{@{}l@{}}\tx{n}|-<n * x|->10 * x{+}1|->10 * \cdots * x{+}n|->10\end{array}}{I}\end{array} \right\}$
 \end{lstlisting}}
-\vspace{-2ex}
+\vspace{-3ex}
 \begin{tabular}{@{} l @{\hspace{8ex}} l@{}}
 {\begin{lstlisting}
 master(x)
@@ -239,13 +246,13 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
   S_x' \eqdef \{s_x, s_{x{-}1}'\}
 \end{mathpar}
 \vspace{-5pt}\hrule
-\caption{A proof sketch of the ring program in \colosl. Lines starting
-  with $\color{blue}{//}$ contain assertions that describe the local
+\caption{A proof sketch of the token ring in \colosl. Assertions in lines starting
+  with $\color{blue}{//}$ describe the local
   state and the subjective shared state at the relevant program
-  point. The proof of \li{slave} applies uniformly to all slaves
+  points. The proof of \li{slave(x)} applies to all slaves
   expect the first one (called the foreman) in the parallel
-  composition, whose proof is the same as other slaves, except for the
-  substitution of $S_x'$ with $F_x'$.}
+  composition, where
+   $S_x'$ is replaced by $F_x'$.}
 \label{fig:concurrentInc}
 \end{figure}
 %
@@ -257,8 +264,8 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
 %% the master and foreman threads are similar and can be described
 %% analogously.
 
-\paragraph{Proof of slave threads}
-Let us forget for a moment about the proof outline of
+\paragraph{Proof of the slave}
+Let us temporarily forget about the proof outline of
 \fig\ref{fig:concurrentInc} and attempt to prove \li{slave(x)} in
 isolation, in the spirit of local reasoning. Since
 \li{slave(x)} inspects the value of its counter pointed to by \li{x}
@@ -275,8 +282,8 @@ The above assertion comprises: a) a variable assertion stating that the thread
 locally owns  variable \li{x} with value $x$ (using the variables-as-resource model~\cite{variablesAsResource}); b) a
 \emph{capability} $[\token{s}_x]$ that allows it to perform the
 associated $s_x$ action (see below); and c) a subjective view of the shared state: $x$
-points to $0$ and $x{-}1$ (its left neighbour) points to either $0$ or $1$, since its left
-neighbour might have already incremented its own counter.
+points to $0$, and $x{-}1$, its left neighbour, points to either $0$ or
+$1$ since it might already have incremented its own counter.
  The $*$
 connective used between assertions is that of separation logic and
 means that the assertions describe \emph{disjoint} pieces of state.
@@ -286,24 +293,24 @@ actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
 of the contents of $x$ under the condition that its value is one less
 than the value at address $x{-}1$ (see
 \fig\ref{fig:concurrentInc}). Since the current thread owns $[\token s_x]$ locally,
-it is the only one that can perform $s_x$. On the
+only it can perform $s_x$. On the
 other hand, the capability $[\token s_{x{-}1}]$ is not locally owned,
 thus the environment could potentially perform the associated action
 whenever its precondition (on the left-hand side of $\swap$) is
 satisfied.
 %that performed by the current machine (enabled by $[\token{x}]$); and that of the previous machine in the ring (enabled by $[\token{s}_p]$). Each action allows the value of the corresponding machine to be incremented by $1$ so long is it is the one that can make a move (As described above). 
 Upon closer inspection, since this subjective view says nothing of the
-value of the cell at address $x{-}2$, $s_{x{-}1}$ can always fire in this
-situation. The assertion is thus not \emph{stable}: nothing prevents
-the counter at $x{-}1$ from incrementing beyond value 1. A weaker,
-stable assertion is thus:
+value of the cell at address $x{-}2$, $s_{x{-}1}$ could potentially
+\emph{always} fire. The assertion is thus not \emph{stable}: nothing
+prevents the counter at $x{-}1$ from incrementing beyond value 1. A
+weaker, stable assertion is thus:
 \[
 \li{x} \harpoonything x * [\token{s}_x] * \shared{\exsts{v}
   \cell{x}{0} * \cell{x{-}1}{v}}{S_x}
 \]
 
-Fortunately, we can do better and obtain a stronger small precondition.
-Let us first step back and think again at the level of
+Fortunately, we can do better and obtain a stronger small
+precondition.  Let us first step back and think again at the level of
 the whole algorithm. As the programmer knows, the situation above
 cannot happen as $x{-}2$ can only be at most one ahead of $x$ itself.
 We can thus replace $S_x$ by $S'_x$ and give a stronger stable
@@ -311,28 +318,26 @@ precondition that captures just what we want, as in
 \fig\ref{fig:concurrentInc}. The proof of $\li{slave(x)}$ is now
 relatively straightforward. By inspection (or using the rules of
 \S\ref{subsec:prules}), the invariant of the while loop and the
-postcondition are also stable. The atomic section performs action
-$s_x$ (temporarily ``opening the box'', i.e.\ transferring shared
-resources into the local state to perform the update) and preserves
-the invariant.  The final postcondition of $\li{slave(x)}$ follows
-from the invariant and the boolean expression of the loop.
+postcondition are also stable. The atomic section temporarily ``opens
+the box'' to perform action $s_x$ then ``closes back the box'', and
+preserves the invariant.  The final postcondition of $\li{slave(x)}$
+follows from the invariant and the boolean expression of the loop.
 
-\paragraph{Proof of master and foreman threads}
-The proof sketches of the master and foreman (first slave) threads are
-analogous, following \fig\ref{fig:concurrentInc}. As the first slave,
-the foreman has to account for interference from the master thread
-instead of another slave thread. Note that the master has access to
-variable \li{n} holding the current size of the ring, as does its
-associated action $m_x$, since they both depend on the value of the
-counter at address $x+n$.
+\paragraph{Proof of the master and foreman}
+The proof sketches of the master and foreman threads sketched in
+\fig\ref{fig:concurrentInc} are analogous. As the first slave, the
+foreman has to account for interference from the master instead of
+another slave. Moreover, the master and its associated action $m_x$
+have access to variable \li{n} holding the current size of the ring,
+since they depend on the value of the counter at address $x+n$.
 %Let us now detail the proof of \li{ring(x)}.
 
 \paragraph{Proof of the ring}
-The precondition of \li{ring} states that it owns all capabilities,
+The precondition of \li{ring(x)} states that it owns all capabilities,
 which will be distributed amongst the $n{+}1$ threads; the global
 variable $\li{n} \harpoonything n$ is shared, as are all $n{+}1$ counters, initialised
 to 0. The interference $I$ associated with the subjective view
-consists of the actions of the $n{+}1$ threads. Because at this stage we have a global view
+consists of the actions of the $n{+}1$ threads. Because \li{ring(x)} has a global view
 of the state of the ring (and moreover all capabilities are held
 locally), the $s_{x+i}$ actions are enough to guarantee
 stability.
@@ -363,7 +368,7 @@ thread running \li{slave(x+$i$)} ($i>1$) gets $[\token{s}_{x{+}i}] *
   \shared{\cell{x{+}i}{0} * (\cell{x{+}i{-}1}{0} \lor \cell{x{+}i{-}1}{1})}{\{s'_{x{+}i{-}1}, s_{x{+}i}\}}
 \end{align*}
 %
-We start by \emph{rewriting} the action $s_{x{+}i{-}1}$ of $I$ into the stronger
+We start by exchanging the action $s_{x{+}i{-}1}$ of $I$ for the stronger
 action $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
 us to replace $I$ with any interference assertion $I'$ that has the
 same observable effect as far as the subjective assertion $P$ of the
@@ -391,16 +396,20 @@ foreman threads can be derived analogously.
 Once all threads have completed their operations, we join up their
 postconditions using the \mergeRule principle, which embodies a
 crucial feature of \colosl: different subjective views
-\emph{overlap}. The overlapping
-conjunction $**$ between two assertions means that the two assertions describe
-potentially \emph{overlapping} pieces of state. In particular, $A * B
-=> A ** B$ and $A /| B => A**B$. This connective has been used in the past to reason about sharing in
-data structures~\cite{rey-slnotes,js-popl12,ramification}.
- Since $|/$ distributes over $**$, the subjective view
- simplifies to $\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots * \cell{x{+}n}{10}}{M'_{x}, S'_{x{+}1} \cup \cdots \cup S'_{x{+}n} }$. 
- Finally, since $M'_{x} \cup S'_{x{+}1} \cup \cdots \cup S'_{x{+}n}$ $\weakenI{{\scriptli{n}}|-< n * \cell{x}{10} * \cell{x{+}1}{10} * \cdots *
- \cell{x{+}n}{10}} I $, by the \shiftRule principle, we get
-the postcondition of \li{ring(x)}. This concludes our \colosl proof of \li{ring(x)}. 
+\emph{overlap}. The overlapping conjunction $**$ between two
+assertions means that the two assertions describe potentially
+\emph{overlapping} pieces of state. In particular, $A * B => A ** B$
+and $A /| B => A**B$. This connective has been used in the past to
+reason about sharing in data
+structures~\cite{rey-slnotes,js-popl12,ramification}.  Since $|/$
+distributes over $**$, the subjective view simplifies to
+$\shared{\cell{x}{10} * \cell{x{+}1}{10} * \cdots *
+  \cell{x{+}n}{10}}{I'}$ where $I' = M'_{x}\cup F'_{x{+}1} \cup
+S'_{x{+}2}\cup \cdots \cup S'_{x{+}n}$.  Finally, since
+$I'\weakenI{{\scriptli{n}}|-< n * \cell{x}{10} * \cell{x{+}1}{10} *
+  \cdots * \cell{x{+}n}{10}} I $, we get the postcondition of
+\li{ring(x)} by the \shiftRule principle. This concludes our \colosl
+proof of \li{ring(x)}.
 
 %We complete our semi-formal overview by noting that unlike
 %CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
@@ -435,28 +444,19 @@ environment, and provide more opportunities for proof reuse.
 %slave threads, without needing to reprove \li{master} or \li{slave} at
 %all. 
 
-For instance, let us now modify the third line of \li{ring(x)} by
-forking an additional thread that dynamically grows the ring by
-spawning more slave threads (we leave the details to the accompanying
-technical report). When the ring has size
-$n$ (i.e. $\li{n} \harpoonything n$), we use an instance of the \extendRule principle as follows in
-order to add a new slave (at $x{+}n{+}1$) to the shared state\footnote{%
-Unlike CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
-an explicit \emph{unsharing} mechanism to claim shared resources and
-render them thread-local. Instead, this behaviour can be simply
-encoded 
-%for a resource described by $P$ and associated with tokens
-%$[\token{a}_1]$, \ldots , $[\token{a}_{n}]$ 
-as an action of the form \vspace{0pt}
-$
-\bigvarstar_{j \in J}[\token{a}_j]{:}\, P \swap \bigvarstar_{j \in J}[\token{a}_j]\vspace{0pt}
-$.
-That is, a thread holding tokens $\bigvarstar_{j \in J}[\token{a}_j]$ can move the shared resource $P$
-into its local state in exchange for the associated capabilities $\bigvarstar_{j \in J}[\token{a}_j]$.
-state.
-}. In
-doing so, we also define the new slave's associated interference and
-accompanying capability.
+For instance, let us now add a thread that dynamically grows the ring
+by spawning extra slaves to the parallel composition of \li{ring(x)}
+(the details can be found in~\cite{colosl-tr14}). When the ring has
+size $n$, we use the \extendRule principle as follows to add a new
+slave (at $x{+}n{+}1$) to the shared state with the associated
+interference relation and capability.\footnote{Unlike
+  CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
+  an explicit \emph{unsharing} mechanism to claim back shared
+  resources. Instead, this can be simply encoded as an action of the
+  form $\bigvarstar_{j \in J}[\token{a}_j]{:}\, P \swap \bigvarstar_{j
+    \in J}[\token{a}_j]$: a thread holding $\bigvarstar_{j \in
+    J}[\token{a}_j]$ can move the shared resource $P$ into its local
+  state in exchange for the associated capabilities.}
 \begin{align*}
   \cell{(x{+}n{+}1)}{v} \stackrel{(\extendRule)}{\semimplies} \exsts{\token{s}_{x{+}n{+}1}}[\token{s}_{x{+}n{+}1}] * \shared{\cell{x{+}n{+}1}{v}}{\{s_{x{+}n{+}1}\}}
 \end{align*}
