@@ -283,14 +283,12 @@ more than one predecessors and has been marked by another thread.
 %  //<@\codecomment{$\{\graph{\tx{x}}{\gamma}\}$}@>
 %  //<@\codecomment{$\{\shared{\G{\tx{x}}{\gamma}}{I_{\gamma}}\}$}@> 
 \begin{lstlisting}
-//<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
-b = span(x) $\{$
-  //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\tx{x} \in \gamma \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
+b = span(x) //<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
+$\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\tx{x} \in \gamma \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
   if (x == null)
     //<@\codecomment{$\{\tx{x} = \tx{null} \land \emp\}$}@>
     //<@\codecomment{$\{\tr{\tx{x}}{\gamma}\}$}@>
     return 1;
-
   //<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
   res = $\langle$ CAS(x, 0, 1) $\rangle$;
   //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} *\null\\ \left((\tx{res} = 0\land\emp) \lor  \left(\begin{array}{l} \tx{res} = 1 \land \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\right)\end{array}\right\}$}@>
