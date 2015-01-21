@@ -2,7 +2,7 @@
 
 
 \subsection{Concurrent Spanning Tree}\label{subsec:CST-example}
-Programs manipulating arbitrary graphs present the following
+Programs manipulating arbitrary graphs present a
 significant challenge for compositional verification: because of deep,
 \emph{unspecified} sharing between different components of a graph,
 changes to one subgraph may affect other subgraphs which may point
@@ -23,7 +23,7 @@ successors, called its left and right children. The program concurrently compute
 in-place spanning tree of the graph (i.e.\ a tree that covers
 all nodes of the graphs from a given root), as follows:
 each time a new node is encountered, two new threads are created that
-each prune the edges of the left and right children recursively. A
+each prune the edges of its left and right children recursively. A
 mark bit is associated with each node to keep track of which ones have
 already been visited. Each thread returns whether it marked the node
 it was called on itself or whether somebody else did. In the latter case,
@@ -59,8 +59,8 @@ a finite set of vertices and $E: V \rightarrow (V \uplus
 \{\li{null}\}) \times (V \uplus \{\li{null}\})$ is a function
 associating each vertex with at most two successors, where \li{null}
 denotes the absence of a child.  We write $n \in \gamma$
-for $n \in V$, $\gamma(n)$ for $E(n)$, $n\leadsto_\gamma n'$ if
-$n'\in \gamma(n)$, and $\leadsto^{*}_\gamma$ for the reflexive and
+for $n \in V$, $\gamma(n)$ for $E(n)$ which also assumes $n \in \gamma$, $n\leadsto_\gamma n'$ for
+$n'\in \gamma(n)$, and $\leadsto^{\ast}_\gamma$ for the reflexive and
 transitive closure of $\leadsto_\gamma$.
 
 Mathematical graphs are connected to their in-memory representations
@@ -110,7 +110,7 @@ shared state. In the marked state $\marked{x}$, only $\cell{x}{1}$ is
 owned. In both cases, the shared state also contains the left and
 right subgraphs represented by $\G{l}{\gamma}$ and $\G{r}{\gamma}$.
 
-To understand why that is, let us look at the interference associated
+To understand the discrepancy of ownership denoted by $\unmarked{x}{l}{r}$ and $\marked{x}$, let us look at the interference associated
 with the graph, which is the union of interferences pertaining each
 vertex in the graph. For each vertex $n \in \gamma$, the only
 permitted action is that of marking $n$. (For simplicity, this action
@@ -179,12 +179,12 @@ of the same resource.
   \vspace{-15pt}
   \end{mathpar}
   \begin{align*}
-    \G{x}{\gamma} &\eqdef (x = \li{null} \land \emp) \lor x \in \gamma
-    \land \exsts{l, r} \gamma(x) = (l, r)
+    \G{x}{\gamma} \eqdef &\, (x = \li{null} \land \emp) \lor 
+    \exsts{l, r} \gamma(x) = (l, r) \land
     &
     \unmarked{x}{l}{r} &\eqdef \cell{x}{0, l, r} 
     \\
-    & \qquad\land \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}
+    & \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}
     &
     \marked{x} &\eqdef  \cell{x}{1}
   \end{align*}
@@ -198,10 +198,10 @@ of the same resource.
 \hrule
 \[
 \begin{array}{@{}r @{\hspace*{2pt}} l@{}}
-	\g{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land\null\\
+	\g{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor \exsts{l, r} \gamma(x) = (l, r) \land\null\\
 	& \shared{\unmarked{x}{l}{r} \lor \marked{x}}{I(x)} * \g{l}{\gamma} * \g{r}{\gamma}\\
 	
-	\tr{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor (x \in \gamma \land \exsts{l, r} \gamma(x) = (l, r) \land \exsts{l'\!\! \in\! \{l, \li{null}\},r'\!\! \in \!\{r, \li{null}\}}\\
+	\tr{x}{\gamma} \eqdef & (x = \li{null} \land \emp) \lor (\exsts{l, r} \gamma(x) = (l, r) \land \exsts{l'\!\! \in\! \{l, \li{null}\},r'\!\! \in \!\{r, \li{null}\}}\\
 	& \shared{\marked{x}}{I(x)} *
 	\cell{x.l}{l'} * \tr{l'}{\gamma} * 
 	\cell{x.r}{r'} * \tr{r'}{\gamma})
@@ -229,20 +229,21 @@ the resulting states by $*$ composition through an application of the
 \fig\ref{fig:localCST}. We show at the end of this section how to
 derive the following, perhaps more natural specification from the one
 in \fig\ref{fig:conSpanningTree}:
+%
 \[
 \begin{array}{@{} c @{} }
 	{\color{blue}{
-	\Big\{
+	\{
 %		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
 %		\left[\markT{n}{e}\right] * 
 		\graph{\li{x}}{\gamma}
-	\Big\} 
+	\} 
 	}} 
         \ 
 	\command{b = span(x)} 
         \ 
 	{\color{blue}{
-	\Big\{
+	\{
 %		\cell{\li{n}}{n} *  
 %		\left[\markT{n}{e}\right] * 
 %		\left(
@@ -252,9 +253,9 @@ in \fig\ref{fig:conSpanningTree}:
 %			\cell{\li{b}}{0} *  \tr{\li{null}}{\gamma}
 %		\end{array}
 %		\right)
-	\Big\}
+	\}
 	}}
-\end{array}\vspace*{-7pt}
+\end{array}
 \]
 %
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of
@@ -284,12 +285,12 @@ more than one predecessors and has been marked by another thread.
 %  //<@\codecomment{$\{\shared{\G{\tx{x}}{\gamma}}{I_{\gamma}}\}$}@> 
 \begin{lstlisting}
 b = span(x) //<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
-$\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\tx{x} \in \gamma \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
-  if (x == null)
+$\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
+  if (x == null)$\{$
     //<@\codecomment{$\{\tx{x} = \tx{null} \land \emp\}$}@>
     //<@\codecomment{$\{\tr{\tx{x}}{\gamma}\}$}@>
     return 1;
-  //<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
+  $\}$//<@\codecomment{$\left\{\begin{array}{@{}l@{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} \end{array} \right\}$}@>
   res = $\langle$ CAS(x, 0, 1) $\rangle$;
   //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \exsts{l, r} \gamma(\tx{x})= (l, r) \land\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} *\null\\ \left((\tx{res} = 0\land\emp) \lor  \left(\begin{array}{l} \tx{res} = 1 \land \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\right)\end{array}\right\}$}@>
   //<@\codecomment{$\left\{\begin{array}{@{} l @{}} (\tx{res} = 0\land\emp) \!\lor\! \left(\begin{array}{@{}l@{}}\tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land\null\\\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\end{array}\right\}$}@>
@@ -320,14 +321,14 @@ We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from th
 When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial.
 Let us define
 \begin{align*}
-	P(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n})\\
-	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{*}_\gamma n} \exsts{l,r}\gamma(n) = (l, r)
+	P(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n})\\
+	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r)
         \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}
 \end{align*}
 From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have
 %
 \begin{mathpar}
-	\G{x}{\gamma} \iff  P(x,@g)
+	\graph{x}{\gamma} \iff  \shared{P(x,@g)}{I_{\gamma}}
 	
 	\g{x}{\gamma} \iff Q(x,@g)
 \end{mathpar}
@@ -353,16 +354,16 @@ In order to derive the local specification $\g{x}{\gamma}$ from the global speci
 %\end{align*}
 %
 \begin{align*}
-	\shared{P(x,@g)}{I_{\gamma}} &
+	\graph{x}{\gamma}&
 	{\color{blue}\stackrel{(\copyRule)}{=>}}
-        \iterStar_{x\leadsto^{*}_\gamma n}
+        \iterStar_{x\leadsto^{\ast}_\gamma n}
 	\shared{P(x,@g)}{I_{\gamma}}\\
 %	\underbrace{\shared{P}{I_{\gamma}} * \cdots * \shared{P}{I_{\gamma}}}_{|\gamma| \text{ times}}\\
 	&{\color{blue}\stackrel{(\forgetRule)}{=>}}
-	\iterStar_{x\leadsto^{*}_\gamma n} \left(\exsts{l,r} \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I_{\gamma}}  \right)\\
-	& {\color{blue}\stackrel{(\shiftRule)}{=>}}
-	\iterStar_{x\leadsto^{*}_\gamma n} \left(\exsts{l,r} \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}  \right)
-	{\color{blue}\iffdef} Q(x,@g)
+	\iterStar_{x\leadsto^{\ast}_\gamma n} \left(\exsts{l,r} \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I_{\gamma}}  \right)\\
+	& {\color{blue}\stackrel{(\shiftRule)}{=>}}\!\!
+	\iterStar_{x\leadsto^{\ast}_\gamma n}\!\left(\exsts{l,r} \gamma(n) = (l, r) \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}  \right)
+	{\color{blue}\iffdef} \g{x}{@g}
 \end{align*}
 %
 %%
@@ -456,12 +457,11 @@ In this section we consider a concurrent set module implemented as a singly link
 
 %We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. 
 The following diagram illustrates the set predicate in CAP as described in~\cite{cap-ecoop10}.
-
 %
 {\centering \includegraphics[scale=0.232]{Sections/Examples/Images/capSet.pdf}\\}
 %
 %
-The elements of the list are represented as a singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. In the remainder of this section, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
+\noindent The elements of the list are represented as a sorted singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. Hereafter, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
 
 All nodes of the list reside in a single shared region labelled $s$ and the interference on the list is the combined interference associated with each constituent node. 
 Each node at a given address $x$ is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. 
@@ -488,18 +488,18 @@ On the other hand, as well as being parametric in its capability separation alge
 
 We proceed with the \colosl\ proof of the set implementation. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise proof.  
 
-We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $\nextC{x}{y}$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method. 
+We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $[\nextC{x}{y}]$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method that adds value $v'$ to the set by inserting it in the sorted list. 
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/coloslSet.pdf}\\}
 %
-\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is {extended} by the resources associated with the new node ($\cell{w}{v', z}$) and its associated capabilities ($\nextC{w}{z}$) are generated on the fly as depicted below. \vspace{0pt}
+\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is {extended} by the resources associated with the new node and its associated capabilities ($[\nextC{w}{z}]$) are generated on the fly as depicted below. \vspace{0pt}
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add1.pdf}\\}
 %
 %At this point, since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. However, the interference assertion associated with node $y$ ($I(y)$) allows the node to be unlocked in three possible ways. Either its successor has not changed from its old value $z$ (tracked by $\nextC{y}{z}$); \emph{or} it has been redirected to $z$'s successor (when $z$ is being deleted); \emph{or} it has been directed to a new node whose successor is $z$ (a new node is inserted between $y$ and $z$). When adding a new node after $y$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this condition, we use the (\mergeRule) principle in our reasoning to combine the subjective views of $y$ and $w$ as follows.
-\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion ($I(y)$) allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows. \vspace{0pt}
+\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion $I(y)$ allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node $w$ does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows. \vspace{0pt}
 
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add2.pdf}\\}
@@ -510,9 +510,10 @@ We specify the set predicate as the $*$-composition of the subjective views pert
 %
 {\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add3.pdf}\\}
 %
-We can reason about the \li{remove} operation in a similar fashion. The dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a conciser proof. 
+We can reason about the \li{remove} operation in a similar fashion. The dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a more concise proof. 
 %
-Moreover, rather than having a distinct capability to modify the element at address $x$, before address $y$, for each possible successor address $y$ (as with $[\text{U}(x, y, v)]$ in CAP), we appeal to a single capability of the form $\nextC{x}{y}$ whereby the capability is modified accordingly to record the changes to the successor address. 
+Moreover, rather than having a distinct capability to modify the element at address $x$, for each possible successor address $y$ (as with $[\text{U}(x, y, v)]$ in CAP), we appeal to a single capability of the form $[\nextC{x}{y}]$ that is modified to $[\nextC{x}{y'}]$ whenever $x$'s successor changes from $y$ to $y'$.
+%the capability is modified accordingly to record the changes to the successor address. 
 %
 Lastly, using the reasoning principles of \mergeRule, \forgetRule, \shiftRule\ and \copyRule, we can grow and shrink our subjective views as needed and consequently at any one point we only view the relevant parts of the shared state. 
 %
