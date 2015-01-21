@@ -1087,30 +1087,25 @@ $p*r$ cannot possibly fire, as stated by the   next rule.
 %outside of the current combined subjective view of the shared
 %state).
 %
-The last rule checks that a particular local assertion
+The last rule checks that 
 $\lass{Q}$ is preserved by the effect of an action. Again, there is a
-crucial difference with the corresponding check for fencing: the
-action is applied to the whole state, but part of the result can be
-discarded to re-establish $\lass{Q}$. Indeed, the action may in
-particular bring in some newly-shared state, thus exceeding
-$\lass{Q}$, but the \forgetRule rule allows us to immediately discard
-it.
+crucial difference with the corresponding check for fencing:
+in $p_2$,
+the action may bring in some newly-shared state, hence the result $q *
+\m{true}$;
+but the \forgetRule rule allows us to immediately discard
+it, if appropriate. 
+
 
 
 
 \paragraph{Proof reuse}
-Finally, we note that, once a strict fencing judgement
+Note that, once the  local fencing judgement
 $\lass{F}\strictfences I$ has been established, it automatically
-establishes a fencing judgement $\lass{F}\fences I$, and in turn
-$\lass{F}\fences I$ implies that $\lass{F}$ is stable under
-$I$. The other directions are not valid in general: stability of $\lass{P}$
-under $I$ may omit part of the state resulting from an action
-application to re-establish $\lass{P}$, which is not allowed in fencing, and
-fencing lacks the confinement condition required by local
-fencing. Additionally, a fence $\lass{F}$ for an interference
-assertion $I$ is also a fence for any $I'$ that is a shifting of $I$ under
-$\lass{F}$.
-\vspace{-10pt}
+establishes  the weaker fencing judgement $\lass{F}\fences I$, which  in turn
+implies that $\lass{F}$ is stable under
+$I$. Also, fencing is preserved by action shifting. These observations
+provide the admissible rules: 
 \begin{mathpar}
   \infer{
     \lass{F} \fences I
@@ -1132,7 +1127,15 @@ $\lass{F}$.
     I \weakenI{\lass{F}} I'
   }
 \end{mathpar}
-	
+	 The other directions are not valid in general: 
+fencing lacks the confinement condition required by local
+fencing; stability of $\lass{P}$
+under $I$ may omit part of the state resulting from an action
+application to re-establish $\lass{P}$, which is not allowed in
+fencing;  and
+a fence $\lass{F}$ for a smaller  interference assertion  need not be a fence for
+a larger interference assertion. 
+
 %% ALSO I REMOVED THESE ONES
 	
 	%% \infer{
@@ -1340,8 +1343,8 @@ logic:
   \repartitions{P}{Q}{\lass{P}}{\lass{Q}}
 }
 \]
-This rule  is required in the frameworks from the
-CAP family~\cite{cap-ecoop10,icap}. 
+This rule  is present in logics arising from 
+CAP~\cite{cap-ecoop10,icap}. 
 For \colosl, the \emph{repartitioning} $\repartitions{P}{Q}{\lass{P}}{\lass{Q}}$
 holds if, from any world $(l,g,\lmod)$ satisfying $P$, 
 whenever parts of $l \composeL  g$ 
@@ -1351,7 +1354,7 @@ that $(l', g', \lmod')$ satisfies $Q$.
 Moreover, the passage  from $(l,g,\lmod)$ to $(l',g',\lmod')$ can be
 achieved via a succession of valid updates  from $\lmod$
  and 
-valid extension steps . The details can be found in the accompanying technical
+valid extension steps. The details can be found in the accompanying technical
 report~\cite{colosl-tr14}.
 %Appendix\ref{sec:semantics}.
 
