@@ -1355,7 +1355,7 @@ a concrete machine state.
   The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
   defined as:
   \[
-  \reifyW{(l, g, \lmod)} \eqdef \heapPart{(l \composeL g)}
+  \reifyW{((@s_l, h_l, \ca{l}), (@s_g, h_g, \ca{g}), \lmod)} \eqdef  ((@s_l \uplus @s_g), (h_l \uplus h_g))
   \]
 \end{definition}
 
