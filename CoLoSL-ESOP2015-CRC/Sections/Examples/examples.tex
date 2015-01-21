@@ -180,12 +180,17 @@ of the same resource.
   \vspace{-15pt}
   \end{mathpar}
   \begin{align*}
-    \G{x}{\gamma} \eqdef &\, (x = \li{null} \land \emp) \lor 
-    \exsts{l, r} \gamma(x) = (l, r) \land
+    \G{x}{\gamma} &\eqdef
+    \smash{\begin{array}[t]{@{}l@{}}
+        (x = \li{null} \land \emp) \lor 
+        \exsts{l, r} \gamma(x) = (l, r) \land\null\\
+        \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish
+        \G{l}{\gamma} \sepish \G{r}{\gamma}
+    \end{array}}
     &
     \unmarked{x}{l}{r} &\eqdef \cell{x}{0, l, r} 
     \\
-    & \left( \unmarked{x}{l}{r} \lor \marked{x}\right) \sepish \G{l}{\gamma} \sepish \G{r}{\gamma}
+    & 
     &
     \marked{x} &\eqdef  \cell{x}{1}
   \end{align*}
@@ -229,7 +234,8 @@ the resulting states, as required by the
 \fig\ref{fig:localCST}. We show at the end of this section how to
 derive the following, perhaps more natural specification from the one
 in \fig\ref{fig:conSpanningTree}:
-\[
+\begin{equation}
+  \label{eq:globalspec}
 	{\color{blue}{
 	\{
 %		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
@@ -253,7 +259,7 @@ in \fig\ref{fig:conSpanningTree}:
 %		\right)
 	\}
 	}}
-\]
+\end{equation}
 
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of
 $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the single view
@@ -283,7 +289,7 @@ more than one predecessors and has been marked by another thread.
 \begin{lstlisting}
 b = span(x) //<@\codecomment{$\{\g{\tx{x}}{\gamma}\}$}@>
 $\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\unmarked{\tx{x}}{l}{r} \lor \marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma})\}$}@>
-  if (x == null)$\{$
+  if (x == null) $\{$
     //<@\codecomment{$\{\tx{x} = \tx{null} \land \emp\}$}@>
     //<@\codecomment{$\{\tr{\tx{x}}{\gamma}\}$}@>
     return 1;
@@ -293,7 +299,7 @@ $\{$ //<@\codecomment{$\{(\tx{x} = \tx{null} \land \emp) \lor  (\exsts{l, r} \ga
   //<@\codecomment{$\left\{\begin{array}{@{} l @{}} (\tx{res} = 0\land\emp) \!\lor\! \left(\begin{array}{@{}l@{}}\tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land\null\\\shared{\marked{\tx{x}}}{I(\tx{x})} *  \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} \end{array}\right)\end{array}\right\}$}@>
   if (res) $\{$ 
     //<@\codecomment{$\left\{\begin{array}{@{} l @{}} \tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r}    \end{array} \right\}$}@>
-      $\begin{array}{l @{\hspace{10pt}} || @{\hspace{10pt}} l} \color{blue} //\{\g{l}{\gamma}\} & \color{blue} //\{\g{r}{\gamma}\} \\ \tx{b1 = span(x-}\!>\tx{l)}; & \tx{b2 = span(x-}\!>\tx{r)}; \\ \color{blue} //\{(\tx{b1} = 0\land\emp) \lor (\tx{b1} = 1 \land \tr{l}{\gamma}) \} & \color{blue} //\{(\tx{b2} = 0 \land\emp)\lor (\tx{b2} = 1 \land \tr{r}{\gamma})\} \end{array}$
+      $\begin{array}{l @{\hspace{10pt}} || @{\hspace{10pt}} l} \color{blue} //\{\g{l}{\gamma}\} & \color{blue} //\{\g{r}{\gamma}\} \\ \tx{b1 = span(x-}\!\textgreater\tx{l)}; & \tx{b2 = span(x-}\!\textgreater\tx{r)}; \\ \color{blue} //\{(\tx{b1} = 0\land\emp) \lor (\tx{b1} = 1 \land \tr{l}{\gamma}) \} & \color{blue} //\{(\tx{b2} = 0 \land\emp)\lor (\tx{b2} = 1 \land \tr{r}{\gamma})\} \end{array}$
     //<@\codecomment{$\left\{\begin{array}{@{} l @{} } \tx{res} = 1 \land \exsts{l, r} \gamma(\tx{x})= (l, r) \land \shared{\marked{\tx{x}}}{I(\tx{x})} * \cell{\tx{x}.l}{l} * \cell{\tx{x}.r}{r} *\null\\ \left( (\tx{b1} = 0\land\emp) \lor (\tx{b1} = 1 \land  \tr{l}{\gamma}) \right) * \left( (\tx{b2} = 0\land\emp) \lor (\tx{b2} = 1 \land \tr{r}{\gamma}) \right)  \end{array}\right\}$}@>
     if (!b1) $\{$ x-$\!\textgreater$l = null; $\}$
     if (!b2) $\{$ x-$\!\textgreater$r = null; $\}$
@@ -309,18 +315,25 @@ $\}$ //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} (\tx{b} = 0\land\emp)  \
 \label{fig:conSpanningTree}
 \end{figure}
 
-Using our setup, the proof sketched in \fig\ref{fig:conSpanningTree}
-is straightforward.
+The proof sketched in \fig\ref{fig:conSpanningTree} is now mostly
+straightforward. One subtlety is the consequence step just before the
+second \li{if} statement. There, we first distribute the shared state
+$\shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma}$
+over the disjunction, then use the fact that it implies $\emp$ to
+discard it in the left disjunct.
 
-We now demonstrate how to obtain the local specification $\g{x}{\gamma}$ from the global specification of \fig\ref{fig:globalCST}. 
-When expanding the definition of $\G{x}{\gamma}$, there are two cases to consider depending on whether or not $x = \li{null}$. In what follows we only consider the case where $x \not= \li{null}$ since the derivation in the case of $x = \li{null}$ is trivial.
-Let us define
+Finally, let us show how to derive the
+specification~\eqref{eq:globalspec} above from the one obtained in
+\fig\ref{fig:globalCST}. We introduce the \emph{iterative star}
+operator $\iterStar$; when iterating over the empty set, it denotes
+$\emp$ by convention (e.g., below, when $x$ is null). We define
 \begin{align*}
 	P(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n})\\
 	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r)
         \land \shared{\unmarked{n}{l}{r} \lor \marked{n}}{I(n)}
 \end{align*}
-From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have
+From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$, one can
+show that
 %
 \begin{mathpar}
 	\graph{x}{\gamma} \iff  \shared{P(x,@g)}{I_{\gamma}}
@@ -335,8 +348,8 @@ From the definitions of $\G{x}{\gamma}$ and $\g{x}{\gamma}$ we then have
 %% \end{array}
 %% \]
 %% %
-We can now derive the global specification using \conseqRule and the
-derivation
+The specification~\eqref{eq:globalspec} then follows from \conseqRule,
+\fig\ref{fig:conSpanningTree}, and the derivation below.
 %
 %\begin{align*}
 %	&\shared{P}{I_{\gamma}}\!\!\!\!
