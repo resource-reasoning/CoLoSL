@@ -963,23 +963,25 @@ fencing  $\lass{F}\strictfences I$
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} partially axiomatises the stability of
 assertions of the form $\exsts{\bar x}\lass{P} * \bigvarstar_{i\in
-  I}\shared{\lass{Q}_i}{I_i}$. We work with a more restricted form of 
-assertions than our two previous axiomatisations for simplicity. A
-more comprehensive 
-set of rules exists for the general case (see~\cite{colosl-tr14}).
+  J}\shared{\lass{Q}_i}{I_i}$. We work with a more restricted form of 
+assertions than our two previous axiomatisations for simplicity; 
+see~\cite{colosl-tr14} for the general case. 
 %(see Appendix~\ref{sec:assertions-continued}). 
 The
 first two rules state that local assertions are always stable and
-existentials can be eliminated. Then, checking the stability of
-$\lass{P} * \bigvarstar_{i\in I}\shared{\lass{Q}_i}{I_i}$ boils down to
-establishing, for each subjective view $\shared{\lass{Q}_i}{I_i}$, the
-four-place $\mathsf{Stable}$ predicate holds. In this rule, this means that
+existentials can be eliminated. The next rule  states that checking the stability of
+$\lass{P} * \bigvarstar_{i\in J}\shared{\lass{Q}_i}{I_i}$ boils down to
+establishing, for each local assertion $\lass{Q}_j$ for $j \in J$,
+that the
+four-place predicate    $\stable{\lass{Q}_j, I_j, \lass{P},
+  \bigocon_{i\in J} \lass{Q}_i}$ holds: 
+this means that
 $\lass{Q}_i$ is stable under the interference assertion $I_i$, a local
 context $\lass{P}$, and a shared context made of the $**$-combination
-of all the subjective assertions (including $\lass{Q}_i$).  In turn,
+of all the subjective assertions (including $\lass{Q}_j$).  In turn,
 checking this fact reduces to checking stability for each action of
-$I_i$. The last three rules deal with checking stability for a single
-action, in a similar way to fencing rules above.
+$I_j$. The last three rules deal with checking stability for a single
+action, in a similar way to the fencing rules above.
 
 \begin{figure*}
 \hrule
@@ -1001,11 +1003,11 @@ action, in a similar way to fencing rules above.
 	}
 
 	\infer{
-	  \stable{\lass{P} * \bigvarstar_{j\in J}\shared{\lass{Q}_j}{I_j}}
+	  \stable{\lass{P} * \bigvarstar_{i\in J}\shared{\lass{Q}_i}{I_i}}
 	}
 	{
           \for{j\in J}
-	  \stable{\lass{Q}_j, I_j, \lass{P}, \bigocon_{j\in J} \lass{Q}_j}
+	  \stable{\lass{Q}_j, I_j, \lass{P}, \bigocon_{i\in J} \lass{Q}_i}
 	}
 
 %	\infer{
@@ -1064,20 +1066,25 @@ action, in a similar way to fencing rules above.
 \label{fig:stability-rules}
 \end{figure*}
 
-The first of these is new: unlike fencing, stability only has to be
-checked against actions for which the environment may hold enough
-capabilities. If the capabilities required by the action cannot exist
-separately from those held by the whole assertion, which may be summed
-up by $\lass{P} * \lass{R}$, then the environment cannot possibly own
-them and thus perform the action. Similarly, an action whose
-precondition is incompatible with the current knowledge about the
-state cannot possibly fire, as seen in the next rule. The current
-knowledge consists of the local context $*$-separated with the shared
-context, itself overlapped with the precondition of the
-action. Indeed, that precondition must hold somewhere in the shared
-state, separately from any private state (but possibly partially
-outside of the current combined subjective view of the shared
-state). The last rule checks that a particular subjective assertion
+The first of these rules  is unfamilar. Unlike fencing, stability
+checking for assertions only has to be
+checked against actions for which the environment may have the 
+capability. If the capability required by the action cannot exist
+separately from those held by the assertion  (that is, those in $p *
+r$) then the environment cannot possibly own
+the capablity  and perform the action. Similarly, an action whose
+precondition is incompatible with the assertion 
+$p*r$ cannot possibly fire, as stated by the   next rule. 
+%
+%The current
+%knowledge consists of the local context $*$-separated with the shared
+%context, itself overlapped with the precondition of the
+%action. Indeed, that precondition must hold somewhere in the shared
+%state, separately from any private state (but possibly partially
+%outside of the current combined subjective view of the shared
+%state). 
+%
+The last rule checks that a particular local assertion
 $\lass{Q}$ is preserved by the effect of an action. Again, there is a
 crucial difference with the corresponding check for fencing: the
 action is applied to the whole state, but part of the result can be
