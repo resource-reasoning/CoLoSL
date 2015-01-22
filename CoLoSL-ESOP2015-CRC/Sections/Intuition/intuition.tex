@@ -7,7 +7,7 @@ distributed algorithms~\cite{dijkstra74}. Our proof highlights the main
 reasoning principles of \colosl and results in \emph{small
   specifications} for each participant in the ring. Besides their
 concision, we show how small specifications are robust against
-non-trivial changes to the algorithm.
+non-trivial changes to the program.
 
 The algorithm %presented in \fig\ref{fig:concurrentInc}, assumes a
 assumes a network of $n{+}1$ machines arranged in a ring, with a designated
@@ -469,9 +469,9 @@ instrumented (logical)  state satisfying $P$ may be changed to $Q$ as
 long as the underlying  machine state does not change. In particular, $(P => Q) => (P
 ===> Q)$.
 The point is that our proof changes only minimally to accommodate the new program: the proof
-of \li{master(x)} has to account for the new
+of \li{master(x)} accounts for new
 interference on $\li{n} \harpoonything n$ since the environment can grow the
-ring and thus mutate $\li{n} \harpoonything n$;  and the proofs of
+ring, hence mutate \li{n}; the proofs of
 other threads can be directly reused.
 
 %% \begin{figure}
