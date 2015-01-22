@@ -33,7 +33,7 @@ they might be; they  are either too coarse or
 too 
 contrived. 
 We explore a different approach, introducing the
-program logic \colosl, using which we can give natural small
+program logic \colosl, using which we can give small
 specifications and proofs which correspond to the  programmer's intuition of what shared
 resource
 is required by the thread. 
@@ -112,7 +112,7 @@ consider a program whose threads manipulate subgraphs of a graph, such
 as a recursive
 concurrent spanning tree algorithm. Current approaches cannot give small specifications capturing just the subgraph manipulated by each thread due to intrinsic, unspecified sharing  between subgraphs.
 Finally, consider a concurrent set implementation. In \colosl it is
-possible to describe the interference associated with a new element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot accomodate such dynamic interference relations.
+possible to describe the interference associated with a new element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot accommodate such dynamic interference relations.
 % Finally, consider a concurrent set
 %library initially endowed with just an insert function. Current
 %approaches cannot extend their reasoning to include a remove function,
@@ -140,7 +140,7 @@ This paper introduces the program logic \colosl, which stands for
 \underline{Co}ncurrent \underline{Lo}cal \underline{S}ubjective
 \underline{L}ogic. \colosl's semantic model is based on one global
 shared state, and each thread is verified with respect to its partial
-{\em subjective view} of this state.  Each subjective (personalised)
+{\em subjective view} of this state. Each subjective (personalised)
 view comprises an assertion which describes \emph{parts} of the shared
 global resource used by a thread, and an interference relation which
 describes how the thread and the environment may affect these parts.
@@ -253,7 +253,7 @@ global state. In particular, he introduced concurrent
 separation logic based on thread-local state and static invariants for
 the shared state.
 
-\pgcomment{CAre: deny-guarantee reasoning v CAP.} 
+\pgcomment{Care: deny-guarantee reasoning v CAP.} 
 
 Since then, there has been much recent work on compositional
 reasoning about fine-grained concurrent algorithms. Vafeiadis and
@@ -284,12 +284,12 @@ comprises one global shared state, with assertions describing
 {disjoint} but flexible parts of this state and rely-guarantee
 relations determining how the thread and environment can affect these
 partial states. With LRG, it is possible to frame off disjoint parts of
-shared state and their associated disjoint rely-guarantee relation, but, as noted
+shared state and their associated disjoint rely-guarantee relations, but, as noted
 by its author, the strong disjointness restrictions make this approach
 only applicable for disjoint modules in the code. We took significant
 inspiration from LRG, combining the flexibility of the LRG approach
 with our subjective views to reason locally about overlapping shared
-state.
+states.
 
 %\pgcomment{Have I grabbed all the points about LRG?}
 
