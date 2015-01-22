@@ -107,7 +107,7 @@ For example, consider a linked list consisting of $n{+}1$ nodes accessed
 concurrently by $n$ threads where the $i$th
 thread requires access to the $i$th and $(i{+}1)$st nodes. Current
 approaches cannot provide a small specification for each thread which
-captures  just these two shared nodes and their interference.\footnote{Similar problems were encountered in an attempt to provide small specifications for a doubly-linked list implementation of a concurrent tree in~\cite{abstract-connectivity}.} Now
+captures  just these two shared nodes and their interference.\footnote{In~\cite{abstract-connectivity}, similar problems were encountered in an attempt to provide small specifications for a doubly-linked list implementation of a concurrent tree.} Now
 consider a program whose threads manipulate subgraphs of a graph, such
 as a recursive
 concurrent spanning tree algorithm. Current approaches cannot give small specifications capturing just the subgraph manipulated by each thread due to intrinsic, unspecified sharing  between subgraphs.
