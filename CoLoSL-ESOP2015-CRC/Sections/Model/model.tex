@@ -131,6 +131,7 @@ An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion.
 %
 \begin{definition}[Action models]
+  \label{def:actions}
   The set $\set{Action}$ of \emph{actions}, ranged over by $a$, and
   the set $\AMods$ of \emph{action models}, ranged over by $\lmod$,
   are defined as:
@@ -273,16 +274,14 @@ include negation nor septraction. The interpretation of assertions
 is a simple lift from that of local assertions, with the exception
 of the subjective view $\shared P I$.  First, an \emph{interference
   assertion} $I$ describes actions enabled by a given capability, in
-the form of a pre- and post-condition.
+the form of a pre- and postcondition.
 %Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and postcondition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
-A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
-\unitL$ and a \emph{subjective state} $s$ can be found in the global
-shared state $g$ (i.e.\ $g = s\composeL r$ for some
-$r$), such that $s$ satisfies $P$ in the standard separation logic
-sense, and $\lmod$ and $I$ \emph{agree} given the decomposition $s$
-and 
-$r$, written $\extendsAM{\lmod}{s}{r}{\semI{I}}$, 
-in the following sense:
+A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l
+= \unitL$ and a \emph{subjective state} $s$ can be found in the global
+shared state $g$ (i.e.\ $g = s\composeL r$ for some $r$), such that
+$s$ satisfies $P$, and $\lmod$ and $I$ \emph{agree} given the
+decomposition $s$ and $r$, written
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$, in the following sense:
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -530,7 +529,7 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 The soundness of \colosl hinges on the fact that,  given a world $(l, g, \lmod)$, 
 the action model $\lmod$ contains all actions that could possibly affect the 
 shared state $g$. This was captured by a well-formedness condition in the
-definition of worlds (Def.~\ref{def:worlds}) as $g\confines \lmod$, 
+definition of worlds (\defin~\ref{def:worlds}) as $g\confines \lmod$, 
 stipulating that the actions in $\lmod$ are confined to the
 shared state $g$. It is also possible to extend $g$ at any time.  Any
 part $l'$ of the local state can migrate to the shared state under
@@ -548,7 +547,7 @@ possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
 For example, recall the interpretation of $s_x$ given by $S$ just
-before definition~\ref{definition3}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
+before Def.~\ref{def:actions}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
 \emptyset), (\emptyset, \{\ell\,{:}\,1\}, \emptyset), (\emptyset,
 \{\ell{-}1\,{:}\,1\}, \emptyset))\in S$ is confined to the logical state
 $l_0=(\emptyset, \{\ell\,{:}\,0\}, \emptyset)$ because $l_0$ is the first component of the
@@ -702,15 +701,15 @@ state.\footnote{$\precise{p} == \for{\lenv, l, l_1, l_2} l_1\leq
   \lenv \slsat p \text{ implies } l_1 = l_2$} The first premise states
 that $\lass{F}$ is invariant under the action
 $\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, similar to the
-way that RGSep encodes stability checks as separation-logic
+way that RGSep encodes stability checks as separation logic
 entailments. Informally, it reads: for any state in $f$, remove a part
 satisfying $p$, add a state satisfying $q$, and the result should
 still be in $f$. The third premise checks the confinement condition:
 given a state in local assertion $f_i$ ($l_1\composeL l_2|=
 \lass{F}_i$), and a state in $p$ ($l_2 \composeL l_3 |= p$ with $l_1$
-and $l_3 $ disjoint), the combined state ($l = l_1 \composeL \l_2
+and $l_3 $ disjoint), the combined state ($l_1 \composeL \l_2
 \composeL l_3$) must also be in $f_i$. Hence, by precision of
-$\lass{F}_i$, we have $l_2\composeL l_3\leq l_1\composeL l_2\composeL
+$\lass{F}_i$, we have $l_1\composeL l_2\composeL
 l_3 = l_1\composeL l_2$, i.e.\ $l_2\composeL l_3 \leq l_1\composeL
 l_2$ as required.
 
@@ -917,7 +916,7 @@ states described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
 The next rule is a shifting equivalence that uses the
 knowledge embodied by $\lass{F}$ of all the possible states that the
 subjective shared state may be in to rewrite an action into an
-equivalent one. More precisely, whenever the precondition
+equivalent one. More precisely, if whenever the precondition
 $\lass{P}$ of the action agrees with $\lass{F}$ then one of the
 $\lass{R}_i$'s is also true, then adding $\lass{R}_i$ as a neutral
 part of the action produces the same behaviour. We can use this rule
@@ -953,20 +952,20 @@ resulting state must still be in $\lass{F}$. One might instead have
 expected that only parts of the resulting state need to be represented
 in $\lass{F}$, to mimic the relationship between $\lass{F}$ and
 $\lass{P}$ (and indeed, this is all that is required for stability, as
-we shall see next). However, we do need the full $q$. Recall that shifting asserts that two interference
-assertions have the same effect even after an arbitrary number of
-steps. Doing otherwise would be  unsound because there is no guarantee that
-$I$ accounts for all possible actions on that part of $q$ that would
-be discarded, since it was not part of $\lass{F}$. Hence, we could end
-up with an assertion $\shared{\lass{F}}{I}$ that does not satisfy the
-action model closure property.  Finally, the reason why $\lass{P}$ and
-$\lass{Q}$ must not intersect stems from similar considerations. If
-$\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$,  such that
-$c$ is not part of $\lass{F}$,  then this would 
-force the fence to account for $c$ which  would prevent us from
-forgetting actions associated with it using  shifting. For instance, it
-would make it impossible to forget actions as we do in
-\S\ref{sec:intuition}.
+we shall see next). However, we do need the full $q$. Recall that
+shifting asserts that two interference assertions have the same effect
+even after an arbitrary number of steps. Doing otherwise would be
+unsound because there would be no guarantee that $I$ accounts for all
+possible actions on that part of $q$ that would be discarded, since it
+would not be part of $\lass{F}$. Hence, we could end up with a new
+interference assertion $I'$ that breaks the original action model
+closure property.  Finally, the reason why $\lass{P}$ and $\lass{Q}$
+must not intersect stems from similar considerations. If $\lass{P}$
+and $\lass{Q}$ had a non-empty intersection $c$, such that $c$ is not
+part of $\lass{F}$, then this would force the fence to account for $c$
+which would prevent us from forgetting actions associated with it
+using shifting. For instance, it would make it impossible to forget
+actions as we do in \S\ref{sec:intuition}.
 
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} partially axiomatises the stability of
@@ -1372,7 +1371,7 @@ a concrete machine state.
   The \emph{reification}, $\reifyW{.}: \Worlds \rightarrow \Heaps$ is
   defined as:
   \[
-  \reifyW{((@s_l, h_l, \ca{l}), (@s_g, h_g, \ca{g}), \lmod)} \eqdef  ((@s_l \uplus @s_g), (h_l \uplus h_g))
+  \reifyW{((@s_l, h_l, \ca{l}), (@s_g, h_g, \ca{g}), \lmod)} \eqdef  (@s_l \uplus @s_g, h_l \uplus h_g)
   \]
 \end{definition}
 
