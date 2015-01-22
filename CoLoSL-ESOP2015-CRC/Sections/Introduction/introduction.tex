@@ -258,10 +258,10 @@ reasoning about fine-grained concurrent algorithms. RGSep~\cite{viktor-marriage}
 separation logic, with the state split into thread-local state and
 disjoint shared regions, and global rely-guarantee relations providing
 the interference on these regions.
-Deny-guarantee can extend rely-guarantee and
-RGSep with permissions that allow one to turn
-individual actions on or off in the course of a program, as would be
-typically needed in a programming language including fork and join
+Deny-guarantee extends rely-guarantee and
+RGSep with permissions that can turn
+pieces of interference on or off during the proof of a program, as would be
+typically needed in a programming language with fork and join
 constructs instead of statically-scoped parallel composition. This has
 influenced the capabilites of CAP.
 CAP reasoning~\cite{cap-ecoop10} increased  compositionality by, instead of the
