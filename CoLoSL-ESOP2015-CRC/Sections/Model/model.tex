@@ -116,7 +116,7 @@ need to isolate the part of the state that is modified by an action,
 hence our technical choice of recording the catalyst in the model.}. 
 For instance, \label{ex:sxsem} as we shall shortly
 see, $s_x$ in \fig\ref{fig:concurrentInc} will be interpreted as the
-set of actions $S=\{((\emptyset, \{\ell:v\}, \emptyset),
+set of actions $S=\{a_v{\eqdef}((\emptyset, \{\ell:v\}, \emptyset),
 (\emptyset, \{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
 \emptyset))\mid v \in \Nats\}$, where $\ell$ is the value of $x$ in the
 current logical environment. 
@@ -492,7 +492,7 @@ consequences of the semantics.
 
 
 We turn to the remaining two principles, \extendRule and \shiftRule,
-and to the stability condition. These involve reasoning outside our
+and to the stability of assertions. These involve reasoning outside our
 assertion language, potentially requiring semantic reasoning 
 in the model. Fortunately, it is enough to work
 with a partial 
@@ -522,23 +522,23 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 
 
 \paragraph{Confinement}
-The soundness of \colosl hinges on the fact that the action model
-$\lmod$ contains all the actions that could possibly affect the shared
-state $g$. This was expressed as a well-formedness condition in the
-definition of worlds (Def.~\ref{def:worlds}), by a confinement
-relation $g\confines \lmod$ that actions in $\lmod$ are confined by a
-global state $g$. It is also possible to extend $g$ at any time.  Any
-part $l'$ of the local state can to migrate to the shared state under
+The soundness of \colosl hinges on the fact that given a world $(l, g, \lmod)$, 
+the action model $\lmod$ contains all actions that could possibly affect the 
+shared state $g$. This was captured by a well-formedness condition in the
+definition of worlds (Def.~\ref{def:worlds}) as $g\confines \lmod$, 
+stipulating that the actions in $\lmod$ are confined to the
+shared state $g$. It is also possible to extend $g$ at any time.  Any
+part $l'$ of the local state can migrate to the shared state under
 a new set of actions $\lmod'$, yielding a new shared state $g\composeL
 l'$ and action model $\lmod \cup \lmod'$. This migration is only
 permitted if $\l ' \confines \lmod'$. This confinement condition means
-that that the migration does not invalidate the views of the threads.
+that the extension does not invalidate the views of the threads.
 
 
 The technical definition of confinement of an action model on a
 logical state is given in the technical report~\cite{colosl-tr14}. Intuitively,
 it means that whenever an action $a = (p, q, c)$ of
-$\lmod'$ is enabled, the state $p$ must be a substate of $l'$.  It is
+$\lmod'$ is enabled, the pre-state $p$ must be a substate of $l'$.  It is
 possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
@@ -889,7 +889,7 @@ This invariant fencing condition is necessary:
 $I_1 \weakenI{\fenceAss{}}
 I_2$ only states that $I_1$ and $I_2$ have the same effect with
 respect to  $\lass{F}$;  $f \fences I\cup I_1$
-states that $\lass{F}$ is an \emph{invariant} of the shared region
+states that $\lass{F}$ is an \emph{invariant} of the shared state
 under the combined interferences of $I$ and $I_1$. 
 
 
@@ -908,11 +908,11 @@ common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
 \]
 
-The next rule is a shifting quivalence that uses the
+The next rule is a shifting equivalence that uses the
 knowledge embodied by $\lass{F}$ of all the possible states that the
 subjective shared state may be in to rewrite an action into an
 equivalent one. More precisely, if whenever the precondition
-$\lass{P}$ of the action is compatible with $\lass{F}$ then one of the
+$\lass{P}$ of the action agrees with $\lass{F}$ then one of the
 $\lass{R}_i$'s is also true, then adding $\lass{R}_i$ as a neutral
 part of the action produces the same behaviour. We can use this rule
 (with the single $r_0 = x|->v$) to justify the shiftings of
@@ -954,7 +954,7 @@ steps. Doing otherwise is unsound because there is no guarantee that
 $I$ accounts for all possible actions on that part of $q$ that would
 be discarded, since it was not part of $\lass{F}$. Hence, we could end
 up with an assertion $\shared{\lass{F}}{I}$ that does not satisfy the
-action closure property.  Finally, the reason why $\lass{P}$ and
+action model closure property.  Finally, the reason why $\lass{P}$ and
 $\lass{Q}$ must not intersect stems from similar considerations. If
 $\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$ then it
 might be that $c$ is not part of $\lass{F}$ and is added together with
