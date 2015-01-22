@@ -52,7 +52,7 @@ and this specification can be simply reused in any context that
 contains these resources.  By making the specification as small as
 possible, we can ensure that it can be reused in a large set of
 possible contexts using the {\em frame rule}. This plays an important
-role in achieving scalable \emph{compositional reasoning}, as each
+role in achieving scalable {compositional reasoning}, as each
 block of code can be proved in isolation and its small specification
 reused in larger contexts.
 
@@ -97,15 +97,19 @@ threads having access to parts of a shared region need only know about the inter
 it is not always possible
 to predict all future interactions  associated with  a shared
 region at the time  of creation. Just as the original separation logic  uses the frame rule to
-obtain small specifications for the \emph{local} state, we seek an analogous framing mechanism on the \emph{shared} state \emph{and} its
+obtain small specifications for the \emph{local} state, we seek an
+analogous framing mechanism on both the {shared} resource  {and} its
 interference to obtain small
-specifications of the shared state. 
+specifications of the \emph{shared} state. 
 
 
 For example, consider a linked list consisting of $n+1$ nodes accessed
 concurrently by $n$ threads where the $i$th
 thread requires access to the $i$th and $(i+1)$st nodes. Current
-approaches cannot provide a small specification for each thread capturing just these two shared nodes and their interference. Now consider a program whose threads manipulate subgraphs of a graph, for instance  a recursive
+approaches cannot provide a small specification for each thread which
+captures  just these two shared nodes and their interference. Now
+consider a program whose threads manipulate subgraphs of a graph, such
+as a recursive
 concurrent spanning tree algorithm. Current approaches cannot give small specifications capturing just the subgraph manipulated by each thread due to intrinsic, unspecified sharing  between subgraphs.
 Finally, consider a concurrent set implementation. In \colosl it is
 possible to describe the interference associated with a new element as it is added to the set. The interference on new elements need not be the same as before and may only be known at the time they are added. Existing approaches cannot accomodate such dynamic interference relations.
@@ -167,9 +171,10 @@ participants.  In \S\ref{sec:examples}, we study two further
 examples. The first is a concurrent spanning tree algorithm for
 graphs, where threads are recursively spawned on potentially
 overlapping subgraphs. We demonstrate that the flexible, overlapping
-subjective views of \colosl are just what we need. In particular, to
-the best of our knowledge,
-we provide the first small specification of a concurrent graph algorithm.
+subjective views of \colosl are just what we need. 
+%In particular, to
+%the best of our knowledge,
+%we provide the first small specification of a concurrent graph algorithm.
 The second is a concurrent set module implemented 
 using a hand-over-hand
 list-locking algorithm. Our \colosl reasoning  for this set module  improves
@@ -240,13 +245,15 @@ compositional reasoning about concurrent programs. It described
 permitted interferences between threads using global rely and
 guarantee relations on one  global shared state. This work is
 compositional in the sense that the guarantee of one thread is the
-rely of another. However, O'Hearn, Reynolds and
-Yang~\cite{o2001local} demonstrated that, for the
-reasoning to scale, it is important to work with small specifications
-based on local and shared state rather than working with one
-global state. In particular, O'Hearn~\cite{csl-tcs} introduced concurrent
+rely of another. However, O'Hearn~\cite{csl-tcs} demonstrated that,
+for  concurrent reasoning to scale,
+ it is important to work with small specifications
+based on local  state and shared state rather than working with one
+global state. In particular, he introduced concurrent
 separation logic based on thread-local state and static invariants for
-the shared resources.
+the shared state.
+
+\pgcomment{CAre: deny-guarantee reasoning v CAP.} 
 
 Since then, there has been much recent work on compositional
 reasoning about fine-grained concurrent algorithms. Vafeiadis and
