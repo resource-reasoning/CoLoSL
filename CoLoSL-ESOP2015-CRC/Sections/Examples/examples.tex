@@ -125,8 +125,8 @@ from $0$ to $1$, the current thread also claims ownership of its left
 and right pointers. Indeed, we observe that other threads need not
 access the children of $n$ once they see that it has already been
 marked. The atomic \li{CAS} (compare-and-swap) instruction prevents
-two threads from concurrently marking the same node and claiming ownership
-of the same resource.
+two threads from concurrently marking the same node and claiming
+ownership of the same resource.
 %% The shared state contains node $x$ which can
 %% be either unmarked ($\unmarked{x}{l}{r}$) or marked ($\marked{x}$); as
 %% well as the left and right subgraphs represented recursively by
@@ -322,10 +322,10 @@ global graph predicate:
 	\}
 	}}
 \end{equation}
-This is achieved by giving a proof of the analogous specification
+This is achieved below by giving a proof of the analogous specification
 using the local graph predicate in \fig\ref{fig:conSpanningTree},
 and  demonstrating that the global graph specification implies the
-local one using the principles of \colosl from \fig~\ref{fig:principles} at the end of this section. 
+local one using the principles of \colosl from \fig~\ref{fig:principles}.
 The proof sketched in \fig\ref{fig:conSpanningTree} is  mostly
 straightforward. One subtlety is the consequence step just before the
 second \li{if} statement. There, we first distribute the shared state
@@ -335,9 +335,9 @@ discard it in the left disjunct. This proof demonstrates
 that our \colosl reasoning  really is compositional,  in the sense that we are 
 doing  local reasoning on the shared state (the subgraphs). 
 
-Finally, let  us show how to derive the
-specification~\eqref{eq:globalspec} above from the one obtained in
-\fig\ref{fig:globalCST}. We introduce the \emph{iterative star}
+Let  us show how to derive the
+specification~\eqref{eq:globalspec} from the one obtained in
+\fig~\ref{fig:conSpanningTree}. We introduce the \emph{iterative star}
 operator $\iterStar$; when iterating over the empty set, it denotes
 $\emp$ by convention (needed below, when $x$ is null). We define
 \begin{align*}
@@ -484,9 +484,8 @@ our \colosl reasoning  provides
 more concise proofs using our local reasoning about shared state. 
 
 %We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. 
-First, consider the following diagram  which illustrates the CAP set
-predicate  as
-described in~\cite{cap-ecoop10}:
+Consider the following diagram  which illustrates the CAP set
+predicate of~\cite{cap-ecoop10}:
 \[
 \capBox{%
 \begin{tikzpicture}[baseline,node distance=7mm, yshift=2pt, every
