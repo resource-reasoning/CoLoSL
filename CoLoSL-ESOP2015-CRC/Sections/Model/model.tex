@@ -23,7 +23,7 @@ $g$ represents shared resources. The action model $\lmod$ records all possible i
 Logical states have two components: one describes machine states
 (e.g.\ stacks and heaps); the other represents
 \emph{capabilities}. The latter are inspired by the capabilities in
-deny-guarantee reasoning~\cite{dg}: a thread in possession of a given
+CAP~\cite{cap-ecoop10}: a thread in possession of a given
 capability is allowed to perform the associated actions (as prescribed
 by the \emph{action model} component of each world, defined below),
 while any capability \emph{not} owned by a thread means that the
@@ -36,7 +36,7 @@ corresponding action is both in the rely and the
 guarantee. Capabilities go beyond the rely-guarantee model~\cite{dg};
 in particular, they may be transferred between a thread and its
 environment just like any other resource to temporarily block or enable certain actions. See the presentation of
-deny-guarantee~\cite{dg} (or CAP~\cite{cap-ecoop10}) for further details
+CAP~\cite{cap-ecoop10} and deny-guarantee~\cite{dg} for further details
 and motivation.
 
 In general, each component of a logical state is taken from an
@@ -461,7 +461,7 @@ consequences of the semantics.
 
 \begin{lemma}
   \label{lem:assertion-facts}
-  The \colosl reasoning principles 
+%  The \colosl reasoning principles 
   \forgetRule, \mergeRule, \shiftRule, \weakenRule, and \copyRule are valid.
   %% \begin{mathpar}
   %%       \infer{
@@ -575,7 +575,7 @@ established.
 
 
 \begin{figure}
-\hrule\vspace{5pt}
+\hrule
 \begin{mathpar}
 	\infer{
 	  P \confines I	

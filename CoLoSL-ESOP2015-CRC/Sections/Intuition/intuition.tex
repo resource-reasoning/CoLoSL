@@ -80,7 +80,7 @@ detail  in \S\ref{sec:colosl}.
 
 \begin{figure}
 \centering
-\noindent\hrule
+\hrule\vspace{-5pt}
 \begin{align*}
   \shared{P * Q}{I} &=> \shared{P}{I}  &\mathllap{(\forgetRule)}&
   &
@@ -143,7 +143,7 @@ detail  in \S\ref{sec:colosl}.
 a \emph{part} of the global shared state and an \emph{interference assertion}
 $I$  characterising  how this partial shared state may be changed
 by the thread or the environment. Similar to the interference assertions
-of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
+of CAP~\cite{cap-ecoop10},
 $I$ declares actions of the form $[\token a] : Q \swap R$, where a
 thread in possession of the $[\token a]$ capability in its local state may carry out its transition and update parts of the shared
 state satisfying $Q$ to a state satisfying $R$. Assertions in Hoare
