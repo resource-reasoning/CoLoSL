@@ -103,9 +103,9 @@ interference to obtain small
 specifications of the \emph{shared} state. 
 
 
-For example, consider a linked list consisting of $n+1$ nodes accessed
+For example, consider a linked list consisting of $n{+}1$ nodes accessed
 concurrently by $n$ threads where the $i$th
-thread requires access to the $i$th and $(i+1)$st nodes. Current
+thread requires access to the $i$th and $(i{+}1)$st nodes as in~\cite{abstract-connectivity}. Current
 approaches cannot provide a small specification for each thread which
 captures  just these two shared nodes and their interference. Now
 consider a program whose threads manipulate subgraphs of a graph, such
