@@ -4,18 +4,22 @@
 \subsection{Concurrent Spanning Tree}\label{subsec:CST-example}
 
 Programs manipulating arbitrary graphs present a
-significant challenge for compositional verification: because of deep,
-\emph{unspecified} sharing between different components of a graph,
-changes to one subgraph may affect other subgraphs which may point
+significant challenge for compositional reasoning, because deep,
+\emph{unspecified} sharing between different components of a graph
+results in 
+changes to one subgraph affecting other subgraphs pointing 
 into it. This makes it hard to reason about updates to each subgraph
-in isolation. In a concurrent setting, this difficulty compounds with
+in isolation. In a concurrent setting, this difficulty is compounded
+by 
 the fact that threads working on different parts of the graph may
 affect each other in ways that are difficult to reason about locally
-to each subgraph. We now demonstrate on a concurrent spanning tree
-example that \colosl may be just the tool needed in this case, as it
-naturally deals with arbitrary overlapping views of the shared state,
-and allows one to tailor interferences to a given subjective view,
-achieving local reasoning about the shared state for this challenging program.
+to each subgraph. Using  a concurrent spanning tree
+algorithm, we demonstrate  that \colosl reasoning might be just the right approach, 
+as subjective views 
+naturally provide  arbitrary overlapping views of the shared state
+where interferences can be naturally tailored to 
+a given subjective view. With \colosl, we have 
+achieved  local reasoning about the shared state for this challenging program.
 
 Our example, presented in \fig\ref{fig:conSpanningTree}, operates on a
 \emph{directed binary graph} (henceforth simply \emph{graph}): 
