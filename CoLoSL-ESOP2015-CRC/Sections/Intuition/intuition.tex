@@ -10,7 +10,7 @@ concision, we show how small specifications are robust against
 non-trivial changes to the algorithm.
 
 The algorithm %presented in \fig\ref{fig:concurrentInc}, assumes a
-network of $n{+}1$ machines arranged in a ring, with a designated
+assumes a network of $n{+}1$ machines arranged in a ring, with a designated
 \emph{master} machine and $n$ slave machines. Each machine maintains a
 local counter and has access to the value of its left neighbour's
 counter; the state of the system consists of all $n{+}1$
@@ -289,7 +289,7 @@ connective used between assertions is that of separation logic and
 means that the assertions describe \emph{disjoint} pieces of state.
  The
 interference assertion associated with the subjective view is captured by $S_x$ and consists of two
-actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
+actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represents an increment
 of the contents of $x$ under the condition that its value is one less
 than the value at address $x{-}1$ (see
 \fig\ref{fig:concurrentInc}). Since the current thread owns $[\token s_x]$ locally,
