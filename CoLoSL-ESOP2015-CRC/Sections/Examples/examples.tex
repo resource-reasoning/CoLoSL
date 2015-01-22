@@ -465,12 +465,33 @@ The specification~\eqref{eq:globalspec} then follows from \conseqRule,
 In this section we consider a concurrent set module implemented as a singly linked list as described in~\cite{cap-ecoop10} and reason about its operations pictorially. We first revisit the proofs provided in~\cite{cap-ecoop10} established using Concurrent Abstract Predicates (CAP) ; we then compare it against our proofs in \colosl. We demonstrate that our \colosl\ reasoning improves on CAP by producing  more concise proofs and allowing for more local reasoning. 
 
 %We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. 
-The following diagram illustrates the set predicate in CAP as described in~\cite{cap-ecoop10}.
+The following diagram illustrates the set predicate in CAP as
+described in~\cite{cap-ecoop10}.
+\[
+\capBox{%
+\begin{tikzpicture}[baseline,node distance=7mm, every
+    node/.style={fill=red!20,circle,draw,inner sep=1pt}]
+  \node (x) {$v_1$};
+  \node[right of=x] (y) {$v_2$};
+  \node[right of=y] (z) {$v_3$};
+  \node[right of=z,draw=none,fill=none] (dots) {$\ldots$};
+  \node[above left of=x,node distance=3.8mm,draw=none,fill=none] {$x$};
+  \node[above left of=y,node distance=3.8mm,draw=none,fill=none] {$y$};
+  \node[above left of=z,node distance=3.8mm,draw=none,fill=none] {$z$};
+  \path[->] (x) edge (y);
+  \path[->] (y) edge (z);
+  \path[->] (z) edge (dots);
+\end{tikzpicture}
+* \displaystyle{\iterStar_{(x,y)\notin S}
+\iterStar_{v} [\text{U}(x,y,v)]
+* \exsts{w}\iterStar_{v\neq w} [\text{U}(x,y,v)]}}
+{I_x \cup I_y\cup I_z\cup \cdots}{s}
+\]
 %
-{\centering \includegraphics[scale=0.232]{Sections/Examples/Images/capSet.pdf}\\}
+%{\centering \includegraphics[scale=0.232]{Sections/Examples/Images/capSet.pdf}\\}
 %
 %
-\noindent The elements of the list are represented as a sorted singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. Hereafter, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
+The elements of the list are represented as a sorted singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. Hereafter, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
 
 All nodes of the list reside in a single shared region labelled $s$ and the interference on the list is the combined interference associated with each constituent node. 
 Each node at a given address $x$ is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. 
@@ -497,27 +518,170 @@ On the other hand, as well as being parametric in its capability separation alge
 
 We proceed with the \colosl\ proof of the set implementation. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise proof.  
 
-We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $[\nextC{x}{y}]$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method that adds value $v'$ to the set by inserting it in the sorted list. 
+We specify the set predicate as the $*$-composition of the subjective views pertaining to each node in the singly-linked list as illustrated below. The interference on each subjective view is limited to the node in question. Associated with each node at address $x$ is a ``next'' capability $[\nextC{x}{y}]$ that tracks its successor $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP and we shortly demonstrate how it is utilised in our reasoning. Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method that adds value $v'$ to the set by inserting it in the sorted list.
 
-%
-{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/coloslSet.pdf}\\}
-%
-\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I(y)$. Subsequently, the shared state is {extended} by the resources associated with the new node and its associated capabilities ($[\nextC{w}{z}]$) are generated on the fly as depicted below. \vspace{0pt}
+{\centering
+\begin{tikzpicture}
+  \node[inner sep=0pt,outer sep=0pt] (xNy) {$[\nextC{x}{y}] *\null$};
+  \node[right of=xNy,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v1) {$v_1$};
+  \node[above left of=v1,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (x) {$x$};
+  \node[fit=(xNy) (v1) (x),rounded corners,rectangle,draw,inner sep=1pt] (n1) {};
+  \node[right of=n1, anchor=north west,xshift=0ex] {$I_x$};
 
-%
-{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add1.pdf}\\}
-%
-%At this point, since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. However, the interference assertion associated with node $y$ ($I(y)$) allows the node to be unlocked in three possible ways. Either its successor has not changed from its old value $z$ (tracked by $\nextC{y}{z}$); \emph{or} it has been redirected to $z$'s successor (when $z$ is being deleted); \emph{or} it has been directed to a new node whose successor is $z$ (a new node is inserted between $y$ and $z$). When adding a new node after $y$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this condition, we use the (\mergeRule) principle in our reasoning to combine the subjective views of $y$ and $w$ as follows.
-\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion $I(y)$ allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node $w$ does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows. \vspace{0pt}
+  \node[right of=n1,xshift=2.5ex] {$*$};
 
+  \node[inner sep=0pt,outer sep=0pt,right of=xNy,node distance=2.7cm] (yNz) {$[\nextC{y}{z}] *\null$};
+  \node[right of=yNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v2) {$v_2$};
+  \node[above left of=v2,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=0pt] (y) {$y$};
+  \node[fit=(yNz) (v2) (y),rounded corners,rectangle,draw,inner sep=1pt] (n2) {};
+  \node[right of=n2, anchor=north west,xshift=0ex] {$I_y$};
+  \node[right of=n2,xshift=2.5ex] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=yNz,node distance=2.9cm] (zN) {$[\nextC{z}{\dots}] *\null$};
+  \node[right of=zN,circle,draw,fill=blue!15,inner sep=1pt,xshift=5pt] (v3) {$v_3$};
+  \node[above left of=v3,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (z) {$z$};
+  \node[fit=(zN) (v3) (z),rounded corners,rectangle,draw,inner sep=1pt] (n3) {};
+  \node[right of=n3, anchor=north west,xshift=1ex] {$I_z$};
+  \node[right of=n3,xshift=3.5ex] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=zN,node distance=2.3cm] (dots) {$\cdots$};
+
+  \path[->] (v1.north east) edge[semithick,bend left=55] (n2.west);
+  \path[->] (v2.north east) edge[semithick,bend left=55] (n3.west);
+  \path[->] (v3.north east) edge[semithick,bend left=55] (dots.north west);
+\end{tikzpicture}\\}
 %
-{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add2.pdf}\\}
+%{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/coloslSet.pdf}\\}
+%
+\noindent Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is to be inserted after node $y$.  The operating thread proceeds by traversing the list by hand-over-hand locking until it reaches node $y$. It then locks $y$ and claims its next pointer and moves it to its local state, as allowed by $I_y$. Subsequently, the shared state is {extended} by the resources associated with the new node and its associated capabilities ($[\nextC{w}{z}]$) are generated on the fly as depicted below. \vspace{0pt}
+
+{\centering
+\begin{tikzpicture}
+  \node[inner sep=0pt,outer sep=0pt] (xNy) {$[\nextC{x}{y}] *\null$};
+  \node[right of=xNy,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v1) {$v_1$};
+  \node[above left of=v1,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (x) {$x$};
+  \node[fit=(xNy) (v1) (x),rounded corners,rectangle,draw,inner sep=1pt] (n1) {};
+  \node[right of=n1, anchor=north west,xshift=0ex] {$I_x$};
+
+  \node[right of=xNy,node distance=1.7cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=xNy,node distance=2.7cm] (yNz) {$[\nextC{y}{z}] *\null$};
+  \node[right of=yNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v2) {$v_2$};
+  \node[above left of=v2,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=0pt] (y) {$y$};
+  \node[fit=(yNz) (v2) (y),rounded corners,rectangle,draw,inner sep=1pt] (n2) {};
+  \node[right of=n2, anchor=north west,xshift=0ex] {$I_y$};
+  \node[right of=yNz,node distance=1.7cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=yNz,node distance=2.7cm] (wNz) {$[\nextC{w}{{\color{red}z}}] *\null$};
+  \node[right of=wNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v4) {$v'$};
+  \node[above left of=v4,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (w) {$w$};
+  \node[fit=(wNz) (v4) (w),rounded corners,rectangle,draw,inner sep=1pt] (n4) {};
+  \node[right of=n4, anchor=north west,xshift=0.4ex] {$I_w$};
+  \node[right of=wNz,node distance=1.75cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=wNz,node distance=2.9cm] (zN) {$[\nextC{z}{\dots}] *\null$};
+  \node[right of=zN,circle,draw,fill=blue!15,inner sep=1pt,xshift=5pt] (v3) {$v_3$};
+  \node[above left of=v3,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (z) {$z$};
+  \node[fit=(zN) (v3) (z),rounded corners,rectangle,draw,inner sep=1pt] (n5) {};
+  \node[right of=n5, anchor=north west,xshift=1ex] {$I_z$};
+  \node[right of=zN,node distance=1.8cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=zN,node distance=2.3cm] (dots) {$\cdots$};
+
+  \draw[fill=red,semithick] (v2.north east) + (-2pt,-2pt)  rectangle +(2pt,2pt);
+  \draw[semithick] (v2.north east) + (2pt,2pt) arc (0:180:2pt);  
+  \path[->] (v1.north east) edge[semithick,bend left=55] (n2.west);
+  \path[->] (v3.north east) edge[semithick,bend left=55] (dots.north west);
+  \path[->] (v4.north east) edge[semithick,bend left=55,red] (n5.west);
+\end{tikzpicture}\\}
+%
+%{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add1.pdf}\\}
+%
+%At this point, since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. However, the interference assertion associated with node $y$ ($I_y$) allows the node to be unlocked in three possible ways. Either its successor has not changed from its old value $z$ (tracked by $\nextC{y}{z}$); \emph{or} it has been redirected to $z$'s successor (when $z$ is being deleted); \emph{or} it has been directed to a new node whose successor is $z$ (a new node is inserted between $y$ and $z$). When adding a new node after $y$, the latter of the possibilities is applicable and thus the unlocking thread must demonstrate that the new node ($w$) does indeed point to $z$. In order to establish this condition, we use the (\mergeRule) principle in our reasoning to combine the subjective views of $y$ and $w$ as follows.
+\noindent Since the locking thread holds the next pointer of $y$ in its local state, it modifies it to point to the new node $w$. It then unlocks $y$ and returns its next pointer to the shared state. When inserting a new node between $y$ and $z$, the associated interference assertion $I_y$ allows $y$ to be unlocked only if it has been directed to a new node whose successor is $z$. As such, the unlocking thread must demonstrate that the new node $w$ does indeed point to $z$. In order to establish this, we use the \mergeRule principle to combine the subjective views of $y$ and $w$ as follows. \vspace{0pt}
+
+{\centering
+\begin{tikzpicture}
+  \node[inner sep=0pt,outer sep=0pt] (xNy) {$[\nextC{x}{y}] *\null$};
+  \node[right of=xNy,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v1) {$v_1$};
+  \node[above left of=v1,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (x) {$x$};
+  \node[fit=(xNy) (v1) (x),rounded corners,rectangle,draw,inner sep=1pt] (n1) {};
+  \node[right of=n1, anchor=north west,xshift=0ex] {$I_x$};
+
+  \node[right of=xNy,node distance=1.7cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=xNy,node distance=2.7cm] (yNz) {$[\nextC{y}{z}] *\null$};
+  \node[right of=yNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v2) {$v_2$};
+  \node[above left of=v2,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=0pt] (y) {$y$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=v2,node distance=1.25cm] (wNz) {$\null*[\nextC{w}{z}] *\null$};
+  \node[right of=wNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=7pt] (v4) {$v'$};
+  \node[above left of=v4,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (w) {$w$};
+  \node[fit=(wNz) (v4) (w) (yNz) (v2) (y),rounded corners,rectangle,draw,inner sep=1pt] (n4) {};
+  \node[right of=n4, anchor=north west,xshift=8.4ex] {$I_y\cup I_w$};
+  \node[right of=wNz,node distance=2.6cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=wNz,node distance=3.8cm] (zN) {$[\nextC{z}{\dots}] *\null$};
+  \node[right of=zN,circle,draw,fill=blue!15,inner sep=1pt,xshift=5pt] (v3) {$v_3$};
+  \node[above left of=v3,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (z) {$z$};
+  \node[fit=(zN) (v3) (z),rounded corners,rectangle,draw,inner sep=1pt] (n5) {};
+  \node[right of=n5, anchor=north west,xshift=1ex] {$I_z$};
+  \node[right of=zN,node distance=1.8cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=zN,node distance=2.3cm] (dots) {$\cdots$};
+
+  \draw[fill=red,semithick] (v2.north east) + (-2pt,-2pt)  rectangle +(2pt,2pt);
+  \draw[semithick] (v2.north east) + (2pt,2pt) arc (0:180:2pt);  
+  \path[->] (v1.north east) edge[semithick,bend left=55] (n2.west);
+  \path[->] (v3.north east) edge[semithick,bend left=55] (dots.north west);
+  \path[->] (v4.north east) edge[semithick,bend left=55] (n5.west);
+\end{tikzpicture}\\}
+%
+%x{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add2.pdf}\\}
 %
 %Finally, node $y$ is unlocked; its updated next pointer is returned to the shared state and its next capability is modified accordingly to reflect its new successor. Using the (\copyRule), (\forgetRule) and (\shiftRule) principles \textit{ad seriatim}, we can once again obtain the set predicate with the new node $w$ inserted. 
 \noindent Finally, $y$ is unlocked; its next pointer is returned to the shared state and its next capability is modified to reflect its new successor. Using the \copyRule, \forgetRule and \shiftRule principles in order, we obtain the set predicate with $w$ inserted. \vspace{0pt}
 
+{\centering
+\begin{tikzpicture}
+  \node[inner sep=0pt,outer sep=0pt] (xNy) {$[\nextC{x}{y}] *\null$};
+  \node[right of=xNy,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v1) {$v_1$};
+  \node[above left of=v1,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (x) {$x$};
+  \node[fit=(xNy) (v1) (x),rounded corners,rectangle,draw,inner sep=1pt] (n1) {};
+  \node[right of=n1, anchor=north west,xshift=0ex] {$I_x$};
+
+  \node[right of=xNy,node distance=1.7cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=xNy,node distance=2.7cm] (yNz) {$[\nextC{y}{{\color{red}w}}] *\null$};
+  \node[right of=yNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v2) {$v_2$};
+  \node[above left of=v2,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=0pt] (y) {$y$};
+  \node[fit=(yNz) (v2) (y),rounded corners,rectangle,draw,inner sep=1pt] (n2) {};
+  \node[right of=n2, anchor=north west,xshift=0ex] {$I_y$};
+  \node[right of=yNz,node distance=1.7cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=yNz,node distance=2.7cm] (wNz) {$[\nextC{w}{z}] *\null$};
+  \node[right of=wNz,circle,draw,fill=blue!15,inner sep=1pt,xshift=2pt] (v4) {$v'$};
+  \node[above left of=v4,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (w) {$w$};
+  \node[fit=(wNz) (v4) (w),rounded corners,rectangle,draw,inner sep=1pt] (n4) {};
+  \node[right of=n4, anchor=north west,xshift=0.4ex] {$I_w$};
+  \node[right of=wNz,node distance=1.75cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=wNz,node distance=2.9cm] (zN) {$[\nextC{z}{\dots}] *\null$};
+  \node[right of=zN,circle,draw,fill=blue!15,inner sep=1pt,xshift=5pt] (v3) {$v_3$};
+  \node[above left of=v3,node distance=3.8mm,draw=none,fill=none,inner sep=0pt,outer sep=1pt] (z) {$z$};
+  \node[fit=(zN) (v3) (z),rounded corners,rectangle,draw,inner sep=1pt] (n5) {};
+  \node[right of=n5, anchor=north west,xshift=1ex] {$I_z$};
+  \node[right of=zN,node distance=1.8cm] {$*$};
+
+  \node[inner sep=0pt,outer sep=0pt,right of=zN,node distance=2.3cm] (dots) {$\cdots$};
+
+  \path[->] (v1.north east) edge[semithick,bend left=55] (n2.west);
+  \path[->] (v2.north east) edge[semithick,bend left=55,red] (n4.west);
+  \path[->] (v3.north east) edge[semithick,bend left=55] (dots.north west);
+  \path[->] (v4.north east) edge[semithick,bend left=55] (n5.west);
+\end{tikzpicture}\\}
 %
-{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add3.pdf}\\}
+%{\centering \includegraphics[scale=0.25]{Sections/Examples/Images/add3.pdf}\\}
 %
 We can reason about the \li{remove} operation in a similar fashion. The dynamic extension afforded by the \extendRule\ principle allows us to generate new capabilities only when needed and thus gives way to a more concise proof. 
 %

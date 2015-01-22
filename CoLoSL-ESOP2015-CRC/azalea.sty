@@ -49,6 +49,8 @@
 
 \newcommand{\codecomment}[1]{\color{blue}{#1}}
 \usetikzlibrary{shapes}
+\usetikzlibrary{fit}
+
 \lstset{%
   language=C,
 %  morecomment=[n][{\comment}]{/*}{*/},
@@ -344,7 +346,7 @@
 \newcommand{\strictsepish}{\sqcupplus}
 %\newcommand{\shared}[3]{\boxed{#1}_{\; #3}^{\; #2}}
 \addtolength{\fboxsep}{-1.5pt}
-%\newcommand{\shared}[2]{\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}}
+\newcommand{\capBox}[3]{{\addtolength{\fboxsep}{-1.5pt}\fbox{\ensuremath{#1\vphantom{Qq}}}_{\; {#2}}^{\;#3}}}
 \newcommand{\shared}[2]{{\ovalbox{$#1\vphantom{Qq}$}}_{\; {#2}}}
 \newcommand{\swap}{\mathrel{\leadsto}}
 \newcommand{\ewand}{\septraction}
@@ -511,7 +513,7 @@
 \DeclareDocumentCommand{\unlockC}{m O{} O{-}}{#1.\textsf{U} \stackrel{#2}{\harpoonything} #3}
 \DeclareDocumentCommand{\valueC}{m m O{} O{-}}{#1.\uppercase{\textsf{#2}} \stackrel{#3}{\harpoonything} #4}
 \DeclareDocumentCommand{\modC}{m O{} O{-}}{#1.\textsf{M} \stackrel{#2}{\harpoonything} #3}
-\DeclareDocumentCommand{\nextC}{m O{} m}{#1.\textsf{N} \stackrel{#2}{\rightarrow} #3}
+\DeclareDocumentCommand{\nextC}{m O{} m}{#1.\textsf{N} {\stackrel{#2}{\rightarrow}} #3}
 
 \newcommand{\isLock}[2]{\textsf{isLock}\left(#1, #2\right)}
 \newcommand{\locked}[1]{\textsf{locked}\left(#1 \right)}
