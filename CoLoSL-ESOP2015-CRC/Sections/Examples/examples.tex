@@ -469,7 +469,7 @@ The following diagram illustrates the set predicate in CAP as
 described in~\cite{cap-ecoop10}.
 \[
 \capBox{%
-\begin{tikzpicture}[baseline,node distance=7mm, every
+\begin{tikzpicture}[baseline,node distance=7mm, yshift=2pt, every
     node/.style={fill=red!20,circle,draw,inner sep=1pt}]
   \node (x) {$v_1$};
   \node[right of=x] (y) {$v_2$};
@@ -483,15 +483,16 @@ described in~\cite{cap-ecoop10}.
   \path[->] (z) edge (dots);
 \end{tikzpicture}
 * \displaystyle{\iterStar_{(x,y)\notin S}
-\iterStar_{v} [\text{U}(x,y,v)]
-* \exsts{w}\iterStar_{v\neq w} [\text{U}(x,y,v)]}}
+  \iterStar_{v} [\text{U}(x,y,v)]
+  * \iterStar_{(x,y)\in S}
+  \exsts{w}\iterStar_{v\neq w} [\text{U}(x,y,v)]}}
 {I_x \cup I_y\cup I_z\cup \cdots}{s}
 \]
 %
 %{\centering \includegraphics[scale=0.232]{Sections/Examples/Images/capSet.pdf}\\}
 %
 %
-The elements of the list are represented as a sorted singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. Hereafter, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
+The set is represented as a sorted singly-linked list with no duplicate elements; the list starts at address $x$ with value $v_1$ and points to the next element at address $y$ with value $v_2$ and so forth. Hereafter, we write $\node{x}{v}{y}$ to denote a node at address $x$, with value $v$ and successor $y$. 
 
 All nodes of the list reside in a single shared region labelled $s$ and the interference on the list is the combined interference associated with each constituent node. 
 Each node at a given address $x$ is associated with a set of update capabilities of the form $[\text{U}(x, y, v)]$ for \emph{all} possible addresses $y$ and \emph{all} possible values $v$. This is to capture all potential successor addresses $y$ and all potential values $v$ that may be stored at address $x$. 
