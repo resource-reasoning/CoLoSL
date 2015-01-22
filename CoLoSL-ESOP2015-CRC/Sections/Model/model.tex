@@ -131,6 +131,7 @@ An action model is a partial function from \emph{capabilities} to sets
 of \emph{actions}. It corresponds to the semantic interpretation of an interference assertion.
 %
 \begin{definition}[Action models]
+  \label{def:actions}
   The set $\set{Action}$ of \emph{actions}, ranged over by $a$, and
   the set $\AMods$ of \emph{action models}, ranged over by $\lmod$,
   are defined as:
@@ -273,16 +274,14 @@ include negation nor septraction. The interpretation of assertions
 is a simple lift from that of local assertions, with the exception
 of the subjective view $\shared P I$.  First, an \emph{interference
   assertion} $I$ describes actions enabled by a given capability, in
-the form of a pre- and post-condition.
+the form of a pre- and postcondition.
 %Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and postcondition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
-A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
-\unitL$ and a \emph{subjective state} $s$ can be found in the global
-shared state $g$ (i.e.\ $g = s\composeL r$ for some
-$r$), such that $s$ satisfies $P$ in the standard separation logic
-sense, and $\lmod$ and $I$ \emph{agree} given the decomposition $s$
-and 
-$r$, written $\extendsAM{\lmod}{s}{r}{\semI{I}}$, 
-in the following sense:
+A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l
+= \unitL$ and a \emph{subjective state} $s$ can be found in the global
+shared state $g$ (i.e.\ $g = s\composeL r$ for some $r$), such that
+$s$ satisfies $P$, and $\lmod$ and $I$ \emph{agree} given the
+decomposition $s$ and $r$, written
+$\extendsAM{\lmod}{s}{r}{\semI{I}}$, in the following sense:
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -548,7 +547,7 @@ possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
 For example, recall the interpretation of $s_x$ given by $S$ just
-before definition~\ref{definition3}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
+before Def.~\ref{def:actions}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
 \emptyset), (\emptyset, \{\ell\,{:}\,1\}, \emptyset), (\emptyset,
 \{\ell{-}1\,{:}\,1\}, \emptyset))\in S$ is confined to the logical state
 $l_0=(\emptyset, \{\ell\,{:}\,0\}, \emptyset)$ because $l_0$ is the first component of the
@@ -702,15 +701,15 @@ state.\footnote{$\precise{p} == \for{\lenv, l, l_1, l_2} l_1\leq
   \lenv \slsat p \text{ implies } l_1 = l_2$} The first premise states
 that $\lass{F}$ is invariant under the action
 $\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$, similar to the
-way that RGSep encodes stability checks as separation-logic
+way that RGSep encodes stability checks as separation logic
 entailments. Informally, it reads: for any state in $f$, remove a part
 satisfying $p$, add a state satisfying $q$, and the result should
 still be in $f$. The third premise checks the confinement condition:
 given a state in local assertion $f_i$ ($l_1\composeL l_2|=
 \lass{F}_i$), and a state in $p$ ($l_2 \composeL l_3 |= p$ with $l_1$
-and $l_3 $ disjoint), the combined state ($l = l_1 \composeL \l_2
+and $l_3 $ disjoint), the combined state ($l_1 \composeL \l_2
 \composeL l_3$) must also be in $f_i$. Hence, by precision of
-$\lass{F}_i$, we have $l_2\composeL l_3\leq l_1\composeL l_2\composeL
+$\lass{F}_i$, we have $l_1\composeL l_2\composeL
 l_3 = l_1\composeL l_2$, i.e.\ $l_2\composeL l_3 \leq l_1\composeL
 l_2$ as required.
 
