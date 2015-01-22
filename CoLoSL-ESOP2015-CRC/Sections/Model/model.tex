@@ -18,7 +18,7 @@ A \emph{world} is a triple $(l, g, \lmod)$ where $l$ and $g$ are
 \emph{local logical state} (or local state) $l$ represents the
 locally owned resources of a thread, in the standard separation logic
 sense, while the \emph{global logical state} (or shared state)
-$g$ represents shared resources. An action model records all possible interferences on the shared state.
+$g$ represents shared resources. The action model $\lmod$ records all possible interferences on the shared state.
 
 Logical states have two components: one describes machine states
 (e.g.\ stacks and heaps); the other represents
@@ -92,9 +92,9 @@ The local and global logical states of a world are always
   %% $(\LStates, \composeL, \unitL)$.
 \end{definition}
 
-We write $l$ to range over either arbitrary logical states or just
+We write $l$ to range over arbitrary logical states or just
 local states, and $g$ to range over logical states representing global
-states. The empty logical state $(\emptyset, \emptyset, \emptyset)$ is
+shared states. The empty logical state $(\emptyset, \emptyset, \emptyset)$ is
 written $\unitL$. We write $l_1 \leq l_2$ when there exists $l$ such
 that $l\composeL l_1 = l_2$, and write $l_2 - l_1$ to denote the
 unique such $l$ (by cancellativity) when it exists. When $l_1\composeL
@@ -147,7 +147,7 @@ states are compatible; the capabilities owned by $l$ and $g$ are in
 the domain of $\lmod$; and actions in $\lmod$ are \emph{confined} to
 $g$ (written $g\containI\lmod$).  An action $a = (p, q, c)$ is
 confined to $g$ if and only if whenever it is enabled ($p \composeL c$
-is compatible with $g$), then its pre-state $p$ is contained in $g$
+agrees with $g$), then its pre-state $p$ is contained in $g$
 ($p \leq g$). We motivate the need for the confinement condition in
 \S\ref{subsec:prules}.
 %We provide an informal description of confinement in
