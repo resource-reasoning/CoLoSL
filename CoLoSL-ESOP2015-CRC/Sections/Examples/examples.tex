@@ -18,19 +18,19 @@ and allows one to tailor interferences to a given subjective view,
 achieving local reasoning about the shared state for this challenging program.
 
 Our example, presented in \fig\ref{fig:conSpanningTree}, operates on a
-\emph{directed binary graph} (henceforth simply \emph{graph}),
-i.e.\ a directed graph where each node has at most two
+\emph{directed binary graph} (henceforth simply \emph{graph}): 
+that is,  a directed graph where each node has at most two
 successors, called its left and right children. The program concurrently computes an
 in-place spanning tree of the graph (i.e.\ a tree that covers
 all nodes of the graphs from a given root), as follows:
 each time a new node is encountered, two new threads are created that
 each prune the edges of its left and right children recursively. A
-mark bit is associated with each node to keep track of which ones have
+mark bit is associated with each node to keep track of which nodes  have
 already been visited. Each thread returns whether it marked the node
 it was called on itself or whether somebody else did. In the latter case,
 the parent thread removes the link from its own root node to the
-corresponding child. Intuitively, it is allowed to do so because the child has to be
-already reachable via some other path in the graph since it was marked by another thread.
+corresponding child. Intuitively, it is allowed to do so because the
+child has already been  reached via some other path in the graph since it was marked by another thread.
 
 %% marking the vertices to keep track of those already visited; the
 %% return value b records the outcome of marking with \li{b}$=1$ when the
@@ -46,9 +46,10 @@ already reachable via some other path in the graph since it was marked by anothe
 We will prove that, given a shared graph as input, the program always
 returns a tree, i.e.\ all sharing and cycles have been
 appropriately removed. Pleasingly, the \colosl specification captures just the subgraph
-manipulated by the thread, instead of the whole graph. Because of
-arbitrary sharing between the two, a proof using a more global specification would be
-unpleasant indeed. 
+manipulated by the thread, instead of the whole graph. 
+%Because of
+%arbitrary sharing between the two, a proof using a more global specification would be
+%unpleasant indeed. 
 %However, we do not establish that the final tree
 %indeed spans the original graph. The reason it does is subtle indeed,
 %as are the invariants required, but in ways unrelated to our main
@@ -231,44 +232,18 @@ concurrent recursive calls \li{span(x-}$\!\textgreater$\li{l)
 the resulting states, as required by the
 \parRule\ rule. We thus conduct our proof with respect to a
 \emph{local} description of the graph, $\g{x}{\gamma}$ as defined in
-\fig\ref{fig:localCST}. We show at the end of this section how to
-derive the following, perhaps more natural specification from the one
-in \fig\ref{fig:conSpanningTree}:
-\begin{equation}
-  \label{eq:globalspec}
-	{\color{blue}{
-	\{
-%		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
-%		\left[\markT{n}{e}\right] * 
-		\graph{\li{x}}{\gamma}
-	\} 
-	}} 
-        \ 
-	\command{b = span(x)} 
-        \ 
-	{\color{blue}{
-	\{
-%		\cell{\li{n}}{n} *  
-%		\left[\markT{n}{e}\right] * 
-%		\left(
-%		\begin{array}{@{} l @{}}
-			(\li{b} = 0\land\emp) \lor (\li{b} = 1 \land \tr{\li{x}}{\gamma})
-%			\cell{\li{b}}{1} * \tr{n}{\gamma} \lor
-%			\cell{\li{b}}{0} *  \tr{\li{null}}{\gamma}
-%		\end{array}
-%		\right)
-	\}
-	}}
-\end{equation}
-
+\fig\ref{fig:localCST}. 
 The definition of the $\g{x}{\gamma}$ predicate is similar to that of
 $\shared{\G{x}{\gamma}}{I_{\gamma}}$ except that the single view
 $\shared{\G{x}{\gamma}}{I_{\gamma}}$ has been broken down into individual
 views for each vertex $n$ reachable from $x$. Moreover, the interference
 assertion of each local view concerning a vertex $n \in \gamma$ has been shifted
-from $I_{\gamma}$ to $I(n)$ so as to reflect only those actions that affect $n$.  
+from $I_{\gamma}$ to $I(n)$ so as to reflect only those actions that
+affect $n$.  
 
-Finally, the $\tr{x}{\gamma}$ predicate represents a \emph{tree}
+
+The $\tr{x}{\gamma}$ predicate, also given in \fig\ref{fig:localCST}, 
+represents a \emph{tree}
 rooted at $x$, as is standard in separation logic~\cite{rey02}, and
 consists, once fully unfolded, of one subjective view for each vertex $n$
 reachable from $x$ in
@@ -315,18 +290,53 @@ $\}$ //<@\codecomment{$\left\{ \begin{array}{@{} l @{}} (\tx{b} = 0\land\emp)  \
 \label{fig:conSpanningTree}
 \end{figure}
 
-The proof sketched in \fig\ref{fig:conSpanningTree} is now mostly
+Our goal is to prove that the following specification holds using the
+global graph predicate:
+\begin{equation}
+  \label{eq:globalspec}
+	{\color{blue}{
+	\{
+%		\cell{\li{n}}{n} * \cell{\li{b}}{-} * 
+%		\left[\markT{n}{e}\right] * 
+		\graph{\li{x}}{\gamma}
+	\} 
+	}} 
+        \ 
+	\command{b = span(x)} 
+        \ 
+	{\color{blue}{
+	\{
+%		\cell{\li{n}}{n} *  
+%		\left[\markT{n}{e}\right] * 
+%		\left(
+%		\begin{array}{@{} l @{}}
+			(\li{b} = 0\land\emp) \lor (\li{b} = 1 \land \tr{\li{x}}{\gamma})
+%			\cell{\li{b}}{1} * \tr{n}{\gamma} \lor
+%			\cell{\li{b}}{0} *  \tr{\li{null}}{\gamma}
+%		\end{array}
+%		\right)
+	\}
+	}}
+\end{equation}
+This is achieved by giving a proof of the analogous specification
+using the local graph predicate in \fig\ref{fig:conSpanningTree},
+and  demonstrating that the global graph specification implies the
+local one using the principles of \colosl from figure~\ref{whatever
+  the figure is} at the end of this section. 
+The proof sketched in \fig\ref{fig:conSpanningTree} is  mostly
 straightforward. One subtlety is the consequence step just before the
 second \li{if} statement. There, we first distribute the shared state
 $\shared{\marked{\tx{x}}}{I(\tx{x})} * \g{l}{\gamma} * \g{r}{\gamma}$
 over the disjunction, then use the fact that it implies $\emp$ to
-discard it in the left disjunct.
+discard it in the left disjunct. This proof demonstrates
+that our \colosl reasoning  really is compositional,  in the sense that we are 
+doing  local reasoning on the shared state (the subgraphs). 
 
-Finally, let us show how to derive the
+Finally, let  us show how to derive the
 specification~\eqref{eq:globalspec} above from the one obtained in
-\fig\ref{fig:globalCST}. We introduce the \emph{iterative star}
+\fig\ref{fig:globalCSTthissaysfig6??}. We introduce the \emph{iterative star}
 operator $\iterStar$; when iterating over the empty set, it denotes
-$\emp$ by convention (e.g., below, when $x$ is null). We define
+$\emp$ by convention (needed below, when $x$ is null). We define
 \begin{align*}
 	P(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r) \land (\unmarked{n}{l}{r} \lor \marked{n})\\
 	Q(x,@g) &\eqdef \iterStar_{x\leadsto^{\ast}_\gamma n} \exsts{l,r}\gamma(n) = (l, r)
@@ -349,7 +359,7 @@ show that
 %% \]
 %% %
 The specification~\eqref{eq:globalspec} then follows from \conseqRule,
-\fig\ref{fig:conSpanningTree}, and the derivation below.
+\fig\ref{fig:conSpanningTree}, and the derivation below:
 %
 %\begin{align*}
 %	&\shared{P}{I_{\gamma}}\!\!\!\!
