@@ -270,9 +270,9 @@ As in RGSep~\cite{viktor-marriage}, our assertions $\Assertions$ are
 defined on top of local assertions. For simplicity, assertions do not
 include negation nor septraction. The interpretation of assertions
 is a simple lift from that of local assertions, with the exception
-of the subjective views $\shared P I$.  First, an \emph{interference
+of the subjective view $\shared P I$.  First, an \emph{interference
   assertion} $I$ describes actions enabled by a given capability, in
-the form of a pre- and postcondition.
+the form of a pre- and post-condition.
 %Following the RGSep style~\cite{viktor-marriage}, interference assertions $I$ describe actions enabled by a given capability, in the form of a pre- and postcondition ($P$ and $Q$ respectively) as well as a side-condition ($R$). We write $P \swap Q$ as a shorthand for $\action{P}{Q}{\emp}$.
 A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective state} $s$ can be found in the global
@@ -292,7 +292,7 @@ $\extendsAM{\lmod}{s}{r}{\semI{I}}$:
 %	\item the above is true after any number of action applications in $I$ that affect $g$ and any number of action applications in $\gmod$ that affect $r$ but not $s$.
 \end{enumerate}
 Thus, given a world $(l,g,\lmod)$ and a subjective view $\shared P I$,
-$P$ describes a subjective state $s$ that is \emph{parts} of $g$ and
+$P$ describes a subjective state $s$ that is \emph{a part} of $g$ and
 $I$ describes \emph{all parts} of $\lmod$ concerning $s$, while
 $\lmod$ describes the overall interference on $g$.  We refer to the
 above agreement between the action model and the subjective view as
@@ -307,8 +307,8 @@ relations. The first one $l,\lenv\slsat p$ interprets local assertions
 $p\in\LAssertions$ in the usual separation logic sense over a logical
 state $l$. The second one $s,\lenv|=_{g,\lmod} P$ interprets
 assertions $P\in\Assertions$ over a \emph{subjective state} $s$ that
-is part of the global shared state $g$, subject to action model
-$\lmod$. This third form of satisfaction is needed to deal with the
+is part of the global shared state $g$, subject to the action model
+$\lmod$. This latter form of satisfaction is needed to deal with the
 nesting of subjective views.\footnote{This presentation with several
   forcing relations differs from the usual CAP
   presentation~\cite{cap-ecoop10}, where formulas are first
@@ -324,7 +324,7 @@ appropriate.
 
 \begin{definition}[Assertion semantics]\label{def:assertion-semantics}
 Given a logical environment $\lenv: \set{LVar} --> \set{Val}$, the
-semantics of \colosl assertions is defined below, using a semantics of
+semantics of \colosl assertions is defined below, using the semantics of
 interference assertions $\semI[(.)]{.}: \LEnv \rightarrow \AMods$ also
 defined below.
 \vspace{-1ex}
