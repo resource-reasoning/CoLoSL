@@ -463,11 +463,11 @@ The specification~\eqref{eq:globalspec} then follows from \conseqRule,
 
 \subsection{Set Module}\label{subsec:set}
 
-Finally, we give a pictoral description of our reasoning about 
+Finally, we give a pictorial description of our reasoning about 
 a concurrent set module implemented as a singly-linked list.
 We compare our \colosl reasoning  with the original CAP reasoning
 of~\cite{cap-ecoop10}, demonstrating that 
-our \colosl\ reasoning  provides 
+our \colosl reasoning  provides 
 more concise proofs using our local reasoning about shared state. 
 
 %We implement a set as a sorted singly-linked list with no duplicate elements (since it represents a set) and one lock per node as described in~\cite{cap-ecoop10}. 
@@ -518,10 +518,13 @@ to have to  account for the capabilities associated with   addresses not in the 
 
 TaDA~\cite{tada} took the first steps towards addressing the above
 shortcomings of the CAP approach. TaDA regions are parametric in the
-separation algebra of capabilities (called guards). It can  therefore
-provide  a set region which just
-describes the elements of a set. This region   can grow and decrease using
-capabilities and axioms on regions. 
+separation algebra of capabilities (called guards).
+As such, one can choose a
+more suitable algebra to axiomatise the desired behaviour of capabilities. 
+%It can  therefore
+%provide  a set region which just
+%describes the elements of a set. This region  can grow and decrease using
+%capabilities and axioms on regions. 
 %For instance, when creating the set region $r$, one can choose a capability algebra that satisfies the following axiom.\vspace{-7pt}
 %%
 %\begin{align*}
@@ -536,7 +539,7 @@ separation algebra, the dynamic subjective views of \colosl provide
 local reasoning about  the shared resource and its interference. 
 %
 
-We proceed with the \colosl\ proof of the set implementation. Recall from \S\ref{sec:colosl} that \colosl\ is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise proof.  
+We proceed with the \colosl proof of the set implementation. Recall from \S\ref{sec:colosl} that \colosl is parametric in the separation algebra of capabilities. We thus instantiate it with a heap-like capability separation algebra that is \emph{stateful} and demonstrate that this allows for a more concise proof.  
 
 We specify the set predicate as the $*$-composition of  subjective
 views associated  each node in the singly-linked list as illustrated
@@ -578,7 +581,7 @@ node in question. Associated with each node at address $x$ is a
 $y$. This is analogous to the $[\text{U}(x, y, v)]$ capability of CAP
 and we shortly demonstrate how it is utilised in our reasoning. 
 
-Since \colosl\ allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method that adds value $v'$ to the set by inserting it in the sorted list.
+Since \colosl allows for {dynamic} extension of the shared state, we do not need to account for capabilities associated with all addresses. Instead, fresh capabilities are generated dynamically as needed. We demonstrate this by giving a reasoning outline of the \li{add(}$v'$\li{)} method that adds value $v'$ to the set by inserting it in the sorted list.
 Suppose $v_2 < v' < v_3$, and thus a new node $w$ with value $v'$ is
 to be inserted after node $y$.  The operating thread proceeds by
 traversing the list by hand-over-hand locking until it reaches node
