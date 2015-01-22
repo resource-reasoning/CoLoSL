@@ -448,8 +448,8 @@ environment, and provide more opportunities for proof reuse.
 
 For instance, let us now add a thread that dynamically grows the ring
 by spawning extra slaves to the parallel composition of \li{ring(x)}
-(the details can be found in~\cite{colosl-tr14}). When the ring has
-size $n$, we use the \extendRule principle as follows to add a new
+(the details can be found in~\cite{colosl-tr14}). When the ring has $n{+}1$ 
+machines, we use the \extendRule principle as follows to add a new
 slave (at $x{+}n{+}1$) to the shared state with the associated
 interference relation and capability.\footnote{Unlike
   CAP~\cite{cap-ecoop10} and as in iCAP~\cite{icap}, we do not provide
