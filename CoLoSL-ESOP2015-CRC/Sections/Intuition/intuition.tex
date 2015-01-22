@@ -10,7 +10,7 @@ concision, we show how small specifications are robust against
 non-trivial changes to the algorithm.
 
 The algorithm %presented in \fig\ref{fig:concurrentInc}, assumes a
-network of $n{+}1$ machines arranged in a ring, with a designated
+is a network of $n{+}1$ machines arranged in a ring, with a designated
 \emph{master} machine and $n$ slave machines. Each machine maintains a
 local counter and has access to the value of its left neighbour's
 counter; the state of the system consists of all $n{+}1$
@@ -63,14 +63,14 @@ In~\cite{colosl-tr14}, we outline a proof of the token ring's
 self-stabilisation phase, which shows that the system always converges
 to a legitimate state. We also provide a proof of the token ring as a
 mutual exclusion mechanism, where a machine holding $\bullet$ may gain
-ownership of a shared resource. For simplicity, we focus here on the
-case where the token ring is already in the $0$th legitimate state,
+ownership of a shared resource. For simplicity, here we focus on the
+case where the token ring is in the $0$th legitimate state,
 with all counters holding value $0$. Our proof makes use of the
 \colosl principles laid out in \fig\ref{fig:principles}, together with
 the usual concurrency rule of separation logic~\cite{csl-tcs} and the
-rule of semantic consequence from the Views framework~\cite{views}.
-We introduce them informally as needed, and present them in more
-details in \S\ref{sec:colosl}.
+rule of semantic consequence from the views framework~\cite{views}.
+We introduce them informally as needed, and discuss  them in more
+detail  in \S\ref{sec:colosl}.
 
 %% \begin{figure}
 %%   \centering
@@ -140,17 +140,17 @@ details in \S\ref{sec:colosl}.
 
 \colosl introduces a new assertion $\shared{P} I$ called a
 \emph{subjective view}, which comprises a \emph{subjective assertion} $P$ describing
-a \emph{part} of the global shared state, and an \emph{interference assertion}
-$I$ which characterises how this partial shared state may be changed
-by the thread or the environment. Similar to interference assertions
+a \emph{part} of the global shared state and an \emph{interference assertion}
+$I$  characterising  how this partial shared state may be changed
+by the thread or the environment. Similar to the interference assertions
 of CAP~\cite{cap-ecoop10} and permissions of deny-guarantee~\cite{dg},
 $I$ declares actions of the form $[\token a] : Q \swap R$, where a
-thread in possession of the $[\token a]$ capability (in its local state) may carry out its transition and update parts of the shared
+thread in possession of the $[\token a]$ capability in its local state may carry out its transition and update parts of the shared
 state satisfying $Q$ to a state satisfying $R$. Assertions in Hoare
 triples must be {\em stable} with respect to the interference from the environment: that is, robust with respect to the interference assertion $I$.
 
 Consider the program $\li{ring(x)}$ defined in
-\fig\ref{fig:concurrentInc} representing a token ring with $n{+}1$
+\fig\ref{fig:concurrentInc} which represents a token ring with $n{+}1$
 machines.
 %ignoring the assertions (lines starting with \li{//}). 
 %We represent each machine in the ring as a heap address that records the value of the counter 
@@ -164,7 +164,7 @@ run in parallel until all counters reach value $10$.
 %$n$-place ring. We focus on a 3-place ring for concision.
 While the implementation of all the slave threads are identical, we shall see that the proof of the
 first slave in the ring (at $x{+}1$) is slightly different from the
-others, for which a single proof suffices.
+others.
 We henceforth refer to the first slave thread as the
 \emph{foreman}.  Let us proceed with the proof of the other
 slaves.
@@ -264,7 +264,7 @@ $\}$ //$\color{blue} \left\{\begin{array}{@{}l@{}}\varcell{\tx x}{x} * [\token s
 %% the master and foreman threads are similar and can be described
 %% analogously.
 
-\paragraph{Proof of the slave}
+\paragraph{Proof of the slaves}
 Let us temporarily forget about the proof outline of
 \fig\ref{fig:concurrentInc} and attempt to prove \li{slave(x)} in
 isolation, in the spirit of local reasoning. Since
@@ -289,7 +289,7 @@ connective used between assertions is that of separation logic and
 means that the assertions describe \emph{disjoint} pieces of state.
  The
 interference assertion associated with the subjective view is captured by $S_x$ and consists of two
-actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represent an increment
+actions: $s_x$ and $s_{x{-}1}$, where $s_{x}$ represents an increment
 of the contents of $x$ under the condition that its value is one less
 than the value at address $x{-}1$ (see
 \fig\ref{fig:concurrentInc}). Since the current thread owns $[\token s_x]$ locally,
@@ -324,7 +324,7 @@ preserves the invariant.  The final postcondition of $\li{slave(x)}$
 follows from the invariant and the boolean expression of the loop.
 
 \paragraph{Proof of the master and foreman}
-The proof sketches of the master and foreman threads sketched in
+The proof sketches of the master and foreman threads given  in
 \fig\ref{fig:concurrentInc} are analogous. As the first slave, the
 foreman has to account for interference from the master instead of
 another slave. Moreover, the master and its associated action $m_x$
@@ -347,7 +347,7 @@ view. This assertion may be freely duplicated using the \copyRule
 principle of \fig\ref{fig:principles} and each thread is given a copy together with the
 appropriate capability using the usual \parRule rule of concurrent
 separation logic. For instance, the
-thread running \li{slave(x+$i$)} ($i>1$) gets $[\token{s}_{x{+}i}] *
+thread running \li{slave(x+$i$)}, for $i>1$,  gets $[\token{s}_{x{+}i}] *
 \shared{P}{I}$.  This assertion does not match the precondition of
 \li{slave(x+$i$)} just yet. Using the principles of \fig\ref{fig:principles}, we can weaken the assertion as such:
 %
@@ -369,10 +369,11 @@ thread running \li{slave(x+$i$)} ($i>1$) gets $[\token{s}_{x{+}i}] *
 \end{align*}
 %
 We start by exchanging the action $s_{x{+}i{-}1}$ of $I$ for the stronger
-action $s'_{x{+}i{-}1}$ using \shiftRule. In general, \shiftRule allows
+action $s'_{x{+}i{-}1}$ using the \shiftRule principle. In general, \shiftRule allows
 us to replace $I$ with any interference assertion $I'$ that has the
-same observable effect as far as the subjective assertion $P$ of the
-subjective view is concerned (written $I \weakenI{P} I'$). In this
+same observable effect as far as the subjective assertion $P$ 
+%of the subjective view
+ is concerned (written $I \weakenI{P} I'$). In this
 instance, the actions $s_{x{+}i{-}1}$ and $s'_{x{+}i{-}1}$ have the same effect
 according to $P$, as discussed in the proof of \li{slave(x)}. As such,
 rewriting $s_{x{+}i{-}1}$ as $s'_{x{+}i{-}1}$
@@ -382,7 +383,8 @@ related through $x{+}i{-}1$. In particular, $I\weakenI{P} \left(I \setminus \{s_
 Next, because subjective views only describe \emph{parts} of the
 shared state, we can use the \forgetRule principle to obtain a weaker
 view of the shared state, in this case a view that ignores all cells
-in the ring except for those at addresses $x{+}i{-}1$ and $x{+}i$. With all other cells out of the scope, their actions no longer have
+in the ring except for those at addresses $x{+}i{-}1$ and
+$x{+}i$. With all other cells out of the subjective view, their actions no longer have
 observable effects on the assertion, since they leave $x{+}i{-}1$ and $x{+}i$ unchanged. We can thus apply the \shiftRule principle again to \emph{frame off}
 those actions and obtain $S'_{x{+}i} = \{s'_{x{+}i{-}1}, s_{x{+}i}\}$.
 
@@ -434,8 +436,8 @@ proof of \li{ring(x)}.
 
 \paragraph{Small specifications and proof reuse}
 Our expansion and
-contraction of subjective views, in particular with shifting of
-interference assertions in key places, enables us to confine the
+contraction of subjective views, in particular with the  shifting of
+interference assertions at  key places, enables us to confine the
 specification and verification of each thread to just the resources
 they need. Such small specifications make proofs robust against changes to each thread's
 environment, and provide more opportunities for proof reuse.
@@ -463,13 +465,13 @@ interference relation and capability.\footnote{Unlike
 Here, the
 \emph{view shift}~\cite{views} (or
 \emph{repartitioning}~\cite{cap-ecoop10}) $P ===> Q$ means that an
-(instrumented) state satisfying $P$ may be changed to $Q$ without
-changing the machine states it denotes. In particular, $(P => Q) => (P
+instrumented (logical)  state satisfying $P$ may be changed to $Q$ as
+long as the underlying  machine state does not change. In particular, $(P => Q) => (P
 ===> Q)$.
-Our proof changes only minimally to accommodate the new program: the proof
+The point is that our proof changes only minimally to accommodate the new program: the proof
 of \li{master(x)} has to account for the new
 interference on $\li{n} \harpoonything n$ since the environment can grow the
-ring and thus mutate $\li{n} \harpoonything n$, and the proofs of
+ring and thus mutate $\li{n} \harpoonything n$;  and the proofs of
 other threads can be directly reused.
 
 %% \begin{figure}
@@ -511,7 +513,11 @@ other threads can be directly reused.
 %% \label{fig:spawner}
 %% \end{figure}
 
-In contrast, in existing CAP-like approaches~\cite{cap-ecoop10,tada}, both $\li{n} \harpoonything n$ and the global interference relation are observed by all threads.  As such, with the above extension, the global interference relation needs to change (to include the interference on $\li{n} \harpoonything n$) and the proofs of \emph{both} master and slave threads need to be adapted. 
+In contrast, in existing CAP-like approaches~\cite{cap-ecoop10,tada},
+both $\li{n} \harpoonything n$ and the global interference relation
+are observed by all threads.  As such, with the above extension, the
+global interference relation needs to change (to include the
+interference on $\li{n} \harpoonything n$),  and the proofs of \emph{both} master and slave threads need to be adapted. 
 %
 %
 %% . For instance, in order to
