@@ -43,10 +43,10 @@ In general, each component of a logical state is taken from an
 arbitrary \emph{separation algebra}~\cite{asl} (i.e.\ a cancellative,
 partial commutative monoid) that satisfies the
 \emph{cross-split} property\footnote{A monoid
-  $(\mathbb{A}, +, \mathbf{1})$ satisfies the cross-split property iff
-  for all $a, b, c, d \in \mathbb{A}$, if $a + b = c + d$, there
+  $(\mathbb{A}, +, \mathbf{1})$ satisfies the cross-split property
+  iff,   for all $a, b, c, d \in \mathbb{A}$, if $a + b = c + d$, there
   exists $x, y, z, w \in \mathbb{A}$ s.t.\ $a = x + y$, $b = z + w$,
-  $c = x + z$, and $d = y + w$.}\cite{dockins2009fresh} (this is
+  $c = x + z$  and $d = y + w$.}\cite{dockins2009fresh} (this is
 needed for $**$ to be associative~\cite{ramification}).  As we demonstrate in the examples of
 \S\ref{sec:examples}, our programs often call for a more complex model
 of machine states and capabilities than that presented here. For instance, we may need our
@@ -147,7 +147,7 @@ that satisfy several well-formedness conditions: the local and shared
 states are compatible; the capabilities owned by $l$ and $g$ are in
 the domain of $\lmod$; and actions in $\lmod$ are \emph{confined} to
 $g$ (written $g\containI\lmod$).  An action $a = (p, q, c)$ is
-confined to $g$ if and only if whenever it is enabled ($p \composeL c$
+confined to $g$ if and only if,  whenever it is enabled ($p \composeL c$
 agrees with $g$), then its pre-state $p$ is contained in $g$
 ($p \leq g$). We motivate the need for the confinement condition in
 \S\ref{subsec:prules}.
@@ -158,7 +158,7 @@ agrees with $g$), then its pre-state $p$ is contained in $g$
   \label{def:wf}
   A triple $(l, g, \lmod)\in\LStates\times\LStates\times\AMods$ is \emph{well-formed},
   written $\wf{l, g, \lmod}$, iff $l \compatL g$, $l_{\ca{}} \cup
-  g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)$, and $g \containI \lmod$.
+  g_{\ca{}} \subseteq \bigcup \m{dom}(\lmod)$ and $g \containI \lmod$.
 %%   \vspace{-1ex}
 %%   \[
 %%   \begin{array}{L}
@@ -213,10 +213,10 @@ Our assertion language extends separation logic with \emph{subjective
   views} and \emph{capability assertions}.
 
 \colosl is parametric in the assertions of machine states and
-capabilities and can be instantiated with any assertion language over
+capabilities,  and can be instantiated with any assertion language over
 machine states $\Heaps$ and capabilities $\Caps$. In this paper, we
 use standard heap and stack assertions for machine state assertions,
-and single-token assertions of the form $[\token{a}]$ for capability
+and single token assertions of the form $[\token{a}]$ for capability
 assertions where $\token{a} \in \set{Token}$. We write $[\token{A}]$
 as a shorthand for $\bigvarstar_{\token{a} \in \token{A}} [\token{a}]$.
 We assume an infinite set $\set{LVar}$ of \emph{logical variables},
@@ -246,13 +246,13 @@ as in standard separation logic with
 variables-as-resource~\cite{variablesAsResource}.\footnote{Note in
   particular that expressions $E$ do not allow program variables: they
   can only appear on the left-hand side of $\li{x} \harpoonything E$.}
-Local assertions are interpreted over a world's local state. The assertion $\li{x}
+Local assertions are interpreted over a world's local state. The empty local state $\unitL$ is denoted
+by $\emp$. The assertion $\li{x}
 \harpoonything E$ denotes a singleton stack where \li{x} has value
 $E$. Similarly, $E_1|->E_2$ is true of the singleton heap where only
 address $E_1$ is allocated and has value $E_2$.  The capability
 assertion $[E]$ is true of the singleton capability $\{\token{a}\}$ if
-$E$ evaluates to $\token a$. The empty local state $\unitL$ is denoted
-by $\emp$. The \emph{separating conjunction} $\lass{P} * \lass{Q}$ is
+$E$ evaluates to $\token a$. The \emph{separating conjunction} $\lass{P} * \lass{Q}$ is
 true when the local state can be split into two according to
 $\composeL$ such that one state satisfies $\lass{P}$ and the other
 satisfies $\lass{Q}$. The \emph{overlapping conjunction}
@@ -264,7 +264,7 @@ $\lass{Q}$~\cite{ramification,gareth-js12,rey-slnotes}. \emph{Septraction}
 (or \emph{existential magic wand}) $\lass{P}\septraction\lass{Q}$ is
 true when there exists a local state satisfying $\lass{P}$ that can be
 $\composeL$-composed with the current one to yield a state satisfying
-$\lass{Q}$. Classical predicates and connectives have their standard
+$\lass{Q}$. The usual  predicates and connectives have their standard
 classical meaning.
 
 As in RGSep~\cite{viktor-marriage}, our assertions $\Assertions$ are
@@ -279,9 +279,10 @@ A subjective view $\shared P I$ is then true of $(l,g,\lmod)$ when $l =
 \unitL$ and a \emph{subjective state} $s$ can be found in the global
 shared state $g$ (i.e.\ $g = s\composeL r$ for some
 $r$), such that $s$ satisfies $P$ in the standard separation logic
-sense, and $\lmod$ and $I$ \emph{agree} given the decomposition $s$,
-$r$, in the following sense, which we write as
-$\extendsAM{\lmod}{s}{r}{\semI{I}}$:
+sense, and $\lmod$ and $I$ \emph{agree} given the decomposition $s$
+and 
+$r$, written $\extendsAM{\lmod}{s}{r}{\semI{I}}$, 
+in the following sense:
 %Appendix~\ref{sec:model-continued}):
 \begin{enumerate}
 	\item every action in $I$ is reflected in $\lmod{}$;
@@ -309,10 +310,10 @@ $p\in\LAssertions$ in the usual separation logic sense over a logical
 state $l$. The second one $s,\lenv|=_{g,\lmod} P$ interprets
 assertions $P\in\Assertions$ over a \emph{subjective state} $s$ that
 is part of the global shared state $g$, subject to the action model
-$\lmod$. This latter form of satisfaction is needed to deal with the
+$\lmod$. This second relation  is needed to deal with the
 nesting of subjective views.\footnote{This presentation with several
   forcing relations differs from the usual CAP
-  presentation~\cite{cap-ecoop10}, where formulas are first
+  presentation~\cite{cap-ecoop10}, where assertions are first
   interpreted over worlds that are not necessarily well-formed, and
   then cut down to well-formed ones. The advantage of our presentation
   is that the semantics of assertions is \emph{compositional},
@@ -327,7 +328,7 @@ appropriate.
 Given a logical environment $\lenv: \set{LVar} --> \set{Val}$, the
 semantics of \colosl assertions is defined below, using the semantics of
 interference assertions $\semI[(.)]{.}: \LEnv \rightarrow \AMods$ also
-defined below.
+defined below:
 \vspace{-1ex}
 \[
 \begin{array}{R>{\null}l@{\ \,}c@{\ \,}l}
@@ -505,8 +506,8 @@ our examples. In this section, we give cut-down versions of these
 rules for a fragment of the \colosl assertion language where the 
 nesting of subjective views is not permitted   and  interference
 assertions cannot mention subjective views. This restriction is easily
-lifted: we can always \emph{flatten}
-assertions with nested boxes into logically equivalent assertions with
+lifted:  
+assertions with nested boxes can always be \emph{flatten} into logically equivalent assertions with
 no nesting; and  interference assertions  mentioning  other
 subjective views in their actions may be rewritten into ones
 that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:assertions-continued}.
@@ -526,7 +527,7 @@ that do not.  See~\cite{colosl-tr14} for the full details.% Appendix~\ref{sec:as
 
 
 \paragraph{Confinement}
-The soundness of \colosl hinges on the fact that given a world $(l, g, \lmod)$, 
+The soundness of \colosl hinges on the fact that,  given a world $(l, g, \lmod)$, 
 the action model $\lmod$ contains all actions that could possibly affect the 
 shared state $g$. This was captured by a well-formedness condition in the
 definition of worlds (Def.~\ref{def:worlds}) as $g\confines \lmod$, 
@@ -541,13 +542,13 @@ that the extension does not invalidate the views of the threads.
 
 The technical definition of confinement of an action model on a
 logical state is given in the technical report~\cite{colosl-tr14}. Intuitively,
-it means that whenever an action $a = (p, q, c)$ of
+it means that, whenever an action $a = (p, q, c)$ of
 $\lmod'$ is enabled, the pre-state $p$ must be a substate of $l'$.  It is
 possible for some of the catalyst $c$ to lie outside $l'$, since the
 fact that it does not change during the course of the action means
 that it will not have an effect on the views of other threads.
-For example, recall the interpretation of $s_x$ given by $S$ on
-page~\pageref{ex:sxsem}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
+For example, recall the interpretation of $s_x$ given by $S$ just
+before definition~\ref{definition3}. The action $a_0 = ((\emptyset, \{\ell\,{:}\,0\},
 \emptyset), (\emptyset, \{\ell\,{:}\,1\}, \emptyset), (\emptyset,
 \{\ell{-}1\,{:}\,1\}, \emptyset))\in S$ is confined to the logical state
 $l_0=(\emptyset, \{\ell\,{:}\,0\}, \emptyset)$ because $l_0$ is the first component of the
@@ -560,7 +561,10 @@ potentially affect address $\ell$.
 %$l_3$; $p \composeL c$ is not compatible with $l_2$, hence $a$ has no effect on
 %$l_2$ and is automatically confined to $l_2$. 
 %
-The definition of confinement also requires that all states resulting from the successive application of actions in $\lmod'$ themselves confine all actions in $\lmod'$. For instance, we also require that $l_1 = (\emptyset, \{\ell\,{:}\,1\}, \emptyset)$,  resulting from the application of $a_0$ on $l_0$, $l_2 = (\emptyset, \{\ell\,{:}\,2\}, \emptyset)$, resulting from the application of $a_1$ on $l_1$, and so forth, \emph{all} confine the actions in $S$. 
+The definition of confinement also requires that all states resulting
+from the successive application of actions in $\lmod'$ themselves
+confine all actions in $\lmod'$. For instance, we also require that
+$l_1 = (\emptyset, \{\ell\,{:}\,1\}, \emptyset)$  resulting from the application of $a_0$ on $l_0$, $l_2 = (\emptyset, \{\ell\,{:}\,2\}, \emptyset)$ resulting from the application of $a_1$ on $l_1$, and so forth, \emph{all} confine the actions in $S$. 
 %This simple example does not show the full subtlety of confinement. We  also require that all states resulting from the successive application of actions in $\lmod'$ themselves confine all actions in
 %$\lmod'$. 
 Inspired by the LRG approach~\cite{lrg}, we achieve this by
@@ -568,12 +572,12 @@ first finding a set that is invariant under all actions in $\lmod'$
 (called a \emph{fence}), then checking the confinement condition for
 each action. We provide the technical details of confinement in~\cite{colosl-tr14}.
 
-For the examples of this paper, it is in fact enough to work with confinement in the
-logic. We lift the notion of confinement to assertions and write
+For our  examples, it is in fact enough to work with confinement in the
+logic. We lift the notion of confinement to assertions,  and write
 $P \confines I$ when the set of states described by $P$
  confines the actions of interface assertion $I$.  In the logic, the
  shared state can be extended by the resources in
-$P$ under the interference assertion $I$ via \extendRule,
+$P$ under the interference assertion $I$ via the \extendRule principle,
 which requires that $P\containI I$ be
 established. 
 
@@ -680,8 +684,8 @@ because its precondition does not agree with $\lass{F}$: no state
 satisfying $\lass{F}$ may be extended such that a subpart satisfies
 $\lass{P}$. 
 %The second of these rules allows one to trim the side-condition as it is left unchanged by the action. 
-The second of these rules allows us to trim \emph{neutral} parts
-$\lass{R}$ (corresponding to parts of the catalysts in the
+The second of these rules allows us to trim a \emph{neutral} part
+$\lass{R}$ (corresponding to a part of the catalyst in the
 interpretation of this action) of an action
 $\interAss{[\token{A}]}{\bar x}{\lass{P}}{\lass{Q}}$ appearing both in
 $\lass{P}$ and $\lass{Q}$. This only applies when $\lass{R}$ is
@@ -913,7 +917,7 @@ states described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
 The next rule is a shifting equivalence that uses the
 knowledge embodied by $\lass{F}$ of all the possible states that the
 subjective shared state may be in to rewrite an action into an
-equivalent one. More precisely, if whenever the precondition
+equivalent one. More precisely, whenever the precondition
 $\lass{P}$ of the action agrees with $\lass{F}$ then one of the
 $\lass{R}_i$'s is also true, then adding $\lass{R}_i$ as a neutral
 part of the action produces the same behaviour. We can use this rule
@@ -949,20 +953,18 @@ resulting state must still be in $\lass{F}$. One might instead have
 expected that only parts of the resulting state need to be represented
 in $\lass{F}$, to mimic the relationship between $\lass{F}$ and
 $\lass{P}$ (and indeed, this is all that is required for stability, as
-we shall see next). However, we do want to capture the spatially
-larger state, because shifting asserts that two interference
+we shall see next). However, we do need the full $q$. Recall that shifting asserts that two interference
 assertions have the same effect even after an arbitrary number of
-steps. Doing otherwise is unsound because there is no guarantee that
+steps. Doing otherwise would be  unsound because there is no guarantee that
 $I$ accounts for all possible actions on that part of $q$ that would
 be discarded, since it was not part of $\lass{F}$. Hence, we could end
 up with an assertion $\shared{\lass{F}}{I}$ that does not satisfy the
 action model closure property.  Finally, the reason why $\lass{P}$ and
 $\lass{Q}$ must not intersect stems from similar considerations. If
-$\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$ then it
-might be that $c$ is not part of $\lass{F}$ and is added together with
-$\lass{Q}$ by $*$ on the left-hand side of the sequent. This would
-force the fence to account for this catalyst, and prevent us from
-forgetting actions associated with it via shifting. For instance, it
+$\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$,  such that
+$c$ is not part of $\lass{F}$,  then this would 
+force the fence to account for $c$ which  would prevent us from
+forgetting actions associated with it using  shifting. For instance, it
 would make it impossible to forget actions as we do in
 \S\ref{sec:intuition}.
 
