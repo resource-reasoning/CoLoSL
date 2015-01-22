@@ -109,17 +109,18 @@ are the action \emph{pre-} and \emph{post-states} describing how the
 shared state is modified by the action; and $c$ is the action
 \emph{catalyst}. An action catalyst has to be present for the action
 to take effect, but is left unchanged by the action. It is maximal in
-the sense that no further, non-empty catalyst $c'$ can be found such
-that $c' \leq p$ and $c' \leq q$\footnote{Alternatively, the catalyst
-could be computed a posteriori for each action.  However, we often
-need to isolate the part of the state that is modified by an action,
-hence our technical choice of recording the catalyst in the model.}. 
-For instance, \label{ex:sxsem} as we shall shortly
-see, $s_x$ in \fig\ref{fig:concurrentInc} will be interpreted as the
-set of actions $S=\{a_v{\eqdef}((\emptyset, \{\ell:v\}, \emptyset),
-(\emptyset, \{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
-\emptyset))\mid v \in \Nats\}$, where $\ell$ is the value of $x$ in the
-current logical environment. 
+the sense that no further, non-empty catalyst $c'$ can be found, which
+we write $\separate{p}{q}$: $\for{l} l \leq p \land l \leq q
+\implies l = \unitL$.\footnote{Alternatively, the catalyst could be
+  computed a posteriori for each action.  However, we often need to
+  isolate the part of the state that is modified by an action, hence
+  our technical choice of recording the catalyst in the model.}  For
+instance, \label{ex:sxsem} as we shall shortly see, $s_x$ in
+\fig\ref{fig:concurrentInc} will be interpreted as the set of actions
+$S=\{a_v{\eqdef}((\emptyset, \{\ell:v\}, \emptyset), (\emptyset,
+\{\ell:v{+}1\}, \emptyset), (\emptyset, \{\ell{-}1:v{+}1\},
+\emptyset))\mid v \in \Nats\}$, where $\ell$ is the value of $x$ in
+the current logical environment.
 %We record the action catalyst separately
 %for technical convenience. As we will shortly demonstrate (see
 %\emph{worlds} below), we often need to refer to the action pre-state
@@ -426,8 +427,11 @@ defined below.
   \begin{array}{@{}l@{\ }|@{\ }r@{}}
     (p, q, c )&
     \begin{array}{@{}l@{}}
-      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /| \exsts{\bar{v}, \lmod, r, r'} \\
-      \quad c = r \composeL r' \land \for{l} l \leq p \land l \leq q \implies l = \unitL/|\null\\
+      \interAss{[\token{A}]}{\bar x}{P}{Q} \in I /|
+      \separate{p}{q} /|
+      \exsts{\bar{v}, \lmod, r, r'}
+      %\for{l} l \leq p \land l \leq q => l = \unitL/|\null\\
+      c = r \composeL r' \land \null\\
       \quad p \composeL r, [\lenv|||\bar x:\bar v]  |=_{p \composeL c, \lmod} P 
       /| q \composeL r,  [\lenv|||\bar x:\bar v]  |=_{q \composeL c, \lmod} Q 
     \end{array}
@@ -461,7 +465,7 @@ consequences of the semantics.
 
 \begin{lemma}
   \label{lem:assertion-facts}
-%  The \colosl reasoning principles 
+  The \colosl reasoning principles 
   \forgetRule, \mergeRule, \shiftRule, \weakenRule, and \copyRule are valid.
   %% \begin{mathpar}
   %%       \infer{
@@ -901,9 +905,7 @@ precondition.
 The notation $\separate{\lass{P}}{\lass{Q}}$ asserts that
 states described by $\lass{P}$ and $\lass{Q}$ have \emph{empty
   intersections}: whenever $l_1, \lenv \slsat \lass{P}$ and $l_2,
-\lenv \slsat \lass{Q}$, $l_1$ and $l_2$ do not have any non-trivial
-common substate ($\for{l} l \leq l_1 \land l \leq l_2 \implies l =
-\unitL$). This is expressible in standard separation logic as follows:
+\lenv \slsat \lass{Q}$, we have $\separate{l_1}{l_2}$ as defined in \S\ref{subsec:model}. This is expressible in standard separation logic as follows:
 \[
 \separate{\lass{P}}{\lass{Q}} <=> \lass{P} \slentails \neg\left( \m{true} * (\neg\emp \land (\m{true} \septraction \lass{Q}) ) \right)
 \]
