@@ -952,20 +952,20 @@ resulting state must still be in $\lass{F}$. One might instead have
 expected that only parts of the resulting state need to be represented
 in $\lass{F}$, to mimic the relationship between $\lass{F}$ and
 $\lass{P}$ (and indeed, this is all that is required for stability, as
-we shall see next). However, we do need the full $q$. Recall that shifting asserts that two interference
-assertions have the same effect even after an arbitrary number of
-steps. Doing otherwise would be  unsound because there is no guarantee that
-$I$ accounts for all possible actions on that part of $q$ that would
-be discarded, since it was not part of $\lass{F}$. Hence, we could end
-up with an assertion $\shared{\lass{F}}{I}$ that does not satisfy the
-action model closure property.  Finally, the reason why $\lass{P}$ and
-$\lass{Q}$ must not intersect stems from similar considerations. If
-$\lass{P}$ and $\lass{Q}$ had a non-empty intersection $c$,  such that
-$c$ is not part of $\lass{F}$,  then this would 
-force the fence to account for $c$ which  would prevent us from
-forgetting actions associated with it using  shifting. For instance, it
-would make it impossible to forget actions as we do in
-\S\ref{sec:intuition}.
+we shall see next). However, we do need the full $q$. Recall that
+shifting asserts that two interference assertions have the same effect
+even after an arbitrary number of steps. Doing otherwise would be
+unsound because there would be no guarantee that $I$ accounts for all
+possible actions on that part of $q$ that would be discarded, since it
+would not be part of $\lass{F}$. Hence, we could end up with a new
+interference assertion $I'$ that breaks the original action model
+closure property.  Finally, the reason why $\lass{P}$ and $\lass{Q}$
+must not intersect stems from similar considerations. If $\lass{P}$
+and $\lass{Q}$ had a non-empty intersection $c$, such that $c$ is not
+part of $\lass{F}$, then this would force the fence to account for $c$
+which would prevent us from forgetting actions associated with it
+using shifting. For instance, it would make it impossible to forget
+actions as we do in \S\ref{sec:intuition}.
 
 \paragraph{Stability}
 \fig\ref{fig:stability-rules} partially axiomatises the stability of
