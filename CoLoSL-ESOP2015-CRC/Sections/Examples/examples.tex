@@ -325,8 +325,7 @@ global graph predicate:
 This is achieved by giving a proof of the analogous specification
 using the local graph predicate in \fig\ref{fig:conSpanningTree},
 and  demonstrating that the global graph specification implies the
-local one using the principles of \colosl from figure~\ref{whatever
-  the figure is} at the end of this section. 
+local one using the principles of \colosl from \fig~\ref{fig:principles} at the end of this section. 
 The proof sketched in \fig\ref{fig:conSpanningTree} is  mostly
 straightforward. One subtlety is the consequence step just before the
 second \li{if} statement. There, we first distribute the shared state
@@ -338,7 +337,7 @@ doing  local reasoning on the shared state (the subgraphs).
 
 Finally, let  us show how to derive the
 specification~\eqref{eq:globalspec} above from the one obtained in
-\fig\ref{fig:globalCSTthissaysfig6??}. We introduce the \emph{iterative star}
+\fig\ref{fig:globalCST}. We introduce the \emph{iterative star}
 operator $\iterStar$; when iterating over the empty set, it denotes
 $\emp$ by convention (needed below, when $x$ is null). We define
 \begin{align*}
